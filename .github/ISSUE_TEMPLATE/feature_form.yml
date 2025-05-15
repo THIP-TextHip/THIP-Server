@@ -1,0 +1,34 @@
+name: Issue:⭐️FEATURE
+description: 기능 개발 이슈를 작성해주세요
+title: "[FEAT]"
+labels: ["feature"]
+body:
+  - type: input
+    id: parentKey
+    attributes:
+      label: 상위 Ticket Number
+      description: 연관된 Jira 상위 작업 키를 입력하세요 (예: THIP2025-1)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📄 Description
+      description: 어떤 기능인지 설명해주세요
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: tasks
+    attributes:
+      label: ✅ Tasks
+      options:
+        - label: 첫 번째 작업
+        - label: 두 번째 작업
+
+  - type: textarea
+    id: more
+    attributes:
+      label: 🙋🏻‍♂️ More
+      description: 기타 설명이 있다면 작성해주세요
