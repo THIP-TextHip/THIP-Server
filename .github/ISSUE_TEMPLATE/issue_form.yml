@@ -1,5 +1,5 @@
-name: 'Issue:⭐️Feature'
-description: '기능 개발을 위한 이슈를 작성하세요.'
+name: 'Issue:⭐️'
+description: '개발을 위한 이슈를 작성하세요.'
 labels: [feat]
 title: '이슈 제목'
 body:
@@ -9,26 +9,6 @@ body:
       label: '🎟️ 상위 작업 (Ticket Number)'
       description: '상위 작업의 Ticket Number를 기입해주세요'
       placeholder: 'THIP2025-00'
-    validations:
-      required: true
-
-  - type: dropdown
-    id: branchType
-    attributes:
-      label: '브랜치 타입'
-      options:
-        - feature
-        - bugfix
-        - hotfix
-        - refactor
-    validations:
-      required: true
-
-  - type: input
-    id: branch
-    attributes:
-      label: '🌳 브랜치명 (Branch)'
-      description: '영어로 브랜치명을 작성해주세요'
     validations:
       required: true
 
