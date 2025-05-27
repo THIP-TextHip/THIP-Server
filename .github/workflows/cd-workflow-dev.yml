@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  RESOURCE_PATH: ./src/main/resources/application.yml
+  RESOURCE_PATH: ./src/main/resources
   APP_PORT : 8000
 
 jobs:
@@ -28,9 +28,9 @@ jobs:
 
       - name: 🧾 Create application.yml from secret
         run: |
-          cd ./src/main/resources
+          cd ${{env.RESOURCE_PATH}}
           rm -f application.yml    
-          echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{env.RESOURCE_PATH}}
+          echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
 
       - name: 🐘 Cache Gradle dependencies
         uses: actions/cache@v3
