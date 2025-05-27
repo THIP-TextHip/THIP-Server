@@ -1,0 +1,124 @@
+spring:
+  application:
+    name: THIP
+  profiles:
+    group:
+      local: db-local, port-local, common
+      prod: db-prod, port-prod, common
+    active: local
+
+---
+
+# ?? DB
+spring:
+  config:
+    activate:
+      on-profile: db-local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/THIP
+    username: ${LOCAL_DB_USER}
+    password: ${LOCAL_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  #    datasource:
+  #      url: jdbc:h2:mem:ThipServerApplication;MODE=PostgreSQL;
+  #      username: sa
+  #      password:
+  #      driver-class-name: org.h2.Driver
+
+  #    h2:
+  #      console:
+  #        enabled: true
+  #
+  #    jpa:
+  #      hibernate:
+  #        ddl-auto: update
+  #      show-sql: true
+  #      properties:
+  #        hibernate:
+  #          format_sql: true
+
+  #  data:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+  docker:
+    compose:
+      enabled: false
+
+---
+# prod DB
+spring:
+  config:
+    activate:
+      on-profile: db-prod
+
+  datasource:
+    url: ${PROD_DB_URL}
+    username: ${PROD_DB_USER}
+    password: ${PROD_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  docker:
+    compose:
+      enabled: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port-prod
+
+server:
+  port: 9000
+  servlet:
+    context-path: /
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: port-local
+
+server:
+  port: 8000
+  servlet:
+    context-path: /
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: common
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
