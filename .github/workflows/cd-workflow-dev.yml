@@ -28,8 +28,7 @@ jobs:
 
       - name: 🧾 Create application.yml from secret
         run: |
-          cd ${{env.RESOURCE_PATH}}
-          rm -f application.yml    
+          cd ${{env.RESOURCE_PATH}}  
           echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
 
       - name: 🐘 Cache Gradle dependencies

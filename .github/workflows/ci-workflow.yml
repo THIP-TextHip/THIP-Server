@@ -33,7 +33,6 @@ jobs:
       - name: 🧾 Create application.yml from secret
         run: |
           cd ${{env.RESOURCE_PATH}}
-          rm -f application.yml    
           echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
 
       - name: Setup Gradle
