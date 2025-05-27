@@ -32,7 +32,7 @@ jobs:
 
       - name: 🧾 Create application.yml from secret
         run: |
-          cd ${{env.RESOURCE_PATH}}  
+          cd ${{ env.RESOURCE_PATH }}  
           echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
         shell: bash
 
@@ -82,7 +82,7 @@ jobs:
           envs: GITHUB_SHA
           script: |
             echo "🗂️ Change Directory to Compose Path"
-            cd ${{env.COMPOSE_PATH}}
+            cd ${{ env.COMPOSE_PATH }}
             
             echo "✋🏻Stopping existing container and Cleaning up old images"
             sudo docker-compose down --rmi all
