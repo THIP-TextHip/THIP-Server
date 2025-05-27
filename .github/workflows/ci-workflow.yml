@@ -13,6 +13,9 @@ on:
 permissions:
   contents: read
 
+env:
+  RESOURCE_PATH: ./src/main/resources
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,9 +32,9 @@ jobs:
 
       - name: 🧾 Create application.yml from secret
         run: |
-          cd ./src/main/resources
-          rm -f application-dev.yml    
-          echo "${{ secrets.APPLICATION_YML_DEV }}" > ./src/main/resources/application.yml
+          cd ${{env.RESOURCE_PATH}}
+          rm -f application.yml    
+          echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
