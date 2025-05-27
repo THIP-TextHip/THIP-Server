@@ -14,7 +14,7 @@ permissions:
 env:
   RESOURCE_PATH: ./src/main/resources
   COMPOSE_PATH: /home/ec2-user/compose
-  APP_PORT : 8000
+  APP_PORT: 8000
 
 jobs:
   build:
