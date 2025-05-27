@@ -13,6 +13,7 @@ permissions:
 
 env:
   RESOURCE_PATH: ./src/main/resources
+  COMPOSE_PATH: /home/ec2-user/compose
   APP_PORT : 8000
 
 jobs:
@@ -27,7 +28,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           server-id: github
-          setting-path: ${{ github.workspace }}
+          settings-path: ${{ github.workspace }}
 
       - name: 🧾 Create application.yml from secret
         run: |
@@ -78,7 +79,7 @@ jobs:
           envs: GITHUB_SHA
           script: |
             echo "🗂️ Change Directory to EC2 Root"
-            cd /home/ec2-user/compose
+            cd ${{env.COMPOSE_PATH}}
             
             echo "✋🏻Stopping existing container and Cleaning up old images"
             sudo docker-compose down --rmi all
@@ -90,3 +91,4 @@ jobs:
             
             echo "🌱 Starting new container"
             sudo docker-compose up -d
+            sudo docker image prune -f
