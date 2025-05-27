@@ -34,9 +34,6 @@ jobs:
         run: |
           cd ${{env.RESOURCE_PATH}}  
           echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
-          echo "===== application.yml content start ====="
-          cat application.yml
-          echo "===== application.yml content end ====="
 
 #      - name: 🐘 Cache Gradle dependencies
 #        uses: actions/cache@v3
@@ -47,6 +44,9 @@ jobs:
 #          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 #          restore-keys: |
 #            gradle-${{ runner.os }}-
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x gradlew
@@ -59,7 +59,6 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build --build-arg PORT=${{env.APP_PORT}} -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
-      
 
       - name: 🫴🏻 Get Public IP
         id: ip
@@ -81,7 +80,7 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           envs: GITHUB_SHA
           script: |
-            echo "🗂️ Change Directory to EC2 Root"
+            echo "🗂️ Change Directory to Compose Path"
             cd ${{env.COMPOSE_PATH}}
             
             echo "✋🏻Stopping existing container and Cleaning up old images"
