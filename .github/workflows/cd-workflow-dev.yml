@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  RESOURCE_PATH: ./src/main/resources
+  RESOURCE_PATH: src/main/resources
   COMPOSE_PATH: /home/ec2-user/compose
   APP_PORT: 8000
 
@@ -32,9 +32,8 @@ jobs:
 
       - name: 🧾 Create application.yml from secret
         run: |
-          ls -la ${{ env.RESOURCE_PATH }}
-          cd ${{ env.RESOURCE_PATH }}  
-          echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
+          mkdir -p ${{ env.RESOURCE_PATH }}
+          echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
           cat application.yml
         shell: bash
 
