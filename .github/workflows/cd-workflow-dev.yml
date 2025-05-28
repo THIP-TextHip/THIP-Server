@@ -34,7 +34,6 @@ jobs:
         run: |
           mkdir -p ${{ env.RESOURCE_PATH }}
           echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
-          cat application.yml
         shell: bash
 
 #      - name: 🐘 Cache Gradle dependencies
