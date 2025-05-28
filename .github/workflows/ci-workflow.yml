@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 env:
-  RESOURCE_PATH: ./src/main/resources
+  RESOURCE_PATH: src/main/resources
 
 jobs:
   build:
@@ -40,8 +40,8 @@ jobs:
 
       - name: 🧾 Create application.yml from secret
         run: |
-          cd ${{ env.RESOURCE_PATH }}
-          echo "${{ secrets.APPLICATION_YML_DEV }}" > application.yml
+          mkdir -p ${{ env.RESOURCE_PATH }}
+          echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
 
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x gradlew

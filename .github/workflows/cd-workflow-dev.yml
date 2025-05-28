@@ -36,18 +36,15 @@ jobs:
           echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
         shell: bash
 
-#      - name: 🐘 Cache Gradle dependencies
-#        uses: actions/cache@v3
-#        with:
-#          path: |
-#            ~/.gradle/caches
-#            ~/.gradle/wrapper
-#          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#          restore-keys: |
-#            gradle-${{ runner.os }}-
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      - name: 🐘 Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
 
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x gradlew
@@ -61,16 +58,12 @@ jobs:
           docker build --build-arg PORT=${{env.APP_PORT}} -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
 
-      - name: 🫴🏻 Get Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
-
-      - name: 🪪 Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'ap-northeast-2'
+#      - name: 🪪 Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: 'ap-northeast-2'
 
       - name: 🚀 deploy to server
         uses: appleboy/ssh-action@master
