@@ -22,13 +22,15 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     @Override
     public void update(User user) {
-        userMapper.toJpaEntity(user);
+        UserJpaEntity jpaEntity = userMapper.toJpaEntity(user);
 
         /**
-         * domain -> jpa entity 로 mapping 만 하여도 jpa 변경감지 기능으로 인해 DB에 update 쿼리가 날라가긴함
-         * (대신 Service 메서드에 @Transactional 어노테이션이 명시되어 있어야함)
-         *
-         * 아니면 그냥 명시적으로 update 쿼리를 날려도 괜춘
+         * domain -> jpa entity 매핑 후, 변경사항을 jpa entity에 반영
+         * Spring Data JPA 의 변경감지 기능 활용 가능 (대신 해당 update 메서드가 @Transactional 범위 내에 존재해야함)
+         * or 그냥 DB update 쿼리를 명시적으로 날려도 됨
          */
+        // jpaEntity.changeName(String name);
+        // japEntity.changePassword(String password);
+        // jpaRepository.update(jpaEntity);     -> 선택 사항
     }
 }
