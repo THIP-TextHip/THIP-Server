@@ -5,11 +5,6 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserUpdateCommand {
+public class DummyResult {
 
-    private Long id;
-
-    private String name;
-
-    private String password;
 }

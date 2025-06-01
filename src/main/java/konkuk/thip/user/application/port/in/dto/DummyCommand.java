@@ -5,11 +5,6 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class UserSignupCommand {
+public class DummyCommand {
 
-    private String name;
-
-    private String email;
-
-    private String password;
 }
