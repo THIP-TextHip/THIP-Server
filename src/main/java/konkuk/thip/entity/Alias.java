@@ -21,7 +21,7 @@ public class Alias extends BaseEntity {
     @Column(name = "alias_id")
     private Long aliasId;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "alias_value",length = 50, nullable = false)
     private String value;
 
     @OneToOne(mappedBy = "alias")

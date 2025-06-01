@@ -25,7 +25,7 @@ public class Category extends BaseEntity {
     @JoinColumn(name = "alias_id", nullable = false)
     private Alias alias;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "category_value",length = 50, nullable = false)
     private String value;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

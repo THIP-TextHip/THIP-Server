@@ -25,6 +25,6 @@ public class Tag extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "tag_value",length = 50, nullable = false)
     private String value;
 }
