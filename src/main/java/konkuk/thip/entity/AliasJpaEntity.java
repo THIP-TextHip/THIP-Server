@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "aliasJpaEntity")
+@Table(name = "alias")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
