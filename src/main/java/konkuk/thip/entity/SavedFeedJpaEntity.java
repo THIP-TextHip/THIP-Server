@@ -1,7 +1,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class SavedFeed extends BaseEntity {
+public class SavedFeedJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,9 +18,9 @@ public class SavedFeed extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Feed feed;
+    private FeedJpaEntity feedJpaEntity;
 }

@@ -1,18 +1,18 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "rooms")
+@Table(name = "roomJpaEntities")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Room extends BaseEntity {
+public class RoomJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class Room extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
-    private Book book;
+    private BookJpaEntity bookJpaEntity;
 
     @Column(length = 50, nullable = false)
     private String title;

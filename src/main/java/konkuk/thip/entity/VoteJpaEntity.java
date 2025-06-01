@@ -1,16 +1,16 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "vote")
+@Table(name = "voteJpaEntity")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Vote extends BaseEntity {
+public class VoteJpaEntity extends BaseJpaEntity {
 
     @Id
     @Column(name = "post_id")
@@ -19,11 +19,11 @@ public class Vote extends BaseEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post;
+    private PostJpaEntity postJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
-    private Room room;
+    private RoomJpaEntity roomJpaEntity;
 
     private Integer page;
 

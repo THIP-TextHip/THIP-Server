@@ -2,7 +2,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 
@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class RecentSearch extends BaseEntity {
+public class RecentSearchJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class RecentSearch extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserJpaEntity userJpaEntity;
 
     @Column(name = "search_term",length = 50, nullable = false)
     private String searchTerm;

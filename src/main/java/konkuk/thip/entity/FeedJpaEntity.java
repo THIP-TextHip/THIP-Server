@@ -2,7 +2,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Feed extends BaseEntity {
+public class FeedJpaEntity extends BaseJpaEntity {
 
     @Id
     @Column(name = "post_id")
@@ -20,11 +20,11 @@ public class Feed extends BaseEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post;
+    private PostJpaEntity postJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
+    private BookJpaEntity bookJpaEntity;
 
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;

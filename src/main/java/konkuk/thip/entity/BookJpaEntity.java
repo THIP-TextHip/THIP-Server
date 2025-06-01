@@ -1,7 +1,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Book extends BaseEntity {
+public class BookJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,5 +43,5 @@ public class Book extends BaseEntity {
     private String description;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Room> rooms = new ArrayList<>();
+    private List<RoomJpaEntity> roomJpaEntities = new ArrayList<>();
 }

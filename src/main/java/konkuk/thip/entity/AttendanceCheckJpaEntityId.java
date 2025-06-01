@@ -10,7 +10,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class AttendanceCheckId implements Serializable {
+public class AttendanceCheckJpaEntityId implements Serializable {
     private Long roomId;
     private Long userId;
 }

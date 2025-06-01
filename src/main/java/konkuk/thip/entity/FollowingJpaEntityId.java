@@ -5,12 +5,12 @@ import lombok.*;
 
 import java.io.Serializable;
 
+@Embeddable
+@Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Embeddable
-@Getter
-public class UserVoteId implements Serializable {
+public class FollowingJpaEntityId implements Serializable {
     private Long userId;
-    private Long voteItemId;
+    private Long followingUserId;
 }

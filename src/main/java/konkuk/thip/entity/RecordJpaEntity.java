@@ -1,7 +1,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 
@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Record extends BaseEntity {
+public class RecordJpaEntity extends BaseJpaEntity {
 
     @Id
     @Column(name = "post_id")
@@ -20,11 +20,11 @@ public class Record extends BaseEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post;
+    private PostJpaEntity postJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
-    private Room room;
+    private RoomJpaEntity roomJpaEntity;
 
     private Integer page;
 

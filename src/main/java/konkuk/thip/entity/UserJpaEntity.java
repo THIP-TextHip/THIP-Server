@@ -2,7 +2,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User extends BaseEntity {
+public class UserJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class User extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alias_id", nullable = false)
-    private Alias alias;
+    private AliasJpaEntity aliasJpaEntity;
 
     @Column(length = 60, nullable = false)
     private String nickname;
@@ -36,5 +36,5 @@ public class User extends BaseEntity {
     private UserRole role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
+    private List<PostJpaEntity> postJpaEntities = new ArrayList<>();
 }

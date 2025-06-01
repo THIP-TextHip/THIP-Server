@@ -1,7 +1,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
-import konkuk.thip.global.entity.BaseEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
@@ -10,18 +10,18 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Following extends BaseEntity {
+public class FollowingJpaEntity extends BaseJpaEntity {
 
     @EmbeddedId
-    private FollowingId id;
+    private FollowingJpaEntityId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("followingUserId")
     @JoinColumn(name = "following_user_id")
-    private User followingUser;
+    private UserJpaEntity followingUserJpaEntity;
 }

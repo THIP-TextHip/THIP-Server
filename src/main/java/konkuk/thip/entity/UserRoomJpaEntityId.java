@@ -11,7 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Embeddable
 @Getter
-public class UserRoomId implements Serializable {
+public class UserRoomJpaEntityId implements Serializable {
     private Long userId;
     private Long roomId;
 }
