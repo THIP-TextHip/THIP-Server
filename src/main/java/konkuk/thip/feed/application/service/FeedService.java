@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class DummyService implements DummyUseCase {
+public class FeedService implements DummyUseCase {
 
 }
