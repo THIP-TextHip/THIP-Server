@@ -1,6 +1,7 @@
 package konkuk.thip.entity;
 
 import jakarta.persistence.*;
+import konkuk.thip.global.entity.BaseEntity;
 import lombok.*;
 
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Record {
+public class Record extends BaseEntity {
 
     @Id
     @Column(name = "post_id")
