@@ -27,16 +27,16 @@ public class PostJpaEntity extends BaseJpaEntity {
     @Column(length = 6100, nullable = false)
     private String content;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private FeedJpaEntity feedJpaEntity;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private VoteJpaEntity voteJpaEntity;
 
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private RecordJpaEntity recordJpaEntity;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagJpaEntity> tagJpaEntities = new ArrayList<>();
 
 }

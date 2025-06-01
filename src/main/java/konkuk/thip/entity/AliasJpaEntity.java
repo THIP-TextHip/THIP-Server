@@ -24,10 +24,10 @@ public class AliasJpaEntity extends BaseJpaEntity {
     @Column(name = "alias_value",length = 50, nullable = false)
     private String value;
 
-    @OneToOne(mappedBy = "alias")
+    @OneToOne(mappedBy = "aliasJpaEntity")
     private UserJpaEntity userJpaEntity;
 
-    @OneToMany(mappedBy = "alias", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "aliasJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryJpaEntity> categories = new ArrayList<>();
 
 

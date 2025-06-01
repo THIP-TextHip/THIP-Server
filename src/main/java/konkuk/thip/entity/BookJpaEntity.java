@@ -42,6 +42,6 @@ public class BookJpaEntity extends BaseJpaEntity {
     @Column(length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "bookJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomJpaEntity> roomJpaEntities = new ArrayList<>();
 }

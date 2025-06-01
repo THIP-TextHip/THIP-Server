@@ -28,6 +28,6 @@ public class CategoryJpaEntity extends BaseJpaEntity {
     @Column(name = "category_value",length = 50, nullable = false)
     private String value;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "categoryJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagJpaEntity> tagJpaEntities = new ArrayList<>();
 }

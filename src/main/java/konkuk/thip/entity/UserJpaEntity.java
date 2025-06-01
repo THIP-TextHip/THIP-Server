@@ -35,6 +35,6 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "userJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostJpaEntity> postJpaEntities = new ArrayList<>();
 }
