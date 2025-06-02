@@ -20,6 +20,13 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @Column(name = "comment_id")
     private Long commentId;
 
+    @Column(length = 650, nullable = false)
+    private String content;
+
+    @Builder.Default
+    @Column(name = "report_count", nullable = false)
+    private int reportCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
@@ -34,10 +41,4 @@ public class CommentJpaEntity extends BaseJpaEntity {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentJpaEntity> children = new ArrayList<>();
-
-    @Column(length = 650, nullable = false)
-    private String content;
-
-    @Column(name = "report_count", nullable = false)
-    private int reportCount = 0;
 }

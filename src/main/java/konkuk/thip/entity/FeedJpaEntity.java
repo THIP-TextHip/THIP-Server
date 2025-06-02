@@ -17,6 +17,13 @@ public class FeedJpaEntity extends BaseJpaEntity {
     @Column(name = "post_id")
     private Long postId;
 
+    @Column(name = "is_public", nullable = false)
+    private Boolean isPublic;
+
+    @Builder.Default
+    @Column(name = "report_count", nullable = false)
+    private int reportCount = 0;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -25,10 +32,4 @@ public class FeedJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
-
-    @Column(name = "is_public", nullable = false)
-    private Boolean isPublic;
-
-    @Column(name = "report_count", nullable = false)
-    private int reportCount = 0;
 }

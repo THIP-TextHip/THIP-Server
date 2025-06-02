@@ -18,10 +18,6 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
-    private BookJpaEntity bookJpaEntity;
-
     @Column(length = 50, nullable = false)
     private String title;
 
@@ -34,8 +30,9 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(length = 4)
     private Integer password;
 
+    @Builder.Default
     @Column(name = "room_percentage",nullable = false)
-    private double roomPercentage;
+    private double roomPercentage = 0.0;
 
     @Column(name = "start_date",nullable = false)
     private LocalDate startDate;
@@ -45,5 +42,9 @@ public class RoomJpaEntity extends BaseJpaEntity {
 
     @Column(name = "recruit_count",nullable = false)
     private int recruitCount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    private BookJpaEntity bookJpaEntity;
 
 }
