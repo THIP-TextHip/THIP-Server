@@ -1,28 +1,25 @@
-
-package konkuk.thip.entity;
+package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "feeds")
+@Table(name = "votes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class FeedJpaEntity extends BaseJpaEntity {
+public class VoteJpaEntity extends BaseJpaEntity {
 
     @Id
     @Column(name = "post_id")
     private Long postId;
 
-    @Column(name = "is_public", nullable = false)
-    private Boolean isPublic;
+    private Integer page;
 
-    @Builder.Default
-    @Column(name = "report_count", nullable = false)
-    private int reportCount = 0;
+    @Column(name = "is_overview",nullable = false)
+    private boolean isOverview;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
@@ -30,6 +27,6 @@ public class FeedJpaEntity extends BaseJpaEntity {
     private PostJpaEntity postJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private BookJpaEntity bookJpaEntity;
+    @JoinColumn(name = "room_id")
+    private RoomJpaEntity roomJpaEntity;
 }

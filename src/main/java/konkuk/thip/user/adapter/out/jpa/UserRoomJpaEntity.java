@@ -1,6 +1,7 @@
-package konkuk.thip.entity;
+package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
+import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 

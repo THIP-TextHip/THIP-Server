@@ -1,11 +1,37 @@
+
 package konkuk.thip.feed.adapter.out.jpa;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.PostJpaEntity;
+import konkuk.thip.global.entity.BaseJpaEntity;
+import lombok.*;
 
 @Entity
-public class FeedJpaEntity {
+@Table(name = "feeds")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+public class FeedJpaEntity extends BaseJpaEntity {
 
     @Id
-    private Long id;
+    @Column(name = "post_id")
+    private Long postId;
+
+    @Column(name = "is_public", nullable = false)
+    private Boolean isPublic;
+
+    @Builder.Default
+    @Column(name = "report_count", nullable = false)
+    private int reportCount = 0;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private PostJpaEntity postJpaEntity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private BookJpaEntity bookJpaEntity;
 }

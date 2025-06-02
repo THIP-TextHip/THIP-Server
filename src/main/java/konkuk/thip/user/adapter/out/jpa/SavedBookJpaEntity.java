@@ -1,28 +1,27 @@
-package konkuk.thip.entity;
+package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
+import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
-
 @Entity
-@Table(name = "user_votes")
+@Table(name = "saved_books")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserVoteJpaEntity extends BaseJpaEntity {
+public class SavedBookJpaEntity extends BaseJpaEntity {
 
-    @EmbeddedId
-    private UserVoteJpaEntityId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long savedId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("voteItemId")
-    @JoinColumn(name = "vote_item_id")
-    private VoteItemJpaEntity voteItemJpaEntity;
+    @JoinColumn(name = "book_id")
+    private BookJpaEntity bookJpaEntity;
 }

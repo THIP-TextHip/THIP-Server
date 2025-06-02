@@ -1,4 +1,4 @@
-package konkuk.thip.entity;
+package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class FollowingJpaEntityId implements Serializable {
+public class AttendanceCheckJpaEntityId implements Serializable {
+    private Long roomId;
     private Long userId;
-    private Long followingUserId;
 }

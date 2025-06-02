@@ -1,5 +1,4 @@
-
-package konkuk.thip.entity;
+package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
@@ -11,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Embeddable
 @Getter
-public class UserRoomJpaEntityId implements Serializable {
+public class UserVoteJpaEntityId implements Serializable {
     private Long userId;
-    private Long roomId;
+    private Long voteItemId;
 }

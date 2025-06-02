@@ -1,24 +1,29 @@
-package konkuk.thip.entity;
+
+package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
+
 @Entity
-@Table(name = "post_likes")
+@Table(name = "recent_searches")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class PostLikeJpaEntity extends BaseJpaEntity {
+public class RecentSearchJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long recentSearchId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private PostJpaEntity postJpaEntity;
+    @Column(name = "search_term",length = 50, nullable = false)
+    private String searchTerm;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SearchType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

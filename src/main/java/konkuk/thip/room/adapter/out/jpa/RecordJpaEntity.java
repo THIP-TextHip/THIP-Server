@@ -1,16 +1,17 @@
-package konkuk.thip.entity;
+package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
+
 @Entity
-@Table(name = "votes")
+@Table(name = "records")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class VoteJpaEntity extends BaseJpaEntity {
+public class RecordJpaEntity extends BaseJpaEntity {
 
     @Id
     @Column(name = "post_id")
@@ -30,3 +31,4 @@ public class VoteJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
 }
+

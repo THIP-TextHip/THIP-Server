@@ -1,5 +1,5 @@
 
-package konkuk.thip.entity;
+package konkuk.thip.user.adapter.out.jpa;
 
 import lombok.Getter;
 
