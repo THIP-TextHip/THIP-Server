@@ -24,7 +24,6 @@ public class CategoryJpaEntity extends BaseJpaEntity {
     @Column(name = "category_value",length = 50, nullable = false)
     private String value;
 
-    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alias_id", nullable = false)
     private AliasJpaEntity aliasForCategoryJpaEntity;
