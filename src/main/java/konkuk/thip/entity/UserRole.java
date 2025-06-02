@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 public enum UserRole {
 
-    HOST("호스트"),
-    MEMBER("팀원");
+    USER("일반유저"),
+    INFLUENCER("인플루언서");
 
     private String type;
 
