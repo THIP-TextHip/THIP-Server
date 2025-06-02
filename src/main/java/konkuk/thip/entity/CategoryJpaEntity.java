@@ -21,7 +21,8 @@ public class CategoryJpaEntity extends BaseJpaEntity {
     @Column(name = "category_id")
     private Long categoryId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alias_id", nullable = false)
     private AliasJpaEntity aliasJpaEntity;
 

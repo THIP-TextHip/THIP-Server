@@ -27,8 +27,8 @@ public class AliasJpaEntity extends BaseJpaEntity {
     @OneToOne(mappedBy = "aliasJpaEntity")
     private UserJpaEntity userJpaEntity;
 
-    @OneToMany(mappedBy = "aliasJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CategoryJpaEntity> categories = new ArrayList<>();
+    @OneToOne(mappedBy = "aliasJpaEntity")
+    private CategoryJpaEntity categoryJpaEntity;
 
 
 }
