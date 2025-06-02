@@ -33,7 +33,7 @@ public class UserJpaEntity extends BaseJpaEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alias_id", nullable = false)
-    private AliasJpaEntity aliasJpaEntity;
+    private AliasJpaEntity aliasForUserJpaEntity;
 
     @OneToMany(mappedBy = "userJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostJpaEntity> postJpaEntities = new ArrayList<>();
