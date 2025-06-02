@@ -25,7 +25,7 @@ public class CategoryJpaEntity extends BaseJpaEntity {
     private String value;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "alias_id", nullable = false)
+    @JoinColumn(name = "category_alias_id", nullable = false)
     private AliasJpaEntity aliasForCategoryJpaEntity;
 
     @Builder.Default
