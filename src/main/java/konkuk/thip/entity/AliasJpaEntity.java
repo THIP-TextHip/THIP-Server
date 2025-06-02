@@ -27,8 +27,5 @@ public class AliasJpaEntity extends BaseJpaEntity {
     @OneToOne(mappedBy = "aliasForUserJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserJpaEntity userJpaEntity;
 
-    @OneToOne(mappedBy = "aliasForCategoryJpaEntity",cascade = CascadeType.ALL, orphanRemoval = true)
-    private CategoryJpaEntity categoryJpaEntity;
-
 
 }
