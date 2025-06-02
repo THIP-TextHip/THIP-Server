@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -21,13 +21,13 @@ public class CategoryJpaEntity extends BaseJpaEntity {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Column(name = "category_value",length = 50, nullable = false)
+    private String value;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "alias_id", nullable = false)
     private AliasJpaEntity aliasJpaEntity;
-
-    @Column(name = "category_value",length = 50, nullable = false)
-    private String value;
 
     @OneToMany(mappedBy = "categoryJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TagJpaEntity> tagJpaEntities = new ArrayList<>();

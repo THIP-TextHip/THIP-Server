@@ -5,7 +5,7 @@ import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "following")
+@Table(name = "followings")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

@@ -16,10 +16,6 @@ public class NotificationJpaEntity extends BaseJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long notificationId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserJpaEntity userJpaEntity;
-
     @Column(length = 100, nullable = false)
     private String title;
 
@@ -28,4 +24,8 @@ public class NotificationJpaEntity extends BaseJpaEntity {
 
     @Column(name = "is_checked",nullable = false)
     private boolean isChecked;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserJpaEntity userJpaEntity;
 }

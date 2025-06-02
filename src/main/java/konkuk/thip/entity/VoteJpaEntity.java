@@ -5,7 +5,7 @@ import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "vote")
+@Table(name = "votes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -16,6 +16,11 @@ public class VoteJpaEntity extends BaseJpaEntity {
     @Column(name = "post_id")
     private Long postId;
 
+    private Integer page;
+
+    @Column(name = "is_overview",nullable = false)
+    private boolean isOverview;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -24,9 +29,4 @@ public class VoteJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
-
-    private Integer page;
-
-    @Column(name = "is_overview",nullable = false)
-    private boolean isOverview;
 }

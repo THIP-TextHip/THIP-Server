@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "alias")
+@Table(name = "aliases")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -24,10 +24,10 @@ public class AliasJpaEntity extends BaseJpaEntity {
     @Column(name = "alias_value",length = 50, nullable = false)
     private String value;
 
-    @OneToOne(mappedBy = "aliasJpaEntity")
+    @OneToOne(mappedBy = "aliasJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserJpaEntity userJpaEntity;
 
-    @OneToOne(mappedBy = "aliasJpaEntity")
+    @OneToOne(mappedBy = "aliasJpaEntity",cascade = CascadeType.ALL, orphanRemoval = true)
     private CategoryJpaEntity categoryJpaEntity;
 
 

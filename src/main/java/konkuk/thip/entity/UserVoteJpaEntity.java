@@ -6,7 +6,7 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "user_vote")
+@Table(name = "user_votes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

@@ -5,7 +5,7 @@ import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "attendance_check")
+@Table(name = "attendance_checks")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -14,6 +14,9 @@ public class AttendanceCheckJpaEntity extends BaseJpaEntity {
 
     @EmbeddedId
     private AttendanceCheckJpaEntityId id;
+
+    @Column(name = "today_comment",length = 100, nullable = false)
+    private String todayComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("roomId")
@@ -24,8 +27,5 @@ public class AttendanceCheckJpaEntity extends BaseJpaEntity {
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
-
-    @Column(name = "today_comment",length = 100, nullable = false)
-    private String todayComment;
 
 }

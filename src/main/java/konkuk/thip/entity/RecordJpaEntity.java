@@ -17,6 +17,11 @@ public class RecordJpaEntity extends BaseJpaEntity {
     @Column(name = "post_id")
     private Long postId;
 
+    private Integer page;
+
+    @Column(name = "is_overview",nullable = false)
+    private boolean isOverview;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -25,10 +30,5 @@ public class RecordJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
-
-    private Integer page;
-
-    @Column(name = "is_overview",nullable = false)
-    private boolean isOverview;
 }
 

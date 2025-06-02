@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "post")
+@Table(name = "posts")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -20,12 +20,12 @@ public class PostJpaEntity extends BaseJpaEntity {
     @Column(name = "post_id")
     private Long postId;
 
+    @Column(length = 6100, nullable = false)
+    private String content;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
-
-    @Column(length = 6100, nullable = false)
-    private String content;
 
     @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private FeedJpaEntity feedJpaEntity;

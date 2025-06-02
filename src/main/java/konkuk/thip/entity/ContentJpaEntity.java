@@ -17,10 +17,10 @@ public class ContentJpaEntity extends BaseJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long contentId;
 
+    @Column(name = "content_url",columnDefinition = "TEXT", nullable = false)
+    private String contentUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
-
-    @Column(name = "content_url",columnDefinition = "TEXT", nullable = false)
-    private String contentUrl;
 }

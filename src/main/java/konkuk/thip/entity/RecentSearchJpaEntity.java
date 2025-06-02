@@ -7,7 +7,7 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "recent_search")
+@Table(name = "recent_searches")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -18,14 +18,14 @@ public class RecentSearchJpaEntity extends BaseJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recentSearchId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserJpaEntity userJpaEntity;
-
     @Column(name = "search_term",length = 50, nullable = false)
     private String searchTerm;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SearchType type;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserJpaEntity userJpaEntity;
 }

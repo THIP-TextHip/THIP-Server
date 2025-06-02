@@ -5,7 +5,7 @@ import konkuk.thip.global.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "saved_book")
+@Table(name = "saved_books")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

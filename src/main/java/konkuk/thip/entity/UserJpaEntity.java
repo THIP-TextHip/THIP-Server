@@ -21,10 +21,6 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "alias_id", nullable = false)
-    private AliasJpaEntity aliasJpaEntity;
-
     @Column(length = 60, nullable = false)
     private String nickname;
 
@@ -34,6 +30,10 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "alias_id", nullable = false)
+    private AliasJpaEntity aliasJpaEntity;
 
     @OneToMany(mappedBy = "userJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostJpaEntity> postJpaEntities = new ArrayList<>();
