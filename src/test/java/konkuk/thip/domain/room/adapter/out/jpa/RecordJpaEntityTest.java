@@ -1,5 +1,6 @@
 package konkuk.thip.domain.room.adapter.out.jpa;
 
+import jakarta.persistence.EntityManager;
 import konkuk.thip.domain.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.domain.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.domain.room.adapter.out.persistence.RecordJpaRepository;
@@ -20,6 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class RecordJpaEntityTest {
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private UserJpaRepository userRepository;
@@ -89,6 +93,8 @@ class RecordJpaEntityTest {
                 .build();
 
         recordRepository.save(record);
+        em.flush();
+        em.clear();
 
         RecordJpaEntity found = recordRepository.findById(record.getPostId()).orElseThrow();
         assertThat(found).isNotNull();
