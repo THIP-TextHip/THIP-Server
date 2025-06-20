@@ -36,7 +36,4 @@ public class UserJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "userJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostJpaEntity> postJpaEntities = new ArrayList<>();
 }

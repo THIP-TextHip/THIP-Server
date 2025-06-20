@@ -41,7 +41,4 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommentJpaEntity> children = new ArrayList<>();
 }

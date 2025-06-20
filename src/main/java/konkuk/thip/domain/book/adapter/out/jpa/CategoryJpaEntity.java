@@ -29,8 +29,5 @@ public class CategoryJpaEntity extends BaseJpaEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_alias_id", nullable = false)
     private AliasJpaEntity aliasForCategoryJpaEntity;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "categoryJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TagJpaEntity> tagJpaEntities = new ArrayList<>();
+    
 }

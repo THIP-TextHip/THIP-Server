@@ -39,8 +39,4 @@ public class PostJpaEntity extends BaseJpaEntity {
     @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private RecordJpaEntity recordJpaEntity;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TagJpaEntity> tagJpaEntities = new ArrayList<>();
-
 }
