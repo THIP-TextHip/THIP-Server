@@ -46,4 +46,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: 🐘 build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -Dspring.profiles.active=test
