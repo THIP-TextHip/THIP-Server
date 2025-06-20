@@ -1,0 +1,8 @@
+package konkuk.thip.domain.room.adapter.out.mapper;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class RoomMapper {
+
+}
