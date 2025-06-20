@@ -2,7 +2,6 @@ package konkuk.thip.domain.feed.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import konkuk.thip.domain.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.domain.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.domain.feed.adapter.out.persistence.FeedJpaRepository;
@@ -14,12 +13,15 @@ import konkuk.thip.domain.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Transactional
+@DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class FeedJpaEntityTest {
 
     @PersistenceContext
