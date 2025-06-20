@@ -6,6 +6,7 @@ import konkuk.thip.domain.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.global.entity.BaseJpaEntity;
 import konkuk.thip.domain.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,15 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 @Getter
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "dtype")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-public class PostJpaEntity extends BaseJpaEntity {
+public abstract class PostJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "post_id", nullable = false)
     private Long postId;
 
     @Column(length = 6100, nullable = false)
@@ -30,13 +32,8 @@ public class PostJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private FeedJpaEntity feedJpaEntity;
-
-    @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private VoteJpaEntity voteJpaEntity;
-
-    @OneToOne(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private RecordJpaEntity recordJpaEntity;
-
+    public PostJpaEntity(String content, UserJpaEntity userJpaEntity) {
+        this.content = content;
+        this.userJpaEntity = userJpaEntity;
+    }
 }
