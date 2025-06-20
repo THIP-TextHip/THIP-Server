@@ -14,6 +14,8 @@ import konkuk.thip.domain.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDate;
@@ -21,6 +23,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(connection= EmbeddedDatabaseConnection.H2)
 class VoteJpaEntityTest {
 
     @PersistenceContext
