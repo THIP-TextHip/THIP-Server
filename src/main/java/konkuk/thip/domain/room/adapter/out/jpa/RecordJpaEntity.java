@@ -22,7 +22,6 @@ public class RecordJpaEntity extends BaseJpaEntity {
     @Column(name = "is_overview",nullable = false)
     private boolean isOverview;
 
-    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private PostJpaEntity postJpaEntity;

@@ -13,19 +13,19 @@ import lombok.*;
 @Builder
 public class AttendanceCheckJpaEntity extends BaseJpaEntity {
 
-    @EmbeddedId
-    private AttendanceCheckJpaEntityId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "attendancecheck_id")
+    private Long attendanceCheckId;
 
     @Column(name = "today_comment",length = 100, nullable = false)
     private String todayComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("roomId")
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
 

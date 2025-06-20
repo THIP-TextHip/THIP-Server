@@ -26,7 +26,6 @@ public class FeedJpaEntity extends BaseJpaEntity {
     @Column(name = "report_count", nullable = false)
     private int reportCount = 0;
 
-    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private PostJpaEntity postJpaEntity;

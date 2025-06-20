@@ -14,16 +14,16 @@ import lombok.*;
 @Builder
 public class UserVoteJpaEntity extends BaseJpaEntity {
 
-    @EmbeddedId
-    private UserVoteJpaEntityId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "uservote_id")
+    private Long userVoteId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("voteItemId")
     @JoinColumn(name = "vote_item_id")
     private VoteItemJpaEntity voteItemJpaEntity;
 }

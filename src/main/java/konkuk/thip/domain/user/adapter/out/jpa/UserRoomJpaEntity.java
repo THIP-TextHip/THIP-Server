@@ -13,8 +13,10 @@ import lombok.*;
 @Builder
 public class UserRoomJpaEntity extends BaseJpaEntity {
 
-    @EmbeddedId
-    private UserRoomJpaEntityId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userroom_id")
+    private Long userRoomId;
 
     @Builder.Default
     @Column(name = "current_page",nullable = false)
@@ -29,12 +31,10 @@ public class UserRoomJpaEntity extends BaseJpaEntity {
     private UserRoomRole userRoomRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("roomId")
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
 }

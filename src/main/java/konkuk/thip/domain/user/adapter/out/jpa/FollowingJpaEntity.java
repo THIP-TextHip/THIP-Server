@@ -12,16 +12,16 @@ import lombok.*;
 @Builder
 public class FollowingJpaEntity extends BaseJpaEntity {
 
-    @EmbeddedId
-    private FollowingJpaEntityId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "following_id")
+    private Long following_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("followingUserId")
     @JoinColumn(name = "following_user_id")
     private UserJpaEntity followingUserJpaEntity;
 }
