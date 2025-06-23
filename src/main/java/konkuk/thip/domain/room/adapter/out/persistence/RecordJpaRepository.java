@@ -1,0 +1,7 @@
+package konkuk.thip.domain.room.adapter.out.persistence;
+
+import konkuk.thip.domain.room.adapter.out.jpa.RecordJpaEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RecordJpaRepository extends JpaRepository<RecordJpaEntity, Long> {
+}
