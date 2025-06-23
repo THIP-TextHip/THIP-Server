@@ -1,14 +1,33 @@
 package konkuk.thip.room.domain;
 
-import lombok.Builder;
+import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDate;
 
 @Getter
-@Builder
-public class Room {
+@SuperBuilder
+public class Room extends BaseDomainEntity {
 
-    /**
-     * 도메인 엔티티 -> 비즈니스 로직 수행
-     */
+    private Long id;
+
+    private String title;
+
+    private String description;
+
+    private boolean isPublic;
+
+    private Integer password;
+
+    private double roomPercentage;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
+
+    private int recruitCount;
+
+    private Long bookId;
 
 }
