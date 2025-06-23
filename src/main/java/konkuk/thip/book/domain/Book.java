@@ -1,14 +1,29 @@
 package konkuk.thip.book.domain;
 
-import lombok.Builder;
+import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class Book {
+@SuperBuilder
+public class Book extends BaseDomainEntity {
 
-    /**
-     * 도메인 엔티티 -> 비즈니스 로직 수행
-     */
+    private Long id;
+
+    private String title;
+
+    private String isbn;
+
+    private String authorName;
+
+    private boolean bestSeller;
+
+    private String publisher;
+
+    private String imageUrl;
+
+    private Integer pageCount;
+
+    private String description;
 
 }
