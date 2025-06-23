@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     // 허용되지 않은 HTTP 메소드로 요청한 경우
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ErrorResponse HttpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException e) {
+    public ErrorResponse httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException e) {
         log.error("[HttpRequestMethodNotSupportedExceptionHandler] {}", e.getMessage());
         return ErrorResponse.of(ErrorCode.API_METHOD_NOT_ALLOWED);
     }
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     // 요청 파라미터가 유효하지 않은 경우
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorResponse MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+    public ErrorResponse methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         log.error("[MethodArgumentNotValidExceptionHandler] {}", e.getMessage());
         return ErrorResponse.of(ErrorCode.API_INVALID_PARAM);
     }
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     // 요청 파라미터의 타입이 맞지 않는 경우
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ErrorResponse MethodArgumentTypeMismatchExceptionHandler(MethodArgumentTypeMismatchException e) {
+    public ErrorResponse methodArgumentTypeMismatchExceptionHandler(MethodArgumentTypeMismatchException e) {
         log.error("[MethodArgumentTypeMismatchExceptionHandler] {}", e.getMessage());
         return ErrorResponse.of(ErrorCode.API_INVALID_TYPE);
     }
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     // 요청 파라미터가 누락된 경우
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ErrorResponse MissingServletRequestParameterExceptionHandler(MissingServletRequestParameterException e) {
+    public ErrorResponse missingServletRequestParameterExceptionHandler(MissingServletRequestParameterException e) {
         log.error("[MissingServletRequestParameterExceptionHandler] {}", e.getMessage());
         return ErrorResponse.of(ErrorCode.API_MISSING_PARAM);
     }
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     // 비즈니스 로직에서 발생한 예외 처리
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BusinessException.class)
-    public ErrorResponse BusinessExceptionHandler(BusinessException e) {
+    public ErrorResponse businessExceptionHandler(BusinessException e) {
         log.error("[BusinessExceptionHandler] {}", e.getMessage());
         return ErrorResponse.of(e.getErrorCode());
     }
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
     // 서버 내부 오류 예외 처리
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({RuntimeException.class, IllegalStateException.class})
-    public ErrorResponse RuntimeExceptionHandler(Exception e) {
+    public ErrorResponse runtimeExceptionHandler(Exception e) {
         log.error("[RuntimeExceptionHandler] {}", e.getMessage());
         return ErrorResponse.of(ErrorCode.API_SERVER_ERROR);
     }
