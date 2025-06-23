@@ -1,14 +1,21 @@
 package konkuk.thip.user.domain;
 
-import lombok.Builder;
+import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class User {
+@SuperBuilder
+public class User extends BaseDomainEntity {
 
-    /**
-     * 도메인 엔티티 -> 비즈니스 로직 수행
-     */
+    private Long id;
+
+    private String nickname;
+
+    private String imageUrl;
+
+    private String userRole;
+
+    private Long aliasId;
 
 }
