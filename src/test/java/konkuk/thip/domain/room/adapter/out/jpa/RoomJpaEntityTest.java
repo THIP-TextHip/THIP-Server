@@ -2,9 +2,10 @@ package konkuk.thip.domain.room.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import konkuk.thip.domain.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.domain.book.adapter.out.persistence.BookJpaRepository;
-import konkuk.thip.domain.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
