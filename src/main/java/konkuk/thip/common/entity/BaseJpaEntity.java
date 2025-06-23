@@ -1,4 +1,4 @@
-package konkuk.thip.global.entity;
+package konkuk.thip.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

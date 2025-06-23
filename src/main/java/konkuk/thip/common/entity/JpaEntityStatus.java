@@ -1,4 +1,4 @@
-package konkuk.thip.global.entity;
+package konkuk.thip.common.entity;
 
 public enum JpaEntityStatus {
     ACTIVE, INACTIVE, EXPIRED
