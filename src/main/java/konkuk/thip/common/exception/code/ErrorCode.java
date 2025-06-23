@@ -20,6 +20,12 @@ public enum ErrorCode implements ResponseCode {
     private final int code;
     private final String message;
 
+    /**
+     * Constructs an ErrorCode enum constant with the specified numeric code and descriptive message.
+     *
+     * @param code the unique integer representing the error code
+     * @param message the description associated with the error code
+     */
     ErrorCode(int code, String message) {
         this.code = code;
         this.message = message;
