@@ -1,14 +1,23 @@
 package konkuk.thip.feed.domain;
 
-import lombok.Builder;
+import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class Feed {
+@SuperBuilder
+public class Feed extends BaseDomainEntity {
 
-    /**
-     * 도메인 엔티티 -> 비즈니스 로직 수행
-     */
+    private Long id;
+
+    private String content;
+
+    private Long creatorId;
+
+    private Boolean isPublic;
+
+    private int reportCount;
+
+    private Long targetBookId;
 
 }
