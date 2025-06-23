@@ -2,8 +2,11 @@ package konkuk.thip.domain.user.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import konkuk.thip.domain.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.domain.user.adapter.out.persistence.UserJpaRepository;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
