@@ -12,10 +12,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ErrorResponse noHandlerExceptionHandler(NoHandlerFoundException e) {
+        return ErrorResponse.of(ErrorCode.API_NOT_FOUND);
+    }
 
     // 허용되지 않은 HTTP 메소드로 요청한 경우
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
