@@ -26,7 +26,7 @@ public class CommentMapper {
                 .reportCount(commentJpaEntity.getReportCount())
                 .targetPostId(commentJpaEntity.getPostJpaEntity().getPostId())
                 .creatorId(commentJpaEntity.getUserJpaEntity().getUserId())
-                .parentCommentId(commentJpaEntity.getParent().getCommentId())
+                .parentCommentId(commentJpaEntity.getParent() != null ? commentJpaEntity.getParent().getCommentId() : null)
                 .createdAt(commentJpaEntity.getCreatedAt())
                 .modifiedAt(commentJpaEntity.getModifiedAt())
                 .status(commentJpaEntity.getStatus())
