@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode implements ResponseCode {
 
+    API_NOT_FOUND(40400, "요청한 API를 찾을 수 없습니다."),
     API_METHOD_NOT_ALLOWED(40500, "허용되지 않는 HTTP 메소드입니다."),
     API_SERVER_ERROR(50000, "서버 내부 오류입니다."),
 
