@@ -1,7 +1,7 @@
 package konkuk.thip.room.adapter.out.mapper;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.jpa.CategoryJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.domain.Room;
 import org.springframework.stereotype.Component;

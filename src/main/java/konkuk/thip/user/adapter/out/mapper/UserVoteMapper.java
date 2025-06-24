@@ -1,9 +1,9 @@
 package konkuk.thip.user.adapter.out.mapper;
 
-import konkuk.thip.room.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserVoteJpaEntity;
 import konkuk.thip.user.domain.UserVote;
+import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component
