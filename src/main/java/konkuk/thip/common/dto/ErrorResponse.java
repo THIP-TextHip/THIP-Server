@@ -28,4 +28,10 @@ public class ErrorResponse {
     public static ErrorResponse of(ResponseCode response) {
         return new ErrorResponse(response);
     }
+
+    public static ErrorResponse of(ResponseCode response, String message) {
+        StringBuilder sb =  new StringBuilder();
+        sb.append(response.getMessage()).append(" ").append(message);
+        return new ErrorResponse(response.isSuccess(), response.getCode(), sb.toString());
+    }
 }
