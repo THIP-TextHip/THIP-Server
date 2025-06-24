@@ -30,4 +30,5 @@ public class Room extends BaseDomainEntity {
 
     private Long bookId;
 
+    private Long categoryId;
 }
