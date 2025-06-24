@@ -1,6 +1,5 @@
 package konkuk.thip.recentSearch.application.port.out;
 
-
-public interface RecentSearcCommandPort {
+public interface RecentSearchQueryPort {
 
 }
