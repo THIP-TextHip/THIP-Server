@@ -2,7 +2,9 @@ package konkuk.thip.domain.room.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.RecordJpaRepository;
@@ -44,6 +46,9 @@ class RecordJpaEntityTest {
     @Autowired
     private RecordJpaRepository recordRepository;
 
+    @Autowired
+    private CategoryJpaRepository categoryRepository;
+
     private UserJpaEntity createUser() {
         AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
         aliasRepository.save(alias);
@@ -70,7 +75,7 @@ class RecordJpaEntityTest {
                 .build());
     }
 
-    private RoomJpaEntity createRoom(BookJpaEntity book) {
+    private RoomJpaEntity createRoom(BookJpaEntity book, CategoryJpaEntity category) {
         return roomRepository.save(RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -79,14 +84,25 @@ class RecordJpaEntityTest {
                 .endDate(LocalDate.now().plusDays(5))
                 .recruitCount(3)
                 .bookJpaEntity(book)
+                .categoryJpaEntity(category)
                 .build());
+    }
+
+    private CategoryJpaEntity createCategory() {
+        AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
+        aliasRepository.save(alias);
+
+        return categoryRepository.save(CategoryJpaEntity.builder()
+                        .value("카테고리1")
+                        .aliasForCategoryJpaEntity(alias)
+                        .build());
     }
 
     @Test
     @DisplayName("RecordJpaEntity 저장 및 조회 테스트")
     void saveAndFindRecord() {
         UserJpaEntity user = createUser();
-        RoomJpaEntity room = createRoom(createBook());
+        RoomJpaEntity room = createRoom(createBook(), createCategory());
 
         RecordJpaEntity record = RecordJpaEntity.builder()
                 .content("기록 내용")
