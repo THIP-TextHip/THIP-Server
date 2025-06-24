@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
-
 @Entity
 @Table(name = "records")
 @DiscriminatorValue("RECORD")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecordJpaEntity extends PostJpaEntity {
+
     private Integer page;
 
     @Column(name = "is_overview",nullable = false)
@@ -27,5 +27,6 @@ public class RecordJpaEntity extends PostJpaEntity {
         this.isOverview = isOverview;
         this.roomJpaEntity = roomJpaEntity;
     }
+
 }
 

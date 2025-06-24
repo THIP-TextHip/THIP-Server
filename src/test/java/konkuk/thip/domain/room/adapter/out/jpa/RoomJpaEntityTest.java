@@ -3,9 +3,13 @@ package konkuk.thip.domain.room.adapter.out.jpa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,12 @@ class RoomJpaEntityTest {
 
     @Autowired
     private BookJpaRepository bookRepository;
+
+    @Autowired
+    private AliasJpaRepository aliasRepository;
+
+    @Autowired
+    private CategoryJpaRepository categoryRepository;
 
     @Autowired
     private RoomJpaRepository roomRepository;
@@ -43,6 +53,19 @@ class RoomJpaEntityTest {
 
         bookRepository.save(book);
 
+        AliasJpaEntity alias = AliasJpaEntity.builder()
+                .value("칭호1")
+                .build();
+
+        aliasRepository.save(alias);
+
+        CategoryJpaEntity category = CategoryJpaEntity.builder()
+                .value("카테고리1")
+                .aliasForCategoryJpaEntity(alias)
+                .build();
+
+        categoryRepository.save(category);
+
         RoomJpaEntity room = RoomJpaEntity.builder()
                 .title("테스트 방")
                 .description("테스트 방 설명")
@@ -51,6 +74,7 @@ class RoomJpaEntityTest {
                 .endDate(LocalDate.of(2025, 6, 30))
                 .recruitCount(5)
                 .bookJpaEntity(book)
+                .categoryJpaEntity(category)
                 .build();
 
         //when

@@ -1,5 +1,5 @@
 package konkuk.thip.common.entity;
 
-public enum JpaEntityStatus {
+public enum StatusType {
     ACTIVE, INACTIVE, EXPIRED
 }

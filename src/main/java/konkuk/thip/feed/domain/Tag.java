@@ -6,18 +6,13 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class Feed extends BaseDomainEntity {
+public class Tag extends BaseDomainEntity {
 
     private Long id;
 
-    private String content;
+    private String value;
 
-    private Long creatorId;
+    private Long targetPostId;
 
-    private Boolean isPublic;
-
-    private int reportCount;
-
-    private Long targetBookId;
-
+    private Long categoryId;
 }

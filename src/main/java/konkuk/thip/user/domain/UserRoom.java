@@ -6,16 +6,17 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class User extends BaseDomainEntity {
+public class UserRoom extends BaseDomainEntity {
 
     private Long id;
 
-    private String nickname;
+    private int currentPage;
 
-    private String imageUrl;
+    private double userPercentage;
 
-    private String userRole;
+    private String userRoomRole;
 
-    private Long aliasId;
+    private Long userId;
 
+    private Long roomId;
 }

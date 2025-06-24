@@ -37,5 +37,5 @@ public abstract class BaseJpaEntity {
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private JpaEntityStatus status = JpaEntityStatus.ACTIVE;
+    private StatusType status = StatusType.ACTIVE;
 }

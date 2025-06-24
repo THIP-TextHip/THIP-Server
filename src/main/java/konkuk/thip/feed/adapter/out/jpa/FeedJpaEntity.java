@@ -20,19 +20,15 @@ public class FeedJpaEntity extends PostJpaEntity {
     @Column(name = "report_count", nullable = false)
     private int reportCount = 0;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private PostJpaEntity postJpaEntity;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
 
     @Builder
-    public FeedJpaEntity(String content, UserJpaEntity userJpaEntity, Boolean isPublic, BookJpaEntity bookJpaEntity) {
+    public FeedJpaEntity(String content, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity) {
         super(content, userJpaEntity);
         this.isPublic = isPublic;
-        this.reportCount = 0; // Default 값
+        this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
     }
 }

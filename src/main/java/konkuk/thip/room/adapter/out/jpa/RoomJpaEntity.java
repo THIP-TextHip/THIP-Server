@@ -2,6 +2,7 @@ package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import lombok.*;
 
@@ -48,4 +49,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "book_id")
     private BookJpaEntity bookJpaEntity;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryJpaEntity categoryJpaEntity;
 }

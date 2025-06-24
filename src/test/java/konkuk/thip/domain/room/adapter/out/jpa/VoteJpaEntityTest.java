@@ -3,7 +3,9 @@ package konkuk.thip.domain.room.adapter.out.jpa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
@@ -45,6 +47,9 @@ class VoteJpaEntityTest {
     @Autowired
     private VoteJpaRepository voteRepository;
 
+    @Autowired
+    private CategoryJpaRepository categoryRepository;
+
     private UserJpaEntity createUser() {
         AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
         aliasRepository.save(alias);
@@ -71,7 +76,7 @@ class VoteJpaEntityTest {
                 .build());
     }
 
-    private RoomJpaEntity createRoom(BookJpaEntity book) {
+    private RoomJpaEntity createRoom(BookJpaEntity book, CategoryJpaEntity category) {
         return roomRepository.save(RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -80,6 +85,17 @@ class VoteJpaEntityTest {
                 .endDate(LocalDate.now().plusDays(5))
                 .recruitCount(3)
                 .bookJpaEntity(book)
+                .categoryJpaEntity(category)
+                .build());
+    }
+
+    private CategoryJpaEntity createCategory() {
+        AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
+        aliasRepository.save(alias);
+
+        return categoryRepository.save(CategoryJpaEntity.builder()
+                .value("카테고리1")
+                .aliasForCategoryJpaEntity(alias)
                 .build());
     }
 
@@ -87,7 +103,7 @@ class VoteJpaEntityTest {
     @DisplayName("VoteJpaEntity 저장 및 조회 테스트")
     void saveAndFindVote() {
         UserJpaEntity user = createUser();
-        RoomJpaEntity room = createRoom(createBook());
+        RoomJpaEntity room = createRoom(createBook(), createCategory());
 
         VoteJpaEntity vote = VoteJpaEntity.builder()
                 .content("투표 내용")

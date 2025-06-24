@@ -1,4 +1,4 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.book.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
@@ -6,16 +6,11 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class User extends BaseDomainEntity {
+public class Category extends BaseDomainEntity {
 
     private Long id;
 
-    private String nickname;
-
-    private String imageUrl;
-
-    private String userRole;
+    private String value;
 
     private Long aliasId;
-
 }

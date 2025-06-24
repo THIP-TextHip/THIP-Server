@@ -6,16 +6,9 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class User extends BaseDomainEntity {
+public class Alias extends BaseDomainEntity {
 
     private Long id;
 
-    private String nickname;
-
-    private String imageUrl;
-
-    private String userRole;
-
-    private Long aliasId;
-
+    private String value;
 }

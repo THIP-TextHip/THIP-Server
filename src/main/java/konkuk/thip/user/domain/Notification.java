@@ -6,16 +6,15 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class User extends BaseDomainEntity {
+public class Notification extends BaseDomainEntity {
 
     private Long id;
 
-    private String nickname;
+    private String title;
 
-    private String imageUrl;
+    private String content;
 
-    private String userRole;
+    private boolean isChecked;
 
-    private Long aliasId;
-
+    private Long targetUserId;
 }
