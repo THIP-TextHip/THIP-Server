@@ -1,8 +1,8 @@
 package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
-import konkuk.thip.room.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
 import lombok.*;
 
 

@@ -1,9 +1,9 @@
 package konkuk.thip.feed.adapter.out.mapper;
 
-import konkuk.thip.book.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.feed.domain.Tag;
-import konkuk.thip.room.adapter.out.jpa.PostJpaEntity;
+import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

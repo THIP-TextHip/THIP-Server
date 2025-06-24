@@ -1,0 +1,15 @@
+package konkuk.thip.record.adapter.out.persistence;
+
+import konkuk.thip.record.adapter.out.mapper.RecordMapper;
+import konkuk.thip.record.application.port.out.RecordQueryPort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class RecordQueryPersistenceAdapter implements RecordQueryPort {
+
+    private final RecordJpaRepository recordJpaRepository;
+    private final RecordMapper recordMapper;
+
+}
