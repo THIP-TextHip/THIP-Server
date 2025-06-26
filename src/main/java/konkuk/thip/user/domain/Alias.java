@@ -11,4 +11,8 @@ public class Alias extends BaseDomainEntity {
     private Long id;
 
     private String value;
+
+    private String imageUrl;
+
+    private String color;
 }
