@@ -1,10 +1,10 @@
 package konkuk.thip.user.adapter.in.web.response;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@Builder
+@AllArgsConstructor(staticName = "of")
 public class UserSignupResponse {
 
     private Long userId;
