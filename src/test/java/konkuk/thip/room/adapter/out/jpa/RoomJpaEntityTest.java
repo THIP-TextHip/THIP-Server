@@ -1,12 +1,10 @@
-package konkuk.thip.domain.room.adapter.out.jpa;
+package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
@@ -54,7 +52,9 @@ class RoomJpaEntityTest {
         bookRepository.save(book);
 
         AliasJpaEntity alias = AliasJpaEntity.builder()
-                .value("칭호1")
+                .value("칭호")
+                .imageUrl("test-image-url")
+                .color("red")
                 .build();
 
         aliasRepository.save(alias);

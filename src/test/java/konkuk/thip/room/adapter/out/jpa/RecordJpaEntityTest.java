@@ -1,12 +1,10 @@
-package konkuk.thip.domain.room.adapter.out.jpa;
+package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.persistence.RecordJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
@@ -50,10 +48,16 @@ class RecordJpaEntityTest {
     private CategoryJpaRepository categoryRepository;
 
     private UserJpaEntity createUser() {
-        AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
+        AliasJpaEntity alias = AliasJpaEntity.builder()
+                .value("칭호")
+                .imageUrl("test-image-url")
+                .color("red")
+                .build();
+
         aliasRepository.save(alias);
 
         UserJpaEntity user = UserJpaEntity.builder()
+                .email("test@test.com")
                 .nickname("테스터")
                 .imageUrl("https://test.img")
                 .aliasForUserJpaEntity(alias)
@@ -89,7 +93,12 @@ class RecordJpaEntityTest {
     }
 
     private CategoryJpaEntity createCategory() {
-        AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
+        AliasJpaEntity alias = AliasJpaEntity.builder()
+                .value("칭호")
+                .imageUrl("test-image-url")
+                .color("red")
+                .build();
+
         aliasRepository.save(alias);
 
         return categoryRepository.save(CategoryJpaEntity.builder()
