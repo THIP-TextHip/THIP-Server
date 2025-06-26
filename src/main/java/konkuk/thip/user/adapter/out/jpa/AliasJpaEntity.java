@@ -18,7 +18,12 @@ public class AliasJpaEntity extends BaseJpaEntity {
     @Column(name = "alias_id")
     private Long aliasId;
 
-    @Column(name = "alias_value",length = 50, nullable = false)
+    @Column(name = "alias_value", length = 50, nullable = false)
     private String value;
 
+    @Column(name = "image_url", columnDefinition = "TEXT", nullable = false)
+    private String imageUrl;
+
+    @Column(name = "alias_color", length = 10, nullable = false)
+    private String color;
 }

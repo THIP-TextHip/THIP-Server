@@ -18,6 +18,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "email", length = 100, nullable = false)
+    private String email;
+
     @Column(length = 60, nullable = false)
     private String nickname;
 

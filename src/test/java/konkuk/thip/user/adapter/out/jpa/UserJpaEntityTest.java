@@ -1,10 +1,7 @@
-package konkuk.thip.domain.user.adapter.out.jpa;
+package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -34,14 +31,17 @@ class UserJpaEntityTest {
         // given
         AliasJpaEntity alias = AliasJpaEntity.builder()
                 .value("칭호")
+                .imageUrl("test-image-url")
+                .color("red")
                 .build();
         aliasJpaRepository.save(alias);
 
         UserJpaEntity user = UserJpaEntity.builder()
-                .nickname("테스트유저")
-                .imageUrl("http://image.url")
-                .role(UserRole.USER)
+                .email("test@test.com")
+                .nickname("테스터")
+                .imageUrl("https://test.img")
                 .aliasForUserJpaEntity(alias)
+                .role(UserRole.USER)
                 .build();
 
         // when
@@ -52,7 +52,7 @@ class UserJpaEntityTest {
         UserJpaEntity foundUser = userRepository.findById(user.getUserId()).orElseThrow();
 
         // then
-        assertThat(foundUser.getNickname()).isEqualTo("테스트유저");
+        assertThat(foundUser.getNickname()).isEqualTo("테스터");
         assertThat(foundUser.getAliasForUserJpaEntity().getValue()).isEqualTo("칭호");
         assertThat(foundUser.getRole()).isEqualTo(UserRole.USER);
     }

@@ -10,6 +10,8 @@ public class User extends BaseDomainEntity {
 
     private Long id;
 
+    private String email;
+
     private String nickname;
 
     private String imageUrl;
@@ -17,5 +19,16 @@ public class User extends BaseDomainEntity {
     private String userRole;
 
     private Long aliasId;
+
+    public static User withoutId(String email, String nickname, String imageUrl, String userRole, Long aliasId) {
+        return User.builder()
+                .id(null)
+                .email(email)
+                .nickname(nickname)
+                .imageUrl(imageUrl)
+                .userRole(userRole)
+                .aliasId(aliasId)
+                .build();
+    }
 
 }

@@ -1,10 +1,9 @@
-package konkuk.thip.domain.feed.adapter.out.jpa;
+package konkuk.thip.feed.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.FeedJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -39,10 +38,16 @@ class FeedJpaEntityTest {
     private FeedJpaRepository feedRepository;
 
     private UserJpaEntity createUser() {
-        AliasJpaEntity alias = AliasJpaEntity.builder().value("익명1").build();
+        AliasJpaEntity alias = AliasJpaEntity.builder()
+                .value("칭호")
+                .imageUrl("test-image-url")
+                .color("red")
+                .build();
+
         aliasRepository.save(alias);
 
         UserJpaEntity user = UserJpaEntity.builder()
+                .email("test@test.com")
                 .nickname("테스터")
                 .imageUrl("https://test.img")
                 .aliasForUserJpaEntity(alias)
