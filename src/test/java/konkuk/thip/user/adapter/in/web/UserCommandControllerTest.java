@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -92,7 +93,7 @@ class UserCommandControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("40002"))
+                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("aliasId는 필수입니다.")));
     }
 
@@ -111,7 +112,7 @@ class UserCommandControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("40002"))
+                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("닉네임은 공백일 수 없습니다.")));
     }
 
@@ -130,7 +131,7 @@ class UserCommandControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("40002"))
+                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("닉네임은 최대 10자 입니다.")));
     }
 
@@ -149,7 +150,7 @@ class UserCommandControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("40002"))
+                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("이메일은 공백일 수 없습니다.")));
     }
 
