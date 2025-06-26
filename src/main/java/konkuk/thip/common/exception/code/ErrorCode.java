@@ -17,6 +17,12 @@ public enum ErrorCode implements ResponseCode {
     API_INVALID_TYPE(HttpStatus.BAD_REQUEST, 40003, "파라미터 타입이 잘못되었습니다."),
 
     /* 60000부터 비즈니스 예외 */
+    /**
+     * 60000 : alias error
+     */
+    ALIAS_NOT_FOUND(HttpStatus.NOT_FOUND, 60001, "존재하지 않는 ALIAS 입니다.");
+
+
     ;
 
     private final HttpStatus httpStatus;

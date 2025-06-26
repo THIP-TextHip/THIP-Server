@@ -1,15 +1,31 @@
 package konkuk.thip.user.adapter.out.persistence;
 
+import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.mapper.UserMapper;
 import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import static konkuk.thip.common.exception.code.ErrorCode.ALIAS_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
 public class UserCommandPersistenceAdapter implements UserCommandPort {
 
-    private final UserJpaRepository jpaRepository;
+    private final UserJpaRepository userJpaRepository;
+    private final AliasJpaRepository aliasJpaRepository;
+
     private final UserMapper userMapper;
 
+    @Override
+    public Long save(User user) {
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.findById(user.getAliasId()).orElseThrow(
+                () -> new EntityNotFoundException(ALIAS_NOT_FOUND));
+
+        UserJpaEntity userJpaEntity = userMapper.toJpaEntity(user, aliasJpaEntity);
+        return userJpaRepository.save(userJpaEntity).getUserId();
+    }
 }
