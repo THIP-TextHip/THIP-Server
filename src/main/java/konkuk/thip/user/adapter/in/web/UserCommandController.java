@@ -19,14 +19,8 @@ public class UserCommandController {
 
     @PostMapping("/users/signup")
     public BaseResponse<UserSignupResponse> signup(@Validated @RequestBody UserSignupRequest request) {
-        UserSignupCommand command = UserSignupCommand.builder()
-                .aliasId(request.getAliasId())
-                .nickname(request.getNickname())
-                .email(request.getEmail())
-                .build();
-
         return BaseResponse.ok(UserSignupResponse.builder()
-                .userId(userSignupUseCase.signup(command))
+                .userId(userSignupUseCase.signup(request.toCommand()))
                 .build());
     }
 }
