@@ -10,11 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static konkuk.thip.user.adapter.out.jpa.UserRole.USER;
+
+
 @Service
 @RequiredArgsConstructor
 public class UserSignupService implements UserSignupUseCase {
-
-    private static final String NORMAL_USER_ROLE = "일반유저";
 
     private final UserCommandPort userCommandPort;
     private final AliasCommandPort aliasCommandPort;
@@ -22,9 +23,9 @@ public class UserSignupService implements UserSignupUseCase {
     @Override
     @Transactional
     public Long signup(UserSignupCommand command) {
-        Alias alias = aliasCommandPort.findById(command.getAliasId());
+        Alias alias = aliasCommandPort.findById(command.aliasId());
         User user = User.withoutId(
-                command.getEmail(), command.getNickname(), alias.getImageUrl(), NORMAL_USER_ROLE, alias.getId()
+                command.email(), command.nickname(), alias.getImageUrl(), USER.getType(), alias.getId()
         );
 
         return userCommandPort.save(user);

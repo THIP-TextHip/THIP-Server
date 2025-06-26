@@ -73,9 +73,9 @@ class UserCommandControllerTest {
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElse(null);
 
-        assertThat(userJpaEntity.getAliasForUserJpaEntity().getAliasId()).isEqualTo(request.getAliasId());
-        assertThat(userJpaEntity.getNickname()).isEqualTo(request.getNickname());
-        assertThat(userJpaEntity.getEmail()).isEqualTo(request.getEmail());
+        assertThat(userJpaEntity.getAliasForUserJpaEntity().getAliasId()).isEqualTo(request.aliasId());
+        assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
+        assertThat(userJpaEntity.getEmail()).isEqualTo(request.email());
     }
 
     @Test
