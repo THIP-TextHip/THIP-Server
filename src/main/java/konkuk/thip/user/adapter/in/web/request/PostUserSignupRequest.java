@@ -15,11 +15,12 @@ public record PostUserSignupRequest(
         @Email(message = "이메일 형식이 올바르지 않습니다.")
         String email
 ) {
-    public UserSignupCommand toCommand() {
+    public UserSignupCommand toCommand(String oAuth2Id) {
         return UserSignupCommand.builder()
                 .aliasId(aliasId)
                 .nickname(nickname)
                 .email(email)
+                .oauth2Id(oAuth2Id)
                 .build();
     }
 }
