@@ -1,6 +1,7 @@
 package konkuk.thip.common.exception.handler;
 
 import konkuk.thip.common.dto.ErrorResponse;
+import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +72,15 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(API_MISSING_PARAM, e.getParameterName() + "를 추가해서 요청해주세요."));
     }
 
+    // 인증, 인가 권한 관련 예외 처리
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponse> authExceptionHandler(AuthException e) {
+        log.error("[AuthExceptionHandler] {}", e.getMessage());
+        return ResponseEntity
+                .status(e.getErrorCode().getHttpStatus())
+                .body(ErrorResponse.of(e.getErrorCode()));
+    }
+
     // 비즈니스 로직에서 발생한 예외 처리
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> businessExceptionHandler(BusinessException e) {
@@ -81,9 +91,18 @@ public class GlobalExceptionHandler {
     }
 
     // 서버 내부 오류 예외 처리
-    @ExceptionHandler({RuntimeException.class, IllegalStateException.class})
-    public ResponseEntity<ErrorResponse> runtimeExceptionHandler(Exception e) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> runtimeExceptionHandler(RuntimeException e) {
         log.error("[RuntimeExceptionHandler] {}", e.getMessage());
+        return ResponseEntity
+                .status(API_SERVER_ERROR.getHttpStatus())
+                .body(ErrorResponse.of(API_SERVER_ERROR));
+    }
+
+    // IllegalStateException 예외 처리
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> illegalStateExceptionHandler(IllegalStateException e) {
+        log.error("[IllegalStateExceptionHandler] {}", e.getMessage());
         return ResponseEntity
                 .status(API_SERVER_ERROR.getHttpStatus())
                 .body(ErrorResponse.of(API_SERVER_ERROR));
