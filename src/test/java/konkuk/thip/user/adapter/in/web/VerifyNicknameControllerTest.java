@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.user.adapter.in.web.request.VerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ class VerifyNicknameControllerTest {
     @Autowired
     private AliasJpaRepository aliasJpaRepository;
 
-    @BeforeEach
+    @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
         aliasJpaRepository.deleteAll();

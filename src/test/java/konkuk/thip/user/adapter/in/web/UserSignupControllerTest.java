@@ -7,6 +7,7 @@ import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class UserSignupControllerTest {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
-    @BeforeEach
+    @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
         aliasJpaRepository.deleteAll();
