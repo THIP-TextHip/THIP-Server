@@ -163,7 +163,7 @@ class UserSignupControllerTest {
 
         //when //then
         String testToken = jwtUtil.createSignupToken("kakao_12345678");
-        ResultActions result = mockMvc.perform(post("/users/signup")
+        mockMvc.perform(post("/users/signup")
                 .header("Authorization", "Bearer " + testToken)  //헤더 추가
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
