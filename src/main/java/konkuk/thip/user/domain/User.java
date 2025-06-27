@@ -20,7 +20,9 @@ public class User extends BaseDomainEntity {
 
     private Long aliasId;
 
-    public static User withoutId(String email, String nickname, String imageUrl, String userRole, Long aliasId) {
+    private String oauth2Id;
+
+    public static User withoutId(String email, String nickname, String imageUrl, String userRole, Long aliasId, String oauth2Id) {
         return User.builder()
                 .id(null)
                 .email(email)
@@ -28,6 +30,7 @@ public class User extends BaseDomainEntity {
                 .imageUrl(imageUrl)
                 .userRole(userRole)
                 .aliasId(aliasId)
+                .oauth2Id(oauth2Id)
                 .build();
     }
 

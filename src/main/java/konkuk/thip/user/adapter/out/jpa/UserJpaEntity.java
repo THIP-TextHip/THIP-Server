@@ -27,6 +27,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "image_url", columnDefinition = "TEXT", nullable = false)
     private String imageUrl;
 
+    @Column(name = "oauth2_id", length = 50, nullable = false)
+    private String oauth2Id;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;

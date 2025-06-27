@@ -15,6 +15,7 @@ public class UserMapper {
                 .nickname(user.getNickname())
                 .imageUrl(user.getImageUrl())
                 .role(UserRole.from(user.getUserRole()))
+                .oauth2Id(user.getOauth2Id())
                 .aliasForUserJpaEntity(aliasJpaEntity)
                 .build();
     }
@@ -27,6 +28,7 @@ public class UserMapper {
                 .imageUrl(userJpaEntity.getImageUrl())
                 .userRole(userJpaEntity.getRole().getType())
                 .aliasId(userJpaEntity.getAliasForUserJpaEntity().getAliasId())
+                .oauth2Id(userJpaEntity.getOauth2Id())
                 .createdAt(userJpaEntity.getCreatedAt())
                 .modifiedAt(userJpaEntity.getModifiedAt())
                 .status(userJpaEntity.getStatus())
