@@ -7,6 +7,7 @@ import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,12 @@ class UserSignupControllerTest {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
+
+    @BeforeEach
+    void tearDown() {
+        userJpaRepository.deleteAll();
+        aliasJpaRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("[칭호id, 닉네임, 이메일] 정보를 바탕으로 회원가입을 진행한다.")
