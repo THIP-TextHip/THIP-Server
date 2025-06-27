@@ -2,8 +2,6 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.common.security.util.JwtUtil;
-import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.in.web.request.PostUserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -21,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
-import static konkuk.thip.common.exception.code.ErrorCode.AUTH_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
