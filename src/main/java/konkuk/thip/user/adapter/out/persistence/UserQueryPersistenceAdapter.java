@@ -9,7 +9,11 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserQueryPersistenceAdapter implements UserQueryPort {
 
-    private final UserJpaRepository jpaRepository;
+    private final UserJpaRepository userJpaRepository;
     private final UserMapper userMapper;
 
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return userJpaRepository.existsByNickname(nickname);
+    }
 }
