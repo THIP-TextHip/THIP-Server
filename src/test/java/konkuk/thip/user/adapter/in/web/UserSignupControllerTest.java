@@ -64,9 +64,7 @@ class UserSignupControllerTest {
 
         PostUserSignupRequest request = new PostUserSignupRequest(
                 aliasJpaEntity.getAliasId(),
-                "테스트유저",
-                "test@test.com"
-                "테스트 유저"
+                "테스트유저"
         );
 
         //when : 회원가입 api 호출 + 임시 토큰 발급
@@ -88,7 +86,6 @@ class UserSignupControllerTest {
 
         assertThat(userJpaEntity.getAliasForUserJpaEntity().getAliasId()).isEqualTo(request.aliasId());
         assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
-        assertThat(userJpaEntity.getEmail()).isEqualTo(request.email());
     }
 
     @Test
