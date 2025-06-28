@@ -1,6 +1,8 @@
 package konkuk.thip.user.adapter.in.web.request;
 
 import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import konkuk.thip.user.application.port.in.dto.UserSignupCommand;
 
 public record PostUserSignupRequest(
