@@ -24,8 +24,8 @@ public class JwtUtil {
     private final SecretKey secretKey;
 
     //todo 확정 후 환경변수로 변경
-    private final long tokenExpiredMs = 1000 * 60 * 60 * 24; // 24시간
-    private final long signupTokenExpiredMs = 5 * 60 * 1000; // 5분
+    private final long tokenExpiredMs = 86400000; // 24시간
+    private final long signupTokenExpiredMs = 300000; // 5분
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
