@@ -38,14 +38,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         String oauth2Id = oAuth2UserDetails.getProvider() + "_" + oAuth2UserDetails.getProviderId(); //kakao_1234567890
-        String email = oAuth2UserDetails.getEmail();
         UserJpaEntity existingUser = userJpaRepository.findByOauth2Id(oauth2Id);
         if(existingUser == null) {
-            LoginUser newUser = LoginUser.createNewUser(oauth2Id, email);
+            LoginUser newUser = LoginUser.createNewUser(oauth2Id);
             return new CustomOAuth2User(newUser);
         }
 
-        LoginUser loginUser = LoginUser.createExistingUser(oauth2Id, existingUser.getUserId(), email);
+        LoginUser loginUser = LoginUser.createExistingUser(oauth2Id, existingUser.getUserId());
         return new CustomOAuth2User(loginUser);
     }
 }

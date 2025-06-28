@@ -34,7 +34,7 @@ public class UserCommandController {
                                                    @Oauth2Id String oauth2Id,
                                                    HttpServletResponse response) {
         Long userId = userSignupUseCase.signup(request.toCommand(oauth2Id));
-        String accessToken = jwtUtil.createAccessToken(userId, request.email());
+        String accessToken = jwtUtil.createAccessToken(userId);
         response.setHeader(JWT_HEADER_KEY.getValue(), JWT_PREFIX.getValue() + accessToken);
         return BaseResponse.ok(UserSignupResponse.of(userId));
     }

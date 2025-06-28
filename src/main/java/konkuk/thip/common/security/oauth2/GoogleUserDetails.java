@@ -23,9 +23,9 @@ public class GoogleUserDetails implements OAuth2UserDetails{
         return attribute.get("sub").toString();
     }
 
-    @Override
-    public String getEmail() {
-
-        return attribute.get("email").toString();
-    }
+//    @Override
+//    public String getEmail() {
+//
+//        return attribute.get("email").toString();
+//    }
 }

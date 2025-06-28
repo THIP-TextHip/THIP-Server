@@ -40,13 +40,13 @@ public class SecurityConfig {
             "/login/oauth2/code/**",
 
 //            //테스트를 위한 url
-//            "/api/test/public",
-//            "/api/test/auth-status",
-//            "/api/test/protected",
-//            "/auth/kakao/**",
-//            "/kakao-login-test.html",
-//            "/google-login-test.html",
-//            "/index.html",
+            "/api/test/public",
+            "/api/test/auth-status",
+            "/api/test/protected",
+            "/auth/kakao/**",
+            "/kakao-login-test.html",
+            "/google-login-test.html",
+            "/index.html",
     };
 
     @Bean

@@ -30,14 +30,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         if(oAuth2User.isNewUser()) {
             // 최초 로그인 : 회원가입을 위한 임시 토큰 발급
-            String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id(), loginUser.email());
+            String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id());
             response.setHeader(JWT_HEADER_KEY.getValue(), JWT_PREFIX.getValue() + tempToken);
             writeResponse(response, BaseResponse.ok(oAuth2User.getLoginUser()));
             return;
         }
 
         // 기존 회원 : Access Token 발급
-        String accessToken = jwtUtil.createAccessToken(loginUser.userId(), loginUser.email());
+        String accessToken = jwtUtil.createAccessToken(loginUser.userId());
         response.setHeader(JWT_HEADER_KEY.getValue(), JWT_PREFIX.getValue() + accessToken);
         writeResponse(response, BaseResponse.ok(oAuth2User.getLoginUser()));
     }

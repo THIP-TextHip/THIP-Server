@@ -25,7 +25,7 @@ public class UserSignupService implements UserSignupUseCase {
     public Long signup(UserSignupCommand command) {
         Alias alias = aliasCommandPort.findById(command.aliasId());
         User user = User.withoutId(
-                command.email(), command.nickname(), alias.getImageUrl(), USER.getType(), alias.getId(), command.oauth2Id()
+                command.nickname(), alias.getImageUrl(), USER.getType(), alias.getId(), command.oauth2Id()
         );
 
         return userCommandPort.save(user);

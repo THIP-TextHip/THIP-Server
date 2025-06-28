@@ -41,10 +41,6 @@ public class CustomOAuth2User implements OAuth2User {
         return loginUser.oauth2Id();
     }
 
-    public String getEmail() {
-        return loginUser.email();
-    }
-
     public boolean isNewUser() {
         return loginUser.isNewUser();
     }

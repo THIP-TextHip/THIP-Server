@@ -11,7 +11,6 @@ public class UserMapper {
 
     public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
         return UserJpaEntity.builder()
-                .email(user.getEmail())
                 .nickname(user.getNickname())
                 .imageUrl(user.getImageUrl())
                 .role(UserRole.from(user.getUserRole()))
@@ -23,7 +22,6 @@ public class UserMapper {
     public User toDomainEntity(UserJpaEntity userJpaEntity) {
         return User.builder()
                 .id(userJpaEntity.getUserId())
-                .email(userJpaEntity.getEmail())
                 .nickname(userJpaEntity.getNickname())
                 .imageUrl(userJpaEntity.getImageUrl())
                 .userRole(userJpaEntity.getRole().getType())

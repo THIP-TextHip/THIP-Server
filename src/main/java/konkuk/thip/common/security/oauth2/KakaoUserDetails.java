@@ -21,10 +21,10 @@ public class KakaoUserDetails implements OAuth2UserDetails {
         return attributes.get("id").toString();
     }
 
-    @Override
-    public String getEmail() {
-        Object object = attributes.get("kakao_account");
-        LinkedHashMap accountMap = (LinkedHashMap) object;
-        return accountMap.get("email").toString();
-    }
+//    @Override
+//    public String getEmail() {
+//        Object object = attributes.get("kakao_account");
+//        LinkedHashMap accountMap = (LinkedHashMap) object;
+//        return accountMap.get("email").toString();
+//    }
 }

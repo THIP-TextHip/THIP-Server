@@ -4,5 +4,4 @@ package konkuk.thip.common.security.oauth2;
 public interface OAuth2UserDetails {
     String getProvider(); // (e.g., "kakao", "google", etc.)
     String getProviderId();
-    String getEmail();
 }

@@ -28,20 +28,18 @@ public class JwtUtil {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    public String createSignupToken(String oauth2Id, String email) {
+    public String createSignupToken(String oauth2Id) {
         return Jwts.builder()
                 .claim("oauth2Id", oauth2Id)
-                .claim("email", email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + signupTokenExpiredMs))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public String createAccessToken(Long userId, String email) {
+    public String createAccessToken(Long userId) {
         return Jwts.builder()
                 .claim("userId", userId)
-                .claim("email", email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + tokenExpiredMs))
                 .signWith(secretKey)
@@ -76,18 +74,13 @@ public class JwtUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userId", Long.class);
     }
 
-    private String getEmail(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
-    }
-
     public LoginUser getLoginUser(String token) {
         String oauth2Id = getOauth2Id(token);
         Long userId = getUserId(token);
-        String email = getEmail(token);
 
         if (userId == null) {
-            return LoginUser.createNewUser(oauth2Id, email);
+            return LoginUser.createNewUser(oauth2Id);
         }
-        return LoginUser.createExistingUser(oauth2Id, userId, email);
+        return LoginUser.createExistingUser(oauth2Id, userId);
     }
 }
