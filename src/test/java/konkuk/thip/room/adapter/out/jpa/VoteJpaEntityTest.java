@@ -1,14 +1,13 @@
 package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
@@ -20,8 +19,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -29,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(konkuk.thip.config.TestQuerydslConfig.class)    // DataJpaTest 이므로 JPA 제외 빈 추가로 import
 class VoteJpaEntityTest {
 
-    @PersistenceContext
+    @Autowired
     private EntityManager em;
 
     @Autowired
@@ -50,86 +47,35 @@ class VoteJpaEntityTest {
     @Autowired
     private CategoryJpaRepository categoryRepository;
 
-    private UserJpaEntity createUser() {
-        AliasJpaEntity alias = AliasJpaEntity.builder()
-                .value("칭호")
-                .imageUrl("test-image-url")
-                .color("red")
-                .build();
-        aliasRepository.save(alias);
-
-        UserJpaEntity user = UserJpaEntity.builder()
-                .email("test@test.com")
-                .nickname("테스터")
-                .imageUrl("https://test.img")
-                .aliasForUserJpaEntity(alias)
-                .role(UserRole.USER)
-                .build();
-        return userRepository.save(user);
-    }
-
-    private BookJpaEntity createBook() {
-        return bookRepository.save(BookJpaEntity.builder()
-                .title("책제목")
-                .authorName("저자")
-                .isbn("isbn")
-                .bestSeller(false)
-                .publisher("출판사")
-                .imageUrl("img")
-                .pageCount(100)
-                .description("설명")
-                .build());
-    }
-
-    private RoomJpaEntity createRoom(BookJpaEntity book, CategoryJpaEntity category) {
-        return roomRepository.save(RoomJpaEntity.builder()
-                .title("방이름")
-                .description("설명")
-                .isPublic(true)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(5))
-                .recruitCount(3)
-                .bookJpaEntity(book)
-                .categoryJpaEntity(category)
-                .build());
-    }
-
-    private CategoryJpaEntity createCategory() {
-        AliasJpaEntity alias = AliasJpaEntity.builder()
-                .value("칭호")
-                .imageUrl("test-image-url")
-                .color("red")
-                .build();
-
-        aliasRepository.save(alias);
-
-        return categoryRepository.save(CategoryJpaEntity.builder()
-                .value("카테고리1")
-                .aliasForCategoryJpaEntity(alias)
-                .build());
-    }
-
     @Test
     @DisplayName("VoteJpaEntity 저장 및 조회 테스트")
     void saveAndFindVote() {
-        UserJpaEntity user = createUser();
-        RoomJpaEntity room = createRoom(createBook(), createCategory());
+        // given
+        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createAlias());
+        UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
+        BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
+        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createCategory(alias));
+        RoomJpaEntity room = roomRepository.save(TestEntityFactory.createRoom(book, category));
 
-        VoteJpaEntity vote = VoteJpaEntity.builder()
+        VoteJpaEntity vote = voteRepository.save(VoteJpaEntity.builder()
                 .content("투표 내용")
                 .userJpaEntity(user)
                 .page(10)
                 .isOverview(true)
                 .roomJpaEntity(room)
-                .build();
+                .build());
 
-        voteRepository.save(vote);
         em.flush();
         em.clear();
 
+        // when
         VoteJpaEntity found = voteRepository.findById(vote.getPostId()).orElseThrow();
+
+        // then
         assertThat(found).isNotNull();
         assertThat(found.getPage()).isEqualTo(10);
+        assertThat(found.getContent()).isEqualTo("투표 내용");
+        assertThat(found.getUserJpaEntity().getNickname()).isEqualTo("테스터");
         assertThat(found.getRoomJpaEntity().getTitle()).isEqualTo("방이름");
     }
 }
