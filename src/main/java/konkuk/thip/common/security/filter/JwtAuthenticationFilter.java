@@ -19,8 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.common.security.constant.JwtAuthParameters.JWT_HEADER_KEY;
-import static konkuk.thip.common.security.constant.JwtAuthParameters.JWT_PREFIX;
+import static konkuk.thip.common.security.constant.AuthParameters.*;
 
 @Slf4j
 @Component
@@ -50,10 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             LoginUser loginUser = jwtUtil.getLoginUser(token);
 
             if (loginUser.userId() != null) {
-                request.setAttribute("userId", loginUser.userId());
+                request.setAttribute(JWT_ACCESS_TOKEN_KEY.getValue(), loginUser.userId());
             }
             else {
-                request.setAttribute("oauth2Id", loginUser.oauth2Id());
+                request.setAttribute(JWT_SIGNUP_TOKEN_KEY.getValue(), loginUser.oauth2Id());
             }
 
             CustomOAuth2User customOAuth2User = new CustomOAuth2User(loginUser);

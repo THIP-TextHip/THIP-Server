@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static konkuk.thip.common.security.constant.JwtAuthParameters.JWT_HEADER_KEY;
-import static konkuk.thip.common.security.constant.JwtAuthParameters.JWT_PREFIX;
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
 
 @RestController
 @RequiredArgsConstructor

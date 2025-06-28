@@ -14,6 +14,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_ACCESS_TOKEN_KEY;
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_SIGNUP_TOKEN_KEY;
+
 @Slf4j
 @Component
 public class JwtUtil {
@@ -30,7 +33,7 @@ public class JwtUtil {
 
     public String createSignupToken(String oauth2Id) {
         return Jwts.builder()
-                .claim("oauth2Id", oauth2Id)
+                .claim(JWT_SIGNUP_TOKEN_KEY.getValue(), oauth2Id)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + signupTokenExpiredMs))
                 .signWith(secretKey)
@@ -39,7 +42,7 @@ public class JwtUtil {
 
     public String createAccessToken(Long userId) {
         return Jwts.builder()
-                .claim("userId", userId)
+                .claim(JWT_ACCESS_TOKEN_KEY.getValue(), userId)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + tokenExpiredMs))
                 .signWith(secretKey)
@@ -67,11 +70,11 @@ public class JwtUtil {
     }
 
     private String getOauth2Id(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("oauth2Id", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get(JWT_SIGNUP_TOKEN_KEY.getValue(), String.class);
     }
 
     private Long getUserId(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userId", Long.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get(JWT_ACCESS_TOKEN_KEY.getValue(), Long.class);
     }
 
     public LoginUser getLoginUser(String token) {

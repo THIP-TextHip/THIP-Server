@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static konkuk.thip.common.security.constant.JwtAuthParameters.JWT_HEADER_KEY;
-import static konkuk.thip.common.security.constant.JwtAuthParameters.JWT_PREFIX;
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
 
 @Component
 @RequiredArgsConstructor

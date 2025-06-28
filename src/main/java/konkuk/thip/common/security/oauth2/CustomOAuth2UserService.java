@@ -10,6 +10,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import static konkuk.thip.common.security.constant.AuthParameters.GOOGLE;
+import static konkuk.thip.common.security.constant.AuthParameters.KAKAO;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,10 +29,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2UserDetails oAuth2UserDetails = null;
-        if (registrationId.equals("kakao")) {
+        if (registrationId.equals(KAKAO.getValue())) {
             oAuth2UserDetails = new KakaoUserDetails(oAuth2User.getAttributes());
         }
-        else if (registrationId.equals("google")) {
+        else if (registrationId.equals(GOOGLE.getValue())) {
             oAuth2UserDetails = new GoogleUserDetails(oAuth2User.getAttributes());
         }
         else {

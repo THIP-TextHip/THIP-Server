@@ -1,7 +1,9 @@
 package konkuk.thip.common.security.oauth2;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static konkuk.thip.common.security.constant.AuthParameters.KAKAO;
+import static konkuk.thip.common.security.constant.AuthParameters.KAKAO_PROVIDER_ID_KEY;
 
 public class KakaoUserDetails implements OAuth2UserDetails {
 
@@ -13,12 +15,12 @@ public class KakaoUserDetails implements OAuth2UserDetails {
 
     @Override
     public String getProvider() {
-        return "kakao";
+        return KAKAO.getValue();
     }
 
     @Override
     public String getProviderId() {
-        return attributes.get("id").toString();
+        return attributes.get(KAKAO_PROVIDER_ID_KEY.getValue()).toString();
     }
 
 //    @Override
