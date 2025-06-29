@@ -1,13 +1,11 @@
 package konkuk.thip.book.adapter.in.web.response;
 
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
-import lombok.Builder;
 
 import java.util.List;
 
 import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
 
-@Builder
 public record GetBookSearchListResponse(
         List<BookDto> searchResult, // 책 목록
         int page,                   // 현재 페이지 (1부터 시작)
