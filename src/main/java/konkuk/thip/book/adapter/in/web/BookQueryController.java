@@ -1,6 +1,7 @@
 package konkuk.thip.book.adapter.in.web;
 
 import konkuk.thip.book.adapter.in.web.response.GetBookSearchListResponse;
+import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ public class BookQueryController {
     @GetMapping("/books")
     public BaseResponse<GetBookSearchListResponse> getBookSearchList(@RequestParam final String keyword,
                                                                      @RequestParam final int page) {
-        return BaseResponse.ok(bookSearchUseCase.searchBooks(keyword, page));
+        NaverBookParseResult result = bookSearchUseCase.searchBooks(keyword, page);
+        return BaseResponse.ok(GetBookSearchListResponse.of(result, page));
     }
+
 }
