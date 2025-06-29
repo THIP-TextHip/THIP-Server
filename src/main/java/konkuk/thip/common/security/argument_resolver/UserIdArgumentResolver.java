@@ -24,7 +24,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter,
+    public Long resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
@@ -33,6 +33,6 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
         if (userId == null) {
             throw new AuthException(AUTH_TOKEN_NOT_FOUND);
         }
-        return userId;
+        return (Long) userId;
     }
 }

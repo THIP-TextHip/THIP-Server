@@ -24,7 +24,7 @@ public class Oauth2IdArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter,
+    public String resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
@@ -33,6 +33,6 @@ public class Oauth2IdArgumentResolver implements HandlerMethodArgumentResolver {
         if (oauth2Id == null) {
             throw new AuthException(AUTH_TOKEN_NOT_FOUND);
         }
-        return oauth2Id;
+        return (String) oauth2Id;
     }
 }
