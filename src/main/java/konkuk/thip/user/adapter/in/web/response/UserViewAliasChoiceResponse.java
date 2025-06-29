@@ -1,12 +1,12 @@
 package konkuk.thip.user.adapter.in.web.response;
 
-import konkuk.thip.user.application.port.in.dto.AliasChoiceViewResult;
+import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 
 import java.util.List;
 
-public record GetUserShowAliasChoiceResponse(List<AliasChoice> aliasChoices) {
+public record UserViewAliasChoiceResponse(List<AliasChoice> aliasChoices) {
 
-    public static GetUserShowAliasChoiceResponse of(AliasChoiceViewResult result) {
+    public static UserViewAliasChoiceResponse of(UserViewAliasChoiceResult result) {
         List<AliasChoice> choices = result.aliasChoices().stream()
                 .map(ac -> new AliasChoice(
                         ac.aliasId(),
@@ -16,7 +16,7 @@ public record GetUserShowAliasChoiceResponse(List<AliasChoice> aliasChoices) {
                         ac.color()
                 ))
                 .toList();
-        return new GetUserShowAliasChoiceResponse(choices);
+        return new UserViewAliasChoiceResponse(choices);
     }
 
     public record AliasChoice(

@@ -18,7 +18,12 @@ import konkuk.thip.common.security.annotation.Oauth2Id;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
+import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
+import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
+import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
+import konkuk.thip.user.adapter.in.web.response.UserVerifyNicknameResponse;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
+import konkuk.thip.user.application.port.in.UserVerifyNicknameUseCase;
 import konkuk.thip.user.application.port.in.VerifyNicknameUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +39,7 @@ import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
 public class UserCommandController {
 
     private final UserSignupUseCase userSignupUseCase;
-    private final VerifyNicknameUseCase verifyNicknameUseCase;
+    private final UserVerifyNicknameUseCase userVerifyNicknameUseCase;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/users/signup")
@@ -48,9 +53,9 @@ public class UserCommandController {
     }
 
     @PostMapping("/users/nickname")
-    public BaseResponse<PostUserVerifyNicknameResponse> verifyNickname(@Validated @RequestBody PostUserVerifyNicknameRequest request) {
-        return BaseResponse.ok(PostUserVerifyNicknameResponse.of(
-                verifyNicknameUseCase.isNicknameUnique(request.nickname()))
+    public BaseResponse<UserVerifyNicknameResponse> verifyNickname(@Validated @RequestBody UserVerifyNicknameRequest request) {
+        return BaseResponse.ok(UserVerifyNicknameResponse.of(
+                userVerifyNicknameUseCase.isNicknameUnique(request.nickname()))
         );
     }
 }

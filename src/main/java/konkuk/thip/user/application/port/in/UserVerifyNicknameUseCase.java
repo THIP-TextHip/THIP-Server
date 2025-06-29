@@ -1,6 +1,6 @@
 package konkuk.thip.user.application.port.in;
 
-public interface VerifyNicknameUseCase {
+public interface UserVerifyNicknameUseCase {
 
     boolean isNicknameUnique(String nickname);
 }
