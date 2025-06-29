@@ -6,5 +6,5 @@ import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 public interface BookSearchUseCase {
 
     NaverBookParseResult searchBooks(String keyword, int page);
-    BookDetailSearchResult searchDetailBooks(String isbn);
+    BookDetailSearchResult searchDetailBooks(String isbn,Long userId);
 }

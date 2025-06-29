@@ -63,10 +63,10 @@ public class BookSearchService implements BookSearchUseCase {
     }
 
     @Override
-    public BookDetailSearchResult searchDetailBooks(String isbn) {
+    public BookDetailSearchResult searchDetailBooks(String isbn,Long userId) {
 
         //유저정보찾기
-        User user =  userCommandPort.findById(2L);
+        User user =  userCommandPort.findById(userId);
 
         //책 상세정보
         NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);

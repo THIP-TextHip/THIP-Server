@@ -5,6 +5,7 @@ import konkuk.thip.book.adapter.in.web.response.GetBookDetailSearchResponse;
 import konkuk.thip.book.adapter.in.web.response.GetBookSearchListResponse;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
+import konkuk.thip.common.security.annotation.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -28,11 +29,12 @@ public class BookQueryController {
     //책 상세검색 결과 조회
     @GetMapping("/books/{isbn}")
     public BaseResponse<GetBookDetailSearchResponse> getBookDetailSearch(@PathVariable("isbn")
-                                                                             @Pattern(regexp = "\\d{13}") final String isbn) {
+                                                                             @Pattern(regexp = "\\d{13}") final String isbn,
+                                                                         @UserId final Long userId) {
 
 
 
-        return BaseResponse.ok(GetBookDetailSearchResponse.of(bookSearchUseCase.searchDetailBooks(isbn)));
+        return BaseResponse.ok(GetBookDetailSearchResponse.of(bookSearchUseCase.searchDetailBooks(isbn,userId)));
     }
 
 }
