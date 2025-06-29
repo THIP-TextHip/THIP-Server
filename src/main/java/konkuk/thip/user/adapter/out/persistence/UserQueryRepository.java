@@ -1,5 +1,7 @@
 package konkuk.thip.user.adapter.out.persistence;
 
-public interface UserQueryRepository {
+import java.util.Set;
 
+public interface UserQueryRepository {
+    Set<Long> findUserIdsByBookId(Long bookId);
 }
