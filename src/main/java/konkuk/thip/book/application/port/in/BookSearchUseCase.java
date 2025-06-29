@@ -1,9 +1,9 @@
 package konkuk.thip.book.application.port.in;
 
-import konkuk.thip.book.adapter.in.web.response.GetBookSearchListResponse;
+import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 
 public interface BookSearchUseCase {
 
-    GetBookSearchListResponse searchBooks(String keyword, int page);
+    NaverBookParseResult searchBooks(String keyword, int page);
 
 }
