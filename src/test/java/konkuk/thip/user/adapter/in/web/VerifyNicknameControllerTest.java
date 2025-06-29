@@ -2,13 +2,12 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.user.adapter.in.web.request.VerifyNicknameRequest;
+import konkuk.thip.user.adapter.in.web.request.PostUserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 unique 할 경우, true를 반환한다.")
     void verify_nickname_true() throws Exception {
         //given
-        VerifyNicknameRequest request = new VerifyNicknameRequest("테스트유저");
+        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("테스트유저");
 
         //when
         ResultActions result = mockMvc.perform(post("/users/nickname")
@@ -92,7 +91,7 @@ class VerifyNicknameControllerTest {
                 .build();
         userJpaRepository.save(userJpaEntity);
 
-        VerifyNicknameRequest request = new VerifyNicknameRequest("테스트유저");
+        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("테스트유저");
 
         //when
         ResultActions result = mockMvc.perform(post("/users/nickname")
@@ -114,7 +113,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 공백일 경우, 400 error가 발생한다.")
     void nickname_blank() throws Exception {
         //given: nickname blank
-        VerifyNicknameRequest request = new VerifyNicknameRequest("");
+        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("");
 
         //when //then
         mockMvc.perform(post("/users/nickname")
@@ -129,7 +128,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 한글, 영어, 숫자 외의 문자를 포함할 경우, 400 error가 발생한다.")
     void nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
-        VerifyNicknameRequest request = new VerifyNicknameRequest("닉네임!!");
+        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("닉네임!!");
 
         //when //then
         mockMvc.perform(post("/users/nickname")
@@ -144,7 +143,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 11자 이상일 경우, 400 error가 발생한다.")
     void nickname_too_long() throws Exception {
         //given: 11글자 nickname
-        VerifyNicknameRequest request = new VerifyNicknameRequest("11글자닉네임입니다아");
+        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("11글자닉네임입니다아");
 
         //when //then
         mockMvc.perform(post("/users/nickname")

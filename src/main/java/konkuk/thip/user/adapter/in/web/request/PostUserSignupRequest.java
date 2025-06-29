@@ -3,7 +3,7 @@ package konkuk.thip.user.adapter.in.web.request;
 import jakarta.validation.constraints.*;
 import konkuk.thip.user.application.port.in.dto.UserSignupCommand;
 
-public record UserSignupRequest(
+public record PostUserSignupRequest(
         @NotNull(message = "aliasId는 필수입니다.")
         Long aliasId,
 

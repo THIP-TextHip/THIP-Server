@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.user.adapter.in.web.response.ShowAliasChoiceResponse;
+import konkuk.thip.user.adapter.in.web.response.GetUserShowAliasChoiceResponse;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -65,8 +65,8 @@ class ShowAliasChoiceViewControllerTest {
 
         String json = result.andReturn().getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(json);
-        ShowAliasChoiceResponse showResponse = objectMapper.treeToValue(jsonNode.get("data"), ShowAliasChoiceResponse.class);
-        List<ShowAliasChoiceResponse.AliasChoice> choices = showResponse.aliasChoices();
+        GetUserShowAliasChoiceResponse showResponse = objectMapper.treeToValue(jsonNode.get("data"), GetUserShowAliasChoiceResponse.class);
+        List<GetUserShowAliasChoiceResponse.AliasChoice> choices = showResponse.aliasChoices();
 
         assertThat(choices).hasSize(2);
         assertThat(choices)

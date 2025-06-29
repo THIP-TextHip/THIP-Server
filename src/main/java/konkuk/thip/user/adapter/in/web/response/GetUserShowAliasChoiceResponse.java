@@ -4,9 +4,9 @@ import konkuk.thip.user.application.port.in.dto.AliasChoiceViewResult;
 
 import java.util.List;
 
-public record ShowAliasChoiceResponse(List<AliasChoice> aliasChoices) {
+public record GetUserShowAliasChoiceResponse(List<AliasChoice> aliasChoices) {
 
-    public static ShowAliasChoiceResponse of(AliasChoiceViewResult result) {
+    public static GetUserShowAliasChoiceResponse of(AliasChoiceViewResult result) {
         List<AliasChoice> choices = result.aliasChoices().stream()
                 .map(ac -> new AliasChoice(
                         ac.aliasId(),
@@ -16,7 +16,7 @@ public record ShowAliasChoiceResponse(List<AliasChoice> aliasChoices) {
                         ac.color()
                 ))
                 .toList();
-        return new ShowAliasChoiceResponse(choices);
+        return new GetUserShowAliasChoiceResponse(choices);
     }
 
     public record AliasChoice(

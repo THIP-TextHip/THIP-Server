@@ -2,13 +2,12 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
+import konkuk.thip.user.adapter.in.web.request.PostUserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ class UserSignupControllerTest {
                 .build();
         aliasJpaRepository.save(aliasJpaEntity);
 
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 aliasJpaEntity.getAliasId(),
                 "테스트유저",
                 "test@test.com"
@@ -90,7 +89,7 @@ class UserSignupControllerTest {
     @DisplayName("[칭호id]값이 null일 경우, 400 error가 발생한다.")
     void signup_alias_id_null() throws Exception {
         //given: aliasId null
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 null,
                 "테스트유저",
                 "test@test.com"
@@ -109,7 +108,7 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 공백일 경우, 400 error가 발생한다.")
     void signup_nickname_blank() throws Exception {
         //given: nickname blank
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 1L,
                 "",
                 "test@test.com"
@@ -128,7 +127,7 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 한글, 영어, 숫자 외의 문자를 포함할 경우, 400 error가 발생한다.")
     void signup_nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 1L,
                 "닉네임!!",
                 "test@test.com"
@@ -147,7 +146,7 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 11자 이상일 경우, 400 error가 발생한다.")
     void signup_nickname_too_long() throws Exception {
         //given: 11글자 nickname
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 1L,
                 "11글자닉네임입니다아",
                 "test@test.com"
@@ -166,7 +165,7 @@ class UserSignupControllerTest {
     @DisplayName("[이메일]값이 공백일 경우, 400 error가 발생한다.")
     void signup_email_blank() throws Exception {
         //given
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 1L,
                 "테스트유저",
                 ""
@@ -185,7 +184,7 @@ class UserSignupControllerTest {
     @DisplayName("[이메일]값이 유효한 이메일 형식이 아닐 경우, 400 error가 발생한다.")
     void signup_email_invalid_format() throws Exception {
         //given
-        UserSignupRequest request = new UserSignupRequest(
+        PostUserSignupRequest request = new PostUserSignupRequest(
                 1L,
                 "테스트유저",
                 "invalid-email-format"
