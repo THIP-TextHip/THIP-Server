@@ -10,13 +10,13 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class SavedQueryPersistenceAdapter implements SavedQueryPort {
 
-    private final SavedBookRepository savedBookRepository;
-    private final SavedFeedRepository savedFeedRepository;
+    private final SavedBookJpaRepository savedBookJpaRepository;
+    private final SavedFeedJpaRepository savedFeedJpaRepository;
     private final SavedBookMapper savedBookMapper;
     private final SavedFeedMapper savedFeedMapper;
 
     @Override
     public boolean existsByUserIdAndBookId(Long userId, Long bookId) {
-        return savedBookRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
+        return savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
     }
 }
