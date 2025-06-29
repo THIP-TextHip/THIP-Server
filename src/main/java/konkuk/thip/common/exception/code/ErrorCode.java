@@ -15,6 +15,9 @@ public enum ErrorCode implements ResponseCode {
     API_MISSING_PARAM(HttpStatus.BAD_REQUEST, 40001, "필수 파라미터가 없습니다."),
     API_INVALID_PARAM(HttpStatus.BAD_REQUEST, 40002, "파라미터 값 중 유효하지 않은 값이 있습니다."),
     API_INVALID_TYPE(HttpStatus.BAD_REQUEST, 40003, "파라미터 타입이 잘못되었습니다."),
+    API_INVALID_SIZE(HttpStatus.BAD_REQUEST, 40004, "요청값의 사이즈가 잘못되었습니다."),
+    API_INVALID_PATTERN(HttpStatus.BAD_REQUEST, 40005, "요청값의 형식이 잘못되었습니다."),
+    API_REQUEST_INVALID(HttpStatus.BAD_REQUEST, 40006, "요청값이 유효하지않는 형식입니다."),
 
     /* 60000부터 비즈니스 예외 */
     /**
@@ -34,7 +37,8 @@ public enum ErrorCode implements ResponseCode {
     BOOK_NAVER_API_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, 80005,"네이버 API 응답에 실패하였습니다."),
     BOOK_SEARCH_PAGE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, 80006,"검색어 페이지가 범위를 벗어났습니다."),
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
-    BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다.");
+    BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
+    BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80008, "ISBN으로 검색한 결과가 존재하지 않습니다.");
 
 
 
