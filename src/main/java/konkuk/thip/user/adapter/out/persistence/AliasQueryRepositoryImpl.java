@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class AliasRepositoryCustomImpl implements AliasRepositoryCustom {
+public class AliasQueryRepositoryImpl implements AliasQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
