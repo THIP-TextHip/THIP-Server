@@ -2,8 +2,6 @@ package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.application.port.out.SearchBookQueryPort;
-import konkuk.thip.util.NaverApiUtil;
-import konkuk.thip.util.NaverBookXmlParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
