@@ -27,6 +27,11 @@ public enum ErrorCode implements ResponseCode {
 
 
     /**
+     * 70000 : user error
+     */
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 70000, "존재하지 않는 USER 입니다."),
+
+    /**
      * 80000 : book error
      */
     BOOK_KEYWORD_ENCODING_FAILED(HttpStatus.BAD_REQUEST, 80000, "검색어 인코딩에 실패했습니다."),
@@ -38,7 +43,9 @@ public enum ErrorCode implements ResponseCode {
     BOOK_SEARCH_PAGE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, 80006,"검색어 페이지가 범위를 벗어났습니다."),
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
-    BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80008, "ISBN으로 검색한 결과가 존재하지 않습니다.");
+    BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80008, "ISBN으로 검색한 결과가 존재하지 않습니다."),
+    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "존재하지 않는 BOOK 입니다.");
+
 
 
 
