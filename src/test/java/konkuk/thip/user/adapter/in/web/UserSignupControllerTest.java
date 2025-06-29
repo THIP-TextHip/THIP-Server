@@ -3,8 +3,7 @@ package konkuk.thip.user.adapter.in.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.security.util.JwtUtil;
-import konkuk.thip.user.adapter.in.web.request.PostUserSignupRequest;
-import konkuk.thip.user.adapter.in.web.request.PostUserSignupRequest;
+import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
@@ -21,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
+import static konkuk.thip.common.exception.code.ErrorCode.AUTH_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -64,7 +64,7 @@ class UserSignupControllerTest {
                 .build();
         aliasJpaRepository.save(aliasJpaEntity);
 
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 aliasJpaEntity.getAliasId(),
                 "테스트유저"
         );
@@ -94,7 +94,7 @@ class UserSignupControllerTest {
     @DisplayName("[칭호id]값이 null일 경우, 400 error가 발생한다.")
     void signup_alias_id_null() throws Exception {
         //given: aliasId null
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 null,
                 "테스트유저"
         );
@@ -114,7 +114,7 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 공백일 경우, 400 error가 발생한다.")
     void signup_nickname_blank() throws Exception {
         //given: nickname blank
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
                 ""
         );
@@ -134,13 +134,15 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 한글, 영어, 숫자 외의 문자를 포함할 경우, 400 error가 발생한다.")
     void signup_nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
                 "닉네임!!"
         );
 
         //when //then
-        mockMvc.perform(post("/users/signup")
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
+        ResultActions result = mockMvc.perform(post("/users/signup")
+                        .header("Authorization", "Bearer " + testToken)  //헤더 추가
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -152,7 +154,7 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 11자 이상일 경우, 400 error가 발생한다.")
     void signup_nickname_too_long() throws Exception {
         //given: 11글자 nickname
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
                 "11글자닉네임입니다아"
         );
