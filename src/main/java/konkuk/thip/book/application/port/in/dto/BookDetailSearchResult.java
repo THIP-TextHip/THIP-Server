@@ -7,7 +7,7 @@ public record BookDetailSearchResult(
         NaverDetailBookParseResult naverDetailBook,
         int recruitingRoomCount,
         int recruitingReadCount,
-        boolean isSaved //회원가입 머지되면 추가
+        boolean isSaved
 
 )
 {
