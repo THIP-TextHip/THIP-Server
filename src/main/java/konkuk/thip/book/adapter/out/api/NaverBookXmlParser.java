@@ -1,7 +1,6 @@
-package konkuk.thip.util;
+package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
-import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import org.w3c.dom.*;
@@ -14,7 +13,7 @@ import org.xml.sax.InputSource;
 public class NaverBookXmlParser {
 
     public static NaverBookParseResult parse(String xml) {
-        List<Book> books = new ArrayList<>();
+        List<NaverBookParseResult.NaverBook> Naverbooks = new ArrayList<>();
         int total = -1;
         int start = -1;
         try {
@@ -34,23 +33,23 @@ public class NaverBookXmlParser {
                     Element item = (Element) itemNodes.item(i);
                     String title = getTagValue(item, "title");
                     String imageUrl = getTagValue(item, "image");
-                    String authorName = getTagValue(item, "author");
+                    String author = getTagValue(item, "author");
                     String publisher = getTagValue(item, "publisher");
                     String isbn = getTagValue(item, "isbn");
-                    Book book = Book.builder()
+                    NaverBookParseResult.NaverBook naverBook = NaverBookParseResult.NaverBook.builder()
                             .title(title)
                             .imageUrl(imageUrl)
-                            .authorName(authorName)
+                            .author(author)
                             .publisher(publisher)
                             .isbn(isbn)
                             .build();
-                    books.add(book);
+                    Naverbooks.add(naverBook);
                 }
             }
         } catch (Exception e) {
            throw new BusinessException(ErrorCode.BOOK_NAVER_API_PARSING_ERROR);
         }
-        return NaverBookParseResult.of(books, total, start);
+        return NaverBookParseResult.of(Naverbooks, total, start);
     }
 
     private static String getTagValue(Element element, String tag) {
