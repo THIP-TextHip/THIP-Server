@@ -1,5 +1,6 @@
 package konkuk.thip.common.security.oauth2;
 
+import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static konkuk.thip.common.exception.code.ErrorCode.AUTH_UNSUPPORTED_SOCIAL_LOGIN;
 import static konkuk.thip.common.security.constant.AuthParameters.GOOGLE;
 import static konkuk.thip.common.security.constant.AuthParameters.KAKAO;
 
@@ -39,7 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         else {
             log.warn("카카오 또는 구글 소셜 로그인만 지원합니다.");
-            return null;
+            throw new AuthException(AUTH_UNSUPPORTED_SOCIAL_LOGIN);
         }
 
         String oauth2Id = oAuth2UserDetails.getProvider() + "_" + oAuth2UserDetails.getProviderId(); //kakao_1234567890
