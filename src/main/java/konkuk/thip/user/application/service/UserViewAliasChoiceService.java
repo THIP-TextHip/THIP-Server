@@ -1,19 +1,19 @@
 package konkuk.thip.user.application.service;
 
-import konkuk.thip.user.application.port.in.ShowAliasChoiceViewUseCase;
-import konkuk.thip.user.application.port.in.dto.AliasChoiceViewResult;
+import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
+import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.application.port.out.AliasQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShowAliasChoiceViewService implements ShowAliasChoiceViewUseCase {
+public class UserViewAliasChoiceService implements UserViewAliasChoiceUseCase {
 
     private final AliasQueryPort aliasQueryPort;
 
     @Override
-    public AliasChoiceViewResult getAllAliasesAndCategories() {
+    public UserViewAliasChoiceResult getAllAliasesAndCategories() {
         return aliasQueryPort.getAllAliasesAndCategories();
     }
 }

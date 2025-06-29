@@ -2,6 +2,7 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -31,23 +32,10 @@ class UserJpaEntityTest {
     @DisplayName("UserJpaEntity 저장 및 조회 테스트")
     void saveAndFindUser() {
         // given
-        AliasJpaEntity alias = AliasJpaEntity.builder()
-                .value("칭호")
-                .imageUrl("test-image-url")
-                .color("red")
-                .build();
-        aliasJpaRepository.save(alias);
-
-        UserJpaEntity user = UserJpaEntity.builder()
-                .email("test@test.com")
-                .nickname("테스터")
-                .imageUrl("https://test.img")
-                .aliasForUserJpaEntity(alias)
-                .role(UserRole.USER)
-                .build();
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createAlias());
+        UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
 
         // when
-        userRepository.save(user);
         em.flush();
         em.clear();
 
