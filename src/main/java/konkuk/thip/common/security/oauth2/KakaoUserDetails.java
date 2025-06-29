@@ -7,7 +7,7 @@ import static konkuk.thip.common.security.constant.AuthParameters.KAKAO_PROVIDER
 
 public class KakaoUserDetails implements OAuth2UserDetails {
 
-    private Map<String, Object> attributes;
+    private final Map<String, Object> attributes;
 
     public KakaoUserDetails(Map<String, Object> attributes) {
         this.attributes = attributes;

@@ -7,11 +7,11 @@ import static konkuk.thip.common.security.constant.AuthParameters.GOOGLE_PROVIDE
 
 public class GoogleUserDetails implements OAuth2UserDetails{
 
-    private final Map<String, Object> attribute;
+    private final Map<String, Object> attributes;
 
-    public GoogleUserDetails(Map<String, Object> attribute) {
+    public GoogleUserDetails(Map<String, Object> attributes) {
 
-        this.attribute = attribute;
+        this.attributes = attributes;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class GoogleUserDetails implements OAuth2UserDetails{
     @Override
     public String getProviderId() {
 
-        return attribute.get(GOOGLE_PROVIDER_ID_KEY.getValue()).toString();
+        return attributes.get(GOOGLE_PROVIDER_ID_KEY.getValue()).toString();
     }
 
 //    @Override
