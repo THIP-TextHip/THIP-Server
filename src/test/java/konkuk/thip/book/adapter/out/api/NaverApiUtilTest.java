@@ -1,22 +1,44 @@
-package konkuk.thip.util;
+package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.common.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.lang.reflect.Field;
+
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_REQUEST_ERROR;
 import static org.assertj.core.api.Assertions.*;
 
 class NaverApiUtilTest {
 
+    private NaverApiUtil createTestUtil() {
+        NaverApiUtil util = Mockito.spy(new NaverApiUtil());
+        // @Value로 주입되는 필드를 직접 세팅
+        try {
+            Field clientIdField = NaverApiUtil.class.getDeclaredField("clientId");
+            clientIdField.setAccessible(true);
+            clientIdField.set(util, "dummy-client-id");
+
+            Field clientSecretField = NaverApiUtil.class.getDeclaredField("clientSecret");
+            clientSecretField.setAccessible(true);
+            clientSecretField.set(util, "dummy-client-secret");
+
+            Field bookSearchUrlField = NaverApiUtil.class.getDeclaredField("bookSearchUrl");
+            bookSearchUrlField.setAccessible(true);
+            bookSearchUrlField.set(util, "https://dummy-url.com/search?query=");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return util;
+    }
+
     @Test
-    @DisplayName("정상 응답을 모킹하여 반환")
+    @DisplayName("NaverApiUtil - 정상적으로 XML 응답을 반환한다 (외부 API 성공 케이스)")
     void searchBook_success_mocking() {
         // given
-        NaverApiUtil naverApiUtil = Mockito.spy(new NaverApiUtil());
+        NaverApiUtil naverApiUtil = createTestUtil();
 
-        // get 메서드를 spy로 모킹 (실제 네트워크 호출 없이 원하는 응답 반환)
         String expectedXml = "<rss><channel><total>1</total><start>1</start></channel></rss>";
         Mockito.doReturn(expectedXml)
                 .when(naverApiUtil)
@@ -31,12 +53,11 @@ class NaverApiUtilTest {
     }
 
     @Test
-    @DisplayName("get 메서드에서 예외가 발생하면 BusinessException이 발생")
+    @DisplayName("NaverApiUtil - get 메서드에서 예외 발생 시 BusinessException 발생")
     void searchBook_ioException() {
         // given
-        NaverApiUtil naverApiUtil = Mockito.spy(new NaverApiUtil());
+        NaverApiUtil naverApiUtil = createTestUtil();
 
-        // get 메서드가 예외를 던지도록 설정
         Mockito.doThrow(new BusinessException(BOOK_NAVER_API_REQUEST_ERROR))
                 .when(naverApiUtil)
                 .get(Mockito.anyString(), Mockito.anyMap());
