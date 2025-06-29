@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class VerifyNicknameControllerTest {
 
     @Autowired
@@ -83,10 +83,10 @@ class VerifyNicknameControllerTest {
         aliasJpaRepository.save(aliasJpaEntity);
 
         UserJpaEntity userJpaEntity = UserJpaEntity.builder()
-                .email("test@test.com")
                 .nickname("테스트유저")
                 .imageUrl("http://image.url")
                 .role(USER)
+                .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(aliasJpaEntity)
                 .build();
         userJpaRepository.save(userJpaEntity);
