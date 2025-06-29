@@ -55,8 +55,14 @@ dependencies {
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
 
-tasks.withType(JavaCompile).configureEach {
+// QueryDSL Q-클래스는 compileJava 단계에서만 생성
+tasks.named('compileJava', org.gradle.api.tasks.compile.JavaCompile) {
 	options.generatedSourceOutputDirectory.set(querydslDir)
+}
+
+// test 컴파일 단계에서는 어노테이션 프로세서를 비워서 Q-클래스 중복 생성 방지
+tasks.named('compileTestJava', org.gradle.api.tasks.compile.JavaCompile) {
+	options.annotationProcessorPath = files()
 }
 
 sourceSets {
