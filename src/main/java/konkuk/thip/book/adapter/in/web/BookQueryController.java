@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class BookQueryController {
 
     private final BookSearchUseCase bookSearchUseCase;
