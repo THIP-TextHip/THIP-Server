@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import static konkuk.thip.common.exception.code.ErrorCode.ALIAS_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,5 +28,13 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
 
         UserJpaEntity userJpaEntity = userMapper.toJpaEntity(user, aliasJpaEntity);
         return userJpaRepository.save(userJpaEntity).getUserId();
+    }
+
+    @Override
+    public User findById(Long userId) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND));
+
+        return userMapper.toDomainEntity(userJpaEntity);
     }
 }
