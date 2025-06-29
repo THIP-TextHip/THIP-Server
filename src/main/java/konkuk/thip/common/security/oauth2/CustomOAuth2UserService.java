@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static konkuk.thip.common.security.constant.AuthParameters.GOOGLE;
 import static konkuk.thip.common.security.constant.AuthParameters.KAKAO;
 
@@ -41,13 +43,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         String oauth2Id = oAuth2UserDetails.getProvider() + "_" + oAuth2UserDetails.getProviderId(); //kakao_1234567890
-        UserJpaEntity existingUser = userJpaRepository.findByOauth2Id(oauth2Id);
-        if(existingUser == null) {
+        Optional<UserJpaEntity> existingUser = userJpaRepository.findByOauth2Id(oauth2Id);
+        if(existingUser.isEmpty()) {
             LoginUser newUser = LoginUser.createNewUser(oauth2Id);
             return new CustomOAuth2User(newUser);
         }
 
-        LoginUser loginUser = LoginUser.createExistingUser(oauth2Id, existingUser.getUserId());
+        LoginUser loginUser = LoginUser.createExistingUser(oauth2Id, existingUser.get().getUserId());
         return new CustomOAuth2User(loginUser);
     }
 }
