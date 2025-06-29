@@ -33,6 +33,7 @@ public class AliasQueryRepositoryImpl implements AliasQueryRepository {
                 .from(alias)
                 .leftJoin(category)
                 .on(category.aliasForCategoryJpaEntity.eq(alias))
+                .orderBy(alias.aliasId.asc())
                 .fetch();
 
         return new AliasChoiceViewResult(aliasChoices);
