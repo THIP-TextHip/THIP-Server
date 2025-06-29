@@ -15,4 +15,8 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
     private final SavedBookMapper savedBookMapper;
     private final SavedFeedMapper savedFeedMapper;
 
+    @Override
+    public boolean existsByUserIdAndBookId(Long userId, Long bookId) {
+        return savedBookRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
+    }
 }
