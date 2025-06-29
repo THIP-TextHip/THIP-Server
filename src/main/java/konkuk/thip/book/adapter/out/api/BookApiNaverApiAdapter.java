@@ -2,14 +2,13 @@ package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
-import konkuk.thip.book.application.port.out.SearchDetailBookQueryPort;
-import konkuk.thip.book.application.port.out.SearchBookQueryPort;
+import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BookNaverApiAdapter implements SearchBookQueryPort, SearchDetailBookQueryPort {
+public class BookApiNaverApiAdapter implements BookApiQueryPort {
 
     private final NaverApiUtil naverApiUtil;
 
