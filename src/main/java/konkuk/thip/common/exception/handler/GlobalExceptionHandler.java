@@ -1,5 +1,9 @@
 package konkuk.thip.common.exception.handler;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import konkuk.thip.common.dto.ErrorResponse;
 import konkuk.thip.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -88,5 +92,34 @@ public class GlobalExceptionHandler {
                 .status(API_SERVER_ERROR.getHttpStatus())
                 .body(ErrorResponse.of(API_SERVER_ERROR));
     }
+
+    // @Size,@Pattern 예외처리
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        // 여러 위반 중 첫 번째만 처리
+        ConstraintViolation<?> violation = e.getConstraintViolations().stream()
+                .findFirst()
+                .orElse(null);
+
+        if (violation != null) {
+            Class<?> annotationType = violation.getConstraintDescriptor().getAnnotation().annotationType();
+            log.error("[ConstraintViolationException] {}", e.getMessage());
+            if (annotationType == Size.class) {
+                return ResponseEntity
+                        .status(API_INVALID_SIZE.getHttpStatus())
+                        .body(ErrorResponse.of(API_INVALID_SIZE));
+            } else if (annotationType == Pattern.class) {
+                return ResponseEntity
+                        .status(API_INVALID_PATTERN.getHttpStatus())
+                        .body(ErrorResponse.of(API_INVALID_PATTERN));
+            }
+        }
+
+        return ResponseEntity
+                .status(API_REQUEST_INVALID.getHttpStatus())
+                .body(ErrorResponse.of(API_REQUEST_INVALID));
+
+    }
+
 
 }
