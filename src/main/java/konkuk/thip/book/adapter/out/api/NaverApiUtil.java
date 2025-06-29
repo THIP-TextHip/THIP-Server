@@ -1,4 +1,4 @@
-package konkuk.thip.util;
+package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,10 @@ public class NaverApiUtil {
     private String clientId;
     @Value("${naver.clientSecret}")
     private String clientSecret;
+    @Value("${naver.bookSearchUrl}")
+    private String bookSearchUrl;
 
-    private final String NAVER_BOOK_SEARCH_URL = "https://openapi.naver.com/v1/search/book.xml?query=";   //책 검색 결과 조회
-
+    public static final int PAGE_SIZE = 10;
 
     public String searchBook(String keyword, int start){
         String query = keywordToEncoding(keyword);
@@ -39,7 +40,7 @@ public class NaverApiUtil {
     }
 
     private String buildSearchApiUrl(String query,Integer start) {
-        return NAVER_BOOK_SEARCH_URL+query+"&start="+start;
+        return bookSearchUrl+query+"&display="+PAGE_SIZE+"&start="+start;
     }
 
     private String keywordToEncoding(String keyword) {
