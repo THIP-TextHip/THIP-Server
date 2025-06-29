@@ -3,20 +3,20 @@ package konkuk.thip.book.adapter.in.web;
 import jakarta.validation.constraints.Pattern;
 import konkuk.thip.book.adapter.in.web.response.GetBookDetailSearchResponse;
 import konkuk.thip.book.adapter.in.web.response.GetBookSearchListResponse;
-import konkuk.thip.book.application.port.in.BookDetailSearchUseCase;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class BookQueryController {
 
     private final BookSearchUseCase bookSearchUseCase;
-    private final BookDetailSearchUseCase bookDetailSearchUseCase;
 
     //책 검색결과 조회
     @GetMapping("/books")
@@ -31,7 +31,8 @@ public class BookQueryController {
                                                                              @Pattern(regexp = "\\d{13}") final String isbn) {
 
 
-        return BaseResponse.ok(GetBookDetailSearchResponse.of(bookDetailSearchUseCase.searchDetailBooks(isbn)));
+
+        return BaseResponse.ok(GetBookDetailSearchResponse.of(bookSearchUseCase.searchDetailBooks(isbn)));
     }
 
 }
