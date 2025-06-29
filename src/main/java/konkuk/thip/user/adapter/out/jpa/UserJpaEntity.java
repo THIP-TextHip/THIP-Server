@@ -31,7 +31,7 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 
