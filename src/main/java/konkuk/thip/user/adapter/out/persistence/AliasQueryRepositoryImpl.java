@@ -4,7 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
-import konkuk.thip.user.application.port.in.dto.AliasChoiceViewResult;
+import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,13 +17,13 @@ public class AliasQueryRepositoryImpl implements AliasQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public AliasChoiceViewResult getAllAliasesAndCategories() {
+    public UserViewAliasChoiceResult getAllAliasesAndCategories() {
         QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
         QCategoryJpaEntity category = QCategoryJpaEntity.categoryJpaEntity;
 
-        List<AliasChoiceViewResult.AliasChoice> aliasChoices = jpaQueryFactory
+        List<UserViewAliasChoiceResult.AliasChoice> aliasChoices = jpaQueryFactory
                 .select(Projections.constructor(
-                        AliasChoiceViewResult.AliasChoice.class,
+                        UserViewAliasChoiceResult.AliasChoice.class,
                         alias.aliasId,
                         alias.value,
                         category.value,
@@ -36,6 +36,6 @@ public class AliasQueryRepositoryImpl implements AliasQueryRepository {
                 .orderBy(alias.aliasId.asc())
                 .fetch();
 
-        return new AliasChoiceViewResult(aliasChoices);
+        return new UserViewAliasChoiceResult(aliasChoices);
     }
 }

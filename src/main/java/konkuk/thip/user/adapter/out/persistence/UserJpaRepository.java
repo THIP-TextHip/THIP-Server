@@ -3,7 +3,9 @@ package konkuk.thip.user.adapter.out.persistence;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long>, UserQueryRepository {
+import java.util.Optional;
 
+public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long>, UserQueryRepository {
+    Optional<UserJpaEntity> findByOauth2Id(String oauth2Id);
     boolean existsByNickname(String nickname);
 }

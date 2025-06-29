@@ -2,7 +2,7 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.user.adapter.in.web.request.PostUserVerifyNicknameRequest;
+import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
@@ -28,8 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
-class VerifyNicknameControllerTest {
+@AutoConfigureMockMvc(addFilters = false)
+class UserVerifyNicknameControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -53,7 +53,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 unique 할 경우, true를 반환한다.")
     void verify_nickname_true() throws Exception {
         //given
-        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("테스트유저");
+        UserVerifyNicknameRequest request = new UserVerifyNicknameRequest("테스트유저");
 
         //when
         ResultActions result = mockMvc.perform(post("/users/nickname")
@@ -83,15 +83,15 @@ class VerifyNicknameControllerTest {
         aliasJpaRepository.save(aliasJpaEntity);
 
         UserJpaEntity userJpaEntity = UserJpaEntity.builder()
-                .email("test@test.com")
                 .nickname("테스트유저")
                 .imageUrl("http://image.url")
                 .role(USER)
+                .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(aliasJpaEntity)
                 .build();
         userJpaRepository.save(userJpaEntity);
 
-        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("테스트유저");
+        UserVerifyNicknameRequest request = new UserVerifyNicknameRequest("테스트유저");
 
         //when
         ResultActions result = mockMvc.perform(post("/users/nickname")
@@ -113,7 +113,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 공백일 경우, 400 error가 발생한다.")
     void nickname_blank() throws Exception {
         //given: nickname blank
-        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("");
+        UserVerifyNicknameRequest request = new UserVerifyNicknameRequest("");
 
         //when //then
         mockMvc.perform(post("/users/nickname")
@@ -128,7 +128,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 한글, 영어, 숫자 외의 문자를 포함할 경우, 400 error가 발생한다.")
     void nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
-        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("닉네임!!");
+        UserVerifyNicknameRequest request = new UserVerifyNicknameRequest("닉네임!!");
 
         //when //then
         mockMvc.perform(post("/users/nickname")
@@ -143,7 +143,7 @@ class VerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 11자 이상일 경우, 400 error가 발생한다.")
     void nickname_too_long() throws Exception {
         //given: 11글자 nickname
-        PostUserVerifyNicknameRequest request = new PostUserVerifyNicknameRequest("11글자닉네임입니다아");
+        UserVerifyNicknameRequest request = new UserVerifyNicknameRequest("11글자닉네임입니다아");
 
         //when //then
         mockMvc.perform(post("/users/nickname")
