@@ -7,7 +7,6 @@ import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
