@@ -34,11 +34,16 @@ import static konkuk.thip.recentSearch.adapter.out.jpa.SearchType.BOOK_SEARCH;
 public class BookSavedService implements BookSavedUseCase {
 
     private final UserCommandPort userCommandPort;
-    Pr
-
+    private final BookCommandPort bookCommandPort;
 
     @Override
+    @Transactional
     public BookIsSavedResult isSavedBook(String isbn, boolean type, Long userId) {
+
+        User user = userCommandPort.findById(userId);
+
+
+
 
         return null;
     }
