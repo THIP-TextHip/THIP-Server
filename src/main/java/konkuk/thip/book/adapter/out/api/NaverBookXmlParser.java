@@ -3,7 +3,7 @@ package konkuk.thip.book.adapter.out.api;
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.exception.ExternalApiException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.StringReader;
@@ -12,6 +12,7 @@ import java.util.List;
 import org.xml.sax.InputSource;
 
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_ISBN_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_PARSING_ERROR;
 
 public class NaverBookXmlParser {
 
@@ -42,7 +43,7 @@ public class NaverBookXmlParser {
                 }
             }
         } catch (Exception e) {
-            throw new BusinessException(ErrorCode.BOOK_NAVER_API_PARSING_ERROR);
+            throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
         }
         return NaverBookParseResult.of(naverBooks, total, start);
     }
@@ -81,28 +82,27 @@ public class NaverBookXmlParser {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            throw new BusinessException(ErrorCode.BOOK_NAVER_API_PARSING_ERROR);
+            throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
         }
         return null;
     }
 
-
-    private static Element getFirstChannel(String xml) throws Exception {
+    private static Document parseXml(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         factory.setExpandEntityReferences(false);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader(xml));
-        Document doc = builder.parse(is);
-
-        NodeList channelNodes = doc.getElementsByTagName("channel");
-        if (channelNodes.getLength() > 0) {
-            return (Element) channelNodes.item(0);
-        }
-        return null;
+        return builder.parse(new InputSource(new StringReader(xml)));
     }
+
+    private static Element getFirstChannel(String xml) throws Exception {
+        Document doc = parseXml(xml);
+        NodeList channelNodes = doc.getElementsByTagName("channel");
+        return (channelNodes.getLength() > 0) ? (Element) channelNodes.item(0) : null;
+    }
+
 
     private static List<Element> getItemElements(Element channel) {
         NodeList itemNodes = channel.getElementsByTagName("item");
