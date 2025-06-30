@@ -14,6 +14,7 @@ import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
+import konkuk.thip.saved.application.port.out.SavedCommandPort;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
@@ -35,6 +37,7 @@ public class BookSavedService implements BookSavedUseCase {
 
     private final UserCommandPort userCommandPort;
     private final BookCommandPort bookCommandPort;
+    private final SavedCommandPort savedCommandPort;
 
     @Override
     @Transactional
@@ -42,9 +45,25 @@ public class BookSavedService implements BookSavedUseCase {
 
         User user = userCommandPort.findById(userId);
 
+        Optional<Book> bookOpt = bookCommandPort.findByIsbn(isbn);
 
 
+        Book book;
 
-        return null;
+        if (bookOpt.isEmpty()) {
+            // 책이 없으면 새로 저장???
+            //book = bookCommandPort.save(new Book(isbn /*, 필요한 필드들 채워서*/));
+        } else {
+            book = bookOpt.get();
+        }
+
+        // 저장 상태 변경
+        if (type) {
+            savedCommandPort.saveBook(user.getId(), book.getId());
+        } else {
+            savedCommandPort.deleteBook(user.getId(), book.getId());
+        }
+
+        return BookIsSavedResult.of(isbn,type);
     }
 }
