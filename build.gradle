@@ -56,11 +56,6 @@ dependencies {
 	testImplementation 'com.h2database:h2:2.1.214'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	//@Valid 의존성
-	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
-	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
-
-
 	// Querydsl
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
