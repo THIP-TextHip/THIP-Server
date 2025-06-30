@@ -71,31 +71,12 @@ public class BookSearchService implements BookSearchUseCase {
         //책 상세정보
         NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
 
-        //이책에 모집중인 모임방 개수
+
         Book book = bookCommandPort.findByIsbn(isbn);
-        LocalDate today = LocalDate.now();
-        //오늘 날짜 기준으로 방 활동 시작 기간이 이후인 방 찾기(모집중인 방)
-        int recruitingRoomCount = roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(book.getId(), today);
-
-
+        //이책에 모집중인 모임방 개수
+        int recruitingRoomCount = getRecruitingRoomCount(book);
         // 이책에 읽기 참여중인 사용자 수
-        // 해당책으로 피드에 글 작성
-        // 해당책에 대해 모임방 참여
-        // 둘 중 하나라도 부합될 경우 카운트, 중복 카운트 불가
-
-        // 이 책으로 만들어진 방에 참여한 사용자 ID 집합
-        Set<Long> roomParticipantUserIds = userQueryPort.findUserIdsParticipatedInRoomsByBookId(book.getId());
-
-        // 이 책으로 피드를 쓴 사용자 ID 집합
-        Set<Long> feedAuthorUserIds = feedQueryPort.findUserIdsByBookId(book.getId());
-
-        // 합집합(중복 제거)
-        Set<Long> combinedUsers = new HashSet<>();
-        combinedUsers.addAll(roomParticipantUserIds);
-        combinedUsers.addAll(feedAuthorUserIds);
-
-        int recruitingReadCount = combinedUsers.size();
-
+        int recruitingReadCount = getRecruitingReadCount(book);
         // 사용자의 해당 책 저장 여부
         boolean isSaved = savedQueryPort.existsByUserIdAndBookId(user.getId(), book.getId());
 
@@ -104,6 +85,30 @@ public class BookSearchService implements BookSearchUseCase {
                 recruitingRoomCount,
                 recruitingReadCount,
                 isSaved);
+    }
+
+    private int getRecruitingRoomCount(Book book) {
+        //오늘 날짜 기준으로 방 활동 시작 기간이 이후인 방 찾기(모집중인 방)
+        LocalDate today = LocalDate.now();
+        return roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(book.getId(), today);
+    }
+
+    private int getRecruitingReadCount(Book book) {
+        // 해당책으로 피드에 글 작성
+        // 해당책에 대해 모임방 참여
+        // 둘 중 하나라도 부합될 경우 카운트, 중복 카운트 불가
+
+        // 이 책으로 만들어진 방에 참여한 사용자 ID 집합
+        Set<Long> roomParticipantUserIds = userQueryPort.findUserIdsParticipatedInRoomsByBookId(book.getId());
+        // 이 책으로 피드를 쓴 사용자 ID 집합
+        Set<Long> feedAuthorUserIds = feedQueryPort.findUserIdsByBookId(book.getId());
+
+        // 합집합(중복 제거)
+        Set<Long> combinedUsers = new HashSet<>();
+        combinedUsers.addAll(roomParticipantUserIds);
+        combinedUsers.addAll(feedAuthorUserIds);
+        return combinedUsers.size();
+
     }
 
 }
