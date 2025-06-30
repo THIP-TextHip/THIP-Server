@@ -2,11 +2,12 @@ package konkuk.thip.common.exception.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import konkuk.thip.common.dto.ErrorResponse;
 import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.validation.ConstraintViolationResult;
+import konkuk.thip.common.exception.validation.ConstraintViolationStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,11 +18,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final List<ConstraintViolationStrategy> violationStrategies;
 
     // 요청한 API가 없는 경우
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -112,33 +119,36 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(API_SERVER_ERROR));
     }
 
-    // @Size,@Pattern 예외처리
+    // @validation 예외처리
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
-        // 여러 위반 중 첫 번째만 처리
-        ConstraintViolation<?> violation = e.getConstraintViolations().stream()
-                .findFirst()
-                .orElse(null);
-
+    public ResponseEntity<ErrorResponse> constraintViolationExceptionHandler(ConstraintViolationException e) {
+        log.error("[ConstraintViolationExceptionHandler] {}", e.getMessage());
+        // 첫 번째 위반을 꺼내서
+        ConstraintViolation<?> violation = e.getConstraintViolations().stream().findFirst().orElse(null);
         if (violation != null) {
-            Class<?> annotationType = violation.getConstraintDescriptor().getAnnotation().annotationType();
-            log.error("[ConstraintViolationException] {}", e.getMessage());
-            if (annotationType == Size.class) {
-                return ResponseEntity
-                        .status(API_INVALID_SIZE.getHttpStatus())
-                        .body(ErrorResponse.of(API_INVALID_SIZE));
-            } else if (annotationType == Pattern.class) {
-                return ResponseEntity
-                        .status(API_INVALID_PATTERN.getHttpStatus())
-                        .body(ErrorResponse.of(API_INVALID_PATTERN));
+            Class<? extends Annotation> annotationType =
+                    violation.getConstraintDescriptor().getAnnotation().annotationType();
+
+            // 등록된 전략 중 supports()를 만족하는 첫 번째 전략에 위임
+            for (ConstraintViolationStrategy strategy : violationStrategies) {
+                if (strategy.supports(annotationType)) {
+                    ConstraintViolationResult result = strategy.handle(violation);
+                    return ResponseEntity.status(result.httpStatus()).body(result.errorResponse());
+                }
             }
+
+            // 지원하지 않는 제약인 경우 기본 처리
+            return ResponseEntity
+                    .status(API_REQUEST_INVALID.getHttpStatus())
+                    .body(ErrorResponse.of(API_REQUEST_INVALID, violation.getMessage()));
         }
 
+        // violation 자체가 없으면 최종 폴백
         return ResponseEntity
                 .status(API_REQUEST_INVALID.getHttpStatus())
-                .body(ErrorResponse.of(API_REQUEST_INVALID));
-
+                .body(ErrorResponse.of(API_REQUEST_INVALID, "잘못된 요청입니다."));
     }
+
 
 
 }
