@@ -51,11 +51,14 @@ public enum ErrorCode implements ResponseCode {
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
     BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "ISBN으로 검색한 결과가 존재하지 않습니다."),
-    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 800010, "존재하지 않는 BOOK 입니다.");
+    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 800010, "존재하지 않는 BOOK 입니다."),
 
 
 
-
+    /**
+     * 90000 : recentSearch error
+     */
+    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 900000,"알맞은 검색어 타입을 찾을 수 없습니다.");
 
 
     private final HttpStatus httpStatus;
