@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
@@ -72,7 +73,20 @@ public class BookSearchService implements BookSearchUseCase {
         NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
 
 
-        Book book = bookCommandPort.findByIsbn(isbn);
+        Optional<Book> bookOpt = bookCommandPort.findByIsbn(isbn);
+
+        if (bookOpt.isEmpty()) {
+            // 책이 없으면 기본값으로 반환
+            return BookDetailSearchResult.of(
+                    naverDetailBookParseResult,
+                    0,
+                    0,
+                    false
+            );
+        }
+
+        Book book = bookOpt.get();
+
         //이책에 모집중인 모임방 개수
         int recruitingRoomCount = getRecruitingRoomCount(book);
         // 이책에 읽기 참여중인 사용자 수
