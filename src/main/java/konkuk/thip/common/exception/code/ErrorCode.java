@@ -18,8 +18,6 @@ public enum ErrorCode implements ResponseCode {
     API_INVALID_SIZE(HttpStatus.BAD_REQUEST, 40004, "요청값의 사이즈가 잘못되었습니다."),
     API_INVALID_PATTERN(HttpStatus.BAD_REQUEST, 40005, "요청값의 형식이 잘못되었습니다."),
     API_REQUEST_INVALID(HttpStatus.BAD_REQUEST, 40006, "요청값이 유효하지않는 형식입니다."),
-    API_REQUEST_BODY_MISSING(HttpStatus.BAD_REQUEST, 40007, "요청 바디가 비어 있습니다."),
-    API_JSON_PARSE_ERROR(HttpStatus.BAD_REQUEST, 40008, "JSON 파싱에 실패했습니다."),
 
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 40100, "유효하지 않은 토큰입니다."),
     AUTH_EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "만료된 토큰입니다."),
