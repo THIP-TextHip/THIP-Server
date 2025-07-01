@@ -48,7 +48,7 @@ public enum ErrorCode implements ResponseCode {
     BOOK_NAVER_API_PARSING_ERROR(HttpStatus.BAD_REQUEST, 80002,"네이버 API 응답 파싱에 실패하였습니다."),
     BOOK_NAVER_API_URL_ERROR(HttpStatus.BAD_REQUEST, 80003,"네이버 API URL이 잘못되었습니다."),
     BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED(HttpStatus.BAD_REQUEST, 80004,"네이버 API 요청 중, HTTP 연결에 실패하였습니다."),
-    BOOK_NAVER_API_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, 80005,"네이버 API 응답에 실패하였습니다."),
+    BOOK_NAVER_API_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80005,"네이버 API 응답에 실패하였습니다."),
     BOOK_SEARCH_PAGE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, 80006,"검색어 페이지가 범위를 벗어났습니다."),
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
