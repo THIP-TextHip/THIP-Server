@@ -1,7 +1,5 @@
 package konkuk.thip.book.application.port.in.dto;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
-
 
 public record BookIsSavedResult(
         String isbn,
