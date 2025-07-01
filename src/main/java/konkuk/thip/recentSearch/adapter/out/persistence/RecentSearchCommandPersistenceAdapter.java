@@ -10,7 +10,7 @@ import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import static konkuk.thip.common.exception.code.ErrorCode.ALIAS_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class RecentSearchCommandPersistenceAdapter implements RecentSearchComman
     public void save(Long userId, String keyword, SearchType searchType) {
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(ALIAS_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         RecentSearchJpaEntity entity = RecentSearchJpaEntity.builder()
                 .searchTerm(keyword)
