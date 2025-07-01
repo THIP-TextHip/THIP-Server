@@ -18,6 +18,8 @@ public enum ErrorCode implements ResponseCode {
     API_INVALID_SIZE(HttpStatus.BAD_REQUEST, 40004, "요청값의 사이즈가 잘못되었습니다."),
     API_INVALID_PATTERN(HttpStatus.BAD_REQUEST, 40005, "요청값의 형식이 잘못되었습니다."),
     API_REQUEST_INVALID(HttpStatus.BAD_REQUEST, 40006, "요청값이 유효하지않는 형식입니다."),
+    API_REQUEST_BODY_MISSING(HttpStatus.BAD_REQUEST, 40007, "요청 바디가 비어 있습니다."),
+    API_JSON_PARSE_ERROR(HttpStatus.BAD_REQUEST, 40008, "JSON 파싱에 실패했습니다."),
 
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 40100, "유효하지 않은 토큰입니다."),
     AUTH_EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "만료된 토큰입니다."),
@@ -51,7 +53,9 @@ public enum ErrorCode implements ResponseCode {
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
     BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "ISBN으로 검색한 결과가 존재하지 않습니다."),
-    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 800010, "존재하지 않는 BOOK 입니다."),
+    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 800010, "존재하지 않는 책입니다."),
+    BOOK_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 800011, "이미 저장되어있는 책입니다."),
+    BOOK_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 800012, "저장되어있지 않은 책은 저장삭제 할 수 없습니다."),
 
 
 
