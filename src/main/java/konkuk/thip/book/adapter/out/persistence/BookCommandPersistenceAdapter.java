@@ -1,5 +1,6 @@
 package konkuk.thip.book.adapter.out.persistence;
 
+import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.mapper.BookMapper;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
@@ -19,5 +20,11 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     public Optional<Book> findByIsbn(String isbn) {
         return bookJpaRepository.findByIsbn(isbn)
                 .map(bookMapper::toDomainEntity);
+    }
+
+    @Override
+    public Long save(Book book) {
+        BookJpaEntity bookJpaEntity = bookMapper.toJpaEntity(book);
+        return bookJpaRepository.save(bookJpaEntity).getBookId();
     }
 }
