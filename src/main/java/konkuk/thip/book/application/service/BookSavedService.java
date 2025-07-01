@@ -38,21 +38,16 @@ public class BookSavedService implements BookSavedUseCase {
 
         if (postBookIsSavedRequest.type()) {
             // 저장 요청일 때만 책이 없으면 네이버 API로 저장
-            Long bookId;
-            if (bookOpt.isEmpty()) {
+            Long bookId = bookOpt.map(Book::getId).orElseGet(() -> {
                 NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
-                bookId = bookCommandPort.save(NaverDetailBookParseResult.toBook(naverDetailBookParseResult));
-            } else {
-                bookId = bookOpt.get().getId();
-            }
+                return bookCommandPort.save(NaverDetailBookParseResult.toBook(naverDetailBookParseResult));
+            });
             savedCommandPort.saveBook(user.getId(), bookId);
         } else {
             // 삭제 요청일 때는 책이 DB에 있을 때만 삭제 시도
             if (bookOpt.isPresent()) {
-                Long bookId = bookOpt.get().getId();
-                savedCommandPort.deleteBook(user.getId(), bookId);
-            }
-            else {
+                savedCommandPort.deleteBook(user.getId(), bookOpt.get().getId());
+            } else {
                 // 책이 DB에 없으면 저장하지 않은 책이므로 예외처리
                 throw new BusinessException(BOOK_NOT_SAVED_CANNOT_DELETE);
             }
