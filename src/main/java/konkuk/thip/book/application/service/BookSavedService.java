@@ -1,69 +1,63 @@
 package konkuk.thip.book.application.service;
 
 import jakarta.transaction.Transactional;
-import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
+import konkuk.thip.book.adapter.in.web.request.PostBookIsSavedRequest;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.in.BookSavedUseCase;
-import konkuk.thip.book.application.port.in.BookSearchUseCase;
-import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 import konkuk.thip.book.application.port.in.dto.BookIsSavedResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.feed.application.port.out.FeedQueryPort;
-import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
-import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.saved.application.port.out.SavedCommandPort;
-import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
-import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
-import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
-import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.recentSearch.adapter.out.jpa.SearchType.BOOK_SEARCH;
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NOT_SAVED_CANNOT_DELETE;
 
 @Service
 @RequiredArgsConstructor
 public class BookSavedService implements BookSavedUseCase {
 
+    private final BookApiQueryPort bookApiQueryPort;
     private final UserCommandPort userCommandPort;
     private final BookCommandPort bookCommandPort;
     private final SavedCommandPort savedCommandPort;
 
     @Override
     @Transactional
-    public BookIsSavedResult isSavedBook(String isbn, boolean type, Long userId) {
+    public BookIsSavedResult isSavedBook(String isbn, PostBookIsSavedRequest postBookIsSavedRequest, Long userId) {
 
         User user = userCommandPort.findById(userId);
 
         Optional<Book> bookOpt = bookCommandPort.findByIsbn(isbn);
 
-
-        Book book;
-
-        if (bookOpt.isEmpty()) {
-            // 책이 없으면 새로 저장???
-            //book = bookCommandPort.save(new Book(isbn /*, 필요한 필드들 채워서*/));
+        if (postBookIsSavedRequest.type()) {
+            // 저장 요청일 때만 책이 없으면 네이버 API로 저장
+            Long bookId;
+            if (bookOpt.isEmpty()) {
+                NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
+                bookId = bookCommandPort.save(NaverDetailBookParseResult.toBook(naverDetailBookParseResult));
+            } else {
+                bookId = bookOpt.get().getId();
+            }
+            savedCommandPort.saveBook(user.getId(), bookId);
         } else {
-            book = bookOpt.get();
+            // 삭제 요청일 때는 책이 DB에 있을 때만 삭제 시도
+            if (bookOpt.isPresent()) {
+                Long bookId = bookOpt.get().getId();
+                savedCommandPort.deleteBook(user.getId(), bookId);
+            }
+            else {
+                // 책이 DB에 없으면 저장하지 않은 책이므로 예외처리
+                throw new BusinessException(BOOK_NOT_SAVED_CANNOT_DELETE);
+            }
         }
 
-        // 저장 상태 변경
-        if (type) {
-            savedCommandPort.saveBook(user.getId(), book.getId());
-        } else {
-            savedCommandPort.deleteBook(user.getId(), book.getId());
-        }
-
-        return BookIsSavedResult.of(isbn,type);
+        return BookIsSavedResult.of(isbn,postBookIsSavedRequest.type());
     }
 }
