@@ -25,22 +25,37 @@ public class NaverApiUtil {
     private String clientSecret;
     @Value("${naver.bookSearchUrl}")
     private String bookSearchUrl;
+    @Value("${naver.bookDetailSearchUrl}")
+    private String bookDetailSearchUrl;
 
     public static final int PAGE_SIZE = 10;
 
-    public String searchBook(String keyword, int start){
+    public String searchBook(String keyword, int start) {
+        return callNaverApi(keyword, start, false);
+    }
+
+    public String detailSearchBook(String isbn) {
+        return callNaverApi(isbn, null, true);
+    }
+
+    private String callNaverApi(String keyword, Integer start, boolean isDetail) {
         String query = keywordToEncoding(keyword);
-        String url = buildSearchApiUrl(query, start);
+        String url = isDetail ? buildDetailSearchApiUrl(query) : buildSearchApiUrl(query, start);
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("X-Naver-Client-Id", clientId);
         requestHeaders.put("X-Naver-Client-Secret", clientSecret);
 
-        return get(url,requestHeaders);
+        return get(url, requestHeaders);
     }
+
 
     private String buildSearchApiUrl(String query,Integer start) {
         return bookSearchUrl+query+"&display="+PAGE_SIZE+"&start="+start;
+    }
+
+    private String buildDetailSearchApiUrl(String query) {
+        return bookDetailSearchUrl+query;
     }
 
     private String keywordToEncoding(String keyword) {
