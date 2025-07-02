@@ -15,9 +15,6 @@ public enum ErrorCode implements ResponseCode {
     API_MISSING_PARAM(HttpStatus.BAD_REQUEST, 40001, "필수 파라미터가 없습니다."),
     API_INVALID_PARAM(HttpStatus.BAD_REQUEST, 40002, "파라미터 값 중 유효하지 않은 값이 있습니다."),
     API_INVALID_TYPE(HttpStatus.BAD_REQUEST, 40003, "파라미터 타입이 잘못되었습니다."),
-    API_INVALID_SIZE(HttpStatus.BAD_REQUEST, 40004, "요청값의 사이즈가 잘못되었습니다."),
-    API_INVALID_PATTERN(HttpStatus.BAD_REQUEST, 40005, "요청값의 형식이 잘못되었습니다."),
-    API_REQUEST_INVALID(HttpStatus.BAD_REQUEST, 40006, "요청값이 유효하지않는 형식입니다."),
 
     AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 40100, "유효하지 않은 토큰입니다."),
     AUTH_EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40101, "만료된 토큰입니다."),
