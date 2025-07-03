@@ -9,4 +9,5 @@ public interface BookCommandPort {
 
     Optional<Book> findByIsbn(String isbn);
 
+    Book findById(Long id);
 }

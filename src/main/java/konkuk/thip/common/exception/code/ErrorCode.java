@@ -48,12 +48,23 @@ public enum ErrorCode implements ResponseCode {
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
     BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "ISBN으로 검색한 결과가 존재하지 않습니다."),
-    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 80010, "존재하지 않는 BOOK 입니다.");
+    BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 80010, "존재하지 않는 BOOK 입니다."),
 
 
+    /**
+     * 100000 : room error
+     */
+    ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 100000, "존재하지 않는 ROOM 입니다."),
 
 
+    /**
+     * 110000 : vote error
+     */
+    VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, 110000, "존재하지 않는 VOTE 입니다."),
+    VOTE_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 110001, "총평이 될 수 없는 VOTE 입니다. 총평은 진행률이 80% 이상이어야 가능합니다."),
+    INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다. 페이지 값은 1이상 ")
 
+    ;
 
     private final HttpStatus httpStatus;
     private final int code;
