@@ -20,8 +20,9 @@ public class BookQueryController {
     //책 검색결과 조회
     @GetMapping("/books")
     public BaseResponse<GetBookSearchListResponse> getBookSearchList(@RequestParam final String keyword,
-                                                                     @RequestParam final int page) {
-        return BaseResponse.ok(GetBookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page), page));
+                                                                     @RequestParam final int page,
+                                                                     @UserId final Long userId) {
+        return BaseResponse.ok(GetBookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page,userId), page));
     }
 
     //책 상세검색 결과 조회

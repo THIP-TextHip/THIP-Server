@@ -1,7 +1,10 @@
 package konkuk.thip.recentSearch.adapter.out.jpa;
 
 
+import konkuk.thip.common.exception.BusinessException;
 import lombok.Getter;
+
+import static konkuk.thip.common.exception.code.ErrorCode.INVALID_SEARCH_TYPE;
 
 @Getter
 public enum SearchType {
@@ -21,8 +24,6 @@ public enum SearchType {
                 return type;
             }
         }
-        //컨트롤러 어드바이스 추가하고 예외처리
-        //throw new GlobalException(INVALID_SEARCH_TYPE);
-        return null;
+        throw new BusinessException(INVALID_SEARCH_TYPE);
     }
 }
