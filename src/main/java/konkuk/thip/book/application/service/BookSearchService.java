@@ -66,15 +66,12 @@ public class BookSearchService implements BookSearchUseCase {
         }
 
         //최근검색어 추가
-        User user = userCommandPort.findById(userId);
         RecentSearch  recentSearch =  RecentSearch.builder()
                         .searchTerm(keyword)
                         .type(BOOK_SEARCH.getSearchType())
-                        .userId(user.getId())
+                        .userId(userId)
                         .build();
-
-
-        recentSearchCommandPort.save(user.getId(),recentSearch);
+        recentSearchCommandPort.save(userId,recentSearch);
 
         return result;
     }
