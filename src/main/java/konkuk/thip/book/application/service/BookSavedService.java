@@ -10,7 +10,6 @@ import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.saved.application.port.out.SavedCommandPort;
-import konkuk.thip.user.application.port.out.UserCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
