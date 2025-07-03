@@ -11,6 +11,7 @@ import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
+import konkuk.thip.recentSearch.domain.RecentSearch;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -65,8 +66,12 @@ public class BookSearchService implements BookSearchUseCase {
         }
 
         //최근검색어 추가
-        User user = userCommandPort.findById(userId);
-        recentSearchCommandPort.save(user.getId(),keyword,BOOK_SEARCH);
+        RecentSearch  recentSearch =  RecentSearch.builder()
+                        .searchTerm(keyword)
+                        .type(BOOK_SEARCH.getSearchType())
+                        .userId(userId)
+                        .build();
+        recentSearchCommandPort.save(userId,recentSearch);
 
         return result;
     }

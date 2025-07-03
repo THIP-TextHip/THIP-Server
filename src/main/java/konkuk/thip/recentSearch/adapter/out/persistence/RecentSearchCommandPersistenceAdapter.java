@@ -2,9 +2,9 @@ package konkuk.thip.recentSearch.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
 import konkuk.thip.recentSearch.adapter.out.mapper.RecentSearchMapper;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
+import konkuk.thip.recentSearch.domain.RecentSearch;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +22,14 @@ public class RecentSearchCommandPersistenceAdapter implements RecentSearchComman
     private final RecentSearchMapper recentSearchMapper;
 
     @Override
-    public void save(Long userId, String keyword, SearchType searchType) {
+    public void save(Long userId,RecentSearch recentSearch) {
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        RecentSearchJpaEntity entity = RecentSearchJpaEntity.builder()
-                .searchTerm(keyword)
-                .type(searchType)
-                .userJpaEntity(userJpaEntity)
-                .build();
+        RecentSearchJpaEntity recentSearchJpaEntity =
+                recentSearchMapper.toJpaEntity(recentSearch, userJpaEntity);
 
-        recentSearchJpaRepository.save(entity);
+        recentSearchJpaRepository.save(recentSearchJpaEntity);
     }
 }

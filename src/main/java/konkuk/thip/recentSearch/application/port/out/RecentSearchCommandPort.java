@@ -1,8 +1,8 @@
 package konkuk.thip.recentSearch.application.port.out;
 
 
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
+import konkuk.thip.recentSearch.domain.RecentSearch;
 
 public interface RecentSearchCommandPort {
-    void save(Long userId, String keyword, SearchType searchType);
+    void save(Long userId, RecentSearch recentSearch);
 }
