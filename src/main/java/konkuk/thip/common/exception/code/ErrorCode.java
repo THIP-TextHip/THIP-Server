@@ -65,7 +65,7 @@ public enum ErrorCode implements ResponseCode {
      * 110000 : vote error
      */
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, 110000, "존재하지 않는 VOTE 입니다."),
-    VOTE_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 110001, "총평이 될 수 없는 VOTE 입니다. 총평은 진행률이 80% 이상이어야 가능합니다."),
+    VOTE_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 110001, "총평이 될 수 없는 VOTE 입니다."),
     INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다.")
 
     ;
