@@ -2,7 +2,8 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.user.adapter.in.web.request.PostUserSignupRequest;
+import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
+import static konkuk.thip.common.exception.code.ErrorCode.AUTH_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +44,9 @@ class UserSignupControllerTest {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
@@ -49,7 +54,7 @@ class UserSignupControllerTest {
     }
 
     @Test
-    @DisplayName("[칭호id, 닉네임, 이메일] 정보를 바탕으로 회원가입을 진행한다.")
+    @DisplayName("[칭호id, 닉네임] 정보를 바탕으로 회원가입을 진행한다.")
     void signup_success() throws Exception {
         //given : alias 생성, 회원가입 request 생성
         AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
@@ -59,14 +64,15 @@ class UserSignupControllerTest {
                 .build();
         aliasJpaRepository.save(aliasJpaEntity);
 
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 aliasJpaEntity.getAliasId(),
-                "테스트유저",
-                "test@test.com"
+                "테스트유저"
         );
 
-        //when : 회원가입 api 호출
+        //when : 회원가입 api 호출 + 임시 토큰 발급
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
         ResultActions result = mockMvc.perform(post("/users/signup")
+                .header("Authorization", "Bearer " + testToken)  //헤더 추가
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
 
@@ -82,23 +88,23 @@ class UserSignupControllerTest {
 
         assertThat(userJpaEntity.getAliasForUserJpaEntity().getAliasId()).isEqualTo(request.aliasId());
         assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
-        assertThat(userJpaEntity.getEmail()).isEqualTo(request.email());
     }
 
     @Test
     @DisplayName("[칭호id]값이 null일 경우, 400 error가 발생한다.")
     void signup_alias_id_null() throws Exception {
         //given: aliasId null
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 null,
-                "테스트유저",
-                "test@test.com"
+                "테스트유저"
         );
 
         //when //then
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
         mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .header("Authorization", "Bearer " + testToken)  //헤더 추가
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("aliasId는 필수입니다.")));
@@ -108,16 +114,17 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 공백일 경우, 400 error가 발생한다.")
     void signup_nickname_blank() throws Exception {
         //given: nickname blank
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
-                "",
-                "test@test.com"
+                ""
         );
 
         //when //then
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
         mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .header("Authorization", "Bearer " + testToken)  //헤더 추가
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("닉네임은 한글, 영어, 숫자로만 구성되어야 합니다.(공백불가)")));
@@ -127,14 +134,15 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 한글, 영어, 숫자 외의 문자를 포함할 경우, 400 error가 발생한다.")
     void signup_nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
-                "닉네임!!",
-                "test@test.com"
+                "닉네임!!"
         );
 
         //when //then
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
         mockMvc.perform(post("/users/signup")
+                        .header("Authorization", "Bearer " + testToken)  //헤더 추가
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -146,56 +154,81 @@ class UserSignupControllerTest {
     @DisplayName("[닉네임]값이 11자 이상일 경우, 400 error가 발생한다.")
     void signup_nickname_too_long() throws Exception {
         //given: 11글자 nickname
-        PostUserSignupRequest request = new PostUserSignupRequest(
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
-                "11글자닉네임입니다아",
-                "test@test.com"
+                "11글자닉네임입니다아"
         );
 
         //when //then
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
         mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .header("Authorization", "Bearer " + testToken)  //헤더 추가
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("닉네임은 최대 10자 입니다.")));
     }
 
     @Test
-    @DisplayName("[이메일]값이 공백일 경우, 400 error가 발생한다.")
-    void signup_email_blank() throws Exception {
-        //given
-        PostUserSignupRequest request = new PostUserSignupRequest(
-                1L,
-                "테스트유저",
-                ""
+    @DisplayName("임시 토큰을 통해 @Oauth2Id로 oauth2Id를 정확히 추출하여 회원가입에 성공한다.")
+    void signup_whenValidSignupToken_thenExtractOauth2IdCorrectly() throws Exception {
+        //given : alias 데이터 저장
+        AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
+                .value("테스트칭호")
+                .color("green")
+                .imageUrl("http://image.url")
+                .build();
+        aliasJpaRepository.save(aliasJpaEntity);
+
+        //회원가입 request 생성
+        UserSignupRequest request = new UserSignupRequest(
+                aliasJpaEntity.getAliasId(),
+                "테스트유저"
         );
 
-        //when //then
-        mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
-                .andExpect(jsonPath("$.message", containsString("이메일은 공백일 수 없습니다.")));
+        //when : 임시 토큰 생성
+        String expectedOauth2Id = "kakao_12345678";
+        String testToken = jwtUtil.createSignupToken(expectedOauth2Id);
+
+        //when : 회원가입 API 호출
+        ResultActions result = mockMvc.perform(post("/users/signup")
+                .header("Authorization", "Bearer " + testToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        //then : 응답 검증
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.userId").exists());
+
+        //등록된 사용자 oauth2Id 검증
+        String responseBody = result.andReturn().getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        Long savedUserId = jsonNode.path("data").path("userId").asLong();
+
+        UserJpaEntity savedUser = userJpaRepository.findById(savedUserId).orElseThrow();
+
+        assertThat(savedUser.getOauth2Id()).isEqualTo(expectedOauth2Id);
+        assertThat(savedUser.getNickname()).isEqualTo("테스트유저");
     }
 
     @Test
-    @DisplayName("[이메일]값이 유효한 이메일 형식이 아닐 경우, 400 error가 발생한다.")
-    void signup_email_invalid_format() throws Exception {
-        //given
-        PostUserSignupRequest request = new PostUserSignupRequest(
+    @DisplayName("헤더에 토큰을 넣지 않고 요청시에 401 error가 발생한다.")
+    void signup_whenNoToken_thenUnauthorized() throws Exception {
+        //given: aliasId null
+        UserSignupRequest request = new UserSignupRequest(
                 1L,
-                "테스트유저",
-                "invalid-email-format"
+                "테스트유저"
         );
 
         //when //then
         mockMvc.perform(post("/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("40002"))
-                .andExpect(jsonPath("$.message", containsString("이메일 형식이 올바르지 않습니다.")));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(AUTH_TOKEN_NOT_FOUND.getCode()))
+                .andExpect(jsonPath("$.message", containsString(AUTH_TOKEN_NOT_FOUND.getMessage())));
     }
+
+
 }

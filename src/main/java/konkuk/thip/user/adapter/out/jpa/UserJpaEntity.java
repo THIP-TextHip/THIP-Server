@@ -18,20 +18,20 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "email", length = 100, nullable = false)
-    private String email;
-
     @Column(length = 60, nullable = false)
     private String nickname;
 
     @Column(name = "image_url", columnDefinition = "TEXT", nullable = false)
     private String imageUrl;
 
+    @Column(name = "oauth2_id", length = 50, nullable = false)
+    private String oauth2Id;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 

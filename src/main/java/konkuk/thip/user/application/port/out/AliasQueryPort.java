@@ -1,8 +1,8 @@
 package konkuk.thip.user.application.port.out;
 
-import konkuk.thip.user.application.port.in.dto.AliasChoiceViewResult;
+import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 
 public interface AliasQueryPort {
 
-    AliasChoiceViewResult getAllAliasesAndCategories();
+    UserViewAliasChoiceResult getAllAliasesAndCategories();
 }

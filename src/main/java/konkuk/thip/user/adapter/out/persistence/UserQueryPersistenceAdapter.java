@@ -5,6 +5,8 @@ import konkuk.thip.user.application.port.out.UserQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 @Repository
 @RequiredArgsConstructor
 public class UserQueryPersistenceAdapter implements UserQueryPort {
@@ -15,5 +17,10 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
     @Override
     public boolean existsByNickname(String nickname) {
         return userJpaRepository.existsByNickname(nickname);
+    }
+
+    @Override
+    public Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId) {
+        return  userJpaRepository.findUserIdsByBookId(bookId);
     }
 }

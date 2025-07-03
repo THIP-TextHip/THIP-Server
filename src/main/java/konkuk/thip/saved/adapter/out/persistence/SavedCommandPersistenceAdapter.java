@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class SavedCommandPersistenceAdapter implements SavedCommandPort {
 
-    private final SavedBookRepository savedBookRepository;
-    private final SavedFeedRepository savedFeedRepository;
+    private final SavedBookJpaRepository savedBookJpaRepository;
+    private final SavedFeedJpaRepository savedFeedJpaRepository;
     private final SavedBookMapper savedBookMapper;
     private final SavedFeedMapper savedFeedMapper;
 

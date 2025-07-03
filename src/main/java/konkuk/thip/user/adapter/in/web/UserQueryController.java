@@ -1,8 +1,8 @@
 package konkuk.thip.user.adapter.in.web;
 
 import konkuk.thip.common.dto.BaseResponse;
-import konkuk.thip.user.adapter.in.web.response.GetUserShowAliasChoiceResponse;
-import konkuk.thip.user.application.port.in.ShowAliasChoiceViewUseCase;
+import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
+import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserQueryController {
 
-    private final ShowAliasChoiceViewUseCase showAliasChoiceViewUseCase;
+    private final UserViewAliasChoiceUseCase userViewAliasChoiceUseCase;
 
     @GetMapping("/users/alias")
-    public BaseResponse<GetUserShowAliasChoiceResponse> showAliasChoiceView() {
-        return BaseResponse.ok(GetUserShowAliasChoiceResponse.of(
-                showAliasChoiceViewUseCase.getAllAliasesAndCategories()
+    public BaseResponse<UserViewAliasChoiceResponse> showAliasChoiceView() {
+        return BaseResponse.ok(UserViewAliasChoiceResponse.of(
+                userViewAliasChoiceUseCase.getAllAliasesAndCategories()
         ));
     }
 }

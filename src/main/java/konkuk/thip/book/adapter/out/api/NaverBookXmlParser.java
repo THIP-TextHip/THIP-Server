@@ -1,8 +1,9 @@
 package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
+import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.exception.ExternalApiException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.StringReader;
@@ -10,27 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 import org.xml.sax.InputSource;
 
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_ISBN_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_PARSING_ERROR;
+
 public class NaverBookXmlParser {
 
-    public static NaverBookParseResult parse(String xml) {
-        List<NaverBookParseResult.NaverBook> Naverbooks = new ArrayList<>();
+    public static NaverBookParseResult parseBookList(String xml) {
+        List<NaverBookParseResult.NaverBook> naverBooks = new ArrayList<>();
         int total = -1;
         int start = -1;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            InputSource is = new InputSource(new StringReader(xml));
-            Document doc = builder.parse(is);
-
-            NodeList channelNodes = doc.getElementsByTagName("channel");
-            if (channelNodes.getLength() > 0) {
-                Element channel = (Element) channelNodes.item(0);
+            Element channel = getFirstChannel(xml);
+            if (channel != null) {
                 total = Integer.parseInt(getTagValue(channel, "total"));
                 start = Integer.parseInt(getTagValue(channel, "start"));
 
-                NodeList itemNodes = channel.getElementsByTagName("item");
-                for (int i = 0; i < itemNodes.getLength(); i++) {
-                    Element item = (Element) itemNodes.item(i);
+                for (Element item : getItemElements(channel)) {
                     String title = getTagValue(item, "title");
                     String imageUrl = getTagValue(item, "image");
                     String author = getTagValue(item, "author");
@@ -43,13 +39,78 @@ public class NaverBookXmlParser {
                             .publisher(publisher)
                             .isbn(isbn)
                             .build();
-                    Naverbooks.add(naverBook);
+                    naverBooks.add(naverBook);
                 }
             }
         } catch (Exception e) {
-           throw new BusinessException(ErrorCode.BOOK_NAVER_API_PARSING_ERROR);
+            throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
         }
-        return NaverBookParseResult.of(Naverbooks, total, start);
+        return NaverBookParseResult.of(naverBooks, total, start);
+    }
+
+    public static NaverDetailBookParseResult parseBookDetail(String xml) {
+        try {
+            Element channel = getFirstChannel(xml);
+            if (channel != null) {
+                int total = 0;
+                String totalStr = getTagValue(channel, "total");
+                if (totalStr != null) total = Integer.parseInt(totalStr);
+
+                // total이 0이면 isbn에 해당하는 책이 없음(잘못 넘어온 isbn 예외처리)
+                if (total == 0) throw new BusinessException(BOOK_ISBN_NOT_FOUND);
+
+                List<Element> items = getItemElements(channel);
+                if (!items.isEmpty()) {
+                    Element item = items.get(0);
+                    String title = getTagValue(item, "title");
+                    String imageUrl = getTagValue(item, "image");
+                    String author = getTagValue(item, "author");
+                    String publisher = getTagValue(item, "publisher");
+                    String isbn = getTagValue(item, "isbn");
+                    String description = getTagValue(item, "description");
+
+                    return NaverDetailBookParseResult.builder()
+                            .title(title)
+                            .imageUrl(imageUrl)
+                            .author(author)
+                            .publisher(publisher)
+                            .isbn(isbn)
+                            .description(description)
+                            .build();
+                }
+            }
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
+        }
+        return null;
+    }
+
+    private static Document parseXml(String xml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setExpandEntityReferences(false);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.parse(new InputSource(new StringReader(xml)));
+    }
+
+    private static Element getFirstChannel(String xml) throws Exception {
+        Document doc = parseXml(xml);
+        NodeList channelNodes = doc.getElementsByTagName("channel");
+        return (channelNodes.getLength() > 0) ? (Element) channelNodes.item(0) : null;
+    }
+
+
+    private static List<Element> getItemElements(Element channel) {
+        NodeList itemNodes = channel.getElementsByTagName("item");
+        List<Element> items = new ArrayList<>();
+        for (int i = 0; i < itemNodes.getLength(); i++) {
+            items.add((Element) itemNodes.item(i));
+        }
+        return items;
     }
 
     private static String getTagValue(Element element, String tag) {

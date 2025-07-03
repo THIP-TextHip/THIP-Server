@@ -1,5 +1,7 @@
 package konkuk.thip.room.application.port.out;
 
-public interface RoomQueryPort {
+import java.time.LocalDate;
 
+public interface RoomQueryPort {
+    int countRecruitingRoomsByBookAndStartDateAfter(Long bookId, LocalDate currentDate);
 }
