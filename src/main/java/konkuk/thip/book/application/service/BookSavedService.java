@@ -11,7 +11,6 @@ import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.saved.application.port.out.SavedCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
-import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +23,12 @@ import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NOT_SAVED_CANNOT_
 public class BookSavedService implements BookSavedUseCase {
 
     private final BookApiQueryPort bookApiQueryPort;
-    private final UserCommandPort userCommandPort;
     private final BookCommandPort bookCommandPort;
     private final SavedCommandPort savedCommandPort;
 
     @Override
     @Transactional
     public BookIsSavedResult isSavedBook(String isbn, PostBookIsSavedRequest postBookIsSavedRequest, Long userId) {
-
-        User user = userCommandPort.findById(userId);
 
         Optional<Book> bookOpt = bookCommandPort.findByIsbn(isbn);
 
@@ -42,11 +38,11 @@ public class BookSavedService implements BookSavedUseCase {
                 NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
                 return bookCommandPort.save(NaverDetailBookParseResult.toBook(naverDetailBookParseResult));
             });
-            savedCommandPort.saveBook(user.getId(), bookId);
+            savedCommandPort.saveBook(userId, bookId);
         } else {
             // 삭제 요청일 때는 책이 DB에 있을 때만 삭제 시도
             if (bookOpt.isPresent()) {
-                savedCommandPort.deleteBook(user.getId(), bookOpt.get().getId());
+                savedCommandPort.deleteBook(userId, bookOpt.get().getId());
             } else {
                 // 책이 DB에 없으면 저장하지 않은 책이므로 예외처리
                 throw new BusinessException(BOOK_NOT_SAVED_CANNOT_DELETE);
