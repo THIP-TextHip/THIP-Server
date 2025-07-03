@@ -1,5 +1,6 @@
 package konkuk.thip.book.application.service;
 
+import jakarta.transaction.Transactional;
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
@@ -9,6 +10,8 @@ import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
+import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
+import konkuk.thip.recentSearch.domain.RecentSearch;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -24,6 +27,7 @@ import java.util.Set;
 
 import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.recentSearch.adapter.out.jpa.SearchType.BOOK_SEARCH;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +38,14 @@ public class BookSearchService implements BookSearchUseCase {
     private final UserQueryPort userQueryPort;
     private final FeedQueryPort feedQueryPort;
     private final SavedQueryPort savedQueryPort;
+    private final RecentSearchCommandPort recentSearchCommandPort;
     private final BookCommandPort bookCommandPort;
     private final UserCommandPort userCommandPort;
 
 
     @Override
-    public NaverBookParseResult searchBooks(String keyword, int page) {
+    @Transactional
+    public NaverBookParseResult searchBooks(String keyword, int page, Long userId) {
 
         if (keyword == null || keyword.isBlank()) {
             throw new BusinessException(BOOK_KEYWORD_REQUIRED);
@@ -49,7 +55,6 @@ public class BookSearchService implements BookSearchUseCase {
             throw new BusinessException(BOOK_PAGE_NUMBER_INVALID);
         }
 
-        //유저의 최근검색어 로직 추가
 
         int start = (page - 1) * PAGE_SIZE + 1; //검색 시작 위치
         NaverBookParseResult result = bookApiQueryPort.findBooksByKeyword(keyword, start);
@@ -59,6 +64,14 @@ public class BookSearchService implements BookSearchUseCase {
         if ( totalElements!=0 && page > totalPages) {
             throw new BusinessException(BOOK_SEARCH_PAGE_OUT_OF_RANGE);
         }
+
+        //최근검색어 추가
+        RecentSearch  recentSearch =  RecentSearch.builder()
+                        .searchTerm(keyword)
+                        .type(BOOK_SEARCH.getSearchType())
+                        .userId(userId)
+                        .build();
+        recentSearchCommandPort.save(userId,recentSearch);
 
         return result;
     }
