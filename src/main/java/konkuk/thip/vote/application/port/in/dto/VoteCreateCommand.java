@@ -1,12 +1,7 @@
 package konkuk.thip.vote.application.port.in.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.List;
 
-@Builder
-@Getter
 public record VoteCreateCommand(
         Long userId,
 
@@ -18,9 +13,7 @@ public record VoteCreateCommand(
 
         String content,
 
-        List<VoteItem> voteItems
+        List<VoteItemCreateCommand> voteItemCreateCommands
 ) {
-    @Getter
-    @Builder
-    public record VoteItem(String itemName) {}
+    public record VoteItemCreateCommand(String itemName) {}
 }
