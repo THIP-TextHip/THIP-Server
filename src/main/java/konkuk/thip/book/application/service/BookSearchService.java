@@ -7,6 +7,7 @@ import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
+import konkuk.thip.book.application.port.out.BookRedisCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
@@ -40,6 +41,7 @@ public class BookSearchService implements BookSearchUseCase {
     private final SavedQueryPort savedQueryPort;
     private final RecentSearchCommandPort recentSearchCommandPort;
     private final BookCommandPort bookCommandPort;
+    private final BookRedisCommandPort bookRedisCommandPort;
     private final UserCommandPort userCommandPort;
 
 
@@ -85,8 +87,10 @@ public class BookSearchService implements BookSearchUseCase {
         //책 상세정보
         NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
 
-
         Optional<Book> bookOpt = bookCommandPort.findByIsbn(isbn);
+
+        //책 검색순위 정보 업데이트
+        bookRedisCommandPort.incrementBookSearchCount(isbn,LocalDate.now());
 
         if (bookOpt.isEmpty()) {
             // 책이 없으면 기본값으로 반환
