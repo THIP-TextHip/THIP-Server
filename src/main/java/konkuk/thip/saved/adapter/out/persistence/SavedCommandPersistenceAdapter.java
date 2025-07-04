@@ -2,7 +2,6 @@ package konkuk.thip.saved.adapter.out.persistence;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
-import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.mapper.SavedBookMapper;
@@ -28,13 +27,8 @@ public class SavedCommandPersistenceAdapter implements SavedCommandPort {
 
     @Override
     public void saveBook(Long userId, Long bookId) {
-
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-
-        if (savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(user.getUserId(), bookId))
-            throw new BusinessException(BOOK_ALREADY_SAVED);
-
         BookJpaEntity book = bookJpaRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException(BOOK_NOT_FOUND));
         SavedBookJpaEntity entity = SavedBookJpaEntity.builder()
@@ -42,19 +36,12 @@ public class SavedCommandPersistenceAdapter implements SavedCommandPort {
                 .bookJpaEntity(book)
                 .build();
         savedBookJpaRepository.save(entity);
-
     }
+
 
     //삭제 전략 도입 전
     @Override
     public void deleteBook(Long userId, Long bookId) {
-
-        UserJpaEntity user = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-
-        if (!savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(user.getUserId(), bookId))
-            throw new BusinessException(BOOK_NOT_SAVED_CANNOT_DELETE);
-
-        savedBookJpaRepository.deleteByUserJpaEntity_UserIdAndBookJpaEntity_BookId(user.getUserId(), bookId);
+        savedBookJpaRepository.deleteByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
     }
 }
