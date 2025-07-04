@@ -57,9 +57,6 @@ class BookMostSearchedBooksControllerTest {
 
     private final DateTimeFormatter DAILY_KEY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    @Value("${app.redis.search-count-prefix}")
-    private String searchCountPrefix;
-
     @Value("${app.redis.search-rank-prefix}")
     private String searchRankPrefix;
 
@@ -117,7 +114,7 @@ class BookMostSearchedBooksControllerTest {
 
         String json = result.andReturn().getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(json);
-        JsonNode rankArray = jsonNode.path("data").path("bookRankInfos");
+        JsonNode rankArray = jsonNode.path("data").path("bookList");
 
         assertThat(rankArray).isNotNull();
         assertThat(rankArray.size()).isEqualTo(3);
