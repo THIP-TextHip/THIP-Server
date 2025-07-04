@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class BookIsSavedControllerTest {
+class BookChangeSavedControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -242,7 +242,7 @@ class BookIsSavedControllerTest {
 
         // then
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(ErrorCode.BOOK_NOT_SAVED_CANNOT_DELETE.getCode()));
+                .andExpect(jsonPath("$.code").value(ErrorCode.BOOK_NOT_FOUND.getCode()));
     }
 
 }
