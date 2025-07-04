@@ -19,11 +19,11 @@ public class BookCommandController {
 
     //책 저장 상태 변경
     @PostMapping("/books/{isbn}/saved")
-    public BaseResponse<PostBookIsSavedResponse> isSavedBook(@PathVariable("isbn")
+    public BaseResponse<PostBookIsSavedResponse> changeSavedBook(@PathVariable("isbn")
                                                                          @Pattern(regexp = "\\d{13}") final String isbn,
-                                                             @RequestBody final PostBookIsSavedRequest postBookIsSavedRequest,
-                                                             @UserId final Long userId) {
-        return BaseResponse.ok(PostBookIsSavedResponse.of(bookSavedUseCase.isSavedBook(isbn,postBookIsSavedRequest,userId)));
+                                                                 @RequestBody final PostBookIsSavedRequest postBookIsSavedRequest,
+                                                                 @UserId final Long userId) {
+        return BaseResponse.ok(PostBookIsSavedResponse.of(bookSavedUseCase.changeSavedBook(isbn,postBookIsSavedRequest.type(),userId)));
     }
 
 }
