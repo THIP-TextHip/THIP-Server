@@ -54,13 +54,25 @@ public enum ErrorCode implements ResponseCode {
     BOOK_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80013, "사용자가 저장하지 않은 책은 저장삭제 할 수 없습니다."),
     BOOK_NOT_SAVED_DB_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80014, "DB에 존재하지 않은 책은 저장삭제 할 수 없습니다."),
 
-
-
     /**
      * 90000 : recentSearch error
      */
-    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 900000,"알맞은 검색어 타입을 찾을 수 없습니다.");
+    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 900000,"알맞은 검색어 타입을 찾을 수 없습니다."),
 
+
+    /**
+     * 100000 : room error
+     */
+    ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 100000, "존재하지 않는 ROOM 입니다."),
+
+    /**
+     * 110000 : vote error
+     */
+    VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, 110000, "존재하지 않는 VOTE 입니다."),
+    VOTE_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 110001, "총평이 될 수 없는 VOTE 입니다."),
+    INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다.")
+
+    ;
 
     private final HttpStatus httpStatus;
     private final int code;
