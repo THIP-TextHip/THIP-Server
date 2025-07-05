@@ -41,9 +41,15 @@ jobs:
           mkdir -p ${{ env.TEST_RESOURCE_PATH }}
           echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
           echo "${{ secrets.APPLICATION_YML_TEST }}" > ${{ env.TEST_RESOURCE_PATH }}/application-test.yml
+          
 
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x gradlew
+
+#      - name: 🚀 Start Redis
+#        uses: supercharge/redis-github-action@1.7.0
+#        with:
+#          redis-version: 7
 
       - name: 🐘 build with Gradle
         run: ./gradlew build
