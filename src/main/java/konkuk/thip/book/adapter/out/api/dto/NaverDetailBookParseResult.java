@@ -12,5 +12,4 @@ public record NaverDetailBookParseResult(
             String isbn,
             String description
     ) {
-
 }

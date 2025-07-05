@@ -49,6 +49,10 @@ public enum ErrorCode implements ResponseCode {
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
     BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "ISBN으로 검색한 결과가 존재하지 않습니다."),
     BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 80010, "존재하지 않는 BOOK 입니다."),
+    BOOK_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 80011, "사용자가 이미 저장한 책입니다."),
+    DUPLICATED_BOOKS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 80012, "중복된 책이 존재합니다."),
+    BOOK_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80013, "사용자가 저장하지 않은 책은 저장삭제 할 수 없습니다."),
+    BOOK_NOT_SAVED_DB_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80014, "DB에 존재하지 않은 책은 저장삭제 할 수 없습니다."),
 
 
 
