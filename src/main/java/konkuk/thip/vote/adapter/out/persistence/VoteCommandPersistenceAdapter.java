@@ -46,14 +46,15 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void saveAllVoteItems(List<VoteItem> voteItems) {
-        List<VoteItemJpaEntity> voteItemJpaEntities = voteItems.stream()
-                .map(voteItem -> {
-                    VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(voteItem.getVoteId()).orElseThrow(
-                            () -> new EntityNotFoundException(VOTE_NOT_FOUND)
-                    );
+        if (voteItems.isEmpty()) return;
 
-                    return voteItemMapper.toJpaEntity(voteItem, voteJpaEntity);
-                })
+        Long voteId = voteItems.get(0).getVoteId();
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(voteId).orElseThrow(
+                () -> new EntityNotFoundException(VOTE_NOT_FOUND)
+        );
+
+        List<VoteItemJpaEntity> voteItemJpaEntities = voteItems.stream()
+                .map(voteItem -> voteItemMapper.toJpaEntity(voteItem, voteJpaEntity))
                 .toList();
 
         voteItemJpaRepository.saveAll(voteItemJpaEntities);
