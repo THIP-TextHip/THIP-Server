@@ -242,7 +242,7 @@ class BookChangeSavedControllerTest {
 
         // then
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(ErrorCode.BOOK_NOT_FOUND.getCode()));
+                .andExpect(jsonPath("$.code").value(ErrorCode.BOOK_NOT_SAVED_DB_CANNOT_DELETE.getCode()));
     }
 
 }
