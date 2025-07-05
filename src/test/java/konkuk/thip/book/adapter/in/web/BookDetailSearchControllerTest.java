@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@DisplayName("[통합] BookDetailSearchController 테스트")
 class BookDetailSearchControllerTest {
 
     @Autowired

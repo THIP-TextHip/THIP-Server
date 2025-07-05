@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import(konkuk.thip.config.TestQuerydslConfig.class)    // DataJpaTest 이므로 JPA 제외 빈 추가로 import
+@DisplayName("[JPA] RoomJpaEntity 테스트")
 class RoomJpaEntityTest {
 
     @PersistenceContext
