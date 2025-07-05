@@ -5,11 +5,8 @@ import konkuk.thip.book.adapter.out.mapper.BookMapper;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.common.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NOT_FOUND;
 
@@ -21,9 +18,17 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     private final BookMapper bookMapper;
 
     @Override
-    public Optional<Book> findByIsbn(String isbn) {
-        return bookJpaRepository.findByIsbn(isbn)
-                .map(bookMapper::toDomainEntity);
+    public Book findByIsbn(String isbn) {
+        BookJpaEntity bookJpaEntity = bookJpaRepository.findByIsbn(isbn).orElseThrow(
+                () -> new EntityNotFoundException(BOOK_NOT_FOUND));
+        return bookMapper.toDomainEntity(bookJpaEntity);
+    }
+
+
+    @Override
+    public Long save(Book book) {
+        BookJpaEntity bookJpaEntity = bookMapper.toJpaEntity(book);
+        return bookJpaRepository.save(bookJpaEntity).getBookId();
     }
 
     @Override
