@@ -70,7 +70,11 @@ public enum ErrorCode implements ResponseCode {
      */
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, 110000, "존재하지 않는 VOTE 입니다."),
     VOTE_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 110001, "총평이 될 수 없는 VOTE 입니다."),
-    INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다.")
+    INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다."),
+
+    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, 120000, "존재하지 않는 RECORD 입니다."),
+    RECORD_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 120001, "총평이 될 수 없는 RECORD 입니다."),
+    INVALID_RECORD_PAGE_RANGE(HttpStatus.BAD_REQUEST, 120002, "RECORD의 page 값이 유효하지 않습니다."),
 
     ;
 
