@@ -39,8 +39,8 @@ jobs:
         run: |
           mkdir -p ${{ env.RESOURCE_PATH }}
           mkdir -p ${{ env.TEST_RESOURCE_PATH }}
-          printf "%s" "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
-          printf "%s" "${{ secrets.APPLICATION_YML_TEST }}" > ${{ env.TEST_RESOURCE_PATH }}/application-test.yml
+          echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
+          echo "${{ secrets.APPLICATION_YML_TEST }}" > ${{ env.TEST_RESOURCE_PATH }}/application-test.yml
           
 
       - name: 👏🏻 grant execute permission for gradlew
