@@ -7,9 +7,9 @@ import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
-import konkuk.thip.book.application.port.out.BookRedisCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
 import konkuk.thip.recentSearch.domain.RecentSearch;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
@@ -41,7 +40,6 @@ public class BookSearchService implements BookSearchUseCase {
     private final SavedQueryPort savedQueryPort;
     private final RecentSearchCommandPort recentSearchCommandPort;
     private final BookCommandPort bookCommandPort;
-    private final BookRedisCommandPort bookRedisCommandPort;
     private final UserCommandPort userCommandPort;
 
 
@@ -87,22 +85,20 @@ public class BookSearchService implements BookSearchUseCase {
         //책 상세정보
         NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
 
-        Optional<Book> bookOpt = bookCommandPort.findByIsbn(isbn);
-
-        //책 검색순위 정보 업데이트
-        bookRedisCommandPort.incrementBookSearchCount(isbn,LocalDate.now());
-
-        if (bookOpt.isEmpty()) {
-            // 책이 없으면 기본값으로 반환
+        Book book;
+        try {
+            // DB에서 책 정보 조회 (없으면 예외 발생)
+            book = bookCommandPort.findByIsbn(isbn);
+        } catch (EntityNotFoundException e) {
+            // 책이 DB에 없으면 기본값으로 반환
             return BookDetailSearchResult.of(
                     naverDetailBookParseResult,
-                    0,
-                    0,
-                    false
+                    0,    // 모집 중인 방 개수
+                    0,    // 읽기 참여자 수
+                    false // 저장 여부
             );
         }
 
-        Book book = bookOpt.get();
 
         //이책에 모집중인 모임방 개수
         int recruitingRoomCount = getRecruitingRoomCount(book);
