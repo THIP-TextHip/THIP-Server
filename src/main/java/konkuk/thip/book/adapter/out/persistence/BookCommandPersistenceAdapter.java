@@ -30,4 +30,13 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
         BookJpaEntity bookJpaEntity = bookMapper.toJpaEntity(book);
         return bookJpaRepository.save(bookJpaEntity).getBookId();
     }
+
+    @Override
+    public Book findById(Long id) {
+        BookJpaEntity bookJpaEntity = bookJpaRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(BOOK_NOT_FOUND)
+        );
+
+        return bookMapper.toDomainEntity(bookJpaEntity);
+    }
 }
