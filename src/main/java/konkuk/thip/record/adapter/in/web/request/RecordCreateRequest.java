@@ -4,9 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import konkuk.thip.record.application.port.in.dto.RecordCreateCommand;
-import lombok.Getter;
 
-@Getter
 public record RecordCreateRequest (
     @NotNull(message = "page는 필수입니다.")
     Integer page,
