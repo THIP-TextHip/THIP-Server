@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class RecordCommandController {
     private final RecordCreateUseCase recordCreateUseCase;
 
-    @PostMapping("/rooms/{roomId}/records")
+    @PostMapping("/rooms/{roomId}/record")
     public BaseResponse<RecordCreateResponse> createRecord(
             @UserId Long userId,
             @PathVariable Long roomId,
