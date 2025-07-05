@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class VoteService implements VoteCreateUseCase {
+public class VoteCreateService implements VoteCreateUseCase {
 
     private final VoteCommandPort voteCommandPort;
     private final RoomCommandPort roomCommandPort;
