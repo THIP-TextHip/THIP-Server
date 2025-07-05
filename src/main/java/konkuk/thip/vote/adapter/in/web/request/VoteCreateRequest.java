@@ -22,7 +22,7 @@ public record VoteCreateRequest(
         @NotNull(message = "투표 항목은 필수입니다.")
         @Size(min = 1, max = 5, message = "투표 항목은 1개 이상, 최대 5개까지입니다.")
         @Valid
-        List<VoteItemCreateRequest> voteItemCreateRequests
+        List<VoteItemCreateRequest> voteItemList
 ) {
         public record VoteItemCreateRequest(
                 @NotBlank(message = "투표 항목 이름은 필수입니다.")
@@ -31,7 +31,7 @@ public record VoteCreateRequest(
         ) {}
 
         public VoteCreateCommand toCommand(Long userId, Long roomId) {
-                List<VoteCreateCommand.VoteItemCreateCommand> mappedItems = voteItemCreateRequests.stream()
+                List<VoteCreateCommand.VoteItemCreateCommand> mappedItems = voteItemList.stream()
                         .map(voteItem -> new VoteCreateCommand.VoteItemCreateCommand(voteItem.itemName))
                         .toList();
 

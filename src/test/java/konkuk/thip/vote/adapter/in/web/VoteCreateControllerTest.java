@@ -185,7 +185,7 @@ class VoteCreateControllerTest {
         Map<String, Object> request = Map.of(
                 "isOverview", false,
                 "content", "내용",
-                "voteItemCreateRequests", List.of(Map.of("itemName", "찬성"))
+                "voteItemList", List.of(Map.of("itemName", "찬성"))
         );
 
         // when & then
@@ -205,7 +205,7 @@ class VoteCreateControllerTest {
         Map<String, Object> request = Map.of(
                 "page", 1,
                 "content", "내용",
-                "voteItemCreateRequests", List.of(Map.of("itemName", "찬성"))
+                "voteItemList", List.of(Map.of("itemName", "찬성"))
         );
 
         // when & then
@@ -226,7 +226,7 @@ class VoteCreateControllerTest {
                 "page", 1,
                 "isOverview", false,
                 "content", "",
-                "voteItemCreateRequests", List.of(Map.of("itemName", "찬성"))
+                "voteItemList", List.of(Map.of("itemName", "찬성"))
         );
 
         // when & then
@@ -248,7 +248,7 @@ class VoteCreateControllerTest {
                 "page", 1,
                 "isOverview", false,
                 "content", longContent,
-                "voteItemCreateRequests", List.of(Map.of("itemName", "찬성"))
+                "voteItemList", List.of(Map.of("itemName", "찬성"))
         );
 
         // when & then
@@ -262,14 +262,14 @@ class VoteCreateControllerTest {
     }
 
     @Test
-    @DisplayName("[voteItemCreateRequests]가 누락되었을 때 400 Bad Request 반환")
+    @DisplayName("[voteItemList]가 누락되었을 때 400 Bad Request 반환")
     void vote_create_vote_item_null() throws Exception {
         // given
         Map<String, Object> request = Map.of(
                 "page", 1,
                 "isOverview", false,
                 "content", "내용"
-                // voteItemCreateRequests 생략
+                // voteItemList 생략
         );
 
         // when & then
@@ -283,7 +283,7 @@ class VoteCreateControllerTest {
     }
 
     @Test
-    @DisplayName("[voteItemCreateRequests]가 5개 초과일 때 400 Bad Request 반환")
+    @DisplayName("[voteItemList]가 5개 초과일 때 400 Bad Request 반환")
     void vote_create_vote_item_too_many() throws Exception {
         // given: 6개 아이템
         List<Map<String, String>> items = List.of(
@@ -295,7 +295,7 @@ class VoteCreateControllerTest {
                 "page", 1,
                 "isOverview", false,
                 "content", "내용",
-                "voteItemCreateRequests", items
+                "voteItemList", items
         );
 
         // when & then
@@ -309,14 +309,14 @@ class VoteCreateControllerTest {
     }
 
     @Test
-    @DisplayName("[voteItemCreateRequests] 내 [itemName]이 빈 문자열일 때 400 Bad Request 반환")
+    @DisplayName("[voteItemList] 내 [itemName]이 빈 문자열일 때 400 Bad Request 반환")
     void vote_create_vote_item_name_blank() throws Exception {
         // given
         Map<String, Object> request = Map.of(
                 "page", 1,
                 "isOverview", false,
                 "content", "내용",
-                "voteItemCreateRequests", List.of(Map.of("itemName",""))
+                "voteItemList", List.of(Map.of("itemName",""))
         );
 
         // when & then
@@ -330,7 +330,7 @@ class VoteCreateControllerTest {
     }
 
     @Test
-    @DisplayName("[voteItemCreateRequests] 내 [itemName]이 20자 초과일 때 400 Bad Request 반환")
+    @DisplayName("[voteItemList] 내 [itemName]이 20자 초과일 때 400 Bad Request 반환")
     void vote_create_vote_item_name_too_long() throws Exception {
         // given
         String longName = "가".repeat(21);
@@ -338,7 +338,7 @@ class VoteCreateControllerTest {
                 "page", 1,
                 "isOverview", false,
                 "content", "내용",
-                "voteItemCreateRequests", List.of(Map.of("itemName", longName))
+                "voteItemList", List.of(Map.of("itemName", longName))
         );
 
         // when & then
