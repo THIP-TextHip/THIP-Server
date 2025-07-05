@@ -91,9 +91,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> businessExceptionHandler(BusinessException e) {
         log.error("[BusinessExceptionHandler] {}", e.getMessage());
+
+        // 1) cause 에 포함된 상세 메시지를 파싱, 없다면 빈 문자열로 설정
+        String detail = Optional.ofNullable(e.getCause())
+                .map(Throwable::getMessage)
+                .orElse("");
+
         return ResponseEntity
                 .status(e.getErrorCode().getHttpStatus())
-                .body(ErrorResponse.of(e.getErrorCode()));
+                .body(ErrorResponse.of(e.getErrorCode(), detail));
     }
 
     // 서버 내부 오류 예외 처리
@@ -131,6 +137,5 @@ public class GlobalExceptionHandler {
                 .status(API_INVALID_PARAM.getHttpStatus())
                 .body(ErrorResponse.of(API_INVALID_PARAM, errorMessage));
     }
-
 
 }
