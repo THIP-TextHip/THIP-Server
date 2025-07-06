@@ -45,19 +45,19 @@ class RecordTest {
     }
 
     @Test
-    @DisplayName("validateOverview: 진행률 80% 이상이고 isOverview=true 이면, 예외가 발생하지 않는다.")
-    void validate_overview_ratio_at_least_80_percent() {
-        Record record = Record.withoutId("content", 1L, 16, true, 1L);
-        assertDoesNotThrow(() -> record.validateOverview(20));
+    @DisplayName("validateOverview: isOverview=true 이고 page가 전체 페이지 수와 같으면, 예외가 발생하지 않는다.")
+    void validate_overview_page_is_book_page_count() {
+        Record record = Record.withoutId("content", 1L, 100, true, 1L);
+        assertDoesNotThrow(() -> record.validateOverview(100));
     }
 
     @Test
-    @DisplayName("validateOverview: 진행률 80% 미만이고 isOverview=true 이면, InvalidStateException 발생한다.")
-    void validate_overview_ratio_below_80_percent() {
+    @DisplayName("validateOverview: isOverview=true 이고 page가 전체 페이지 수와 다르면, InvalidStateException 발생한다.")
+    void validate_overview_page_is_not_book_page_count() {
         Record record = Record.withoutId("content", 1L, 15, true, 1L);  // 15/20 = 0.75
         InvalidStateException ex = assertThrows(InvalidStateException.class,
                 () -> record.validateOverview(20));
-        assertInstanceOf(IllegalStateException.class, ex.getCause());
-        assertTrue(ex.getCause().getMessage().contains("현재 진행률 = 75.00% (15/20)"));
+        assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+        assertTrue(ex.getCause().getMessage().contains("현재 페이지 = 15"));
     }
 }
