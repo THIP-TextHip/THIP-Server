@@ -12,10 +12,10 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,9 +66,13 @@ class RecordCreateControllerTest {
     @Autowired
     private RecordJpaRepository recordJpaRepository;
 
+    @Autowired
+    private UserRoomJpaRepository userRoomJpaRepository;
+
     @AfterEach
     void tearDown() {
         recordJpaRepository.deleteAll();
+        userRoomJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         categoryJpaRepository.deleteAll();
@@ -86,6 +90,17 @@ class RecordCreateControllerTest {
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createCategory(alias));
 
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+
+        //UserRoomJpaEntity 생성 및 저장
+        UserRoomJpaEntity userRoom = UserRoomJpaEntity.builder()
+                .currentPage(10)
+                .userPercentage(80.0)
+                .userRoomRole(UserRoomRole.HOST)
+                .userJpaEntity(user)
+                .roomJpaEntity(room)
+                .build();
+
+        userRoomJpaRepository.save(userRoom);
     }
 
     @Test
