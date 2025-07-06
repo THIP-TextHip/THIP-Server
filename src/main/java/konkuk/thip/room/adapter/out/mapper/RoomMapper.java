@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoomMapper {
 
-    public RoomJpaEntity roomJpaEntity(Room room, BookJpaEntity bookJpaEntity, CategoryJpaEntity categoryJpaEntity) {
+    public RoomJpaEntity toJpaEntity(Room room, BookJpaEntity bookJpaEntity, CategoryJpaEntity categoryJpaEntity) {
         return RoomJpaEntity.builder()
                 .title(room.getTitle())
                 .description(room.getDescription())
