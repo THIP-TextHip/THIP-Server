@@ -28,7 +28,7 @@ public class UserRoom extends BaseDomainEntity {
     public boolean updateUserProgress(int requestPage, int totalPageCount) {
         if (currentPage < requestPage) {
             currentPage = requestPage;
-            userPercentage = ((double) currentPage / totalPageCount) * 100;
+            userPercentage = Math.min(((double) currentPage / totalPageCount) * 100, 100.0);
             return true;
         }
 
