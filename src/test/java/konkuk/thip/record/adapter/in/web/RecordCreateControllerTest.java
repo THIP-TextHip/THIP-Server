@@ -133,7 +133,7 @@ class RecordCreateControllerTest {
 
     @Test
     @DisplayName("[page]가 누락되었을 때 400 Bad Request 반환")
-    void vote_create_page_null() throws Exception {
+    void record_create_page_null() throws Exception {
         // given: page 누락
         Map<String, Object> request = Map.of(
                 "isOverview", false,
@@ -152,7 +152,7 @@ class RecordCreateControllerTest {
 
     @Test
     @DisplayName("[isOverview]가 누락되었을 때 400 Bad Request 반환")
-    void vote_create_is_over_view_null() throws Exception {
+    void record_create_is_over_view_null() throws Exception {
         // given: isOverview 누락
         Map<String, Object> request = Map.of(
                 "page", 1,
@@ -171,7 +171,7 @@ class RecordCreateControllerTest {
 
     @Test
     @DisplayName("[content]가 빈 문자열일 때 400 Bad Request 반환")
-    void vote_create_content_blank() throws Exception {
+    void record_create_content_blank() throws Exception {
         // given
         Map<String, Object> request = Map.of(
                 "page", 1,
@@ -191,7 +191,7 @@ class RecordCreateControllerTest {
 
     @Test
     @DisplayName("[content]가 500자 초과일 때 400 Bad Request 반환")
-    void vote_create_content_too_long() throws Exception {
+    void record_create_content_too_long() throws Exception {
         // given
         String longContent = "가".repeat(501);
         Map<String, Object> request = Map.of(
