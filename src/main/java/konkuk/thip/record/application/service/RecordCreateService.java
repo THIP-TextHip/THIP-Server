@@ -75,7 +75,7 @@ public class RecordCreateService implements RecordCreateUseCase {
         if (!userRoom.canWriteOverview()) {
             String message = String.format(
                     "총평(isOverview)은 사용자 진행률이 80%% 이상일 때만 가능합니다. 현재 사용자 진행률 = %.2f%%",
-                    userRoom.getUserPercentage() * 100
+                    userRoom.getUserPercentage()
             );
             throw new InvalidStateException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
         }
