@@ -8,17 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BookApiNaverApiAdapter implements BookApiQueryPort {
+public class BookApiNaverApiAdapter {
 
     private final NaverApiUtil naverApiUtil;
 
-    @Override
     public NaverBookParseResult findBooksByKeyword(String keyword, int start) {
         String xml = naverApiUtil.searchBook(keyword, start); // 네이버 API 호출
         return NaverBookXmlParser.parseBookList(xml); // XML 파싱 + 페이징 정보 포함
     }
 
-    @Override
     public NaverDetailBookParseResult findDetailBookByKeyword(String isbn) {
         String xml = naverApiUtil.detailSearchBook(isbn); // 네이버 API 호출
         return NaverBookXmlParser.parseBookDetail(xml); // XML 파싱
