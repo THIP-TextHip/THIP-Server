@@ -41,13 +41,13 @@ public class Record extends BaseDomainEntity {
 
 
     public void validateOverview(int totalPageCount) {
-        double ratio = (double) page / totalPageCount;
-        if (isOverview && ratio < 0.8) {
+        // 총평 기록 생성 요청인데 page가 책의 전체 페이지 수가 아니라면 에러
+        if (isOverview && page != totalPageCount) {
             String message = String.format(
-                    "총평(isOverview)은 진행률이 80%% 이상일 때만 가능합니다. 현재 진행률 = %.2f%% (%d/%d)",
-                    ratio * 100, page, totalPageCount
+                    "총평(isOverview)은 책의 전체 페이지 수(%d)와 동일한 페이지에서만 작성할 수 있습니다. 현재 페이지 = %d",
+                    totalPageCount, page
             );
-            throw new InvalidStateException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
+            throw new InvalidStateException(RECORD_CANNOT_BE_OVERVIEW, new IllegalArgumentException(message));
         }
     }
 
