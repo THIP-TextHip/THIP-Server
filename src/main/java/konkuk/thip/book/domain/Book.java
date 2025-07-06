@@ -56,18 +56,31 @@ public class Book extends BaseDomainEntity {
     }
 
     public Book withId(Long id) {
-        return Book.builder()
+        return this.toBuilder()
                 .id(id)
-                .title(this.title)
-                .isbn(this.isbn)
-                .authorName(this.authorName)
-                .bestSeller(this.bestSeller)
-                .publisher(this.publisher)
-                .imageUrl(this.imageUrl)
-                .pageCount(this.pageCount)
-                .description(this.description)
                 .build();
     }
 
+    public boolean hasPageCount() {
+        return pageCount != null && pageCount > 0;
+    }
 
+    public Book changePageCount(Integer newPageCount) {
+        return this.toBuilder()
+                .pageCount(newPageCount)
+                .build();
+    }
+
+    private BookBuilder toBuilder() {
+        return Book.builder()
+                .id(id)
+                .title(title)
+                .isbn(isbn)
+                .authorName(authorName)
+                .bestSeller(bestSeller)
+                .publisher(publisher)
+                .imageUrl(imageUrl)
+                .pageCount(pageCount)
+                .description(description);
+    }
 }
