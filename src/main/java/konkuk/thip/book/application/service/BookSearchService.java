@@ -85,7 +85,7 @@ public class BookSearchService implements BookSearchUseCase {
         User user =  userCommandPort.findById(userId);
 
         //책 상세정보
-        NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
+        NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
 
         //책 검색순위 정보 업데이트
         bookRedisCommandPort.incrementBookSearchCount(isbn,LocalDate.now());

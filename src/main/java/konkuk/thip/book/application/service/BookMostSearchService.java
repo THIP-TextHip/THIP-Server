@@ -57,7 +57,7 @@ public class BookMostSearchService implements BookMostSearchUseCase {
             Book book = bookMap.get(isbn);
             if (book == null) {
                 // DB에 없으면 Naver API에서 상세 정보 조회
-                NaverDetailBookParseResult naverResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
+                NaverDetailBookParseResult naverResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
                 bookRankInfos.add(GetBookMostSearchResponse.BookRankInfo.builder()
                         .rank(rank++)
                         .title(naverResult.title())
