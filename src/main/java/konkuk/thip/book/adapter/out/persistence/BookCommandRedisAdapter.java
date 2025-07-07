@@ -1,6 +1,10 @@
 package konkuk.thip.book.adapter.out.persistence;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.book.application.port.in.dto.BookMostSearchResult;
 import konkuk.thip.book.application.port.out.BookRedisCommandPort;
+import konkuk.thip.common.exception.ExternalApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,6 +14,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static konkuk.thip.common.exception.code.ErrorCode.JSON_PROCESSING_ERROR;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +31,10 @@ public class BookCommandRedisAdapter implements BookRedisCommandPort {
     @Value("${app.redis.search-rank-prefix}")
     private String searchRankPrefix;
 
+    @Value("${app.redis.search-rank-detail-prefix}")
+    private String searchRankDetailPrefix;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public void incrementBookSearchCount(String isbn, LocalDate date) {
@@ -42,14 +52,27 @@ public class BookCommandRedisAdapter implements BookRedisCommandPort {
     }
 
     @Override
+    public void saveBookSearchRankDetail(List<BookMostSearchResult.BookRankInfo> bookRankDetails, LocalDate date) {
+        String redisKey = makeRedisKey(searchRankDetailPrefix, date);
+        String detailJson = null;
+        try {
+            detailJson = objectMapper.writeValueAsString(bookRankDetails);
+        } catch (JsonProcessingException e) {
+            throw new ExternalApiException(JSON_PROCESSING_ERROR);
+        }
+        redisTemplate.opsForValue().set(redisKey, detailJson);
+    }
+
+    @Override
     public void deleteBookSearchRank(LocalDate date) {
         deleteZSetKey(searchRankPrefix, date);
     }
 
     @Override
-    public void deleteBookSearchCount(LocalDate date) {
-        deleteZSetKey(searchCountPrefix, date);
-    }
+    public void deleteBookSearchCount(LocalDate date) { deleteZSetKey(searchCountPrefix, date); }
+
+    @Override
+    public void deleteBookSearchRankDetail(LocalDate date) { deleteZSetKey(searchRankDetailPrefix, date); }
 
     private void deleteZSetKey(String prefix, LocalDate date) {
         String redisKey = makeRedisKey(prefix, date);
@@ -60,6 +83,5 @@ public class BookCommandRedisAdapter implements BookRedisCommandPort {
         String dateStr = date.format(DAILY_KEY_FORMATTER);
         return prefix + dateStr;
     }
-
 
 }
