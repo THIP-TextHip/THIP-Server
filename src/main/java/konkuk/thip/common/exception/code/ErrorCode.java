@@ -23,7 +23,7 @@ public enum ErrorCode implements ResponseCode {
     AUTH_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, 40104, "로그인에 실패했습니다."),
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
 
-    JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "JSON 직렬화/역직렬화에 실패했습니다."),
+    JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
 
     /* 60000부터 비즈니스 예외 */
     /**
