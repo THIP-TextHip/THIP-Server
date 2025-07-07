@@ -7,6 +7,9 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
+import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
+import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 
 import java.time.LocalDate;
 
@@ -70,6 +73,24 @@ public class TestEntityFactory {
                 .page(22)
                 .isOverview(false)
                 .roomJpaEntity(room)
+                .build();
+    }
+
+    public static VoteJpaEntity createVote(UserJpaEntity user, RoomJpaEntity room) {
+        return VoteJpaEntity.builder()
+                .content("투표 내용")
+                .userJpaEntity(user)
+                .page(33)
+                .isOverview(true)
+                .roomJpaEntity(room)
+                .build();
+    }
+
+    public static CommentJpaEntity createComment(PostJpaEntity post, UserJpaEntity user) {
+        return CommentJpaEntity.builder()
+                .content("댓글 내용")
+                .postJpaEntity(post)
+                .userJpaEntity(user)
                 .build();
     }
 }
