@@ -7,6 +7,7 @@ import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
+import konkuk.thip.book.application.port.out.BookRedisCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.EntityNotFoundException;
@@ -41,6 +42,7 @@ public class BookSearchService implements BookSearchUseCase {
     private final RecentSearchCommandPort recentSearchCommandPort;
     private final BookCommandPort bookCommandPort;
     private final UserCommandPort userCommandPort;
+    private final BookRedisCommandPort bookRedisCommandPort;
 
 
     @Override
@@ -85,6 +87,9 @@ public class BookSearchService implements BookSearchUseCase {
         //책 상세정보
         NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
 
+        //책 검색순위 정보 업데이트
+        bookRedisCommandPort.incrementBookSearchCount(isbn,LocalDate.now());
+
         Book book;
         try {
             // DB에서 책 정보 조회 (없으면 예외 발생)
@@ -98,7 +103,6 @@ public class BookSearchService implements BookSearchUseCase {
                     false // 저장 여부
             );
         }
-
 
         //이책에 모집중인 모임방 개수
         int recruitingRoomCount = getRecruitingRoomCount(book);
