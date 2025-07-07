@@ -16,9 +16,9 @@ public class RecordCommandController {
 
     @PostMapping("/rooms/{roomId}/record")
     public BaseResponse<RecordCreateResponse> createRecord(
-            @UserId Long userId,
-            @PathVariable Long roomId,
-            @Valid @RequestBody RecordCreateRequest recordCreateRequest) {
+            @UserId final Long userId,
+            @PathVariable final Long roomId,
+            @Valid @RequestBody final RecordCreateRequest recordCreateRequest) {
         return BaseResponse.ok(
                 RecordCreateResponse.of(
                         recordCreateUseCase.createRecord(recordCreateRequest.toCommand(roomId, userId))
