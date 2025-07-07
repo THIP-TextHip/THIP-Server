@@ -2,6 +2,7 @@ package konkuk.thip.book.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.book.application.port.in.dto.BookMostSearchResult;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -51,14 +52,14 @@ class BookMostSearchedBooksControllerTest {
     private ObjectMapper objectMapper;
 
 
-    private LocalDate today;
+    private LocalDate yesterday;
     private String rankKey;
 
 
     private final DateTimeFormatter DAILY_KEY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    @Value("${app.redis.search-rank-prefix}")
-    private String searchRankPrefix;
+    @Value("${app.redis.search-rank-detail-prefix}")
+    private String searchRankDetailPrefix;
 
     @BeforeEach
     void setUp() {
@@ -85,18 +86,35 @@ class BookMostSearchedBooksControllerTest {
         aliasJpaRepository.deleteAll();
     }
 
-
     @Test
-    @DisplayName("오늘 랭킹 Top 5를 정상적으로 조회한다")
+    @DisplayName("어제 랭킹 Top 5를 정상적으로 조회한다")
     void getMostSearchedBooks_returnsRankList() throws Exception {
+        // given: 어제 날짜의 랭킹 상세정보(JSON)를 Redis에 저장
+        yesterday = LocalDate.now().minusDays(1);
+        String detailKey = searchRankDetailPrefix + yesterday.format(DAILY_KEY_FORMATTER);
 
-        // given 오늘 날짜의 랭킹 키에 테스트용 데이터 3개를 저장.
-        today = LocalDate.now();
-        rankKey = searchRankPrefix + today.format(DAILY_KEY_FORMATTER);
-
-        redisTemplate.opsForZSet().add(rankKey, "9788954682152", 10);
-        redisTemplate.opsForZSet().add(rankKey, "9788991742178", 5);
-        redisTemplate.opsForZSet().add(rankKey, "9791198783400", 7);
+        List<BookMostSearchResult.BookRankInfo> bookRankInfos = List.of(
+                BookMostSearchResult.BookRankInfo.builder()
+                        .rank(1)
+                        .title("책1")
+                        .imageUrl("http://image1.jpg")
+                        .isbn("9788954682152")
+                        .build(),
+                BookMostSearchResult.BookRankInfo.builder()
+                        .rank(2)
+                        .title("책2")
+                        .imageUrl("http://image2.jpg")
+                        .isbn("9788991742178")
+                        .build(),
+                BookMostSearchResult.BookRankInfo.builder()
+                        .rank(3)
+                        .title("책3")
+                        .imageUrl("http://image3.jpg")
+                        .isbn("9791198783400")
+                        .build()
+        );
+        String json = objectMapper.writeValueAsString(bookRankInfos);
+        redisTemplate.opsForValue().set(detailKey, json);
 
         Long userId = userJpaRepository.findAll().get(0).getUserId();
 
@@ -111,39 +129,25 @@ class BookMostSearchedBooksControllerTest {
                 .andExpect(jsonPath("$.data.bookList").isArray())
                 .andExpect(jsonPath("$.data.bookList.length()").value(3));
 
+        String responseJson = result.andReturn().getResponse().getContentAsString();
+        JsonNode bookList = objectMapper.readTree(responseJson).path("data").path("bookList");
 
-        String json = result.andReturn().getResponse().getContentAsString();
-        JsonNode jsonNode = objectMapper.readTree(json);
-        JsonNode rankArray = jsonNode.path("data").path("bookList");
+        assertThat(bookList).isNotNull();
+        assertThat(bookList.size()).isEqualTo(3);
 
-        assertThat(rankArray).isNotNull();
-        assertThat(rankArray.size()).isEqualTo(3);
-
-
-        // 점수 내림차순 확인 (Redis에서 직접 점수 확인)
-        double previousScore = Double.MAX_VALUE;
-        for (JsonNode bookRankInfo : rankArray) {
-            String isbn = bookRankInfo.path("isbn").asText();
-            Double score = redisTemplate.opsForZSet().score(rankKey, isbn);
-            assertThat(score).isLessThanOrEqualTo(previousScore);
-            previousScore = score;
-        }
-
-        // 저장된 isbn이 포함되어 있는지 확인
-        List<String> isbns = List.of("9788954682152", "9788991742178", "9791198783400");
-        for (JsonNode bookRankInfo : rankArray) {
-            assertThat(isbns.contains(bookRankInfo.path("isbn").asText())).isTrue();
-        }
+        // 순서 및 필드 검증
+        assertThat(bookList.get(0).path("isbn").asText()).isEqualTo("9788954682152");
+        assertThat(bookList.get(1).path("isbn").asText()).isEqualTo("9788991742178");
+        assertThat(bookList.get(2).path("isbn").asText()).isEqualTo("9791198783400");
     }
 
     @Test
     @DisplayName("랭킹 데이터가 없으면 빈 리스트를 반환한다")
     void getMostSearchedBooks_returnsEmptyList_whenNoData() throws Exception {
-
-        // given 오늘 날짜의 랭킹 키를 삭제해서 데이터가 없는 상태로 만든다
-        today = LocalDate.now();
-        rankKey = searchRankPrefix + today.format(DAILY_KEY_FORMATTER);
-        redisTemplate.delete(rankKey);
+        // given: 어제 날짜의 랭킹 상세정보 키를 삭제
+        yesterday = LocalDate.now().minusDays(1);
+        String detailKey = searchRankDetailPrefix + yesterday.format(DAILY_KEY_FORMATTER);
+        redisTemplate.delete(detailKey);
 
         Long userId = userJpaRepository.findAll().get(0).getUserId();
 
@@ -158,12 +162,12 @@ class BookMostSearchedBooksControllerTest {
                 .andExpect(jsonPath("$.data.bookList").isArray())
                 .andExpect(jsonPath("$.data.bookList.length()").value(0));
 
-        String json = result.andReturn().getResponse().getContentAsString();
-        JsonNode jsonNode = objectMapper.readTree(json);
-        JsonNode bookList = jsonNode.path("data").path("bookList");
+        String responseJson = result.andReturn().getResponse().getContentAsString();
+        JsonNode bookList = objectMapper.readTree(responseJson).path("data").path("bookList");
 
         assertThat(bookList).isNotNull();
         assertThat(bookList.size()).isEqualTo(0);
     }
+
 
 }
