@@ -39,4 +39,14 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
 
         return bookMapper.toDomainEntity(bookJpaEntity);
     }
+
+    @Override
+    public void updateForPageCount(Book book) {
+        BookJpaEntity bookJpaEntity = bookJpaRepository.findById(book.getId()).orElseThrow(
+                () -> new EntityNotFoundException(BOOK_NOT_FOUND)
+        );
+
+        bookJpaEntity.changePageCount(book.getPageCount());
+        bookJpaRepository.save(bookJpaEntity);
+    }
 }

@@ -42,19 +42,21 @@ public enum ErrorCode implements ResponseCode {
      */
     BOOK_KEYWORD_ENCODING_FAILED(HttpStatus.BAD_REQUEST, 80000, "검색어 인코딩에 실패했습니다."),
     BOOK_NAVER_API_REQUEST_ERROR(HttpStatus.BAD_REQUEST, 80001,"네이버 API 요청에 실패하였습니다."),
-    BOOK_NAVER_API_PARSING_ERROR(HttpStatus.BAD_REQUEST, 80002,"네이버 API 응답 파싱에 실패하였습니다."),
+    BOOK_NAVER_API_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80002,"네이버 API 응답 파싱에 실패하였습니다."),
     BOOK_NAVER_API_URL_ERROR(HttpStatus.BAD_REQUEST, 80003,"네이버 API URL이 잘못되었습니다."),
     BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED(HttpStatus.BAD_REQUEST, 80004,"네이버 API 요청 중, HTTP 연결에 실패하였습니다."),
     BOOK_NAVER_API_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80005,"네이버 API 응답에 실패하였습니다."),
     BOOK_SEARCH_PAGE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, 80006,"검색어 페이지가 범위를 벗어났습니다."),
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
     BOOK_PAGE_NUMBER_INVALID(HttpStatus.BAD_REQUEST, 80008, "페이지 번호는 1 이상의 값이어야 합니다."),
-    BOOK_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "ISBN으로 검색한 결과가 존재하지 않습니다."),
+    BOOK_NAVER_API_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "네이버 API 에서 ISBN으로 검색한 결과가 존재하지 않습니다."),
     BOOK_NOT_FOUND(HttpStatus.BAD_REQUEST, 80010, "존재하지 않는 BOOK 입니다."),
     BOOK_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 80011, "사용자가 이미 저장한 책입니다."),
     DUPLICATED_BOOKS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 80012, "중복된 책이 존재합니다."),
     BOOK_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80013, "사용자가 저장하지 않은 책은 저장삭제 할 수 없습니다."),
     BOOK_NOT_SAVED_DB_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80014, "DB에 존재하지 않은 책은 저장삭제 할 수 없습니다."),
+    BOOK_ALADIN_API_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80015, "알라딘 API 응답 파싱에 실패하였습니다."),
+    BOOK_ALADIN_API_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80016, "알라딘 API 에서 ISBN으로 검색한 결과가 존재하지 않습니다."),
 
     /**
      * 90000 : recentSearch error
@@ -66,9 +68,10 @@ public enum ErrorCode implements ResponseCode {
      * 100000 : room error
      */
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 100000, "존재하지 않는 ROOM 입니다."),
-    ROOM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, 100001, "비밀번호가 일치하지 않습니다."),
-    ROOM_PASSWORD_NOT_REQUIRED(HttpStatus.BAD_REQUEST, 100002, "공개방은 비밀번호가 필요하지 않습니다."),
-    ROOM_RECRUITMENT_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, 100003, "모집기간이 만료된 방입니다."),
+    INVALID_ROOM_CREATE(HttpStatus.BAD_REQUEST, 100001, "유효하지 않은 ROOM 생성 요청 입니다."),
+    ROOM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, 100002, "비밀번호가 일치하지 않습니다."),
+    ROOM_PASSWORD_NOT_REQUIRED(HttpStatus.BAD_REQUEST, 100003, "공개방은 비밀번호가 필요하지 않습니다."),
+    ROOM_RECRUITMENT_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, 100004, "모집기간이 만료된 방입니다."),
     /**
      * 110000 : vote error
      */
@@ -88,6 +91,11 @@ public enum ErrorCode implements ResponseCode {
      * 130000 : userRoom error
      */
     USER_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 130000, "존재하지 않는 USER_ROOM (방과 사용자 관계) 입니다."),
+
+    /**
+     * 140000 : Category error
+     */
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 CATEGORY 입니다.")
 
     ;
 
