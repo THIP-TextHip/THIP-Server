@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_ROOM_CREATE;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
@@ -114,7 +114,7 @@ public class Room extends BaseDomainEntity {
         return PASSWORD_ENCODER.matches(rawPassword, this.hashedPassword);
     }
 
-    public void verifyPassword(String password) {
+    public void verifyPassword(String rawPassword) {
 
         // 모집기간 만료 체크
         LocalDate deadline = this.startDate.minusDays(1);
@@ -130,8 +130,8 @@ public class Room extends BaseDomainEntity {
             throw new BusinessException(ROOM_PASSWORD_NOT_REQUIRED);
         }
 
-        //비밀번호 해싱 로직 추가되면 해싱 해제 하고 검증하는 로직추가
-        if (this.password == null || !this.password.toString().equals(password)) {
+        //비밀번호 검증
+        if (!matchesPassword(rawPassword)) {
             throw new BusinessException(ROOM_PASSWORD_MISMATCH);
         }
     }
