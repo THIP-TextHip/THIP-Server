@@ -186,7 +186,7 @@ class RoomTest {
                 "제목", "설명", false, "1234",
                 start, start.plusDays(10), 5, 123L, 456L
         );
-        // 오늘이 startDate.minusDays(1)보다 이후면 true
+        setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
         assertTrue(room.isRecruitmentPeriodExpired());
     }
 
