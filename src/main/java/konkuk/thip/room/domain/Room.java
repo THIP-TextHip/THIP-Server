@@ -77,6 +77,7 @@ public class Room extends BaseDomainEntity {
 
     private static void validateDates(LocalDate startDate, LocalDate endDate) {
         LocalDate today = LocalDate.now();
+
         if (!startDate.isBefore(endDate)) {
             String message = String.format(
                     "시작일(%s)은 종료일(%s)보다 이전이어야 합니다.",
@@ -86,9 +87,9 @@ public class Room extends BaseDomainEntity {
                     new IllegalArgumentException(message));
         }
 
-        if (startDate.isBefore(today)) {
+        if (!startDate.isAfter(today)) {
             String message = String.format(
-                    "시작일(%s)은 현재 날짜(%s) 이후여야 합니다.",     // 현재 날짜 포함
+                    "시작일(%s)은 현재 날짜(%s) 이후여야 합니다.",     // 현재 날짜 미포함
                     startDate, today
             );
             throw new InvalidStateException(INVALID_ROOM_CREATE,

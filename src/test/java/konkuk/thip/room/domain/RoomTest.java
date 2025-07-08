@@ -85,6 +85,25 @@ class RoomTest {
     }
 
     @Test
+    @DisplayName("withoutId: 시작일 현재 날짜와 동일할 경우, InvalidStateException 발생한다.")
+    void withoutId_startDate_is_today() {
+        LocalDate today = LocalDate.now();
+        LocalDate future = today.plusDays(1);
+
+        // 시작일 == 현재시점
+        InvalidStateException ex = assertThrows(InvalidStateException.class, () ->
+                Room.withoutId(
+                        "제목", "설명", false, "1234",
+                        today, future, 5, 123L, 456L
+                )
+        );
+        assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+        assertTrue(ex.getCause().getMessage().contains(
+                String.format("시작일(%s)은 현재 날짜(%s) 이후여야 합니다.", today, today)
+        ));
+    }
+
+    @Test
     @DisplayName("withoutId: 전달받은 비밀번호를 해싱해서 보관한다.")
     void withoutId_password_hashing() {
         String rawPassword = "1234";
