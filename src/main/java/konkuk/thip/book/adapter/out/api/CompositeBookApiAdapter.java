@@ -43,7 +43,7 @@ public class CompositeBookApiAdapter implements BookApiQueryPort {
                 detailBookByKeyword.title(),
                 isbn,
                 detailBookByKeyword.author(),
-                false,
+                false,      // TODO : 추후 BestSeller 도입되면 고려해야함
                 detailBookByKeyword.publisher(),
                 detailBookByKeyword.imageUrl(),
                 pageCount,
