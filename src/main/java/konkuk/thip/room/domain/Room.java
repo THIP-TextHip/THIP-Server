@@ -2,6 +2,7 @@ package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.entity.StatusType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -64,5 +65,13 @@ public class Room extends BaseDomainEntity {
             throw new InvalidStateException(INVALID_ROOM_CREATE,
                     new IllegalArgumentException(message));
         }
+    }
+
+    public boolean isExpired() {
+        return this.getStatus() == StatusType.EXPIRED;
+    }
+
+    public void updateRoomPercentage(double roomPercentage) {
+        this.roomPercentage = roomPercentage;
     }
 }

@@ -23,6 +23,8 @@ public enum ErrorCode implements ResponseCode {
     AUTH_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, 40104, "로그인에 실패했습니다."),
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
 
+    JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
+
     /* 60000부터 비즈니스 예외 */
     /**
      * 60000 : alias error
@@ -75,9 +77,22 @@ public enum ErrorCode implements ResponseCode {
     INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다."),
 
     /**
-     * 120000 : Category error
+     * 120000 : record error
      */
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 120000, "존재하지 않는 CATEGORY 입니다.")
+    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, 120000, "존재하지 않는 RECORD 입니다."),
+    RECORD_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 120001, "총평이 될 수 없는 RECORD 입니다."),
+    INVALID_RECORD_PAGE_RANGE(HttpStatus.BAD_REQUEST, 120002, "RECORD의 page 값이 유효하지 않습니다."),
+    RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM(HttpStatus.BAD_REQUEST, 120003, "만료된 방에는 기록을 남길 수 없습니다."),
+
+    /**
+     * 130000 : userRoom error
+     */
+    USER_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 130000, "존재하지 않는 USER_ROOM (방과 사용자 관계) 입니다."),
+
+    /**
+     * 140000 : Category error
+     */
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 CATEGORY 입니다.")
 
     ;
 

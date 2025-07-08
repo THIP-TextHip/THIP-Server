@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_REQUEST_ERROR;
 import static org.assertj.core.api.Assertions.*;
 
+@DisplayName("[단위] NaverApiUtil 테스트")
 class NaverApiUtilTest {
 
     private NaverApiUtil createTestUtil() {
