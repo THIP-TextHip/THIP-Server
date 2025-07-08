@@ -19,7 +19,7 @@ public class BookApiNaverApiAdapter implements BookApiQueryPort {
     }
 
     @Override
-    public NaverDetailBookParseResult findDetailBookByKeyword(String isbn) {
+    public NaverDetailBookParseResult findDetailBookByIsbn(String isbn) {
         String xml = naverApiUtil.detailSearchBook(isbn); // 네이버 API 호출
         return NaverBookXmlParser.parseBookDetail(xml); // XML 파싱
     }
