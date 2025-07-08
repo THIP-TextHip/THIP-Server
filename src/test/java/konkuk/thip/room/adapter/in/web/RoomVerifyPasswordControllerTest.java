@@ -9,14 +9,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.anyOf;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,8 +57,9 @@ class RoomVerifyPasswordControllerTest {
     @Nested
     @DisplayName("비밀번호 검증")
     class PasswordValidation {
+
         @Test
-        @DisplayName("비밀번호가 4자리 숫자가 아닐 때 400 error")
+        @DisplayName("숫자로 구성되지 않았을 때 400 error")
         void invalid_password() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("password", "12ab");
@@ -63,7 +67,7 @@ class RoomVerifyPasswordControllerTest {
         }
 
         @Test
-        @DisplayName("비밀번호가 4자리가 아닐 때 400 error")
+        @DisplayName("4자리 숫자 아닐 때 400 error")
         void short_password() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("password", "123");
@@ -71,11 +75,12 @@ class RoomVerifyPasswordControllerTest {
         }
 
         @Test
-        @DisplayName("비밀번호가 빈 값일 때 400 error")
-        void blank_password() throws Exception {
+        @DisplayName("빈 문자열일 때 400 error")
+        void blank_description() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("password", "");
-            assertBad(req, "파라미터 값 중 유효하지 않은 값이 있습니다. 비밀번호는 필수입니다.");        }
+            assertBad(req, "비밀번호는 필수입니다.");
+        }
     }
 
     @Nested
