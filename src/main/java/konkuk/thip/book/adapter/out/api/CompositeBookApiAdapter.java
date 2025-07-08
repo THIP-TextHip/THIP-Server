@@ -27,7 +27,7 @@ public class CompositeBookApiAdapter implements BookApiQueryPort {
 
     @Override
     public Integer findPageCountByIsbn(String isbn) {
-        return aladinApiClient.findPageCountByIsb(isbn);
+        return aladinApiClient.findPageCountByIsbn(isbn);
     }
 
     @Override

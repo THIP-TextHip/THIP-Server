@@ -9,7 +9,7 @@ public class AladinApiClient {
 
     private final AladinApiUtil aladinApiUtil;
 
-    public Integer findPageCountByIsb(String isbn) {
+    public Integer findPageCountByIsbn(String isbn) {
         return aladinApiUtil.getPageCount(isbn);
     }
 }
