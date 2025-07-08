@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BookApiNaverApiAdapter {
+public class NaverApiClient {
 
     private final NaverApiUtil naverApiUtil;
 

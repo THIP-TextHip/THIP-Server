@@ -12,17 +12,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CompositeBookApiAdapter implements BookApiQueryPort {
 
-    private final BookApiNaverApiAdapter bookApiNaverApiAdapter;
+    private final NaverApiClient naverApiClient;
     private final AladinApiClient aladinApiClient;
 
     @Override
     public NaverBookParseResult findBooksByKeyword(String keyword, int start) {
-        return bookApiNaverApiAdapter.findBooksByKeyword(keyword, start);
+        return naverApiClient.findBooksByKeyword(keyword, start);
     }
 
     @Override
-    public NaverDetailBookParseResult findDetailBookByKeyword(String isbn) {
-        return bookApiNaverApiAdapter.findDetailBookByKeyword(isbn);
+    public NaverDetailBookParseResult findDetailBookByIsbn(String isbn) {
+        return naverApiClient.findDetailBookByIsbn(isbn);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class CompositeBookApiAdapter implements BookApiQueryPort {
     @Override
     public Book loadBookWithPageByIsbn(String isbn) {
         // 1. naver 상세정보 조회 api 로 책 상세정보(without page) load
-        NaverDetailBookParseResult detailBookByKeyword = findDetailBookByKeyword(isbn);
+        NaverDetailBookParseResult detailBookByKeyword = findDetailBookByIsbn(isbn);
 
         // 2. 알라딘으로부터 책 page 정보 load
         Integer pageCount = findPageCountByIsbn(isbn);
