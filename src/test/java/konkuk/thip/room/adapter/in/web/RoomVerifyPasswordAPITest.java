@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -58,6 +60,8 @@ class RoomVerifyPasswordAPITest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     private Long userId;
     private Long privateRoomId;
@@ -104,7 +108,7 @@ class RoomVerifyPasswordAPITest {
                         .title("비공개방")
                         .description("비공개방입니다")
                         .isPublic(false)
-                        .password(1234)
+                        .password(PASSWORD_ENCODER.encode("1234"))
                         .startDate(LocalDate.now().plusDays(1))
                         .endDate(LocalDate.now().plusDays(5))
                         .recruitCount(3)
@@ -188,7 +192,7 @@ class RoomVerifyPasswordAPITest {
                         .title("모집만료방")
                         .description("모집기간이 만료된 방입니다")
                         .isPublic(false)
-                        .password(1234)
+                        .password(PASSWORD_ENCODER.encode("1234"))
                         .startDate(LocalDate.now()) // 오늘 시작이므로 모집기간은 어제까지
                         .endDate(LocalDate.now().plusDays(5))
                         .recruitCount(3)
