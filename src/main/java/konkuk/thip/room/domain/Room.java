@@ -5,6 +5,8 @@ import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.entity.StatusType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
@@ -14,6 +16,8 @@ import static konkuk.thip.common.exception.code.ErrorCode.INVALID_ROOM_CREATE;
 @SuperBuilder
 public class Room extends BaseDomainEntity {
 
+    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
+
     private Long id;
 
     private String title;
@@ -22,7 +26,7 @@ public class Room extends BaseDomainEntity {
 
     private boolean isPublic;
 
-    private String password;
+    private String hashedPassword;
 
     private double roomPercentage;
 
@@ -40,12 +44,15 @@ public class Room extends BaseDomainEntity {
         validateVisibilityPasswordRule(isPublic, password);
         validateDates(startDate, endDate);
 
+        // 비밀번호 해싱
+        String hashedPassword = (password != null) ? PASSWORD_ENCODER.encode(password) : null;
+
         return Room.builder()
                 .id(null)
                 .title(title)
                 .description(description)
                 .isPublic(isPublic)
-                .password(password)
+                .hashedPassword(hashedPassword)
                 .roomPercentage(0)      // 처음 Room 생성 시 -> 0%
                 .startDate(startDate)
                 .endDate(endDate)
@@ -95,5 +102,12 @@ public class Room extends BaseDomainEntity {
 
     public void updateRoomPercentage(double roomPercentage) {
         this.roomPercentage = roomPercentage;
+    }
+
+    public boolean matchesPassword(String rawPassword) {
+        if (this.hashedPassword == null || rawPassword == null) {
+            return false;
+        }
+        return PASSWORD_ENCODER.matches(rawPassword, this.hashedPassword);
     }
 }
