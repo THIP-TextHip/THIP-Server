@@ -56,7 +56,8 @@ public class BookSavedService implements BookSavedUseCase {
                     naverResult.description());
 
             Long newBookId = bookCommandPort.save(newBook);
-            book = newBook.withId(newBookId);
+
+            book = bookCommandPort.findById(newBookId);
         }
 
         // 유저가 저장한 책 목록 조회

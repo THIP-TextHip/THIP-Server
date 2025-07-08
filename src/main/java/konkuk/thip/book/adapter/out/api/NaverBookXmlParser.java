@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.xml.sax.InputSource;
 
-import static konkuk.thip.common.exception.code.ErrorCode.BOOK_ISBN_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_ISBN_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_PARSING_ERROR;
 
 public class NaverBookXmlParser {
@@ -57,7 +57,7 @@ public class NaverBookXmlParser {
                 if (totalStr != null) total = Integer.parseInt(totalStr);
 
                 // total이 0이면 isbn에 해당하는 책이 없음(잘못 넘어온 isbn 예외처리)
-                if (total == 0) throw new BusinessException(BOOK_ISBN_NOT_FOUND);
+                if (total == 0) throw new BusinessException(BOOK_NAVER_API_ISBN_NOT_FOUND);
 
                 List<Element> items = getItemElements(channel);
                 if (!items.isEmpty()) {
