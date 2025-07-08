@@ -14,12 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.anyOf;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
