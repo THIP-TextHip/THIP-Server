@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("[단위] Vote 도메인 테스트")
 class VoteTest {
 
     @Test

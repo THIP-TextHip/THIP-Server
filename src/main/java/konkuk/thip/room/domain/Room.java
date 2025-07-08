@@ -1,6 +1,7 @@
 package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.entity.StatusType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -31,4 +32,12 @@ public class Room extends BaseDomainEntity {
     private Long bookId;
 
     private Long categoryId;
+
+    public boolean isExpired() {
+        return this.getStatus() == StatusType.EXPIRED;
+    }
+
+    public void updateRoomPercentage(double roomPercentage) {
+        this.roomPercentage = roomPercentage;
+    }
 }

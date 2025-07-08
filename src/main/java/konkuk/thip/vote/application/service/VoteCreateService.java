@@ -27,6 +27,7 @@ public class VoteCreateService implements VoteCreateUseCase {
 
     @Transactional
     @Override
+    //todo UserRoom 업데이트 로직 추가 필요!!
     public Long createVote(VoteCreateCommand command) {
         // 1. validate
         Vote vote = Vote.withoutId(
