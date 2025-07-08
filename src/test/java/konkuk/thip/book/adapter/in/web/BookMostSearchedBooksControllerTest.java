@@ -53,7 +53,6 @@ class BookMostSearchedBooksControllerTest {
 
 
     private LocalDate yesterday;
-    private String rankKey;
 
 
     private final DateTimeFormatter DAILY_KEY_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
