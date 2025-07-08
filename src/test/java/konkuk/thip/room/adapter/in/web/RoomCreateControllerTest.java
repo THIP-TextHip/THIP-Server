@@ -153,6 +153,14 @@ class RoomCreateControllerTest {
             req.put("recruitCount", 0);
             assertBad(req, "모집 인원은 최소 1명이어야 합니다.");
         }
+
+        @Test
+        @DisplayName("30 초과일 때 400 error")
+        void greater_than_max() throws Exception {
+            Map<String, Object> req = buildValidRequest();
+            req.put("recruitCount", 31);
+            assertBad(req, "모집 인원은 최대 30명이어야 합니다.");
+        }
     }
 
     @Nested

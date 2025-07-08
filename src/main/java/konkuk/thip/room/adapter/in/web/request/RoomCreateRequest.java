@@ -33,6 +33,7 @@ public record RoomCreateRequest(
         String progressEndDate,
 
         @Min(value = 1, message = "모집 인원은 최소 1명이어야 합니다.")
+        @Max(value = 30, message = "모집 인원은 최대 30명이어야 합니다.")
         int recruitCount,
 
         @Nullable
