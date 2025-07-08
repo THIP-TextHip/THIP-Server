@@ -25,7 +25,7 @@ public class RoomCreateService implements RoomCreateUseCase {
 
     @Override
     @Transactional
-    public Long createRoom(RoomCreateCommand command) {
+    public Long createRoom(RoomCreateCommand command, Long userId) {
         // 1. Category 찾기
         Category category = categoryCommandPort.findByValue(command.category());
 
