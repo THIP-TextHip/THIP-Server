@@ -38,7 +38,6 @@ public class RoomCreateService implements RoomCreateUseCase {
                 command.description(),
                 command.isPublic(),
                 command.password(),
-                0,
                 command.progressStartDate(),
                 command.progressEndDate(),
                 command.recruitCount(),

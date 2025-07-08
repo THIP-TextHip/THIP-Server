@@ -36,8 +36,9 @@ public class Room extends BaseDomainEntity {
 
     private Long categoryId;
 
-    public static Room withoutId(String title, String description, boolean isPublic, String password, double roomPercentage, LocalDate startDate, LocalDate endDate, int recruitCount, Long bookId, Long categoryId) {
+    public static Room withoutId(String title, String description, boolean isPublic, String password, LocalDate startDate, LocalDate endDate, int recruitCount, Long bookId, Long categoryId) {
         validateVisibilityPasswordRule(isPublic, password);
+        validateDates(startDate, endDate);
 
         return Room.builder()
                 .id(null)
@@ -45,7 +46,7 @@ public class Room extends BaseDomainEntity {
                 .description(description)
                 .isPublic(isPublic)
                 .password(password)
-                .roomPercentage(roomPercentage)
+                .roomPercentage(0)      // 처음 Room 생성 시 -> 0%
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitCount(recruitCount)
@@ -61,6 +62,27 @@ public class Room extends BaseDomainEntity {
             String message = String.format(
                     "방 공개/비공개 여부와 비밀번호 설정이 일치하지 않습니다. 공개 여부 = %s, 비밀번호 존재 여부 = %s",
                     isPublic, hasPassword
+            );
+            throw new InvalidStateException(INVALID_ROOM_CREATE,
+                    new IllegalArgumentException(message));
+        }
+    }
+
+    private static void validateDates(LocalDate startDate, LocalDate endDate) {
+        LocalDate today = LocalDate.now();
+        if (!startDate.isBefore(endDate)) {
+            String message = String.format(
+                    "시작일(%s)은 종료일(%s)보다 이전이어야 합니다.",
+                    startDate, endDate
+            );
+            throw new InvalidStateException(INVALID_ROOM_CREATE,
+                    new IllegalArgumentException(message));
+        }
+
+        if (startDate.isBefore(today)) {
+            String message = String.format(
+                    "시작일(%s)은 현재 날짜(%s) 이후여야 합니다.",     // 현재 날짜 포함
+                    startDate, today
             );
             throw new InvalidStateException(INVALID_ROOM_CREATE,
                     new IllegalArgumentException(message));
