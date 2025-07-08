@@ -45,6 +45,9 @@ public class RoomCreateService implements RoomCreateUseCase {
                 category.getId()
         );
 
+        // TODO : 방 생성한 사람 (= api 호출 토큰에 포함된 userId) 이 해당 방에 속한 멤버라는 사실을 DB에 영속화 해야함
+        // UserRoom 도메인이 정리되면 개발 ㄱㄱ
+
         return roomCommandPort.save(room);
     }
 
@@ -62,8 +65,8 @@ public class RoomCreateService implements RoomCreateUseCase {
 
     private void updateBookPageCount(Book book) {
         Integer pageCount = bookApiQueryPort.findPageCountByIsbn(book.getIsbn());
-        Book updated = book.changePageCount(pageCount);
-        bookCommandPort.updateForPageCount(updated);
+        book.changePageCount(pageCount);
+        bookCommandPort.updateForPageCount(book);
     }
 
     private Long saveNewBookWithPageCount(String isbn) {
