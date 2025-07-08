@@ -5,5 +5,5 @@ import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 
 public interface BookApiQueryPort {
     NaverBookParseResult findBooksByKeyword(String keyword, int start);
-    NaverDetailBookParseResult findDetailBookByKeyword(String isbn);
+    NaverDetailBookParseResult findDetailBookByIsbn(String isbn);
 }
