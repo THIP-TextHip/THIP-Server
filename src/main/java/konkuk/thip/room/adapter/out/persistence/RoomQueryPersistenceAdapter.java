@@ -1,8 +1,11 @@
 package konkuk.thip.room.adapter.out.persistence;
 
+import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -17,5 +20,10 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     @Override
     public int countRecruitingRoomsByBookAndStartDateAfter(Long bookId, LocalDate currentDate) {
         return roomJpaRepository.countByBookJpaEntity_BookIdAndStartDateAfter(bookId, currentDate);
+    }
+
+    @Override
+    public Page<RoomSearchResponse.RoomSearchResult> searchRoom(String keyword, String category, Pageable pageable) {
+        return roomJpaRepository.searchRoom(keyword, category, pageable);
     }
 }
