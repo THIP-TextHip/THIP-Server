@@ -24,4 +24,8 @@ public class VoteItem extends BaseDomainEntity {
                 .voteId(voteId)
                 .build();
     }
+
+    public int calculatePercentage(int totalCount) {
+        return totalCount == 0 ? 0 : (int) Math.round((this.count * 100.0) / totalCount);
+    }
 }
