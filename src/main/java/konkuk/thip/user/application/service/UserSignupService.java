@@ -23,7 +23,7 @@ public class UserSignupService implements UserSignupUseCase {
     @Override
     @Transactional
     public Long signup(UserSignupCommand command) {
-        Alias alias = aliasCommandPort.findById(command.aliasId());
+        Alias alias = Alias.from(command.aliasName());
         User user = User.withoutId(
                 command.nickname(), alias.getImageUrl(), USER.getType(), alias.getId(), command.oauth2Id()
         );

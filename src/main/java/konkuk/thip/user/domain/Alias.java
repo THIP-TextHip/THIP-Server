@@ -1,18 +1,23 @@
 package konkuk.thip.user.domain;
 
-import konkuk.thip.common.entity.BaseDomainEntity;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
-public class Alias extends BaseDomainEntity {
+@Builder
+public class Alias {
 
-    private Long id;
-
-    private String value;
+    private AliasName value;
 
     private String imageUrl;
 
     private String color;
+
+    public static Alias from(String value, String imageUrl, String color) {
+        return Alias.builder()
+                .value(AliasName.from(value))
+                .imageUrl(imageUrl)
+                .color(color)
+                .build();
+    }
 }
