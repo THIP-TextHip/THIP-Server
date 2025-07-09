@@ -3,6 +3,7 @@ package konkuk.thip.record.adapter.in.web;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
+import konkuk.thip.record.application.port.in.dto.RecordSearchQuery;
 import konkuk.thip.record.application.port.in.dto.RecordSearchUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +19,25 @@ public class RecordQueryController {
 
     @GetMapping("/rooms/{roomId}/posts")
     public BaseResponse<RecordSearchResponse> viewRecordList(
-            @PathVariable Long roomId,
-            @RequestParam String type,
-            @RequestParam String sort,
-            @RequestParam(required = false) Integer pageStart,
-            @RequestParam(required = false) Integer pageEnd,
-            @UserId Long userId
+            @PathVariable final Long roomId,
+            @RequestParam final String type,
+            @RequestParam final String sort,
+            @RequestParam(required = false) final Integer pageStart,
+            @RequestParam(required = false) final Integer pageEnd,
+            @RequestParam final Integer pageNum,
+            @UserId final Long userId
     ) {
-
-        return null;
+        return BaseResponse.ok(recordSearchUseCase.search(
+                RecordSearchQuery.builder()
+                        .roomId(roomId)
+                        .type(type)
+                        .sort(sort)
+                        .pageStart(pageStart)
+                        .pageEnd(pageEnd)
+                        .pageNum(pageNum)
+                        .userId(userId)
+                        .build()
+        ));
     }
 
 }
