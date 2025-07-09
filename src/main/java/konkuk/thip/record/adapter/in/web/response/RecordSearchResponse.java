@@ -6,11 +6,19 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 
 public record RecordSearchResponse(
-    List<PostDto> recordList
+    List<PostDto> recordList,
+    Integer page,
+    Integer size,
+    Boolean first,
+    Boolean last
 ){
 
-    public static RecordSearchResponse of(List<PostDto> recordList) {
-        return new RecordSearchResponse(recordList);
+    public static RecordSearchResponse of(List<PostDto> recordList,
+                                          Integer page,
+                                          Integer size,
+                                          Boolean first,
+                                          Boolean last) {
+        return new RecordSearchResponse(recordList, page, size, first, last);
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
