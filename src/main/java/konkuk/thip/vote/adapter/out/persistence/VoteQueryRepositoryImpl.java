@@ -34,7 +34,7 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
     }
 
     private boolean startEndNull(Integer start, Integer end) {
-        return start == null || end == null;
+        return start == null && end == null;
     }
 
     private BooleanExpression filterByType(String type, QVoteJpaEntity post, Long userId) {

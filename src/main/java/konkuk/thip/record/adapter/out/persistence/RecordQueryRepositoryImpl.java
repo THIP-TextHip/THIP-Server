@@ -34,7 +34,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     }
 
     private boolean startEndNull(Integer start, Integer end) {
-        return start == null || end == null;
+        return start == null && end == null;
     }
 
     private BooleanExpression filterByType(String type, QRecordJpaEntity post, Long userId) {
