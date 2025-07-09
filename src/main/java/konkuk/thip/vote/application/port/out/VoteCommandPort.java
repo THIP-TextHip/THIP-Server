@@ -12,6 +12,4 @@ public interface VoteCommandPort {
     void saveAllVoteItems(List<VoteItem> voteItems);
 
     List<VoteItem> findVoteItemsByVoteId(Long voteId);
-
-    boolean isUserVoted(Long userId, Long voteId);
 }

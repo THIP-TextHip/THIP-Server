@@ -1,11 +1,11 @@
 package konkuk.thip.record.application.service;
 
 import com.sun.jdi.request.InvalidRequestStateException;
-import konkuk.thip.comment.application.port.out.CommentCommandPort;
+import konkuk.thip.comment.application.port.out.CommentQueryPort;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.post.application.port.out.PostLikeCommandPort;
+import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.record.adapter.in.web.response.RecordDto;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import konkuk.thip.record.adapter.in.web.response.VoteDto;
@@ -17,6 +17,7 @@ import konkuk.thip.record.domain.Record;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
+import konkuk.thip.vote.application.port.out.VoteQueryPort;
 import konkuk.thip.vote.domain.Vote;
 import konkuk.thip.vote.domain.VoteItem;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +36,10 @@ public class RecordSearchService implements RecordSearchUseCase {
 
     private final RecordQueryPort recordQueryPort;
     private final UserCommandPort userCommandPort;
-    private final PostLikeCommandPort postLikeCommandPort;
-    private final CommentCommandPort commentCommandPort;
+    private final PostLikeQueryPort postLikeQueryPort;
+    private final CommentQueryPort commentQueryPort;
     private final VoteCommandPort voteCommandPort;
+    private final VoteQueryPort voteQueryPort;
 
     private final DateUtil dateUtil;
 
@@ -113,25 +115,25 @@ public class RecordSearchService implements RecordSearchUseCase {
 
     private RecordSearchResponse.PostDto createRecordDto(Record record, Long userId) {
         User user = userCommandPort.findById(record.getCreatorId());
-        int likeCount = postLikeCommandPort.countByPostIdAndUserId(record.getId());
-        int commentCount = commentCommandPort.countByPostIdAndUserId(record.getId(), record.getCreatorId());
-        boolean isLiked = postLikeCommandPort.existsByPostIdAndUserId(userId, record.getId());
+        int likeCount = postLikeQueryPort.countByPostId(record.getId());
+        int commentCount = commentQueryPort.countByPostIdAndUserId(record.getId(), record.getCreatorId());
+        boolean isLiked = postLikeQueryPort.existsByPostIdAndUserId(userId, record.getId());
         boolean isWriter = record.getCreatorId().equals(userId);
         return RecordDto.of(record, dateUtil.formatLastActivityTime(record.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter);
     }
 
     private RecordSearchResponse.PostDto createVoteDto(Vote vote, Long userId) {
         User user = userCommandPort.findById(vote.getCreatorId());
-        int likeCount = postLikeCommandPort.countByPostIdAndUserId(vote.getId());
-        int commentCount = commentCommandPort.countByPostIdAndUserId(vote.getId(), vote.getCreatorId());
-        boolean isLiked = postLikeCommandPort.existsByPostIdAndUserId(userId, vote.getId());
+        int likeCount = postLikeQueryPort.countByPostId(vote.getId());
+        int commentCount = commentQueryPort.countByPostIdAndUserId(vote.getId(), vote.getCreatorId());
+        boolean isLiked = postLikeQueryPort.existsByPostIdAndUserId(userId, vote.getId());
         boolean isWriter = vote.getCreatorId().equals(userId);
 
         List<VoteItem> voteItems = voteCommandPort.findVoteItemsByVoteId(vote.getId());
         int totalCount = voteItems.stream().mapToInt(VoteItem::getCount).sum();
 
         List<VoteDto.VoteItemDto> voteItemDtos = voteItems.stream()
-                .map(item -> VoteDto.VoteItemDto.of(item, item.calculatePercentage(totalCount), voteCommandPort.isUserVoted(userId, item.getId())))
+                .map(item -> VoteDto.VoteItemDto.of(item, item.calculatePercentage(totalCount), voteQueryPort.isUserVoted(userId, item.getId())))
                 .toList();
 
         return VoteDto.of(vote, dateUtil.formatLastActivityTime(vote.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter, voteItemDtos);

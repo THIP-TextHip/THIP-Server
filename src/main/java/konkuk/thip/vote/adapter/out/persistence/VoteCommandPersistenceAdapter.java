@@ -28,7 +28,6 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     private final VoteItemJpaRepository voteItemJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final RoomJpaRepository roomJpaRepository;
-    private final UserVoteJpaRepository userVoteJpaRepository;
 
     private final VoteMapper voteMapper;
     private final VoteItemMapper voteItemMapper;
@@ -73,11 +72,6 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         }
 
         return voteItems;
-    }
-
-    @Override
-    public boolean isUserVoted(Long userId, Long voteId) {
-        return userVoteJpaRepository.existsByUserJpaEntity_UserIdAndVoteItemJpaEntity_VoteItemId(userId, voteId);
     }
 
 }

@@ -1,9 +1,9 @@
 package konkuk.thip.record.application.service;
 
-import konkuk.thip.comment.application.port.out.CommentCommandPort;
+import konkuk.thip.comment.application.port.out.CommentQueryPort;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.post.application.port.out.PostLikeCommandPort;
+import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import konkuk.thip.record.application.port.in.dto.RecordSearchQuery;
 import konkuk.thip.record.application.port.in.dto.RecordSearchResult;
@@ -12,6 +12,7 @@ import konkuk.thip.record.domain.Record;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
+import konkuk.thip.vote.application.port.out.VoteQueryPort;
 import konkuk.thip.vote.domain.Vote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,9 +31,10 @@ class RecordSearchServiceTest {
 
     private RecordQueryPort recordQueryPort;
     private UserCommandPort userCommandPort;
-    private PostLikeCommandPort postLikeCommandPort;
-    private CommentCommandPort commentCommandPort;
+    private PostLikeQueryPort postLikeQueryPort;
+    private CommentQueryPort commentQueryPort;
     private VoteCommandPort voteCommandPort;
+    private VoteQueryPort voteQueryPort;
     private DateUtil dateUtil;
 
     private RecordSearchService recordSearchService;
@@ -43,17 +45,19 @@ class RecordSearchServiceTest {
     void setUp() {
         recordQueryPort = mock(RecordQueryPort.class);
         userCommandPort = mock(UserCommandPort.class);
-        postLikeCommandPort = mock(PostLikeCommandPort.class);
-        commentCommandPort = mock(CommentCommandPort.class);
+        postLikeQueryPort = mock(PostLikeQueryPort.class);
+        commentQueryPort = mock(CommentQueryPort.class);
         voteCommandPort = mock(VoteCommandPort.class);
+        voteQueryPort = mock(VoteQueryPort.class);
         dateUtil = mock(DateUtil.class);
 
         recordSearchService = new RecordSearchService(
                 recordQueryPort,
                 userCommandPort,
-                postLikeCommandPort,
-                commentCommandPort,
+                postLikeQueryPort,
+                commentQueryPort,
                 voteCommandPort,
+                voteQueryPort,
                 dateUtil
         );
     }
@@ -81,11 +85,11 @@ class RecordSearchServiceTest {
                 .thenReturn(RecordSearchResult.of(List.of(record), List.of(vote)));
 
         when(userCommandPort.findById(any())).thenReturn(mock(User.class));
-        when(postLikeCommandPort.countByPostIdAndUserId(anyLong())).thenReturn(0);
-        when(commentCommandPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
-        when(postLikeCommandPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
+        when(postLikeQueryPort.countByPostId(anyLong())).thenReturn(0);
+        when(commentQueryPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
+        when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
         when(voteCommandPort.findVoteItemsByVoteId(anyLong())).thenReturn(emptyList());
-        when(voteCommandPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
+        when(voteQueryPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
         when(dateUtil.formatLastActivityTime(any())).thenReturn("방금 전");
 
         // when
@@ -122,12 +126,12 @@ class RecordSearchServiceTest {
                 .thenReturn(RecordSearchResult.of(List.of(record), List.of(vote)));
 
         when(userCommandPort.findById(any())).thenReturn(mock(User.class));
-        when(postLikeCommandPort.countByPostIdAndUserId(record.getId())).thenReturn(5);
-        when(postLikeCommandPort.countByPostIdAndUserId(vote.getId())).thenReturn(10);
-        when(commentCommandPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
-        when(postLikeCommandPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
+        when(postLikeQueryPort.countByPostId(record.getId())).thenReturn(5);
+        when(postLikeQueryPort.countByPostId(vote.getId())).thenReturn(10);
+        when(commentQueryPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
+        when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
         when(voteCommandPort.findVoteItemsByVoteId(anyLong())).thenReturn(emptyList());
-        when(voteCommandPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
+        when(voteQueryPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
         when(dateUtil.formatLastActivityTime(any())).thenReturn("방금 전");
 
         // when
@@ -161,11 +165,11 @@ class RecordSearchServiceTest {
                 .thenReturn(RecordSearchResult.of(records, votes));
 
         when(userCommandPort.findById(any())).thenReturn(mock(User.class));
-        when(postLikeCommandPort.countByPostIdAndUserId(anyLong())).thenReturn(0);
-        when(commentCommandPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
-        when(postLikeCommandPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
+        when(postLikeQueryPort.countByPostId(anyLong())).thenReturn(0);
+        when(commentQueryPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
+        when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
         when(voteCommandPort.findVoteItemsByVoteId(anyLong())).thenReturn(emptyList());
-        when(voteCommandPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
+        when(voteQueryPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
         when(dateUtil.formatLastActivityTime(any())).thenReturn("방금 전");
 
         // when

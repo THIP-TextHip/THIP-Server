@@ -11,5 +11,10 @@ public class VoteQueryPersistenceAdapter implements VoteQueryPort {
 
     private final VoteJpaRepository voteJpaRepository;
     private final VoteMapper voteMapper;
+    private final UserVoteJpaRepository userVoteJpaRepository;
 
+    @Override
+    public boolean isUserVoted(Long userId, Long voteId) {
+        return userVoteJpaRepository.existsByUserJpaEntity_UserIdAndVoteItemJpaEntity_VoteItemId(userId, voteId);
+    }
 }
