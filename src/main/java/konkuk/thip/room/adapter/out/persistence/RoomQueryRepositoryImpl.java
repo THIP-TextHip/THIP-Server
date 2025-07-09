@@ -8,7 +8,7 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
-import konkuk.thip.common.util.DateUtilsss;
+import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserRoomJpaEntity;
@@ -96,7 +96,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         t.get(memberCountExpr).intValue(),
                         t.get(room.recruitCount),
                         // 모집마감일 까지 남은 시간 포맷
-                        DateUtilsss.formatAfterTime(t.get(room.startDate)),
+                        DateUtil.formatAfterTime(t.get(room.startDate)),
                         t.get(room.categoryJpaEntity.value)
                 ))
                 .toList();
