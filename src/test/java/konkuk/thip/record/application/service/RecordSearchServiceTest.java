@@ -86,7 +86,7 @@ class RecordSearchServiceTest {
 
         when(userCommandPort.findById(any())).thenReturn(mock(User.class));
         when(postLikeQueryPort.countByPostId(anyLong())).thenReturn(0);
-        when(commentQueryPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
+        when(commentQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
         when(voteCommandPort.findVoteItemsByVoteId(anyLong())).thenReturn(emptyList());
         when(voteQueryPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
@@ -128,7 +128,7 @@ class RecordSearchServiceTest {
         when(userCommandPort.findById(any())).thenReturn(mock(User.class));
         when(postLikeQueryPort.countByPostId(record.getId())).thenReturn(5);
         when(postLikeQueryPort.countByPostId(vote.getId())).thenReturn(10);
-        when(commentQueryPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
+        when(commentQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
         when(voteCommandPort.findVoteItemsByVoteId(anyLong())).thenReturn(emptyList());
         when(voteQueryPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);
@@ -166,7 +166,7 @@ class RecordSearchServiceTest {
 
         when(userCommandPort.findById(any())).thenReturn(mock(User.class));
         when(postLikeQueryPort.countByPostId(anyLong())).thenReturn(0);
-        when(commentQueryPort.countByPostIdAndUserId(anyLong(), anyLong())).thenReturn(0);
+        when(commentQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
         when(voteCommandPort.findVoteItemsByVoteId(anyLong())).thenReturn(emptyList());
         when(voteQueryPort.isUserVoted(anyLong(), anyLong())).thenReturn(false);

@@ -13,7 +13,7 @@ public class CommentQueryPersistenceAdapter implements CommentQueryPort {
     private final CommentMapper userMapper;
 
     @Override
-    public int countByPostIdAndUserId(Long postId, Long userId) {
-        return jpaRepository.countByPostJpaEntity_PostIdAndUserJpaEntity_UserId(postId, userId);
+    public int countByPostId(Long postId) {
+        return jpaRepository.countByPostJpaEntity_PostId(postId);
     }
 }

@@ -116,7 +116,7 @@ public class RecordSearchService implements RecordSearchUseCase {
     private RecordSearchResponse.PostDto createRecordDto(Record record, Long userId) {
         User user = userCommandPort.findById(record.getCreatorId());
         int likeCount = postLikeQueryPort.countByPostId(record.getId());
-        int commentCount = commentQueryPort.countByPostIdAndUserId(record.getId(), record.getCreatorId());
+        int commentCount = commentQueryPort.countByPostId(record.getId());
         boolean isLiked = postLikeQueryPort.existsByPostIdAndUserId(userId, record.getId());
         boolean isWriter = record.getCreatorId().equals(userId);
         return RecordDto.of(record, dateUtil.formatLastActivityTime(record.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter);
@@ -125,7 +125,7 @@ public class RecordSearchService implements RecordSearchUseCase {
     private RecordSearchResponse.PostDto createVoteDto(Vote vote, Long userId) {
         User user = userCommandPort.findById(vote.getCreatorId());
         int likeCount = postLikeQueryPort.countByPostId(vote.getId());
-        int commentCount = commentQueryPort.countByPostIdAndUserId(vote.getId(), vote.getCreatorId());
+        int commentCount = commentQueryPort.countByPostId(vote.getId());
         boolean isLiked = postLikeQueryPort.existsByPostIdAndUserId(userId, vote.getId());
         boolean isWriter = vote.getCreatorId().equals(userId);
 
