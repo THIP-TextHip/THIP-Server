@@ -1,6 +1,10 @@
 package konkuk.thip.record.application.service;
 
+import com.sun.jdi.request.InvalidRequestStateException;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.record.adapter.in.web.response.RecordDto;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
@@ -35,10 +39,14 @@ public class RecordSearchService implements RecordSearchUseCase {
     private final CommentCommandPort commentCommandPort;
     private final VoteCommandPort voteCommandPort;
 
+    private final DateUtil dateUtil;
+
     private static final int PAGE_SIZE = 10;
 
     @Override
     public RecordSearchResponse search(RecordSearchQuery query) {
+        validateQueryParams(query);
+
         // 1. 파라미터에 따라 Record와 Vote를 조회
         RecordSearchResult recordSearchResult = recordQueryPort.findRecordsByRoom(
                 query.roomId(),
@@ -73,7 +81,7 @@ public class RecordSearchService implements RecordSearchUseCase {
         int fromIndex = (pageNum - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, combinedPosts.size());
 
-        // 5. 페이지 범위에 따라 서브리스트 생성 (pageNum이 전체 페이지 수를 초과할 경우 빈 리스트 반환)
+        // 5. 페이지 범위에 따라 서브리스트 생성
         List<RecordSearchResponse.PostDto> pagedList = fromIndex >= combinedPosts.size() ? new ArrayList<>() : combinedPosts.subList(fromIndex, toIndex);
 
         boolean isFirst = pageNum == 1;
@@ -85,13 +93,31 @@ public class RecordSearchService implements RecordSearchUseCase {
         return RecordSearchResponse.of(pagedList, pageNum, pageSize, isFirst, isLast);
     }
 
+    private void validateQueryParams(RecordSearchQuery query) {
+        if(query.pageStart() != null && query.pageEnd() == null || query.pageStart() == null && query.pageEnd() != null) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 모두 설정되어야 합니다."));
+        }
+
+        if(query.pageNum() != null && query.pageNum() < 1) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 1 이상의 값이어야 합니다."));
+        }
+
+        if(query.sort() != null && !List.of("latest", "like", "comment").contains(query.sort())) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("sort는 'latest', 'like', 'comment' 중 하나여야 합니다."));
+        }
+
+        if(query.type() != null && !List.of("group", "mine").contains(query.type())) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("type은 'group', 'mine' 중 하나여야 합니다."));
+        }
+    }
+
     private RecordSearchResponse.PostDto createRecordDto(Record record, Long userId) {
         User user = userCommandPort.findById(record.getCreatorId());
         int likeCount = postLikeCommandPort.countByPostIdAndUserId(record.getId());
         int commentCount = commentCommandPort.countByPostIdAndUserId(record.getId(), record.getCreatorId());
         boolean isLiked = postLikeCommandPort.existsByPostIdAndUserId(userId, record.getId());
         boolean isWriter = record.getCreatorId().equals(userId);
-        return RecordDto.of(record, user, likeCount, commentCount, isLiked, isWriter);
+        return RecordDto.of(record, dateUtil.formatLastActivityTime(record.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter);
     }
 
     private RecordSearchResponse.PostDto createVoteDto(Vote vote, Long userId) {
@@ -108,7 +134,7 @@ public class RecordSearchService implements RecordSearchUseCase {
                 .map(item -> VoteDto.VoteItemDto.of(item, item.calculatePercentage(totalCount), voteCommandPort.isUserVoted(userId, item.getId())))
                 .toList();
 
-        return VoteDto.of(vote, user, likeCount, commentCount, isLiked, isWriter, voteItemDtos);
+        return VoteDto.of(vote, dateUtil.formatLastActivityTime(vote.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter, voteItemDtos);
     }
 
     private void sortCombinedPosts(String sort, List<RecordSearchResponse.PostDto> combinedPosts) {
