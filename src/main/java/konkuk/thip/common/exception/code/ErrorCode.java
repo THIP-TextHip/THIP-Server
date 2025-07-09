@@ -63,7 +63,6 @@ public enum ErrorCode implements ResponseCode {
      */
     INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 900000,"알맞은 검색어 타입을 찾을 수 없습니다."),
 
-
     /**
      * 100000 : room error
      */
@@ -72,6 +71,8 @@ public enum ErrorCode implements ResponseCode {
     ROOM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, 100002, "비밀번호가 일치하지 않습니다."),
     ROOM_PASSWORD_NOT_REQUIRED(HttpStatus.BAD_REQUEST, 100003, "공개방은 비밀번호가 필요하지 않습니다."),
     ROOM_RECRUITMENT_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, 100004, "모집기간이 만료된 방입니다."),
+    INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
+
     /**
      * 110000 : vote error
      */
