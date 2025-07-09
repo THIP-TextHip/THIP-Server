@@ -124,8 +124,8 @@ class RoomCreateAPITest {
         request.put("category", "과학/IT");           // 실제 카테고리 값
         request.put("roomName", "방이름");
         request.put("description", "방설명");
-        request.put("progressStartDate", "2025.07.10");
-        request.put("progressEndDate", "2025.08.10");
+        request.put("progressStartDate", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
+        request.put("progressEndDate", LocalDate.now().plusDays(30).format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
         request.put("recruitCount", 3);
         request.put("password", null);
         request.put("isPublic", true);
