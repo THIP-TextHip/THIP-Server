@@ -19,13 +19,7 @@ public class TagMapper {
 
     public Tag toDomainEntity(TagJpaEntity tagJpaEntity) {
         return Tag.builder()
-                .id(tagJpaEntity.getTagId())
                 .value(tagJpaEntity.getValue())
-                .targetPostId(tagJpaEntity.getPostJpaEntity().getPostId())
-                .categoryId(tagJpaEntity.getCategoryJpaEntity().getCategoryId())
-                .createdAt(tagJpaEntity.getCreatedAt())
-                .modifiedAt(tagJpaEntity.getModifiedAt())
-                .status(tagJpaEntity.getStatus())
                 .build();
     }
 }
