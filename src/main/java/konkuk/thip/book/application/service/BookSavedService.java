@@ -44,7 +44,7 @@ public class BookSavedService implements BookSavedUseCase {
             }
 
             // 저장 요청이면 네이버 API로 책 정보 조회 후 저장
-            NaverDetailBookParseResult naverResult = bookApiQueryPort.findDetailBookByKeyword(isbn);
+            NaverDetailBookParseResult naverResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
             Book newBook = Book.withoutId(
                     naverResult.title(),
                     naverResult.isbn(),
@@ -56,7 +56,8 @@ public class BookSavedService implements BookSavedUseCase {
                     naverResult.description());
 
             Long newBookId = bookCommandPort.save(newBook);
-            book = newBook.withId(newBookId);
+
+            book = bookCommandPort.findById(newBookId);
         }
 
         // 유저가 저장한 책 목록 조회

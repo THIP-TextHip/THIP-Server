@@ -10,4 +10,6 @@ public interface BookCommandPort {
     Long save(Book book);
 
     Book findById(Long id);
+
+    void updateForPageCount(Book book);
 }

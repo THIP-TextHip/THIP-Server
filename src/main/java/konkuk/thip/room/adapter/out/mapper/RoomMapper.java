@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoomMapper {
 
-    public RoomJpaEntity roomJpaEntity(Room room, BookJpaEntity bookJpaEntity, CategoryJpaEntity categoryJpaEntity) {
+    public RoomJpaEntity toJpaEntity(Room room, BookJpaEntity bookJpaEntity, CategoryJpaEntity categoryJpaEntity) {
         return RoomJpaEntity.builder()
                 .title(room.getTitle())
                 .description(room.getDescription())
                 .isPublic(room.isPublic())
-                .password(room.getPassword())
+                .password(room.getHashedPassword())
                 .roomPercentage(room.getRoomPercentage())
                 .startDate(room.getStartDate())
                 .endDate(room.getEndDate())
@@ -30,7 +30,7 @@ public class RoomMapper {
                 .title(roomJpaEntity.getTitle())
                 .description(roomJpaEntity.getDescription())
                 .isPublic(roomJpaEntity.isPublic())
-                .password(roomJpaEntity.getPassword())
+                .hashedPassword(roomJpaEntity.getPassword())
                 .roomPercentage(roomJpaEntity.getRoomPercentage())
                 .startDate(roomJpaEntity.getStartDate())
                 .endDate(roomJpaEntity.getEndDate())

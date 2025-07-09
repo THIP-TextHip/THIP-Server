@@ -29,7 +29,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
     private boolean isPublic;
 
     @Column(length = 4)
-    private Integer password;
+    private String password;
 
     @Builder.Default
     @Column(name = "room_percentage",nullable = false)
