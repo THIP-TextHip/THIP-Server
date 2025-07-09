@@ -10,9 +10,8 @@ public record RoomVerifyPasswordRequest(
         @Pattern(regexp = "\\d{4}", message = "비밀번호는 숫자 4자리여야 합니다.")
         String password
 ) {
-    public RoomVerifyPasswordQuery toQuery(Long userId,Long roomId) {
+    public RoomVerifyPasswordQuery toQuery(Long roomId) {
         return new RoomVerifyPasswordQuery(
-                userId,
                 roomId,
                 password);
     }

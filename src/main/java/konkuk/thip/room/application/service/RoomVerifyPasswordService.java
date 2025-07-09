@@ -4,7 +4,6 @@ import konkuk.thip.room.application.port.in.RoomVerifyPasswordUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomVerifyPasswordQuery;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
-import konkuk.thip.user.application.port.out.UserCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,14 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RoomVerifyPasswordService implements RoomVerifyPasswordUseCase {
 
-    private final UserCommandPort userCommandPort;
     private final RoomCommandPort roomCommandPort;
 
     @Override
     public Void verifyRoomPassword(RoomVerifyPasswordQuery query) {
-
-        //유저 검증
-        userCommandPort.findById(query.userId());
 
         //방 검증
         Room room = roomCommandPort.findById(query.roomId());
