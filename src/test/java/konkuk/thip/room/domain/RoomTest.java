@@ -5,6 +5,7 @@ import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,6 +22,7 @@ class RoomTest {
     private final LocalDate today = LocalDate.now();
     private final LocalDate START = today.plusDays(1);
     private final LocalDate END = today.plusDays(32);
+    private final Category validCategory = Category.from("과학/IT");
 
     @Test
     @DisplayName("withoutId: 공개 방이면서 password가 not null 이면, InvalidStateException 발생한다.")
@@ -28,7 +30,7 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, () ->
                 Room.withoutId(
                         "제목", "설명", true, "1234",
-                        START, END, 5, 123L, 456L
+                        START, END, 5, 123L, validCategory
                 )
         );
         assertInstanceOf(IllegalArgumentException.class, ex.getCause());
@@ -42,7 +44,7 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, () ->
                 Room.withoutId(
                         "제목", "설명", false, null,
-                        START, END, 5, 123L, 456L
+                        START, END, 5, 123L, validCategory
                 )
         );
         assertInstanceOf(IllegalArgumentException.class, ex.getCause());
@@ -58,7 +60,7 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, () ->
                 Room.withoutId(
                         "제목", "설명", false, "1234",
-                        start, end, 5, 123L, 456L
+                        start, end, 5, 123L, validCategory
                 )
         );
         assertInstanceOf(IllegalArgumentException.class, ex.getCause());
@@ -78,7 +80,7 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, () ->
                 Room.withoutId(
                         "제목", "설명", false, "1234",
-                        past, future, 5, 123L, 456L
+                        past, future, 5, 123L, validCategory
                 )
         );
         assertInstanceOf(IllegalArgumentException.class, ex.getCause());
@@ -97,7 +99,7 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, () ->
                 Room.withoutId(
                         "제목", "설명", false, "1234",
-                        today, future, 5, 123L, 456L
+                        today, future, 5, 123L, validCategory
                 )
         );
         assertInstanceOf(IllegalArgumentException.class, ex.getCause());
@@ -113,7 +115,7 @@ class RoomTest {
 
         Room room = Room.withoutId(
                 "제목", "설명", false, rawPassword,
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
 
         String hashed = room.getHashedPassword();
@@ -131,7 +133,7 @@ class RoomTest {
     void matchesPassword_correct_password() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
         assertTrue(room.matchesPassword("1234"));
     }
@@ -141,7 +143,7 @@ class RoomTest {
     void matchesPassword_incorrect_password() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
         assertFalse(room.matchesPassword("0000"));
     }
@@ -151,7 +153,7 @@ class RoomTest {
     void matchesPassword_no_password() {
         Room room = Room.withoutId(
                 "제목", "설명", true, null,
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
         assertFalse(room.matchesPassword("0000"));
     }
@@ -161,7 +163,7 @@ class RoomTest {
     void isRecruitmentPeriodExpired_not_expired() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                LocalDate.now().plusDays(3), LocalDate.now().plusDays(10), 5, 123L, 456L
+                LocalDate.now().plusDays(3), LocalDate.now().plusDays(10), 5, 123L, validCategory
         );
         assertFalse(room.isRecruitmentPeriodExpired());
     }
@@ -172,7 +174,7 @@ class RoomTest {
         LocalDate start = LocalDate.now().plusDays(1);
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                start, start.plusDays(10), 5, 123L, 456L
+                start, start.plusDays(10), 5, 123L, validCategory
         );
         // 오늘이 모집마감일(startDate.minusDays(1))이면 false
         assertFalse(room.isRecruitmentPeriodExpired());
@@ -184,7 +186,7 @@ class RoomTest {
         LocalDate start = LocalDate.now().plusDays(1);
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                start, start.plusDays(10), 5, 123L, 456L
+                start, start.plusDays(10), 5, 123L, validCategory
         );
         setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
         assertTrue(room.isRecruitmentPeriodExpired());
@@ -196,7 +198,7 @@ class RoomTest {
         LocalDate startExpired = today.plusDays(2);
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                startExpired, END, 5, 123L, 456L
+                startExpired, END, 5, 123L, validCategory
         );
         setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
         BusinessException ex = assertThrows(BusinessException.class,
@@ -210,7 +212,7 @@ class RoomTest {
     void verifyPassword_publicRoom() {
         Room room = Room.withoutId(
                 "제목", "설명", true, null,
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> room.verifyPassword("1234"));
@@ -222,7 +224,7 @@ class RoomTest {
     void verifyPassword_passwordMismatch() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> room.verifyPassword("0000"));
@@ -234,7 +236,7 @@ class RoomTest {
     void verifyPassword_success() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
-                START, END, 5, 123L, 456L
+                START, END, 5, 123L, validCategory
         );
         assertDoesNotThrow(() -> room.verifyPassword("1234"));
     }

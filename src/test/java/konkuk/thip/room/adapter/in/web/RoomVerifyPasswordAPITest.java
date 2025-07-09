@@ -96,7 +96,7 @@ class RoomVerifyPasswordAPITest {
         userId = user.getUserId();
 
         CategoryJpaEntity categoryJpaEntity = categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("소설")
+                .value("과학/IT")
                 .aliasForCategoryJpaEntity(alias)
                 .build());
 

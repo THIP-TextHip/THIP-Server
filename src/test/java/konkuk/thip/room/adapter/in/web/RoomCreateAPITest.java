@@ -87,7 +87,7 @@ class RoomCreateAPITest {
                 .build());
 
         categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("소설")
+                .value("과학/IT")     // 실제 카테고리 값
                 .aliasForCategoryJpaEntity(alias)
                 .build());
     }
@@ -121,7 +121,7 @@ class RoomCreateAPITest {
     private Map<String, Object> buildRoomCreateRequest() {
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152");
-        request.put("category", "소설");
+        request.put("category", "과학/IT");           // 실제 카테고리 값
         request.put("roomName", "방이름");
         request.put("description", "방설명");
         request.put("progressStartDate", "2025.07.10");
