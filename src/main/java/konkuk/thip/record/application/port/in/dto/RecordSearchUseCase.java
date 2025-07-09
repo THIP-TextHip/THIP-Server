@@ -1,6 +1,8 @@
 package konkuk.thip.record.application.port.in.dto;
 
+import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
+
 public interface RecordSearchUseCase {
 
-    RecordSearchResult search(RecordSearchQuery query);
+    RecordSearchResponse search(RecordSearchQuery query);
 }
