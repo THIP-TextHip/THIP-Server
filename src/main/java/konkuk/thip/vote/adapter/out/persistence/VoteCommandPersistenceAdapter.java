@@ -1,6 +1,7 @@
 package konkuk.thip.vote.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -27,6 +28,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     private final VoteItemJpaRepository voteItemJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final RoomJpaRepository roomJpaRepository;
+    private final UserVoteJpaRepository userVoteJpaRepository;
 
     private final VoteMapper voteMapper;
     private final VoteItemMapper voteItemMapper;
@@ -59,4 +61,23 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
         voteItemJpaRepository.saveAll(voteItemJpaEntities);
     }
+
+    @Override
+    public List<VoteItem> findVoteItemsByVoteId(Long voteId) {
+        List<VoteItem> voteItems = voteItemJpaRepository.findAllByVoteJpaEntity_PostId(voteId).stream()
+                .map(voteItemMapper::toDomainEntity)
+                .toList();
+
+        if (voteItems.isEmpty()) {
+            throw new InvalidStateException(VOTE_ITEM_NOT_FOUND);
+        }
+
+        return voteItems;
+    }
+
+    @Override
+    public boolean isUserVoted(Long userId, Long voteId) {
+        return userVoteJpaRepository.existsByUserJpaEntity_UserIdAndVoteItemJpaEntity_VoteItemId(userId, voteId);
+    }
+
 }
