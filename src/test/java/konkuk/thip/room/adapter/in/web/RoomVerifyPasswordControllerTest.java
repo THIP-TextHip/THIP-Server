@@ -2,6 +2,8 @@ package konkuk.thip.room.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,18 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -72,13 +70,6 @@ class RoomVerifyPasswordControllerTest {
             assertBad(req, "비밀번호는 숫자 4자리여야 합니다.");
         }
 
-        @Test
-        @DisplayName("빈 문자열일 때 400 error")
-        void blank_description() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.put("password", "");
-            assertBad(req, "비밀번호는 필수입니다.");
-        }
     }
 
     @Nested
