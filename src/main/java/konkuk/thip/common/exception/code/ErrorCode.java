@@ -68,7 +68,10 @@ public enum ErrorCode implements ResponseCode {
      */
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 100000, "존재하지 않는 ROOM 입니다."),
     INVALID_ROOM_CREATE(HttpStatus.BAD_REQUEST, 100001, "유효하지 않은 ROOM 생성 요청 입니다."),
-    INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100002, "방 검색 시 정렬 조건이 잘못되었습니다."),
+    ROOM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, 100002, "비밀번호가 일치하지 않습니다."),
+    ROOM_PASSWORD_NOT_REQUIRED(HttpStatus.BAD_REQUEST, 100003, "공개방은 비밀번호가 필요하지 않습니다."),
+    ROOM_RECRUITMENT_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, 100004, "모집기간이 만료된 방입니다."),
+    INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
 
     /**
      * 110000 : vote error
