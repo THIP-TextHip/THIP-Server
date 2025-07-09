@@ -1,4 +1,4 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.vote.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
