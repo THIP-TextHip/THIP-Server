@@ -28,11 +28,11 @@ public record VoteDto(
     }
 
     public static VoteDto of(
-            Vote vote, User user, int likeCount, int commentCount, boolean isLiked, boolean isWriter,
+            Vote vote, String postDate, User user, int likeCount, int commentCount, boolean isLiked, boolean isWriter,
             List<VoteItemDto> voteItems
     ) {
         return VoteDto.builder()
-                .postDate(vote.getCreatedAt().toString())
+                .postDate(postDate)
                 .page(vote.getPage())
                 .userId(vote.getCreatorId())
                 .nickName(user.getNickname())

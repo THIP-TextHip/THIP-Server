@@ -23,9 +23,9 @@ public record RecordDto(
         return "RECORD";
     }
 
-    public static RecordDto of(Record record, User user, int likeCount, int commentCount, boolean isLiked, boolean isWriter) {
+    public static RecordDto of(Record record, String postDate, User user, int likeCount, int commentCount, boolean isLiked, boolean isWriter) {
         return RecordDto.builder()
-                .postDate(record.getCreatedAt().toString())
+                .postDate(postDate)
                 .page(record.getPage())
                 .userId(record.getCreatorId())
                 .nickName(user.getNickname())
