@@ -1,6 +1,8 @@
 package konkuk.thip.room.domain;
 
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -9,8 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
-@DisplayName("Room 단위 테스트")
+@DisplayName("[단위] Room 단위 테스트")
 class RoomTest {
 
     private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
@@ -152,4 +155,88 @@ class RoomTest {
         );
         assertFalse(room.matchesPassword("0000"));
     }
+
+    @Test
+    @DisplayName("isRecruitmentPeriodExpired: 모집기간이 만료되지 않은 경우 false 반환")
+    void isRecruitmentPeriodExpired_not_expired() {
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                LocalDate.now().plusDays(3), LocalDate.now().plusDays(10), 5, 123L, 456L
+        );
+        assertFalse(room.isRecruitmentPeriodExpired());
+    }
+
+    @Test
+    @DisplayName("isRecruitmentPeriodExpired: 모집기간이 오늘이 마감일인 경우 false 반환")
+    void isRecruitmentPeriodExpired_deadline_today() {
+        LocalDate start = LocalDate.now().plusDays(1);
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                start, start.plusDays(10), 5, 123L, 456L
+        );
+        // 오늘이 모집마감일(startDate.minusDays(1))이면 false
+        assertFalse(room.isRecruitmentPeriodExpired());
+    }
+
+    @Test
+    @DisplayName("isRecruitmentPeriodExpired: 모집기간이 이미 만료된 경우 true 반환")
+    void isRecruitmentPeriodExpired_expired() {
+        LocalDate start = LocalDate.now().plusDays(1);
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                start, start.plusDays(10), 5, 123L, 456L
+        );
+        setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
+        assertTrue(room.isRecruitmentPeriodExpired());
+    }
+
+    @Test
+    @DisplayName("verifyPassword: 모집기간 만료 시 BusinessException(ROOM_RECRUITMENT_PERIOD_EXPIRED) 발생")
+    void verifyPassword_recruitmentPeriodExpired() {
+        LocalDate startExpired = today.plusDays(2);
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                startExpired, END, 5, 123L, 456L
+        );
+        setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> room.verifyPassword("1234"));
+        assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());
+        assertTrue(ex.getCause().getMessage().contains("모집기간"));
+    }
+
+    @Test
+    @DisplayName("verifyPassword: 공개방에 비밀번호 입력 시 BusinessException(ROOM_PASSWORD_NOT_REQUIRED) 발생")
+    void verifyPassword_publicRoom() {
+        Room room = Room.withoutId(
+                "제목", "설명", true, null,
+                START, END, 5, 123L, 456L
+        );
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> room.verifyPassword("1234"));
+        assertEquals(ErrorCode.ROOM_PASSWORD_NOT_REQUIRED, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("verifyPassword: 비밀번호 불일치 시 BusinessException(ROOM_PASSWORD_MISMATCH) 발생")
+    void verifyPassword_passwordMismatch() {
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                START, END, 5, 123L, 456L
+        );
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> room.verifyPassword("0000"));
+        assertEquals(ErrorCode.ROOM_PASSWORD_MISMATCH, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("verifyPassword: 모집기간 내, 비공개방, 비밀번호 일치 시 예외 발생하지 않음")
+    void verifyPassword_success() {
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                START, END, 5, 123L, 456L
+        );
+        assertDoesNotThrow(() -> room.verifyPassword("1234"));
+    }
+
 }
