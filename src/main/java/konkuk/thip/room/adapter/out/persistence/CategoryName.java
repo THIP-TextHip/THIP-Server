@@ -1,9 +1,13 @@
 package konkuk.thip.room.adapter.out.persistence;
 
+import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+
+import static konkuk.thip.common.exception.code.ErrorCode.CATEGORY_NOT_MATCH;
 
 @Getter
 @RequiredArgsConstructor
@@ -16,7 +20,7 @@ public enum CategoryName {
     SCIENCE_IT("과학/IT"),
     Literature("문학"),
     ART("예술"),
-    SOCIAL_SCIENCE("사회과확"),
+    SOCIAL_SCIENCE("사회과학"),
     HUMANITY("인문학");
 
     private final String value;
@@ -26,7 +30,7 @@ public enum CategoryName {
                 .filter(categoryName -> categoryName.getValue().equals(value))
                 .findFirst()
                 .orElseThrow(
-                        () -> new IllegalArgumentException("현재 카테고리 이름 : " + value)
+                        () -> new InvalidStateException(CATEGORY_NOT_MATCH)
                 );
     }
 }

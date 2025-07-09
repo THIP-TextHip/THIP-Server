@@ -1,16 +1,16 @@
 package konkuk.thip.room.domain;
 
-import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.room.adapter.out.persistence.CategoryName;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@SuperBuilder
-public class Category extends BaseDomainEntity {
+@RequiredArgsConstructor
+public class Category {
 
-    private Long id;
+    private final CategoryName categoryName;
 
-    private String value;
-
-    private Long aliasId;
+    public static Category from(String value) {
+        return new Category(CategoryName.from(value));
+    }
 }

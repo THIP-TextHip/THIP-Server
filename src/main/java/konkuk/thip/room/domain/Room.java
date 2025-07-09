@@ -40,9 +40,9 @@ public class Room extends BaseDomainEntity {
 
     private Long bookId;
 
-    private Long categoryId;
+    private Category category;
 
-    public static Room withoutId(String title, String description, boolean isPublic, String password, LocalDate startDate, LocalDate endDate, int recruitCount, Long bookId, Long categoryId) {
+    public static Room withoutId(String title, String description, boolean isPublic, String password, LocalDate startDate, LocalDate endDate, int recruitCount, Long bookId, Category category) {
         validateVisibilityPasswordRule(isPublic, password);
         validateDates(startDate, endDate);
 
@@ -60,7 +60,7 @@ public class Room extends BaseDomainEntity {
                 .endDate(endDate)
                 .recruitCount(recruitCount)
                 .bookId(bookId)
-                .categoryId(categoryId)
+                .category(category)
                 .build();
     }
 
