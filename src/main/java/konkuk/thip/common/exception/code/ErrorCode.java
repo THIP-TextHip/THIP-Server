@@ -101,7 +101,13 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 150000 : Category error
      */
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 150000, "존재하지 않는 CATEGORY 입니다.")
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 150000, "존재하지 않는 CATEGORY 입니다."),
+
+    /**
+     * 160000 : Feed error
+     */
+    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, 160000, "존재하지 않는 FEED 입니다."),
+    TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다.")
 
     ;
 

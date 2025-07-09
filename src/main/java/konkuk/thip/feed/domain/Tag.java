@@ -7,6 +7,12 @@ import lombok.Getter;
 @Builder
 public class Tag {
 
-    private String value;
+    private TagName value;
+
+    public static Tag from(String tagName) {
+        return Tag.builder()
+                .value(TagName.from(tagName))
+                .build();
+    }
 
 }
