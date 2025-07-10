@@ -11,7 +11,7 @@ public enum Alias {
     WRITER("문학가", "문학_color", "문학_image"),
     SCIENTIST("과학자", "과학_color", "과학_image"),
     SOCIOLOGIST("사회학자", "사회과학_color", "사회과학_image"),
-    ARTIEST("예술가", "예술_color", "예술_image"),
+    ARTIST("예술가", "예술_color", "예술_image"),
     PHILOSOPHER("철학자", "철학_color", "철학_image");
 
     private final String value;
