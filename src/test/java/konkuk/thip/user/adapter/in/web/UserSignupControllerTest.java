@@ -86,8 +86,9 @@ class UserSignupControllerTest {
         Long userId = jsonNode.path("data").path("userId").asLong();
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElse(null);
+        AliasJpaEntity userAliasJpaEntity = aliasJpaRepository.findByValue(request.aliasName()).orElse(null);
 
-        assertThat(userJpaEntity.getAliasForUserJpaEntity().getValue()).isEqualTo(request.aliasName());
+        assertThat(userAliasJpaEntity.getValue()).isEqualTo(request.aliasName());
         assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
     }
 
@@ -108,7 +109,7 @@ class UserSignupControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
-                .andExpect(jsonPath("$.message", containsString("aliasId는 필수입니다.")));
+                .andExpect(jsonPath("$.message", containsString("aliasName은 필수입니다.")));
     }
 
     @Test

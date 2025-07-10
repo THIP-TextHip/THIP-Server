@@ -44,7 +44,7 @@ class UserJpaEntityTest {
 
         // then
         assertThat(foundUser.getNickname()).isEqualTo("테스터");
-        assertThat(foundUser.getAliasForUserJpaEntity().getValue()).isEqualTo("칭호");
+        assertThat(foundUser.getAliasForUserJpaEntity().getValue()).isEqualTo("문학");
         assertThat(foundUser.getRole()).isEqualTo(UserRole.USER);
     }
 }

@@ -73,16 +73,16 @@ class UserViewAliasChoiceControllerTest {
         assertThat(choices)
                 .extracting("aliasName", "categoryName", "imageUrl", "color")
                 .containsExactlyInAnyOrder(
-                        tuple("문학가", "문학", "문학가_image", "red"),
-                        tuple("과학자", "과학/IT", "과학자_image", "blue")
+                        tuple("문학가", "문학", "문학_image", "문학_color"),
+                        tuple("과학자", "과학/IT", "과학_image", "과학_color")
                 );
     }
 
     private void saveAliasesAndCategories() {
         AliasJpaEntity alias1 = AliasJpaEntity.builder()
                 .value("문학가")
-                .imageUrl("문학가_image")
-                .color("red")
+                .imageUrl("문학_image")
+                .color("문학_color")
                 .build();
         aliasJpaRepository.save(alias1);
 
@@ -94,8 +94,8 @@ class UserViewAliasChoiceControllerTest {
 
         AliasJpaEntity alias2 = AliasJpaEntity.builder()
                 .value("과학자")
-                .imageUrl("과학자_image")
-                .color("blue")
+                .imageUrl("과학_image")
+                .color("과학_color")
                 .build();
         aliasJpaRepository.save(alias2);
 
