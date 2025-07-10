@@ -3,6 +3,7 @@ package konkuk.thip.book.adapter.in.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.application.port.in.dto.BookMostSearchResult;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -62,12 +63,7 @@ class BookMostSearchedBooksControllerTest {
 
     @BeforeEach
     void setUp() {
-
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("문학가")
-                .color("문학_color")
-                .imageUrl("문학_image")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
@@ -76,7 +72,6 @@ class BookMostSearchedBooksControllerTest {
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());
-
     }
 
     @AfterEach
