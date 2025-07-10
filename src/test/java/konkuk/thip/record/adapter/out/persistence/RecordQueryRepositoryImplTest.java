@@ -38,7 +38,7 @@ class RecordQueryRepositoryImplTest {
     @DisplayName("mine 타입일 경우 유저 ID에 해당하는 기록만 조회된다")
     void testFindRecordsByRoom_mine() {
         // given
-        AliasJpaEntity alias = TestEntityFactory.createAlias();
+        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
         em.persist(alias);
 
         UserJpaEntity user1 = TestEntityFactory.createUser(alias);
@@ -49,7 +49,7 @@ class RecordQueryRepositoryImplTest {
         BookJpaEntity book = TestEntityFactory.createBook();
         em.persist(book);
 
-        CategoryJpaEntity category = TestEntityFactory.createCategory(alias);
+        CategoryJpaEntity category = TestEntityFactory.createLiteratureCategory(alias);
         em.persist(category);
 
         RoomJpaEntity room = TestEntityFactory.createRoom(book, category);
@@ -95,7 +95,7 @@ class RecordQueryRepositoryImplTest {
     @DisplayName("pageStart, pageEnd가 null이면 isOverview가 true인 레코드만 조회된다")
     void testFindRecordsByRoom_overview() {
         // given
-        AliasJpaEntity alias = TestEntityFactory.createAlias();
+        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
         em.persist(alias);
 
         UserJpaEntity user = TestEntityFactory.createUser(alias);
@@ -104,7 +104,7 @@ class RecordQueryRepositoryImplTest {
         BookJpaEntity book = TestEntityFactory.createBook();
         em.persist(book);
 
-        CategoryJpaEntity category = TestEntityFactory.createCategory(alias);
+        CategoryJpaEntity category = TestEntityFactory.createLiteratureCategory(alias);
         em.persist(category);
 
         RoomJpaEntity room = TestEntityFactory.createRoom(book, category);
