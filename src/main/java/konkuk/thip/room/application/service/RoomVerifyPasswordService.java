@@ -16,6 +16,7 @@ public class RoomVerifyPasswordService implements RoomVerifyPasswordUseCase {
     private final RoomCommandPort roomCommandPort;
 
     @Override
+    @Transactional(readOnly = true)
     public Void verifyRoomPassword(RoomVerifyPasswordQuery query) {
 
         //방 검증
