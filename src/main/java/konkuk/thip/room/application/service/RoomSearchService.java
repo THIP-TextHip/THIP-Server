@@ -2,7 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.adapter.out.persistence.CategoryName;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.adapter.out.persistence.RoomSearchSortParam;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
@@ -59,7 +59,7 @@ public class RoomSearchService implements RoomSearchUseCase {
             return "";
         }
         try {
-            CategoryName cat = CategoryName.from(category);
+            Category cat = Category.from(category);
             return cat.getValue();
         } catch (IllegalArgumentException ex) {
             throw new BusinessException(CATEGORY_NOT_FOUND, ex);

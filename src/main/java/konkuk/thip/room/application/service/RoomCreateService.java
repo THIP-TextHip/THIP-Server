@@ -6,7 +6,6 @@ import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.room.application.port.in.RoomCreateUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomCreateCommand;
-import konkuk.thip.room.application.port.out.CategoryCommandPort;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
@@ -19,15 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoomCreateService implements RoomCreateUseCase {
 
     private final RoomCommandPort roomCommandPort;
-    private final CategoryCommandPort categoryCommandPort;
     private final BookCommandPort bookCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
 
     @Override
     @Transactional
     public Long createRoom(RoomCreateCommand command, Long userId) {
-        // 1. Category 찾기
-        Category category = categoryCommandPort.findByValue(command.category());
+        // 1. Category 생성
+        Category category = Category.from(command.category());
 
         // 2. Book 찾기, 없으면 Book 로드 및 저장
         Long bookId = resolveBookAndEnsurePage(command.isbn());
@@ -42,7 +40,7 @@ public class RoomCreateService implements RoomCreateUseCase {
                 command.progressEndDate(),
                 command.recruitCount(),
                 bookId,
-                category.getId()
+                category
         );
 
         // TODO : 방 생성한 사람 (= api 호출 토큰에 포함된 userId) 이 해당 방에 속한 멤버라는 사실을 DB에 영속화 해야함
