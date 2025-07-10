@@ -2,6 +2,7 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -76,12 +77,7 @@ class UserVerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 이미 DB에 존재하는 경우, false를 반환한다.")
     void verify_nickname_false() throws Exception {
         //given: DB에 "테스트유저" 생성
-        AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("칭호")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build();
-        aliasJpaRepository.save(aliasJpaEntity);
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity userJpaEntity = UserJpaEntity.builder()
                 .nickname("테스트유저")

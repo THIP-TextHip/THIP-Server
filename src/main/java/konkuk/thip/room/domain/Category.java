@@ -17,7 +17,7 @@ public enum Category {
      * TODO : DB에서 value를 통해 카테고리를 조회하는것보다 id로 조회하는게 성능상 좋으니, id 값도 같이 보관 ??
      */
     SCIENCE_IT("과학/IT"),
-    Literature("문학"),
+    LITERATURE("문학"),
     ART("예술"),
     SOCIAL_SCIENCE("사회과학"),
     HUMANITY("인문학");

@@ -43,7 +43,7 @@ class FeedJpaEntityTest {
     @DisplayName("FeedJpaEntity 저장 및 조회 테스트")
     void saveAndFindFeed() {
         // given
-        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createAlias());
+        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
         UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
         BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
 

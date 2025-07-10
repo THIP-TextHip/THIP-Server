@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
@@ -72,11 +73,7 @@ class RoomCreateAPITest {
     }
 
     private void saveUserAndCategory() {
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("책벌레")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
@@ -86,10 +83,7 @@ class RoomCreateAPITest {
                 .aliasForUserJpaEntity(alias)
                 .build());
 
-        categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("과학/IT")     // 실제 카테고리 값
-                .aliasForCategoryJpaEntity(alias)
-                .build());
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
     }
 
     private void saveBookWithPageCount() {
@@ -121,11 +115,11 @@ class RoomCreateAPITest {
     private Map<String, Object> buildRoomCreateRequest() {
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152");
-        request.put("category", "과학/IT");           // 실제 카테고리 값
+        request.put("category", "문학");           // 실제 카테고리 값
         request.put("roomName", "방이름");
         request.put("description", "방설명");
         request.put("progressStartDate", LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
-        request.put("progressEndDate", LocalDate.now().plusDays(30).format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
+        request.put("progressEndDate", LocalDate.now().plusDays(10).format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
         request.put("recruitCount", 3);
         request.put("password", null);
         request.put("isPublic", true);

@@ -5,7 +5,6 @@ import java.util.List;
 public record UserViewAliasChoiceResult(List<AliasChoice> aliasChoices) {
 
     public record AliasChoice(
-            Long aliasId,
             String aliasName,
             String categoryName,
             String imageUrl,

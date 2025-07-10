@@ -24,7 +24,6 @@ public class AliasQueryRepositoryImpl implements AliasQueryRepository {
         List<UserViewAliasChoiceResult.AliasChoice> aliasChoices = jpaQueryFactory
                 .select(Projections.constructor(
                         UserViewAliasChoiceResult.AliasChoice.class,
-                        alias.aliasId,
                         alias.value,
                         category.value,
                         alias.imageUrl,

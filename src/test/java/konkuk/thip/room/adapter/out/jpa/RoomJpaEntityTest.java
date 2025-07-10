@@ -44,8 +44,8 @@ class RoomJpaEntityTest {
     void saveAndFindRoom() {
         // given
         BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
-        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createAlias());
-        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createCategory(alias));
+        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
+        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         RoomJpaEntity room = roomRepository.save(TestEntityFactory.createRoom(book, category));
 
         // when

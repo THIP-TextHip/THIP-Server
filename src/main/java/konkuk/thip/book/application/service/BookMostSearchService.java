@@ -6,6 +6,7 @@ import konkuk.thip.book.application.port.out.BookRedisQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +19,7 @@ public class BookMostSearchService implements BookMostSearchUseCase {
     private final UserCommandPort userCommandPort;
 
     @Override
+    @Transactional(readOnly = true)
     public BookMostSearchResult getMostSearchedBooks(Long userId) {
 
         userCommandPort.findById(userId);

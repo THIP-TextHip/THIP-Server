@@ -30,6 +30,7 @@ public enum ErrorCode implements ResponseCode {
      * 60000 : alias error
      */
     ALIAS_NOT_FOUND(HttpStatus.NOT_FOUND, 60001, "존재하지 않는 ALIAS 입니다."),
+    ALIAS_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 60002, "일치하는 칭호 이름이 없습니다."),
 
 
     /**
@@ -102,7 +103,13 @@ public enum ErrorCode implements ResponseCode {
      * 150000 : Category error
      */
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 150000, "존재하지 않는 CATEGORY 입니다."),
-    CATEGORY_NOT_MATCH(HttpStatus.BAD_REQUEST, 150001, "일치하는 카테고리 이름이 없습니다.")
+    CATEGORY_NOT_MATCH(HttpStatus.BAD_REQUEST, 150001, "일치하는 카테고리 이름이 없습니다."),
+
+    /**
+     * 160000 : Feed error
+     */
+    FEED_NOT_FOUND(HttpStatus.NOT_FOUND, 160000, "존재하지 않는 FEED 입니다."),
+    TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다.")
 
     ;
 

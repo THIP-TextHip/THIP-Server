@@ -23,6 +23,7 @@ import konkuk.thip.vote.domain.VoteItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,6 +47,7 @@ public class RecordSearchService implements RecordSearchUseCase {
     private static final int PAGE_SIZE = 10;
 
     @Override
+    @Transactional(readOnly = true)
     public RecordSearchResponse search(RecordSearchQuery query) {
         validateQueryParams(query);
 

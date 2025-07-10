@@ -3,6 +3,7 @@ package konkuk.thip.room.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
@@ -70,11 +71,7 @@ class RoomVerifyPasswordAPITest {
     @BeforeEach
     void setUp() {
 
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("책벌레")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
@@ -95,16 +92,13 @@ class RoomVerifyPasswordAPITest {
                 .build());
         userId = user.getUserId();
 
-        CategoryJpaEntity categoryJpaEntity = categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("과학/IT")
-                .aliasForCategoryJpaEntity(alias)
-                .build());
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
         // 비공개 방 저장 (비밀번호: 1234)
         RoomJpaEntity privateRoom = roomJpaRepository.save(
                 RoomJpaEntity.builder()
                         .bookJpaEntity(book)
-                        .categoryJpaEntity(categoryJpaEntity)
+                        .categoryJpaEntity(category)
                         .title("비공개방")
                         .description("비공개방입니다")
                         .isPublic(false)
@@ -120,7 +114,7 @@ class RoomVerifyPasswordAPITest {
         RoomJpaEntity publicRoom = roomJpaRepository.save(
                 RoomJpaEntity.builder()
                         .bookJpaEntity(book)
-                        .categoryJpaEntity(categoryJpaEntity)
+                        .categoryJpaEntity(category)
                         .title("공개방")
                         .description("공개방입니다")
                         .isPublic(true)
