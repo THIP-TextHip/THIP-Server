@@ -1,8 +1,8 @@
 package konkuk.thip.room.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
@@ -68,12 +68,8 @@ class RoomSearchApiTest {
         aliasJpaRepository.deleteAll();
     }
 
-    private RoomJpaEntity saveRoom(String categoryValue, String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("소설-칭호")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build());
+    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
@@ -86,10 +82,36 @@ class RoomSearchApiTest {
                 .description("한강의 소설")
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value(categoryValue)
-                .aliasForCategoryJpaEntity(alias)
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
+
+        return roomJpaRepository.save(RoomJpaEntity.builder()
+                .title(roomName)
+                .description("한강 작품 읽기 모임")
+                .isPublic(true)
+                .roomPercentage(0.0)
+                .startDate(startDate)
+                .endDate(LocalDate.now().plusDays(30))
+                .recruitCount(recruitCount)
+                .bookJpaEntity(book)
+                .categoryJpaEntity(category)
                 .build());
+    }
+
+    private RoomJpaEntity saveLiteratureRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+
+        BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
+                .title(bookTitle)
+                .isbn(isbn)
+                .authorName("한강")
+                .bestSeller(false)
+                .publisher("문학동네")
+                .imageUrl("https://image1.jpg")
+                .pageCount(300)
+                .description("한강의 소설")
+                .build());
+
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
         return roomJpaRepository.save(RoomJpaEntity.builder()
                 .title(roomName)
@@ -105,11 +127,7 @@ class RoomSearchApiTest {
     }
 
     private void saveUsersToRoom(RoomJpaEntity roomJpaEntity, int count) {
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("소설-칭호")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
 
         // User 리스트 생성 및 저장
         List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
@@ -140,22 +158,22 @@ class RoomSearchApiTest {
     @DisplayName("keyword = [과학], 카테고리 선택 X, 정렬 = [마감임박순] 일 경우, 방이름 or 책제목에 '과학'이 포함된 방 검색 결과가 마감임박순으로 반환된다.")
     void search_keyword_and_sort_deadline() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveRoom("과학/IT", "과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_1, 4);
 
-        RoomJpaEntity science_room_2 = saveRoom("과학/IT", "과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveRoom("과학/IT", "과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveRoom("과학/IT", "과학-책", "isbn4", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_4, 1);
 
-        RoomJpaEntity room_3 = saveRoom("문학", "문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveRoom("과학/IT", "과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when
@@ -189,22 +207,22 @@ class RoomSearchApiTest {
     @DisplayName("keyword = [과학], 카테고리 선택 X, 정렬 = [인기순] 일 경우, 방이름 or 책제목에 '과학'이 포함된 방 검색 결과가 인기순(= 현재까지 모집된 인원 많은 순)으로 반환된다.")
     void search_keyword_and_sort_member_count() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveRoom("과학/IT", "과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_1, 4);
 
-        RoomJpaEntity science_room_2 = saveRoom("과학/IT", "과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveRoom("과학/IT", "과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveRoom("과학/IT", "과학-책", "isbn4", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_4, 1);
 
-        RoomJpaEntity room_3 = saveRoom("문학", "문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveRoom("과학/IT", "과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when
@@ -247,16 +265,16 @@ class RoomSearchApiTest {
     @DisplayName("keyword 입력 x, 카테고리 = [과학/IT], 정렬 = [마감임박순] 일 경우, [과학/IT] 카테고리에 속하는 방 검색 결과가 반환된다.")
     void search_category_and_sort_deadline() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveRoom("과학/IT", "과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_1, 4);
 
-        RoomJpaEntity science_room_3 = saveRoom("과학/IT", "과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity room_3 = saveRoom("문학", "문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveRoom("과학/IT", "과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when
@@ -287,16 +305,16 @@ class RoomSearchApiTest {
     @DisplayName("keyword 입력 x, 카테고리 입력 x, 정렬 = [마감임박순] 일 경우, DB에 존재하는 전체 방 검색 결과가 반환된다.")
     void search_sort_deadline() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveRoom("과학/IT", "과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_1, 4);
 
-        RoomJpaEntity science_room_3 = saveRoom("과학/IT", "과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity room_3 = saveRoom("문학", "문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveRoom("과학/IT", "과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when
@@ -327,16 +345,16 @@ class RoomSearchApiTest {
     @DisplayName("keyword=[과학], category=[과학/IT], 정렬=[마감임박순] 일 경우, keyword, category 조건을 모두 만족하는 방만 반환된다.")
     void search_keyword_and_category() throws Exception {
         // given
-        RoomJpaEntity science_room_1 = saveRoom("과학/IT", "과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_1, 4);
 
-        RoomJpaEntity science_room_3 = saveRoom("과학/IT", "과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity room_3 = saveRoom("문학", "문학-책", "isbn5", "문학방입니다", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "문학방입니다", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveRoom("과학/IT", "과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         // when
