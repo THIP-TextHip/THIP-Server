@@ -2,6 +2,7 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
@@ -79,30 +80,10 @@ class UserViewAliasChoiceControllerTest {
     }
 
     private void saveAliasesAndCategories() {
-        AliasJpaEntity alias1 = AliasJpaEntity.builder()
-                .value("문학가")
-                .imageUrl("문학_image")
-                .color("문학_color")
-                .build();
-        aliasJpaRepository.save(alias1);
+        AliasJpaEntity alias1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        CategoryJpaEntity category1 = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias1));
 
-        CategoryJpaEntity category1 = CategoryJpaEntity.builder()
-                .value("문학")
-                .aliasForCategoryJpaEntity(alias1)
-                .build();
-        categoryJpaRepository.save(category1);
-
-        AliasJpaEntity alias2 = AliasJpaEntity.builder()
-                .value("과학자")
-                .imageUrl("과학_image")
-                .color("과학_color")
-                .build();
-        aliasJpaRepository.save(alias2);
-
-        CategoryJpaEntity category2 = CategoryJpaEntity.builder()
-                .value("과학/IT")
-                .aliasForCategoryJpaEntity(alias2)
-                .build();
-        categoryJpaRepository.save(category2);
+        AliasJpaEntity alias2 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        CategoryJpaEntity category2 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias2));
     }
 }
