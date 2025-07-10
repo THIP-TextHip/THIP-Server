@@ -48,7 +48,7 @@ public class TestEntityFactory {
 
     public static CategoryJpaEntity createCategory(AliasJpaEntity alias) {
         return CategoryJpaEntity.builder()
-                .value("카테고리1")
+                .value("과학/IT")     // 실제 존재하는 값
                 .aliasForCategoryJpaEntity(alias)
                 .build();
     }
