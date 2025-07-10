@@ -15,11 +15,37 @@ import java.time.LocalDate;
 
 public class TestEntityFactory {
 
-    public static AliasJpaEntity createAlias() {
-        return AliasJpaEntity.builder()
-                .value("문학")
+    /**
+     * 유효한 Jpa entity를 만들어주는 Factory
+     */
+
+    public static AliasJpaEntity createLiteratureAlias() {
+        return AliasJpaEntity.builder()         // 실제 존재하는 값으로
+                .value("문학가")
                 .imageUrl("문학_image")
                 .color("문학_color")
+                .build();
+    }
+
+    public static CategoryJpaEntity createLiteratureCategory(AliasJpaEntity alias) {
+        return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
+                .value("문학")
+                .aliasForCategoryJpaEntity(alias)
+                .build();
+    }
+
+    public static AliasJpaEntity createScienceAlias() {
+        return AliasJpaEntity.builder()         // 실제 존재하는 값으로
+                .value("과학자")
+                .imageUrl("과학_image")
+                .color("과학_color")
+                .build();
+    }
+
+    public static CategoryJpaEntity createScienceCategory(AliasJpaEntity alias) {
+        return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
+                .value("과학/IT")
+                .aliasForCategoryJpaEntity(alias)
                 .build();
     }
 
@@ -43,13 +69,6 @@ public class TestEntityFactory {
                 .imageUrl("img")
                 .pageCount(100)
                 .description("설명")
-                .build();
-    }
-
-    public static CategoryJpaEntity createCategory(AliasJpaEntity alias) {
-        return CategoryJpaEntity.builder()
-                .value("과학/IT")     // 실제 존재하는 값
-                .aliasForCategoryJpaEntity(alias)
                 .build();
     }
 
