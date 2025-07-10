@@ -73,9 +73,9 @@ class RecordSearchControllerTest {
     void record_with_vote_response_success() throws Exception {
         // given
         AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("별명")
-                .color("blue")
-                .imageUrl("http://alias.img")
+                .value("문학가")
+                .color("문학_color")
+                .imageUrl("문학_image")
                 .build());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()

@@ -59,14 +59,14 @@ class UserSignupControllerTest {
     void signup_success() throws Exception {
         //given : alias 생성, 회원가입 request 생성
         AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("칭호")
-                .color("blue")
-                .imageUrl("http://image.url")
+                .value("문학가")
+                .color("문학_color")
+                .imageUrl("문학_image")
                 .build();
         aliasJpaRepository.save(aliasJpaEntity);
 
         UserSignupRequest request = new UserSignupRequest(
-                aliasJpaEntity.getAliasId(),
+                aliasJpaEntity.getValue(),
                 "테스트유저"
         );
 
@@ -87,7 +87,7 @@ class UserSignupControllerTest {
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElse(null);
 
-        assertThat(userJpaEntity.getAliasForUserJpaEntity().getAliasId()).isEqualTo(request.aliasId());
+        assertThat(userJpaEntity.getAliasForUserJpaEntity().getValue()).isEqualTo(request.aliasName());
         assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
     }
 
@@ -116,7 +116,7 @@ class UserSignupControllerTest {
     void signup_nickname_blank() throws Exception {
         //given: nickname blank
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 ""
         );
 
@@ -136,7 +136,7 @@ class UserSignupControllerTest {
     void signup_nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 "닉네임!!"
         );
 
@@ -156,7 +156,7 @@ class UserSignupControllerTest {
     void signup_nickname_too_long() throws Exception {
         //given: 11글자 nickname
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 "11글자닉네임입니다아"
         );
 
@@ -176,15 +176,15 @@ class UserSignupControllerTest {
     void signup_whenValidSignupToken_thenExtractOauth2IdCorrectly() throws Exception {
         //given : alias 데이터 저장
         AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("테스트칭호")
-                .color("green")
-                .imageUrl("http://image.url")
+                .value("문학가")
+                .color("문학_color")
+                .imageUrl("문학_image")
                 .build();
         aliasJpaRepository.save(aliasJpaEntity);
 
         //회원가입 request 생성
         UserSignupRequest request = new UserSignupRequest(
-                aliasJpaEntity.getAliasId(),
+                aliasJpaEntity.getValue(),
                 "테스트유저"
         );
 
@@ -218,7 +218,7 @@ class UserSignupControllerTest {
     void signup_whenNoToken_thenUnauthorized() throws Exception {
         //given: aliasId null
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 "테스트유저"
         );
 

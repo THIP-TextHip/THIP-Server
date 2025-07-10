@@ -63,9 +63,9 @@ class BookDetailSearchControllerTest {
     @BeforeEach
     void setup() {
         AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("책벌레")
-                .color("blue")
-                .imageUrl("http://image.url")
+                .value("문학가")
+                .color("문학_color")
+                .imageUrl("문학_image")
                 .build());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()

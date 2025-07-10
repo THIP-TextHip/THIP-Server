@@ -10,6 +10,7 @@ import konkuk.thip.record.application.port.in.dto.RecordSearchResult;
 import konkuk.thip.record.application.port.out.RecordQueryPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.application.port.out.VoteQueryPort;
@@ -40,6 +41,7 @@ class RecordSearchServiceTest {
     private RecordSearchService recordSearchService;
 
     private final Long userId = 1L;
+    private User stubUser;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +52,11 @@ class RecordSearchServiceTest {
         voteCommandPort = mock(VoteCommandPort.class);
         voteQueryPort = mock(VoteQueryPort.class);
         dateUtil = mock(DateUtil.class);
+
+        // stubUser 세팅: 항상 같은 Alias와 userId 반환
+        stubUser = mock(User.class);
+        when(stubUser.getAlias()).thenReturn(Alias.WRITER);
+        when(stubUser.getId()).thenReturn(userId);
 
         recordSearchService = new RecordSearchService(
                 recordQueryPort,
@@ -84,7 +91,7 @@ class RecordSearchServiceTest {
         when(recordQueryPort.findRecordsByRoom(any(), any(), any(), any(), any(), any()))
                 .thenReturn(RecordSearchResult.of(List.of(record), List.of(vote)));
 
-        when(userCommandPort.findById(any())).thenReturn(mock(User.class));
+        when(userCommandPort.findById(any())).thenReturn(stubUser);
         when(postLikeQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(commentQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);
@@ -125,7 +132,7 @@ class RecordSearchServiceTest {
         when(recordQueryPort.findRecordsByRoom(any(), any(), any(), any(), any(), any()))
                 .thenReturn(RecordSearchResult.of(List.of(record), List.of(vote)));
 
-        when(userCommandPort.findById(any())).thenReturn(mock(User.class));
+        when(userCommandPort.findById(any())).thenReturn(stubUser);
         when(postLikeQueryPort.countByPostId(record.getId())).thenReturn(5);
         when(postLikeQueryPort.countByPostId(vote.getId())).thenReturn(10);
         when(commentQueryPort.countByPostId(anyLong())).thenReturn(0);
@@ -164,7 +171,7 @@ class RecordSearchServiceTest {
         when(recordQueryPort.findRecordsByRoom(any(), any(), any(), any(), any(), any()))
                 .thenReturn(RecordSearchResult.of(records, votes));
 
-        when(userCommandPort.findById(any())).thenReturn(mock(User.class));
+        when(userCommandPort.findById(any())).thenReturn(stubUser);
         when(postLikeQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(commentQueryPort.countByPostId(anyLong())).thenReturn(0);
         when(postLikeQueryPort.existsByPostIdAndUserId(anyLong(), anyLong())).thenReturn(false);

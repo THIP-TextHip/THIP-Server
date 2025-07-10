@@ -17,9 +17,9 @@ public class TestEntityFactory {
 
     public static AliasJpaEntity createAlias() {
         return AliasJpaEntity.builder()
-                .value("칭호")
-                .imageUrl("test-image-url")
-                .color("red")
+                .value("문학")
+                .imageUrl("문학_image")
+                .color("문학_color")
                 .build();
     }
 
