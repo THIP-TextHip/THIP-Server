@@ -13,7 +13,7 @@ public class UserMapper {
     public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
         return UserJpaEntity.builder()
                 .nickname(user.getNickname())
-                .imageUrl(user.getImageUrl())
+                .imageUrl(user.getAlias().getImageUrl())
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
                 .aliasForUserJpaEntity(aliasJpaEntity)
@@ -24,12 +24,9 @@ public class UserMapper {
         return User.builder()
                 .id(userJpaEntity.getUserId())
                 .nickname(userJpaEntity.getNickname())
-                .imageUrl(userJpaEntity.getImageUrl())
                 .userRole(userJpaEntity.getRole().getType())
                 .oauth2Id(userJpaEntity.getOauth2Id())
-                .alias(Alias.from(userJpaEntity.getAliasForUserJpaEntity().getValue(),
-                        userJpaEntity.getAliasForUserJpaEntity().getImageUrl(),
-                        userJpaEntity.getAliasForUserJpaEntity().getColor()))
+                .alias(Alias.from(userJpaEntity.getAliasForUserJpaEntity().getValue()))
                 .createdAt(userJpaEntity.getCreatedAt())
                 .modifiedAt(userJpaEntity.getModifiedAt())
                 .status(userJpaEntity.getStatus())

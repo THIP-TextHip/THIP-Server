@@ -23,7 +23,7 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     @Override
     public Long save(User user) {
-        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.findById(user.getAliasId()).orElseThrow(
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.findByValue(user.getAlias().getValue()).orElseThrow(
                 () -> new EntityNotFoundException(ALIAS_NOT_FOUND));
 
         UserJpaEntity userJpaEntity = userMapper.toJpaEntity(user, aliasJpaEntity);
