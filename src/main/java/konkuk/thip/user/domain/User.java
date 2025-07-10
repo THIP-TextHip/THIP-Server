@@ -12,19 +12,16 @@ public class User extends BaseDomainEntity {
 
     private String nickname;
 
-    private String imageUrl;
-
     private String userRole;
 
     private String oauth2Id;
 
-    private AliasName alias;
+    private Alias alias;
 
-    public static User withoutId(String nickname, String imageUrl, String userRole, String oauth2Id, Alias alias) {
+    public static User withoutId(String nickname, String userRole, String oauth2Id, Alias alias) {
         return User.builder()
                 .id(null)
                 .nickname(nickname)
-                .imageUrl(imageUrl)
                 .userRole(userRole)
                 .oauth2Id(oauth2Id)
                 .alias(alias)
