@@ -36,7 +36,7 @@ public record VoteDto(
                 .page(vote.getPage())
                 .userId(vote.getCreatorId())
                 .nickName(user.getNickname())
-                .profileImageUrl(user.getImageUrl())
+                .profileImageUrl(user.getAlias().getImageUrl())
                 .content(vote.getContent())
                 .likeCount(likeCount)
                 .commentCount(commentCount)

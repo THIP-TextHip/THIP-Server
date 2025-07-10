@@ -9,7 +9,6 @@ public record UserViewAliasChoiceResponse(List<AliasChoice> aliasChoices) {
     public static UserViewAliasChoiceResponse of(UserViewAliasChoiceResult result) {
         List<AliasChoice> choices = result.aliasChoices().stream()
                 .map(ac -> new AliasChoice(
-                        ac.aliasId(),
                         ac.aliasName(),
                         ac.categoryName(),
                         ac.imageUrl(),
@@ -20,7 +19,6 @@ public record UserViewAliasChoiceResponse(List<AliasChoice> aliasChoices) {
     }
 
     public record AliasChoice(
-            Long aliasId,
             String aliasName,
             String categoryName,
             String imageUrl,

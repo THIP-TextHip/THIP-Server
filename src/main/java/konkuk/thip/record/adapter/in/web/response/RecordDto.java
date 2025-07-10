@@ -29,7 +29,7 @@ public record RecordDto(
                 .page(record.getPage())
                 .userId(record.getCreatorId())
                 .nickName(user.getNickname())
-                .profileImageUrl(user.getImageUrl())
+                .profileImageUrl(user.getAlias().getImageUrl())
                 .content(record.getContent())
                 .likeCount(likeCount)
                 .commentCount(commentCount)
