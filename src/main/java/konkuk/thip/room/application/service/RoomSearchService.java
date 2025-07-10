@@ -60,12 +60,8 @@ public class RoomSearchService implements RoomSearchUseCase {
         if (category == null || category.isEmpty()) {
             return "";
         }
-        try {
-            Category cat = Category.from(category);
-            return cat.getValue();
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException(CATEGORY_NOT_FOUND, ex);
-        }
+
+        return Category.from(category).getValue();
     }
 
     /**
