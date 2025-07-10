@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.persistence.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
@@ -72,11 +73,7 @@ class RecordSearchControllerTest {
     @DisplayName("기록장 조회 시 record와 vote 모두 조회")
     void record_with_vote_response_success() throws Exception {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("문학가")
-                .color("문학_color")
-                .imageUrl("문학_image")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_123")
@@ -97,10 +94,7 @@ class RecordSearchControllerTest {
                 .bestSeller(false)
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("소설")
-                .aliasForCategoryJpaEntity(alias)
-                .build());
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
         RoomJpaEntity room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("방 제목")
