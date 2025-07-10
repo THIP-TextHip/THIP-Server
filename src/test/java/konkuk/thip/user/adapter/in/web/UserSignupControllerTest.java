@@ -3,6 +3,7 @@ package konkuk.thip.user.adapter.in.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -58,12 +59,7 @@ class UserSignupControllerTest {
     @DisplayName("[칭호id, 닉네임] 정보를 바탕으로 회원가입을 진행한다.")
     void signup_success() throws Exception {
         //given : alias 생성, 회원가입 request 생성
-        AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("문학가")
-                .color("문학_color")
-                .imageUrl("문학_image")
-                .build();
-        aliasJpaRepository.save(aliasJpaEntity);
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserSignupRequest request = new UserSignupRequest(
                 aliasJpaEntity.getValue(),
@@ -176,12 +172,7 @@ class UserSignupControllerTest {
     @DisplayName("임시 토큰을 통해 @Oauth2Id로 oauth2Id를 정확히 추출하여 회원가입에 성공한다.")
     void signup_whenValidSignupToken_thenExtractOauth2IdCorrectly() throws Exception {
         //given : alias 데이터 저장
-        AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("문학가")
-                .color("문학_color")
-                .imageUrl("문학_image")
-                .build();
-        aliasJpaRepository.save(aliasJpaEntity);
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         //회원가입 request 생성
         UserSignupRequest request = new UserSignupRequest(
