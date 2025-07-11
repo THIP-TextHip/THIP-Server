@@ -1,46 +1,131 @@
 package konkuk.thip.record.adapter.out.persistence;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import konkuk.thip.comment.adapter.out.jpa.QCommentJpaEntity;
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
+import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
+import konkuk.thip.post.adapter.out.jpa.QPostLikeJpaEntity;
+import konkuk.thip.record.adapter.in.web.response.RecordDto;
+import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
+import konkuk.thip.record.adapter.in.web.response.VoteDto;
 import konkuk.thip.record.adapter.out.jpa.QRecordJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
+import konkuk.thip.vote.adapter.out.jpa.QVoteJpaEntity;
+import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class RecordQueryRepositoryImpl implements RecordQueryRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<RecordJpaEntity> findRecordsByRoom(Long roomId, String type, Integer pageStart, Integer pageEnd, Long userId) {
+    public Page<RecordSearchResponse.RecordSearchResult> findRecordsByRoom(Long roomId, String viewType, Integer pageStart, Integer pageEnd, Boolean isOverview, Long loginUserId, Pageable pageable) {
+        QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
         QRecordJpaEntity record = QRecordJpaEntity.recordJpaEntity;
-        QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
+        QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
 
-        return jpaQueryFactory
-                .select(record)
-                .from(record)
-                .leftJoin(record.userJpaEntity, user).fetchJoin()
-                .where(
-                        record.roomJpaEntity.roomId.eq(roomId),
-                        filterByType(type, record, userId),
-                        (startEndNull(pageStart, pageEnd) ? record.isOverview.isTrue() : record.page.between(pageStart, pageEnd))
-                )
-                .fetch();
-    }
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(post.instanceOf(RecordJpaEntity.class).and(record.roomJpaEntity.roomId.eq(roomId)))
+                .or(post.instanceOf(VoteJpaEntity.class).and(vote.roomJpaEntity.roomId.eq(roomId)));
 
-    private boolean startEndNull(Integer start, Integer end) {
-        return start == null && end == null;
-    }
-
-    private BooleanExpression filterByType(String type, QRecordJpaEntity post, Long userId) {
-        if ("mine".equalsIgnoreCase(type)) {
-            return post.userJpaEntity.userId.eq(userId);
+        if (isOverview) {
+            where.and(post.instanceOf(RecordJpaEntity.class).and(record.isOverview.isTrue()))
+                    .or(post.instanceOf(VoteJpaEntity.class).and(vote.isOverview.isTrue()));
+        } else {
+            where.and(post.instanceOf(RecordJpaEntity.class).and(record.page.between(pageStart, pageEnd)))
+                    .or(post.instanceOf(VoteJpaEntity.class).and(vote.page.between(pageStart, pageEnd)));
         }
-        return null;
+
+        if ("mine".equals(viewType)) {
+            where.and(post.userJpaEntity.userId.eq(loginUserId));
+        }
+
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        for (Sort.Order order : pageable.getSort()) {
+            String property = order.getProperty();
+            boolean asc = order.getDirection().isAscending();
+
+            if ("likeCount".equalsIgnoreCase(property)) {
+                NumberTemplate<Long> likeCountTemplate = com.querydsl.core.types.dsl.Expressions.numberTemplate(
+                        Long.class, "count({0})", QPostLikeJpaEntity.postLikeJpaEntity.likeId);
+                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC, likeCountTemplate));
+            } else if ("commentCount".equalsIgnoreCase(property)) {
+                NumberTemplate<Long> commentCountTemplate = com.querydsl.core.types.dsl.Expressions.numberTemplate(
+                        Long.class, "count({0})", QCommentJpaEntity.commentJpaEntity.commentId);
+                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC, commentCountTemplate));
+            } else if ("createdAt".equalsIgnoreCase(property)) {
+                orderSpecifiers.add(asc ? post.createdAt.asc() : post.createdAt.desc());
+            } else {
+                orderSpecifiers.add(post.createdAt.desc());
+            }
+        }
+
+        List<PostJpaEntity> posts = queryFactory
+                .selectFrom(post)
+                .leftJoin(record).on(post.postId.eq(record.postId))
+                .leftJoin(vote).on(post.postId.eq(vote.postId))
+                .where(where)
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<RecordSearchResponse.RecordSearchResult> resultList = posts.stream()
+                .map(p -> {
+                    if (p instanceof RecordJpaEntity r) {
+                        return new RecordDto(
+                                DateUtil.formatLastActivityTime(r.getCreatedAt()),
+                                r.getPage(),
+                                r.getUserJpaEntity().getUserId(),
+                                r.getUserJpaEntity().getNickname(),
+                                r.getUserJpaEntity().getImageUrl(),
+                                r.getContent(),
+                                r.getLikeCount(),
+                                r.getCommentCount(),
+                                false,
+                                loginUserId.equals(r.getUserJpaEntity().getUserId()),
+                                r.getPostId()
+                        );
+                    } else if (p instanceof VoteJpaEntity v) {
+                        // VoteItem은 양방향 매핑이 없으므로 빈 리스트로 처리하고 서비스 레벨에서 파싱
+                        return new VoteDto(
+                                DateUtil.formatLastActivityTime(v.getCreatedAt()),
+                                v.getPage(),
+                                v.getUserJpaEntity().getUserId(),
+                                v.getUserJpaEntity().getNickname(),
+                                v.getUserJpaEntity().getImageUrl(),
+                                v.getContent(),
+                                v.getLikeCount(),
+                                v.getCommentCount(),
+                                false,
+                                loginUserId.equals(v.getUserJpaEntity().getUserId()),
+                                v.getPostId(),
+                                new ArrayList<>()
+                        );
+                    } else {
+                        throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입: " + p.getClass().getSimpleName()));
+                    }
+                })
+                .map(result -> (RecordSearchResponse.RecordSearchResult) result)
+                .toList();
+
+        return new PageImpl<>(resultList, pageable, resultList.size());
     }
 }
