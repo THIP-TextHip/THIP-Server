@@ -21,6 +21,10 @@ public class Record extends BaseDomainEntity {
 
     private boolean isOverview;
 
+    private Integer likeCount = 0;
+
+    private Integer commentCount = 0;
+
     private Long roomId;
 
     public static Record withoutId(
@@ -35,6 +39,8 @@ public class Record extends BaseDomainEntity {
                 .creatorId(creatorId)
                 .page(page)
                 .isOverview(isOverview)
+                .likeCount(0)
+                .commentCount(0)
                 .roomId(roomId)
                 .build();
     }

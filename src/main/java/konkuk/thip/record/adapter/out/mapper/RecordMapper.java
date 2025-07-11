@@ -12,6 +12,8 @@ public class RecordMapper {
     public RecordJpaEntity toJpaEntity(Record record, UserJpaEntity userJpaEntity, RoomJpaEntity roomJpaEntity) {
         return RecordJpaEntity.builder()
                 .content(record.getContent())
+                .likeCount(record.getLikeCount())
+                .commentCount(record.getCommentCount())
                 .userJpaEntity(userJpaEntity)
                 .page(record.getPage())
                 .isOverview(record.isOverview())
@@ -27,6 +29,8 @@ public class RecordMapper {
                 .page(recordJpaEntity.getPage())
                 .isOverview(recordJpaEntity.isOverview())
                 .roomId(recordJpaEntity.getRoomJpaEntity().getRoomId())
+                .likeCount(recordJpaEntity.getLikeCount())
+                .commentCount(recordJpaEntity.getCommentCount())
                 .createdAt(recordJpaEntity.getCreatedAt())
                 .modifiedAt(recordJpaEntity.getModifiedAt())
                 .status(recordJpaEntity.getStatus())
