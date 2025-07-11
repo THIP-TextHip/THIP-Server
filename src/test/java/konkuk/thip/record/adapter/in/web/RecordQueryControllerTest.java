@@ -54,7 +54,6 @@ class RecordSearchControllerTest {
     @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private DateUtil dateUtil;
 
     @AfterEach
     void tearDown() {
@@ -117,6 +116,8 @@ class RecordSearchControllerTest {
         RecordJpaEntity record = recordJpaRepository.save(RecordJpaEntity.builder()
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
+                .likeCount(1)
+                .commentCount(2)
                 .page(1)
                 .content("레코드 내용")
                 .build());
@@ -124,6 +125,8 @@ class RecordSearchControllerTest {
         VoteJpaEntity vote = voteJpaRepository.save(VoteJpaEntity.builder()
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
+                .likeCount(1)
+                .commentCount(2)
                 .page(1)
                 .content("투표 내용")
                 .build());
@@ -148,6 +151,7 @@ class RecordSearchControllerTest {
                 .param("pageStart", "1")
                 .param("pageEnd", "10")
                 .param("pageNum", "1")
+                .param("isOverview", "false")
                 .contentType(MediaType.APPLICATION_JSON));
 
         // then
@@ -155,27 +159,28 @@ class RecordSearchControllerTest {
         String json = result.andReturn().getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(json);
 
-        JsonNode recordNode = jsonNode.path("data").path("recordList").get(0);
-        assertThat(recordNode.path("type").asText()).isEqualTo("RECORD");
-        assertThat(recordNode.path("page").asInt()).isEqualTo(1);
-        assertThat(recordNode.path("content").asText()).isEqualTo("레코드 내용");
-        assertThat(recordNode.path("nickName").asText()).isEqualTo("사용자");
-        assertThat(recordNode.path("postDate").asText()).isEqualTo(dateUtil.formatLastActivityTime(LocalDateTime.now()));
-        assertThat(recordNode.path("likeCount").asInt()).isEqualTo(0);
-        assertThat(recordNode.path("commentCount").asInt()).isEqualTo(0);
-
-        JsonNode voteNode = jsonNode.path("data").path("recordList").get(1);
+        JsonNode voteNode = jsonNode.path("data").path("recordList").get(0);
         assertThat(voteNode.path("type").asText()).isEqualTo("VOTE");
         assertThat(voteNode.path("page").asInt()).isEqualTo(1);
         assertThat(voteNode.path("content").asText()).isEqualTo("투표 내용");
         assertThat(voteNode.path("nickName").asText()).isEqualTo("사용자");
-        assertThat(voteNode.path("postDate").asText()).isEqualTo(dateUtil.formatLastActivityTime(LocalDateTime.now()));
+        assertThat(voteNode.path("postDate").asText()).isEqualTo(DateUtil.formatLastActivityTime(LocalDateTime.now()));
 
         JsonNode voteItems = voteNode.path("voteItems");
         assertThat(voteItems).hasSize(2);
         assertThat(voteItems.get(0).get("itemName").asText()).isEqualTo("찬성");
         assertThat(voteItems.get(0).get("isVoted").asBoolean()).isEqualTo(false);
         assertThat(voteItems.get(0).get("percentage").asInt()).isEqualTo(75);
+
+        JsonNode recordNode = jsonNode.path("data").path("recordList").get(1);
+        assertThat(recordNode.path("type").asText()).isEqualTo("RECORD");
+        assertThat(recordNode.path("page").asInt()).isEqualTo(1);
+        assertThat(recordNode.path("content").asText()).isEqualTo("레코드 내용");
+        assertThat(recordNode.path("nickName").asText()).isEqualTo("사용자");
+        assertThat(recordNode.path("postDate").asText()).isEqualTo(DateUtil.formatLastActivityTime(LocalDateTime.now()));
+        assertThat(recordNode.path("likeCount").asInt()).isEqualTo(1);
+        assertThat(recordNode.path("commentCount").asInt()).isEqualTo(2);
+
     }
 
 
