@@ -1,33 +1,30 @@
 package konkuk.thip.record.application.service;
 
 import com.sun.jdi.request.InvalidRequestStateException;
-import konkuk.thip.comment.application.port.out.CommentQueryPort;
+import konkuk.thip.book.application.port.out.BookCommandPort;
+import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.record.adapter.in.web.response.RecordDto;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import konkuk.thip.record.adapter.in.web.response.VoteDto;
-import konkuk.thip.record.application.port.in.dto.RecordSearchQuery;
-import konkuk.thip.record.application.port.in.dto.RecordSearchResult;
+import konkuk.thip.record.adapter.out.persistence.RecordSearchSortParams;
+import konkuk.thip.record.adapter.out.persistence.RecordSearchTypeParams;
 import konkuk.thip.record.application.port.in.dto.RecordSearchUseCase;
 import konkuk.thip.record.application.port.out.RecordQueryPort;
-import konkuk.thip.record.domain.Record;
-import konkuk.thip.user.application.port.out.UserCommandPort;
-import konkuk.thip.user.domain.User;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.application.port.out.VoteQueryPort;
-import konkuk.thip.vote.domain.Vote;
 import konkuk.thip.vote.domain.VoteItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,121 +32,119 @@ import java.util.Optional;
 public class RecordSearchService implements RecordSearchUseCase {
 
     private final RecordQueryPort recordQueryPort;
-    private final UserCommandPort userCommandPort;
-    private final PostLikeQueryPort postLikeQueryPort;
-    private final CommentQueryPort commentQueryPort;
+    private final BookCommandPort bookCommandPort;
     private final VoteCommandPort voteCommandPort;
     private final VoteQueryPort voteQueryPort;
+    private final PostLikeQueryPort postLikeQueryPort;
 
-    private final DateUtil dateUtil;
-
-    private static final int PAGE_SIZE = 10;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Override
-    public RecordSearchResponse search(RecordSearchQuery query) {
-        validateQueryParams(query);
+    public RecordSearchResponse search(Long roomId, String type, String sort, Integer pageStart, Integer pageEnd, Boolean isOverview, Integer pageNum, Long userId) {
+        // 1. 유효성 검사
+        validatePageStartAndEnd(pageStart, pageEnd, isOverview);
+        validatePageNum(pageNum);
 
-        // 1. 파라미터에 따라 Record와 Vote를 조회
-        RecordSearchResult recordSearchResult = recordQueryPort.findRecordsByRoom(
-                query.roomId(),
-                Optional.ofNullable(query.type()).orElse("group"),
-                query.pageStart(),
-                query.pageEnd(),
-                query.userId(),
-                query.pageNum()
+        // isOverview가 false일 때 pageStart와 pageEnd가 모두 null이면 전체 페이지 조회
+        if(!isOverview && (pageStart == null || pageEnd == null)) {
+            Book book = bookCommandPort.findBookByRoomId(roomId);
+            pageStart = 1;
+            pageEnd = book.getPageCount();
+        }
+
+        // 2. 정렬 조건 확인
+        RecordSearchSortParams sortVal = sort != null ? RecordSearchSortParams.from(sort) : RecordSearchSortParams.LATEST;
+        RecordSearchTypeParams typeVal = type != null ? RecordSearchTypeParams.from(type) : RecordSearchTypeParams.GROUP;
+
+        // 3. 페이지 인덱스 보정
+        int pageIndex = pageNum > 0 ? pageNum - 1 : 0;
+        Pageable pageable = PageRequest.of(pageIndex, DEFAULT_PAGE_SIZE, buildSort(sortVal));
+
+        // 4. 게시글 조회
+        Page<RecordSearchResponse.RecordSearchResult> result = recordQueryPort.findRecordsByRoom(
+                roomId,
+                typeVal.getValue(),
+                pageStart,
+                pageEnd,
+                isOverview,
+                userId,
+                pageable
         );
 
-        List<Record> records = recordSearchResult.records();
-        List<Vote> votes = recordSearchResult.votes();
-
-        List<RecordSearchResponse.PostDto> combinedPosts = new ArrayList<>();
-
-        // 2. Record와 Vote를 PostDto로 변환하여 combinedPosts에 추가
-        for (Record record : records) {
-            combinedPosts.add(createRecordDto(record, query.userId()));
-        }
-
-        for (Vote vote : votes) {
-            combinedPosts.add(createVoteDto(vote, query.userId()));
-        }
-
-        // 3. sort에 따라 정렬 (기본값은 "latest")
-        String sort = Optional.ofNullable(query.sort()).orElse("latest");
-        sortCombinedPosts(sort, combinedPosts);
-
-        // 4. 페이지네이션 변수 설정
-        int pageNum = Optional.ofNullable(query.pageNum()).orElse(1);
-        int pageSize = PAGE_SIZE;
-        int fromIndex = (pageNum - 1) * pageSize;
-        int toIndex = Math.min(fromIndex + pageSize, combinedPosts.size());
-
-        // 5. 페이지 범위에 따라 서브리스트 생성
-        List<RecordSearchResponse.PostDto> pagedList = fromIndex >= combinedPosts.size() ? new ArrayList<>() : combinedPosts.subList(fromIndex, toIndex);
-
-        boolean isFirst = pageNum == 1;
-        boolean isLast = toIndex >= combinedPosts.size();
-        if (isLast) {
-            pageSize = pagedList.size(); // 마지막 페이지일 경우 페이지 크기 업데이트
-        }
-
-        return RecordSearchResponse.of(pagedList, pageNum, pageSize, isFirst, isLast);
-    }
-
-    private void validateQueryParams(RecordSearchQuery query) {
-        if(query.pageStart() != null && query.pageEnd() == null || query.pageStart() == null && query.pageEnd() != null) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 모두 설정되어야 합니다."));
-        }
-
-        if(query.pageNum() != null && query.pageNum() < 1) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 1 이상의 값이어야 합니다."));
-        }
-
-        if(query.sort() != null && !List.of("latest", "like", "comment").contains(query.sort())) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("sort는 'latest', 'like', 'comment' 중 하나여야 합니다."));
-        }
-
-        if(query.type() != null && !List.of("group", "mine").contains(query.type())) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("type은 'group', 'mine' 중 하나여야 합니다."));
-        }
-    }
-
-    private RecordSearchResponse.PostDto createRecordDto(Record record, Long userId) {
-        User user = userCommandPort.findById(record.getCreatorId());
-        int likeCount = postLikeQueryPort.countByPostId(record.getId());
-        int commentCount = commentQueryPort.countByPostId(record.getId());
-        boolean isLiked = postLikeQueryPort.existsByPostIdAndUserId(userId, record.getId());
-        boolean isWriter = record.getCreatorId().equals(userId);
-        return RecordDto.of(record, dateUtil.formatLastActivityTime(record.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter);
-    }
-
-    private RecordSearchResponse.PostDto createVoteDto(Vote vote, Long userId) {
-        User user = userCommandPort.findById(vote.getCreatorId());
-        int likeCount = postLikeQueryPort.countByPostId(vote.getId());
-        int commentCount = commentQueryPort.countByPostId(vote.getId());
-        boolean isLiked = postLikeQueryPort.existsByPostIdAndUserId(userId, vote.getId());
-        boolean isWriter = vote.getCreatorId().equals(userId);
-
-        List<VoteItem> voteItems = voteCommandPort.findVoteItemsByVoteId(vote.getId());
-        int totalCount = voteItems.stream().mapToInt(VoteItem::getCount).sum();
-
-        List<VoteDto.VoteItemDto> voteItemDtos = voteItems.stream()
-                .map(item -> VoteDto.VoteItemDto.of(item, item.calculatePercentage(totalCount), voteQueryPort.isUserVoted(userId, item.getId())))
+        // 5. isLiked와 voteItems를 포함한 최종 결과 리스트 생성
+        List<RecordSearchResponse.RecordSearchResult> finalList = result.getContent().stream()
+                .map(post -> {
+                    if (post instanceof RecordDto recordDto) {
+                        boolean isLiked = checkIfLiked(recordDto.recordId(), userId);
+                        return recordDto.withIsLiked(isLiked); // withIsLiked 메서드는 builder로 따로 정의
+                    } else if (post instanceof VoteDto voteDto) {
+                        boolean isLiked = checkIfLiked(voteDto.voteId(), userId);
+                        List<VoteItem> items = voteCommandPort.findVoteItemsByVoteId(voteDto.voteId());
+                        List<VoteDto.VoteItemDto> voteItemDtos = mapToVoteItemDtos(items, userId, voteDto.voteId());
+                        return voteDto.withIsLikedAndVoteItems(isLiked, voteItemDtos); // builder 또는 커스텀 생성자 필요
+                    } else {
+                        throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입입니다"));
+                    }
+                })
+                .map(finalResult -> (RecordSearchResponse.RecordSearchResult) finalResult)
                 .toList();
 
-        return VoteDto.of(vote, dateUtil.formatLastActivityTime(vote.getCreatedAt()), user, likeCount, commentCount, isLiked, isWriter, voteItemDtos);
+        // 6. response 구성
+        return new RecordSearchResponse(
+                finalList,
+                pageNum,
+                result.getNumberOfElements(),
+                result.isLast(),
+                result.isFirst());
     }
 
-    private void sortCombinedPosts(String sort, List<RecordSearchResponse.PostDto> combinedPosts) {
-        switch (sort) {
-            case "like" -> combinedPosts.sort(
-                    Comparator.comparingInt(RecordSearchResponse.PostDto::likeCount).reversed()
-            );
-            case "comment" -> combinedPosts.sort(
-                    Comparator.comparingInt(RecordSearchResponse.PostDto::commentCount).reversed()
-            );
-            default -> combinedPosts.sort(
-                    Comparator.comparing(RecordSearchResponse.PostDto::postDate).reversed()
-            );
+    private void validatePageStartAndEnd(Integer pageStart, Integer pageEnd, Boolean isOverview) {
+        if((pageStart != null && pageEnd == null) || (pageStart == null && pageEnd != null)) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 모두 설정되거나(특정 페이지 조회) 모두 설정되지 않아야 합니다.(전체 페이지 조회)"));
+        }
+        if (pageStart != null && pageEnd != null && pageStart > pageEnd) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart는 pageEnd보다 작거나 같아야 합니다."));
+        }
+        if(!isOverview && (pageStart == null || pageEnd == null)) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 isOverview가 false일 때 필수 파라미터입니다."));
+        }
+        if (isOverview && (pageStart != null || pageEnd != null)) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 isOverview가 true일 때 유효한 파라미터가 아닙니다."));
         }
     }
+
+    private void validatePageNum(Integer pageNum) {
+        if (pageNum == null) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 필수 파라미터입니다."));
+        }
+        if (pageNum < 1) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 1 이상의 값이어야 합니다."));
+        }
+    }
+
+    private Sort buildSort(RecordSearchSortParams sort) {
+        return switch (sort) {
+            case LIKE -> Sort.by(Sort.Direction.DESC, "likeCount");
+            case COMMENT -> Sort.by(Sort.Direction.DESC, "commentCount");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+    }
+
+    private List<VoteDto.VoteItemDto> mapToVoteItemDtos(List<VoteItem> items, Long userId, Long voteId) {
+        int total = items.stream().mapToInt(VoteItem::getCount).sum();
+        return items.stream()
+                .map(item -> VoteDto.VoteItemDto.of(
+                        item,
+                        item.calculatePercentage(total),
+                        voteQueryPort.isUserVoted(userId, voteId)
+                        )
+                )
+                .toList();
+    }
+
+    private boolean checkIfLiked(Long postId, Long userId) {
+        return postLikeQueryPort.existsByPostIdAndUserId(postId, userId);
+    }
 }
+
+
