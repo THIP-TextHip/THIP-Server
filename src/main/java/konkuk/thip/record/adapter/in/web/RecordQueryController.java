@@ -20,10 +20,11 @@ public class RecordQueryController {
     @GetMapping("/rooms/{roomId}/posts")
     public BaseResponse<RecordSearchResponse> viewRecordList(
             @PathVariable final Long roomId,
-            @RequestParam final String type,
-            @RequestParam final String sort,
+            @RequestParam(required = false) final String type,
+            @RequestParam(required = false) final String sort,
             @RequestParam(required = false) final Integer pageStart,
             @RequestParam(required = false) final Integer pageEnd,
+            @RequestParam final Boolean isOverview,
             @RequestParam final Integer pageNum,
             @UserId final Long userId
     ) {
@@ -34,6 +35,7 @@ public class RecordQueryController {
                         .sort(sort)
                         .pageStart(pageStart)
                         .pageEnd(pageEnd)
+                        .isOverview(isOverview)
                         .pageNum(pageNum)
                         .userId(userId)
                         .build()

@@ -9,6 +9,7 @@ public record RecordSearchQuery(
         String sort,
         Integer pageStart,
         Integer pageEnd,
+        Boolean isOverview,
         Integer pageNum,
         Long userId) {
 }
