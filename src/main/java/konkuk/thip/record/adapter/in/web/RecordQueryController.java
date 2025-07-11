@@ -3,7 +3,6 @@ package konkuk.thip.record.adapter.in.web;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
-import konkuk.thip.record.application.port.in.dto.RecordSearchQuery;
 import konkuk.thip.record.application.port.in.dto.RecordSearchUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,18 +27,7 @@ public class RecordQueryController {
             @RequestParam final Integer pageNum,
             @UserId final Long userId
     ) {
-        return BaseResponse.ok(recordSearchUseCase.search(
-                RecordSearchQuery.builder()
-                        .roomId(roomId)
-                        .type(type)
-                        .sort(sort)
-                        .pageStart(pageStart)
-                        .pageEnd(pageEnd)
-                        .isOverview(isOverview)
-                        .pageNum(pageNum)
-                        .userId(userId)
-                        .build()
-        ));
+        return BaseResponse.ok(recordSearchUseCase.search(roomId, type, sort, pageStart, pageEnd, isOverview, pageNum, userId));
     }
 
 }
