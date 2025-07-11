@@ -6,14 +6,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 
 public record RecordSearchResponse(
-    List<PostDto> recordList,
+    List<RecordSearchResult> recordList,
     Integer page,
     Integer size,
     Boolean first,
     Boolean last
 ){
 
-    public static RecordSearchResponse of(List<PostDto> recordList,
+    public static RecordSearchResponse of(List<RecordSearchResult> recordList,
                                           Integer page,
                                           Integer size,
                                           Boolean first,
@@ -26,7 +26,7 @@ public record RecordSearchResponse(
             @JsonSubTypes.Type(value = RecordDto.class, name = "RECORD"),
             @JsonSubTypes.Type(value = VoteDto.class, name = "VOTE")
     })
-    public sealed interface PostDto permits RecordDto, VoteDto {
+    public sealed interface RecordSearchResult permits RecordDto, VoteDto {
         String type();
         String postDate();
         int page();

@@ -21,7 +21,7 @@ public record VoteDto(
         boolean isWriter,
         Long voteId,
         List<VoteItemDto> voteItems
-) implements RecordSearchResponse.PostDto {
+) implements RecordSearchResponse.RecordSearchResult {
     @Override
     public String type() {
         return "VOTE";
@@ -45,6 +45,23 @@ public record VoteDto(
                 .voteId(vote.getId())
                 .voteItems(voteItems)
                 .build();
+    }
+
+    public VoteDto withIsLikedAndVoteItems(boolean isLiked, List<VoteItemDto> voteItems) {
+        return new VoteDto(
+                postDate,
+                page,
+                userId,
+                nickName,
+                profileImageUrl,
+                content,
+                likeCount,
+                commentCount,
+                isLiked,
+                isWriter,
+                voteId,
+                voteItems
+        );
     }
 
     public record VoteItemDto(

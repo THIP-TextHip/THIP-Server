@@ -17,7 +17,7 @@ public record RecordDto(
         boolean isLiked,
         boolean isWriter,
         Long recordId
-) implements RecordSearchResponse.PostDto {
+) implements RecordSearchResponse.RecordSearchResult {
     @Override
     public String type() {
         return "RECORD";
@@ -37,5 +37,21 @@ public record RecordDto(
                 .isWriter(isWriter)
                 .recordId(record.getId())
                 .build();
+    }
+
+    public RecordDto withIsLiked(boolean isLiked) {
+        return new RecordDto(
+                postDate,
+                page,
+                userId,
+                nickName,
+                profileImageUrl,
+                content,
+                likeCount,
+                commentCount,
+                isLiked,
+                isWriter,
+                recordId
+        );
     }
 }
