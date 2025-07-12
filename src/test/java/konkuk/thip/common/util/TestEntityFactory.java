@@ -4,9 +4,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
@@ -82,6 +80,29 @@ public class TestEntityFactory {
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .categoryJpaEntity(category)
+                .build();
+    }
+
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category,LocalDate startDate,LocalDate endDate) {
+        return RoomJpaEntity.builder()
+                .title("방이름")
+                .description("설명")
+                .isPublic(true)
+                .startDate(startDate)
+                .endDate(endDate)
+                .recruitCount(3)
+                .bookJpaEntity(book)
+                .categoryJpaEntity(category)
+                .build();
+    }
+
+    public static UserRoomJpaEntity createUserRoom(RoomJpaEntity room, UserJpaEntity user, UserRoomRole userRoomRole, double userPercentage) {
+        return UserRoomJpaEntity.builder()
+                .userJpaEntity(user)
+                .roomJpaEntity(room)
+                .userRoomRole(userRoomRole)
+                .currentPage(0)
+                .userPercentage(userPercentage)
                 .build();
     }
 
