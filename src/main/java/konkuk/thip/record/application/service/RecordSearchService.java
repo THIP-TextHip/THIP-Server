@@ -102,13 +102,13 @@ public class RecordSearchService implements RecordSearchUseCase {
 
     private void validatePageStartAndEnd(Integer pageStart, Integer pageEnd, Boolean isOverview) {
         if((pageStart != null && pageEnd == null) || (pageStart == null && pageEnd != null)) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 모두 설정되거나(특정 페이지 조회) 모두 설정되지 않아야 합니다.(전체 페이지 조회)"));
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart와 pageEnd는 모두 설정되거나(특정 페이지 조회) 모두 설정되지 않아야 합니다.(전체 페이지 조회)"));
         }
         if (pageStart != null && pageEnd != null && pageStart > pageEnd) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart는 pageEnd보다 작거나 같아야 합니다."));
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart는 pageEnd보다 작거나 같아야 합니다."));
         }
         if (isOverview && (pageStart != null || pageEnd != null)) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 isOverview가 true일 때 유효한 파라미터가 아닙니다."));
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart와 pageEnd는 isOverview가 true일 때 유효한 파라미터가 아닙니다."));
         }
     }
 
