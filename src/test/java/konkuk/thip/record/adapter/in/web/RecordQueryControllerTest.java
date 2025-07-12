@@ -164,7 +164,7 @@ class RecordSearchControllerTest {
         assertThat(voteNode.path("page").asInt()).isEqualTo(1);
         assertThat(voteNode.path("content").asText()).isEqualTo("투표 내용");
         assertThat(voteNode.path("nickName").asText()).isEqualTo("사용자");
-        assertThat(voteNode.path("postDate").asText()).isEqualTo(DateUtil.formatLastActivityTime(LocalDateTime.now()));
+        assertThat(voteNode.path("postDate").asText()).isEqualTo(DateUtil.formatBeforeTime(LocalDateTime.now()));
 
         JsonNode voteItems = voteNode.path("voteItems");
         assertThat(voteItems).hasSize(2);
@@ -177,7 +177,7 @@ class RecordSearchControllerTest {
         assertThat(recordNode.path("page").asInt()).isEqualTo(1);
         assertThat(recordNode.path("content").asText()).isEqualTo("레코드 내용");
         assertThat(recordNode.path("nickName").asText()).isEqualTo("사용자");
-        assertThat(recordNode.path("postDate").asText()).isEqualTo(DateUtil.formatLastActivityTime(LocalDateTime.now()));
+        assertThat(recordNode.path("postDate").asText()).isEqualTo(DateUtil.formatBeforeTime(LocalDateTime.now()));
         assertThat(recordNode.path("likeCount").asInt()).isEqualTo(1);
         assertThat(recordNode.path("commentCount").asInt()).isEqualTo(2);
 
