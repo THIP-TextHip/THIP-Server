@@ -1,0 +1,21 @@
+package konkuk.thip.room.adapter.in.web.response;
+
+import java.util.List;
+
+public record RoomGetHomeJoinedListResponse(
+        List<RoomSearchResult> roomList,
+        String nickname,
+        int page,       // 현재 페이지
+        int size,       // 현재 페이지에 포함된 데이터 수
+        boolean last,
+        boolean first
+) {
+
+    public record RoomSearchResult(
+            Long roomId,
+            String bookImageUrl,
+            String bookTitle,
+            int memberCount,
+            int userPercentage
+    ) {}
+}
