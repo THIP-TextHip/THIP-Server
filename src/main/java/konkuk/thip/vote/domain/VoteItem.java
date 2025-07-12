@@ -25,6 +25,7 @@ public class VoteItem extends BaseDomainEntity {
                 .build();
     }
 
+    //todo 총 퍼센트가 100이 되는 알고리즘으로 수정!
     public int calculatePercentage(int totalCount) {
         return totalCount == 0 ? 0 : (int) Math.round((this.count * 100.0) / totalCount);
     }
