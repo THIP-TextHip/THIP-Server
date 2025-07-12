@@ -91,7 +91,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 .map(p -> {
                     if (p instanceof RecordJpaEntity r) {
                         return new RecordDto(
-                                DateUtil.formatLastActivityTime(r.getCreatedAt()),
+                                DateUtil.formatBeforeTime(r.getCreatedAt()),
                                 r.getPage(),
                                 r.getUserJpaEntity().getUserId(),
                                 r.getUserJpaEntity().getNickname(),
@@ -106,7 +106,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                     } else if (p instanceof VoteJpaEntity v) {
                         // VoteItem은 양방향 매핑이 없으므로 빈 리스트로 처리하고 서비스 레벨에서 파싱
                         return new VoteDto(
-                                DateUtil.formatLastActivityTime(v.getCreatedAt()),
+                                DateUtil.formatBeforeTime(v.getCreatedAt()),
                                 v.getPage(),
                                 v.getUserJpaEntity().getUserId(),
                                 v.getUserJpaEntity().getNickname(),
