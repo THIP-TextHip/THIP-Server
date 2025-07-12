@@ -4,11 +4,13 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserRoomJpaEntity;
@@ -136,5 +138,33 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 // deadLine: 마감 임박순 = startDate 빠른 순서대로(오름차순)
                 return room.startDate.asc();
         }
+    }
+
+    @Override
+    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, String category, int count) {
+        NumberExpression<Long> memberCountExpr = userRoom.userRoomId.count();
+        List<Tuple> tuples = queryFactory
+                .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate)
+                .from(room)
+                .leftJoin(userRoom).on(userRoom.roomJpaEntity.eq(room))
+                .where(
+                        room.categoryJpaEntity.value.eq(category)
+                                .and(room.startDate.after(LocalDate.now()))     // 모집 마감 시각 > 현재 시각
+                                .and(room.roomId.ne(roomId))       // 현재 방 제외
+                )
+                .groupBy(room.roomId, room.title, room.recruitCount, room.startDate)
+                .orderBy(room.startDate.asc())
+                .limit(count)
+                .fetch();
+
+        return tuples.stream()
+                .map(t -> new RoomRecruitingDetailViewResponse.RecommendRoom(
+                        null, // roomImageUrl은 추후 구현
+                        t.get(room.title),
+                        t.get(memberCountExpr).intValue(),
+                        t.get(room.recruitCount),
+                        DateUtil.formatAfterTime(t.get(room.startDate))
+                ))
+                .toList();
     }
 }
