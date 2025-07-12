@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -94,8 +95,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                                 .nickName(r.getUserJpaEntity().getNickname())
                                 .profileImageUrl(r.getUserJpaEntity().getImageUrl())
                                 .content(r.getContent())
-                                .likeCount(r.getLikeCount())
-                                .commentCount(r.getCommentCount())
+                                .likeCount(Optional.ofNullable(r.getLikeCount()).map(Number::intValue).orElse(0))
+                                .commentCount(Optional.ofNullable(r.getCommentCount()).map(Number::intValue).orElse(0))
                                 .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
                                 .isWriter(loginUserId.equals(r.getUserJpaEntity().getUserId()))
                                 .recordId(r.getPostId())
@@ -109,8 +110,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                                 .nickName(v.getUserJpaEntity().getNickname())
                                 .profileImageUrl(v.getUserJpaEntity().getImageUrl())
                                 .content(v.getContent())
-                                .likeCount(v.getLikeCount())
-                                .commentCount(v.getCommentCount())
+                                .likeCount(Optional.ofNullable(v.getLikeCount()).map(Number::intValue).orElse(0))
+                                .commentCount(Optional.ofNullable(v.getCommentCount()).map(Number::intValue).orElse(0))
                                 .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
                                 .isWriter(loginUserId.equals(v.getUserJpaEntity().getUserId()))
                                 .voteId(v.getPostId())
