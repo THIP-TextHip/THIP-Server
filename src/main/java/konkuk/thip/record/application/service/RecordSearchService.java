@@ -1,6 +1,5 @@
 package konkuk.thip.record.application.service;
 
-import com.sun.jdi.request.InvalidRequestStateException;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.InvalidStateException;
@@ -117,7 +116,7 @@ public class RecordSearchService implements RecordSearchUseCase {
             return 1; // 기본값으로 첫 페이지 반환
         }
         if (pageNum < 1) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 1 이상의 값이어야 합니다."));
+            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageNum은 1 이상의 값이어야 합니다."));
         }
         return pageNum;
     }
