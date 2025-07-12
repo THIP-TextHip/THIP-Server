@@ -90,35 +90,32 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         List<RecordSearchResponse.RecordSearchResult> resultList = posts.stream()
                 .map(p -> {
                     if (p instanceof RecordJpaEntity r) {
-                        return new RecordDto(
-                                DateUtil.formatBeforeTime(r.getCreatedAt()),
-                                r.getPage(),
-                                r.getUserJpaEntity().getUserId(),
-                                r.getUserJpaEntity().getNickname(),
-                                r.getUserJpaEntity().getImageUrl(),
-                                r.getContent(),
-                                r.getLikeCount(),
-                                r.getCommentCount(),
-                                false,
-                                loginUserId.equals(r.getUserJpaEntity().getUserId()),
-                                r.getPostId()
-                        );
+                        return RecordDto.builder()
+                                .postDate(DateUtil.formatBeforeTime(r.getCreatedAt()))
+                                .page(r.getPage())
+                                .userId(r.getUserJpaEntity().getUserId())
+                                .nickName(r.getUserJpaEntity().getNickname())
+                                .profileImageUrl(r.getUserJpaEntity().getImageUrl())
+                                .content(r.getContent())
+                                .likeCount(r.getLikeCount())
+                                .commentCount(r.getCommentCount())
+                                .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
+                                .isWriter(loginUserId.equals(r.getUserJpaEntity().getUserId()))
+                                .recordId(r.getPostId());
                     } else if (p instanceof VoteJpaEntity v) {
                         // VoteItem은 양방향 매핑이 없으므로 빈 리스트로 처리하고 서비스 레벨에서 파싱
-                        return new VoteDto(
-                                DateUtil.formatBeforeTime(v.getCreatedAt()),
-                                v.getPage(),
-                                v.getUserJpaEntity().getUserId(),
-                                v.getUserJpaEntity().getNickname(),
-                                v.getUserJpaEntity().getImageUrl(),
-                                v.getContent(),
-                                v.getLikeCount(),
-                                v.getCommentCount(),
-                                false,
-                                loginUserId.equals(v.getUserJpaEntity().getUserId()),
-                                v.getPostId(),
-                                new ArrayList<>()
-                        );
+                        return VoteDto.builder()
+                                .postDate(DateUtil.formatBeforeTime(v.getCreatedAt()))
+                                .page(v.getPage())
+                                .userId(v.getUserJpaEntity().getUserId())
+                                .nickName(v.getUserJpaEntity().getNickname())
+                                .profileImageUrl(v.getUserJpaEntity().getImageUrl())
+                                .content(v.getContent())
+                                .likeCount(v.getLikeCount())
+                                .commentCount(v.getCommentCount())
+                                .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
+                                .isWriter(loginUserId.equals(v.getUserJpaEntity().getUserId()))
+                                .voteId(v.getPostId());
                     } else {
                         throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입: " + p.getClass().getSimpleName()));
                     }
@@ -126,6 +123,15 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 .map(result -> (RecordSearchResponse.RecordSearchResult) result)
                 .toList();
 
-        return new PageImpl<>(resultList, pageable, resultList.size());
+        Long totalCount = queryFactory
+                .select(post.count())
+                .from(post)
+                .leftJoin(record).on(post.postId.eq(record.postId))
+                .leftJoin(vote).on(post.postId.eq(vote.postId))
+                .where(where)
+                .fetchOne();
+        long total = (totalCount != null) ? totalCount : 0L;
+
+        return new PageImpl<>(resultList, pageable, total);
     }
 }
