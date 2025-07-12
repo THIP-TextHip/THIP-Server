@@ -2,10 +2,12 @@ package konkuk.thip.record.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.INVALID_RECORD_PAGE_RANGE;
+import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERVIEW;
 
 @Getter
 @SuperBuilder
@@ -21,8 +23,10 @@ public class Record extends BaseDomainEntity {
 
     private boolean isOverview;
 
+    @Builder.Default
     private Integer likeCount = 0;
 
+    @Builder.Default
     private Integer commentCount = 0;
 
     private Long roomId;
