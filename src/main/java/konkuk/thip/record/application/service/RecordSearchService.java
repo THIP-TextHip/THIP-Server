@@ -43,7 +43,7 @@ public class RecordSearchService implements RecordSearchUseCase {
     public RecordSearchResponse search(Long roomId, String type, String sort, Integer pageStart, Integer pageEnd, Boolean isOverview, Integer pageNum, Long userId) {
         // 1. 유효성 검사
         validatePageStartAndEnd(pageStart, pageEnd, isOverview);
-        validatePageNum(pageNum);
+        pageNum = validatePageNum(pageNum);
 
         // isOverview가 false일 때 pageStart와 pageEnd가 모두 null이면 전체 페이지 조회
         if(!isOverview && (pageStart == null || pageEnd == null)) {
@@ -56,8 +56,8 @@ public class RecordSearchService implements RecordSearchUseCase {
         RecordSearchSortParams sortVal = sort != null ? RecordSearchSortParams.from(sort) : RecordSearchSortParams.LATEST;
         RecordSearchTypeParams typeVal = type != null ? RecordSearchTypeParams.from(type) : RecordSearchTypeParams.GROUP;
 
-        // 3. 페이지 인덱스 보정
-        int pageIndex = pageNum > 0 ? pageNum - 1 : 0;
+        // 3. 페이지 인덱스 및 Pageable 객체 생성
+        int pageIndex = pageNum - 1;
         Pageable pageable = PageRequest.of(pageIndex, DEFAULT_PAGE_SIZE, buildSort(sortVal));
 
         // 4. 게시글 조회
@@ -105,21 +105,19 @@ public class RecordSearchService implements RecordSearchUseCase {
         if (pageStart != null && pageEnd != null && pageStart > pageEnd) {
             throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart는 pageEnd보다 작거나 같아야 합니다."));
         }
-        if(!isOverview && (pageStart == null || pageEnd == null)) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 isOverview가 false일 때 필수 파라미터입니다."));
-        }
         if (isOverview && (pageStart != null || pageEnd != null)) {
             throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageStart와 pageEnd는 isOverview가 true일 때 유효한 파라미터가 아닙니다."));
         }
     }
 
-    private void validatePageNum(Integer pageNum) {
+    private Integer validatePageNum(Integer pageNum) {
         if (pageNum == null) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 필수 파라미터입니다."));
+            return 1; // 기본값으로 첫 페이지 반환
         }
         if (pageNum < 1) {
             throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new InvalidRequestStateException("pageNum은 1 이상의 값이어야 합니다."));
         }
+        return pageNum;
     }
 
     private Sort buildSort(RecordSearchSortParams sort) {
