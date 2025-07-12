@@ -89,16 +89,6 @@ class RecordQueryRepositoryImplTest {
         em.clear();
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        em.createQuery("DELETE FROM RecordJpaEntity").executeUpdate();
-//        em.createQuery("DELETE FROM RoomJpaEntity").executeUpdate();
-//        em.createQuery("DELETE FROM UserJpaEntity").executeUpdate();
-//        em.createQuery("DELETE FROM AliasJpaEntity").executeUpdate();
-//        em.createQuery("DELETE FROM CategoryJpaEntity").executeUpdate();
-//        em.createQuery("DELETE FROM BookJpaEntity").executeUpdate();
-//    }
-
     @Test
     @DisplayName("기본 조회 및 페이징 동작 확인")
     void test_paging() {
