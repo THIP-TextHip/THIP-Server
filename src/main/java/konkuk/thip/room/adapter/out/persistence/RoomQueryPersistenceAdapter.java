@@ -1,5 +1,6 @@
 package konkuk.thip.room.adapter.out.persistence;
 
+import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
@@ -25,5 +26,10 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     @Override
     public Page<RoomSearchResponse.RoomSearchResult> searchRoom(String keyword, String category, Pageable pageable) {
         return roomJpaRepository.searchRoom(keyword, category, pageable);
+    }
+
+    @Override
+    public Page<RoomGetHomeJoinedListResponse.RoomSearchResult> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
+        return roomJpaRepository.searchHomeJoinedRooms(userId, date, pageable);
     }
 }
