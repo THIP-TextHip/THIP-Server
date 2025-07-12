@@ -3,6 +3,7 @@ package konkuk.thip.user.adapter.out.mapper;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ public class UserMapper {
     public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
         return UserJpaEntity.builder()
                 .nickname(user.getNickname())
-                .imageUrl(user.getImageUrl())
+                .imageUrl(user.getAlias().getImageUrl())
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
                 .aliasForUserJpaEntity(aliasJpaEntity)
@@ -23,10 +24,9 @@ public class UserMapper {
         return User.builder()
                 .id(userJpaEntity.getUserId())
                 .nickname(userJpaEntity.getNickname())
-                .imageUrl(userJpaEntity.getImageUrl())
                 .userRole(userJpaEntity.getRole().getType())
-                .aliasId(userJpaEntity.getAliasForUserJpaEntity().getAliasId())
                 .oauth2Id(userJpaEntity.getOauth2Id())
+                .alias(Alias.from(userJpaEntity.getAliasForUserJpaEntity().getValue()))
                 .createdAt(userJpaEntity.getCreatedAt())
                 .modifiedAt(userJpaEntity.getModifiedAt())
                 .status(userJpaEntity.getStatus())

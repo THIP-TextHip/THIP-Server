@@ -33,7 +33,7 @@ class UserJpaEntityTest {
     @DisplayName("UserJpaEntity 저장 및 조회 테스트")
     void saveAndFindUser() {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createAlias());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
         UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
 
         // when
@@ -44,7 +44,7 @@ class UserJpaEntityTest {
 
         // then
         assertThat(foundUser.getNickname()).isEqualTo("테스터");
-        assertThat(foundUser.getAliasForUserJpaEntity().getValue()).isEqualTo("칭호");
+        assertThat(foundUser.getAliasForUserJpaEntity().getValue()).isEqualTo("문학가");
         assertThat(foundUser.getRole()).isEqualTo(UserRole.USER);
     }
 }

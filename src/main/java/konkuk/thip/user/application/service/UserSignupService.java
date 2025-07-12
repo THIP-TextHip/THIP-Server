@@ -2,7 +2,6 @@ package konkuk.thip.user.application.service;
 
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
 import konkuk.thip.user.application.port.in.dto.UserSignupCommand;
-import konkuk.thip.user.application.port.out.AliasCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
@@ -18,14 +17,13 @@ import static konkuk.thip.user.adapter.out.jpa.UserRole.USER;
 public class UserSignupService implements UserSignupUseCase {
 
     private final UserCommandPort userCommandPort;
-    private final AliasCommandPort aliasCommandPort;
 
     @Override
     @Transactional
     public Long signup(UserSignupCommand command) {
-        Alias alias = aliasCommandPort.findById(command.aliasId());
+        Alias alias = Alias.from(command.aliasName());
         User user = User.withoutId(
-                command.nickname(), alias.getImageUrl(), USER.getType(), alias.getId(), command.oauth2Id()
+                command.nickname(), USER.getType(), command.oauth2Id(), alias
         );
 
         return userCommandPort.save(user);

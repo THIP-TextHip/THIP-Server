@@ -52,10 +52,10 @@ class VoteJpaEntityTest {
     @DisplayName("VoteJpaEntity 저장 및 조회 테스트")
     void saveAndFindVote() {
         // given
-        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createAlias());
+        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
         UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
         BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
-        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createCategory(alias));
+        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         RoomJpaEntity room = roomRepository.save(TestEntityFactory.createRoom(book, category));
 
         VoteJpaEntity vote = voteRepository.save(VoteJpaEntity.builder()

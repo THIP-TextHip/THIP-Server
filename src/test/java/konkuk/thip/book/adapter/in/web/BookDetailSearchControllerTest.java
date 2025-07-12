@@ -4,6 +4,7 @@ import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.book.application.service.BookSearchService;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
@@ -62,11 +63,7 @@ class BookDetailSearchControllerTest {
 
     @BeforeEach
     void setup() {
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("책벌레")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
@@ -87,11 +84,7 @@ class BookDetailSearchControllerTest {
                 .description("한강의 소설")
                 .build());
 
-
-        CategoryJpaEntity category = categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("소설")
-                .aliasForCategoryJpaEntity(alias)
-                .build());
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
         RoomJpaEntity room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("한강 독서모임")

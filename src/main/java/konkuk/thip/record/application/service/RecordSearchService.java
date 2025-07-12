@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class RecordSearchService implements RecordSearchUseCase {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Override
+    @Transactional(readOnly = true)
     public RecordSearchResponse search(Long roomId, String type, String sort, Integer pageStart, Integer pageEnd, Boolean isOverview, Integer pageNum, Long userId) {
         // 1. 유효성 검사
         validatePageStartAndEnd(pageStart, pageEnd, isOverview);

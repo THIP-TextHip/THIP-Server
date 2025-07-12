@@ -6,6 +6,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.persistence.SavedBookJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
@@ -66,11 +67,7 @@ class BookChangeSavedControllerTest {
     @BeforeEach
     void setUp() {
 
-        AliasJpaEntity alias = aliasJpaRepository.save(AliasJpaEntity.builder()
-                .value("책벌레")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")

@@ -1,6 +1,5 @@
 package konkuk.thip.book.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
@@ -21,6 +20,7 @@ import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -44,9 +44,8 @@ public class BookSearchService implements BookSearchUseCase {
     private final UserCommandPort userCommandPort;
     private final BookRedisCommandPort bookRedisCommandPort;
 
-
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public NaverBookParseResult searchBooks(String keyword, int page, Long userId) {
 
         if (keyword == null || keyword.isBlank()) {
@@ -79,6 +78,7 @@ public class BookSearchService implements BookSearchUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookDetailSearchResult searchDetailBooks(String isbn,Long userId) {
 
         //유저정보찾기

@@ -3,6 +3,7 @@ package konkuk.thip.user.adapter.in.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -58,15 +59,10 @@ class UserSignupControllerTest {
     @DisplayName("[칭호id, 닉네임] 정보를 바탕으로 회원가입을 진행한다.")
     void signup_success() throws Exception {
         //given : alias 생성, 회원가입 request 생성
-        AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("칭호")
-                .color("blue")
-                .imageUrl("http://image.url")
-                .build();
-        aliasJpaRepository.save(aliasJpaEntity);
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserSignupRequest request = new UserSignupRequest(
-                aliasJpaEntity.getAliasId(),
+                aliasJpaEntity.getValue(),
                 "테스트유저"
         );
 
@@ -86,8 +82,9 @@ class UserSignupControllerTest {
         Long userId = jsonNode.path("data").path("userId").asLong();
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElse(null);
+        AliasJpaEntity userAliasJpaEntity = aliasJpaRepository.findByValue(request.aliasName()).orElse(null);
 
-        assertThat(userJpaEntity.getAliasForUserJpaEntity().getAliasId()).isEqualTo(request.aliasId());
+        assertThat(userAliasJpaEntity.getValue()).isEqualTo(request.aliasName());
         assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
     }
 
@@ -108,7 +105,7 @@ class UserSignupControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
-                .andExpect(jsonPath("$.message", containsString("aliasId는 필수입니다.")));
+                .andExpect(jsonPath("$.message", containsString("aliasName은 필수입니다.")));
     }
 
     @Test
@@ -116,7 +113,7 @@ class UserSignupControllerTest {
     void signup_nickname_blank() throws Exception {
         //given: nickname blank
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 ""
         );
 
@@ -136,7 +133,7 @@ class UserSignupControllerTest {
     void signup_nickname_invalid_pattern() throws Exception {
         //given: nickname with invalid characters
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 "닉네임!!"
         );
 
@@ -156,7 +153,7 @@ class UserSignupControllerTest {
     void signup_nickname_too_long() throws Exception {
         //given: 11글자 nickname
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 "11글자닉네임입니다아"
         );
 
@@ -175,16 +172,11 @@ class UserSignupControllerTest {
     @DisplayName("임시 토큰을 통해 @Oauth2Id로 oauth2Id를 정확히 추출하여 회원가입에 성공한다.")
     void signup_whenValidSignupToken_thenExtractOauth2IdCorrectly() throws Exception {
         //given : alias 데이터 저장
-        AliasJpaEntity aliasJpaEntity = AliasJpaEntity.builder()
-                .value("테스트칭호")
-                .color("green")
-                .imageUrl("http://image.url")
-                .build();
-        aliasJpaRepository.save(aliasJpaEntity);
+        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         //회원가입 request 생성
         UserSignupRequest request = new UserSignupRequest(
-                aliasJpaEntity.getAliasId(),
+                aliasJpaEntity.getValue(),
                 "테스트유저"
         );
 
@@ -218,7 +210,7 @@ class UserSignupControllerTest {
     void signup_whenNoToken_thenUnauthorized() throws Exception {
         //given: aliasId null
         UserSignupRequest request = new UserSignupRequest(
-                1L,
+                "문학가",
                 "테스트유저"
         );
 

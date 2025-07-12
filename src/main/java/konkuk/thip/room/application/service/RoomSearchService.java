@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.CATEGORY_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_ROOM_SEARCH_SORT;
@@ -25,6 +26,7 @@ public class RoomSearchService implements RoomSearchUseCase {
     private final RoomQueryPort roomQueryPort;
 
     @Override
+    @Transactional(readOnly = true)
     public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page) {
         // 1. validation
         String sortVal = validateSort(sort);
@@ -58,12 +60,8 @@ public class RoomSearchService implements RoomSearchUseCase {
         if (category == null || category.isEmpty()) {
             return "";
         }
-        try {
-            Category cat = Category.from(category);
-            return cat.getValue();
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException(CATEGORY_NOT_FOUND, ex);
-        }
+
+        return Category.from(category).getValue();
     }
 
     /**

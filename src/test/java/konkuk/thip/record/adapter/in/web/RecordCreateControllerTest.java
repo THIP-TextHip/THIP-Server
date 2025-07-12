@@ -81,13 +81,13 @@ class RecordCreateControllerTest {
     }
 
     private void saveUserAndRoom() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createAlias());
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createCategory(alias));
+        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 

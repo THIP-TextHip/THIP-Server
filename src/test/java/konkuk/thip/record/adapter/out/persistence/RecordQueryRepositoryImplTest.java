@@ -42,7 +42,7 @@ class RecordQueryRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = TestEntityFactory.createAlias();
+        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
         em.persist(alias);
 
         user1 = TestEntityFactory.createUser(alias);
@@ -53,7 +53,7 @@ class RecordQueryRepositoryImplTest {
         BookJpaEntity book = TestEntityFactory.createBook();
         em.persist(book);
 
-        CategoryJpaEntity category = TestEntityFactory.createCategory(alias);
+        CategoryJpaEntity category = TestEntityFactory.createLiteratureCategory(alias);
         em.persist(category);
 
         room = TestEntityFactory.createRoom(book, category);
