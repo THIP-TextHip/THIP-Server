@@ -3,15 +3,12 @@ package konkuk.thip.record.adapter.out.persistence;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import konkuk.thip.comment.adapter.out.jpa.QCommentJpaEntity;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
-import konkuk.thip.post.adapter.out.jpa.QPostLikeJpaEntity;
 import konkuk.thip.record.adapter.in.web.response.RecordDto;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import konkuk.thip.record.adapter.in.web.response.VoteDto;
@@ -49,6 +46,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
             where.and(post.instanceOf(RecordJpaEntity.class).and(record.isOverview.isTrue()))
                     .or(post.instanceOf(VoteJpaEntity.class).and(vote.isOverview.isTrue()));
         } else {
+            where.and(post.instanceOf(RecordJpaEntity.class).and(record.isOverview.isFalse()))
+                    .or(post.instanceOf(VoteJpaEntity.class).and(vote.isOverview.isFalse()));
             where.and(post.instanceOf(RecordJpaEntity.class).and(record.page.between(pageStart, pageEnd)))
                     .or(post.instanceOf(VoteJpaEntity.class).and(vote.page.between(pageStart, pageEnd)));
         }
@@ -63,13 +62,11 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
             boolean asc = order.getDirection().isAscending();
 
             if ("likeCount".equalsIgnoreCase(property)) {
-                NumberTemplate<Long> likeCountTemplate = com.querydsl.core.types.dsl.Expressions.numberTemplate(
-                        Long.class, "count({0})", QPostLikeJpaEntity.postLikeJpaEntity.likeId);
-                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC, likeCountTemplate));
+                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
+                        record.likeCount.coalesce(0).add(vote.likeCount.coalesce(0))));
             } else if ("commentCount".equalsIgnoreCase(property)) {
-                NumberTemplate<Long> commentCountTemplate = com.querydsl.core.types.dsl.Expressions.numberTemplate(
-                        Long.class, "count({0})", QCommentJpaEntity.commentJpaEntity.commentId);
-                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC, commentCountTemplate));
+                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
+                        record.commentCount.coalesce(0).add(vote.commentCount.coalesce(0))));
             } else if ("createdAt".equalsIgnoreCase(property)) {
                 orderSpecifiers.add(asc ? post.createdAt.asc() : post.createdAt.desc());
             } else {
