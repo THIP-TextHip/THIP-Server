@@ -101,7 +101,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                                 .commentCount(r.getCommentCount())
                                 .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
                                 .isWriter(loginUserId.equals(r.getUserJpaEntity().getUserId()))
-                                .recordId(r.getPostId());
+                                .recordId(r.getPostId())
+                                .build();
                     } else if (p instanceof VoteJpaEntity v) {
                         // VoteItem은 양방향 매핑이 없으므로 빈 리스트로 처리하고 서비스 레벨에서 파싱
                         return VoteDto.builder()
@@ -115,7 +116,9 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                                 .commentCount(v.getCommentCount())
                                 .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
                                 .isWriter(loginUserId.equals(v.getUserJpaEntity().getUserId()))
-                                .voteId(v.getPostId());
+                                .voteId(v.getPostId())
+                                .voteItems(new ArrayList<>()) // 빈 리스트로 초기화, 서비스 레벨에서 처리
+                                .build();
                     } else {
                         throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입: " + p.getClass().getSimpleName()));
                     }
