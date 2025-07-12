@@ -76,12 +76,12 @@ public class RecordSearchService implements RecordSearchUseCase {
                 .map(post -> {
                     if (post instanceof RecordDto recordDto) {
                         boolean isLiked = checkIfLiked(recordDto.recordId(), userId);
-                        return recordDto.withIsLiked(isLiked); // withIsLiked 메서드는 builder로 따로 정의
+                        return recordDto.withIsLiked(isLiked);
                     } else if (post instanceof VoteDto voteDto) {
                         boolean isLiked = checkIfLiked(voteDto.voteId(), userId);
                         List<VoteItem> items = voteCommandPort.findVoteItemsByVoteId(voteDto.voteId());
                         List<VoteDto.VoteItemDto> voteItemDtos = mapToVoteItemDtos(items, userId, voteDto.voteId());
-                        return voteDto.withIsLikedAndVoteItems(isLiked, voteItemDtos); // builder 또는 커스텀 생성자 필요
+                        return voteDto.withIsLikedAndVoteItems(isLiked, voteItemDtos);
                     } else {
                         throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입입니다"));
                     }
