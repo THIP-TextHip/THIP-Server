@@ -6,9 +6,12 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserRoomJpaEntity;
@@ -30,6 +33,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     private final QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QUserRoomJpaEntity userRoom = QUserRoomJpaEntity.userRoomJpaEntity;
+
 
     @Override
     public Page<RoomSearchResponse.RoomSearchResult> searchRoom(String keyword, String category, Pageable pageable) {
@@ -136,5 +140,74 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 // deadLine: 마감 임박순 = startDate 빠른 순서대로(오름차순)
                 return room.startDate.asc();
         }
+    }
+
+    @Override
+    public Page<RoomGetHomeJoinedListResponse.RoomSearchResult> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
+
+        QUserRoomJpaEntity userRoomSub = new QUserRoomJpaEntity("userRoomSub");
+
+        // 1. 검색 조건(where) 조립
+        // 유저가 참여한 방만: userId 조건
+        // 활동 기간 중인 방만: startDate ≤ today ≤ endDate
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(userRoom.userJpaEntity.userId.eq(userId));
+        where.and(room.startDate.loe(date));
+        where.and(room.endDate.goe(date));
+
+        // TODO : Room 에 멤버 수 추가되면 로직 수정
+        // 멤버 수 서브쿼리
+        JPQLQuery<Long> memberCountSubQuery = JPAExpressions
+                .select(userRoomSub.count())
+                .from(userRoomSub)
+                .where(userRoomSub.roomJpaEntity.roomId.eq(room.roomId));
+
+        // 2. 페이징된 목록 조회
+        List<Tuple> tuples = queryFactory
+                .select(
+                        room.roomId,
+                        book.imageUrl,
+                        room.title,
+                        memberCountSubQuery,
+                        room.recruitCount,
+                        room.startDate,
+                        book.title,
+                        userRoom.userPercentage
+                )
+                .from(userRoom)
+                .join(userRoom.roomJpaEntity, room)
+                .join(room.bookJpaEntity, book)
+                .where(where)
+                .orderBy(
+                        userRoom.userPercentage.desc(), // 진행률 높은 순(내림차순)
+                        room.startDate.asc() // 진행률 같으면 활동 시작일 빠른 순 (오름차순)
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        // TODO : 추후에 오프셋 페이징이 아니라, 키셋 페이징 기법 도입 검토
+
+        // 3. Tuple → DTO 매핑
+        List<RoomGetHomeJoinedListResponse.RoomSearchResult> content = tuples.stream()
+                .map(t -> new RoomGetHomeJoinedListResponse.RoomSearchResult(
+                        t.get(room.roomId),
+                        t.get(book.imageUrl),
+                        t.get(room.title),
+                        t.get(memberCountSubQuery).intValue(),
+                        (int) Math.round(t.get(userRoom.userPercentage))
+                ))
+                .toList();
+
+        // 4. 전체 개수 조회 (페이징 정보 계산용)
+        Long totalCount = queryFactory
+                .select(userRoom.count())
+                .from(userRoom)
+                .join(userRoom.roomJpaEntity, room)
+                .where(where)
+                .fetchOne();
+        long total = (totalCount != null) ? totalCount : 0L;
+
+        // 5. PageImpl 생성하여 반환
+        return new PageImpl<>(content, pageable, total);
     }
 }
