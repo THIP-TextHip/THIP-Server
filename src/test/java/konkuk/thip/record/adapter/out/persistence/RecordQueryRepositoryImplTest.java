@@ -64,8 +64,8 @@ class RecordQueryRepositoryImplTest {
                     .userJpaEntity(i % 2 == 0 ? user1 : user2)
                     .roomJpaEntity(room)
                     .content("레코드 " + i)
-                    .likeCount(1)
-                    .commentCount(1)
+                    .likeCount(10 - i)
+                    .commentCount(i)
                     .isOverview(false)
                     .page(1)
                     .build();
@@ -127,6 +127,24 @@ class RecordQueryRepositoryImplTest {
     }
 
     @Test
+    @DisplayName("isOverview가 true일 때 레코드가 총평 기록만 조회된다.")
+    void test_isOverview_true() {
+        Page<RecordSearchResponse.RecordSearchResult> result = recordQueryRepository.findRecordsByRoom(
+                room.getRoomId(),
+                "group",
+                1,
+                1,
+                true,
+                user1.getUserId(),
+                PageRequest.of(0, 10)
+        );
+
+        assertThat(result.getNumberOfElements()).isEqualTo(10);
+        assertThat(result.getContent()).allSatisfy(record ->
+                assertThat(record.page()).isEqualTo(room.getBookJpaEntity().getPageCount()));
+    }
+
+    @Test
     @DisplayName("latest 기준 정렬 확인")
     void test_sortingBy_latest() {
         Page<RecordSearchResponse.RecordSearchResult> result = recordQueryRepository.findRecordsByRoom(
@@ -146,20 +164,40 @@ class RecordQueryRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("isOverview가 true일 때 레코드가 총평 기록만 조회된다.")
-    void test_isOverview_true() {
+    @DisplayName("likeCount 기준 정렬 확인")
+    void test_sortingBy_likeCount() {
         Page<RecordSearchResponse.RecordSearchResult> result = recordQueryRepository.findRecordsByRoom(
                 room.getRoomId(),
-                "group",
+                null,
                 1,
                 1,
-                true,
+                false,
                 user1.getUserId(),
-                PageRequest.of(0, 10)
+                PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("likeCount").descending())
         );
 
-        assertThat(result.getNumberOfElements()).isEqualTo(10);
-        assertThat(result.getContent()).allSatisfy(record ->
-                assertThat(record.page()).isEqualTo(room.getBookJpaEntity().getPageCount()));
+        List<RecordSearchResponse.RecordSearchResult> content = result.getContent();
+        for (int i = 1; i < content.size(); i++) {
+            assertThat(content.get(i - 1).likeCount()).isGreaterThanOrEqualTo(content.get(i).likeCount());
+        }
+    }
+
+    @Test
+    @DisplayName("commentCount 기준 정렬 확인")
+    void test_sortingBy_commentCount() {
+        Page<RecordSearchResponse.RecordSearchResult> result = recordQueryRepository.findRecordsByRoom(
+                room.getRoomId(),
+                null,
+                1,
+                1,
+                false,
+                user1.getUserId(),
+                PageRequest.of(0, 10, org.springframework.data.domain.Sort.by("commentCount").descending())
+        );
+
+        List<RecordSearchResponse.RecordSearchResult> content = result.getContent();
+        for (int i = 1; i < content.size(); i++) {
+            assertThat(content.get(i - 1).commentCount()).isGreaterThanOrEqualTo(content.get(i).commentCount());
+        }
     }
 }
