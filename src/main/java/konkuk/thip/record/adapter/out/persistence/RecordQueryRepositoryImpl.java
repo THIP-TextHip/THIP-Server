@@ -40,40 +40,14 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
 
         BooleanBuilder where = new BooleanBuilder();
-        where.and(post.instanceOf(RecordJpaEntity.class).and(record.roomJpaEntity.roomId.eq(roomId)))
-                .or(post.instanceOf(VoteJpaEntity.class).and(vote.roomJpaEntity.roomId.eq(roomId)));
-
-        if (isOverview) {
-            where.and(post.instanceOf(RecordJpaEntity.class).and(record.isOverview.isTrue()))
-                    .or(post.instanceOf(VoteJpaEntity.class).and(vote.isOverview.isTrue()));
-        } else {
-            where.and(post.instanceOf(RecordJpaEntity.class).and(record.isOverview.isFalse()))
-                    .or(post.instanceOf(VoteJpaEntity.class).and(vote.isOverview.isFalse()));
-            where.and(post.instanceOf(RecordJpaEntity.class).and(record.page.between(pageStart, pageEnd)))
-                    .or(post.instanceOf(VoteJpaEntity.class).and(vote.page.between(pageStart, pageEnd)));
-        }
+        where.and(buildRecordCondition(roomId, pageStart, pageEnd, isOverview, post, record).
+                or(buildVoteCondition(roomId, pageStart, pageEnd, isOverview, post, vote)));
 
         if ("mine".equals(viewType)) {
             where.and(post.userJpaEntity.userId.eq(loginUserId));
         }
 
-        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
-        for (Sort.Order order : pageable.getSort()) {
-            String property = order.getProperty();
-            boolean asc = order.getDirection().isAscending();
-
-            if ("likeCount".equalsIgnoreCase(property)) {
-                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
-                        record.likeCount.coalesce(0).add(vote.likeCount.coalesce(0))));
-            } else if ("commentCount".equalsIgnoreCase(property)) {
-                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
-                        record.commentCount.coalesce(0).add(vote.commentCount.coalesce(0))));
-            } else if ("createdAt".equalsIgnoreCase(property)) {
-                orderSpecifiers.add(asc ? post.createdAt.asc() : post.createdAt.desc());
-            } else {
-                orderSpecifiers.add(post.createdAt.desc());
-            }
-        }
+        List<OrderSpecifier<?>> orderSpecifiers = createOrderSpecifiers(pageable, record, vote, post);
 
         List<PostJpaEntity> posts = queryFactory
                 .selectFrom(post)
@@ -95,8 +69,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                                 .nickName(r.getUserJpaEntity().getNickname())
                                 .profileImageUrl(r.getUserJpaEntity().getImageUrl())
                                 .content(r.getContent())
-                                .likeCount(Optional.ofNullable(r.getLikeCount()).map(Number::intValue).orElse(0))
-                                .commentCount(Optional.ofNullable(r.getCommentCount()).map(Number::intValue).orElse(0))
+                                .likeCount(safeInt(r.getLikeCount()))
+                                .commentCount(safeInt(r.getCommentCount()))
                                 .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
                                 .isWriter(loginUserId.equals(r.getUserJpaEntity().getUserId()))
                                 .recordId(r.getPostId())
@@ -110,8 +84,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                                 .nickName(v.getUserJpaEntity().getNickname())
                                 .profileImageUrl(v.getUserJpaEntity().getImageUrl())
                                 .content(v.getContent())
-                                .likeCount(Optional.ofNullable(v.getLikeCount()).map(Number::intValue).orElse(0))
-                                .commentCount(Optional.ofNullable(v.getCommentCount()).map(Number::intValue).orElse(0))
+                                .likeCount(safeInt(v.getLikeCount()))
+                                .commentCount(safeInt(v.getCommentCount()))
                                 .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
                                 .isWriter(loginUserId.equals(v.getUserJpaEntity().getUserId()))
                                 .voteId(v.getPostId())
@@ -134,5 +108,58 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         long total = (totalCount != null) ? totalCount : 0L;
 
         return new PageImpl<>(resultList, pageable, total);
+    }
+
+    private Integer safeInt(Number number) {
+        return Optional.ofNullable(number).map(Number::intValue).orElse(0);
+    }
+
+    private List<OrderSpecifier<?>> createOrderSpecifiers(Pageable pageable, QRecordJpaEntity record, QVoteJpaEntity vote, QPostJpaEntity post) {
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        for (Sort.Order order : pageable.getSort()) {
+            String property = order.getProperty();
+            boolean asc = order.getDirection().isAscending();
+
+            if ("likeCount".equalsIgnoreCase(property)) {
+                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
+                        record.likeCount.coalesce(0).add(vote.likeCount.coalesce(0))));
+            } else if ("commentCount".equalsIgnoreCase(property)) {
+                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
+                        record.commentCount.coalesce(0).add(vote.commentCount.coalesce(0))));
+            } else if ("createdAt".equalsIgnoreCase(property)) {
+                orderSpecifiers.add(asc ? post.createdAt.asc() : post.createdAt.desc());
+            } else {
+                orderSpecifiers.add(post.createdAt.desc());
+            }
+        }
+        return orderSpecifiers;
+    }
+
+    private BooleanBuilder buildVoteCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview, QPostJpaEntity post, QVoteJpaEntity vote) {
+        BooleanBuilder voteCondition = new BooleanBuilder();
+        voteCondition.and(post.instanceOf(VoteJpaEntity.class))
+                .and(vote.roomJpaEntity.roomId.eq(roomId));
+
+        if (isOverview) {
+            voteCondition.and(vote.isOverview.isTrue());
+        } else {
+            voteCondition.and(vote.isOverview.isFalse())
+                    .and(vote.page.between(pageStart, pageEnd));
+        }
+        return voteCondition;
+    }
+
+    private BooleanBuilder buildRecordCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview, QPostJpaEntity post, QRecordJpaEntity record) {
+        BooleanBuilder recordCondition = new BooleanBuilder();
+        recordCondition.and(post.instanceOf(RecordJpaEntity.class))
+                .and(record.roomJpaEntity.roomId.eq(roomId));
+
+        if (isOverview) {
+            recordCondition.and(record.isOverview.isTrue());
+        } else {
+            recordCondition.and(record.isOverview.isFalse())
+                    .and(record.page.between(pageStart, pageEnd));
+        }
+        return recordCondition;
     }
 }
