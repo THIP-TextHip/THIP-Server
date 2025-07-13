@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -189,13 +190,18 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
         // 3. Tuple → DTO 매핑
         List<RoomGetHomeJoinedListResponse.RoomSearchResult> content = tuples.stream()
-                .map(t -> new RoomGetHomeJoinedListResponse.RoomSearchResult(
-                        t.get(room.roomId),
-                        t.get(book.imageUrl),
-                        t.get(room.title),
-                        t.get(memberCountSubQuery).intValue(),
-                        (int) Math.round(t.get(userRoom.userPercentage))
-                ))
+                .map(t -> RoomGetHomeJoinedListResponse.RoomSearchResult.builder()
+                        .roomId(t.get(room.roomId))
+                        .bookImageUrl(t.get(book.imageUrl))
+                        .bookTitle(t.get(book.title))
+                        .memberCount(Optional.ofNullable(t.get(memberCountSubQuery)).map(Number::intValue).orElse(1))
+                        .userPercentage(Optional.ofNullable(t.get(userRoom.userPercentage))
+                                        .map(val -> ((Number) val).doubleValue())
+                                                .map(Math::round)
+                                                .map(Long::intValue)
+                                                .orElse(0))
+                        .build()
+                )
                 .toList();
 
         // 4. 전체 개수 조회 (페이징 정보 계산용)
