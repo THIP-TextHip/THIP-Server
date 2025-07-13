@@ -1,6 +1,5 @@
 package konkuk.thip.room.adapter.in.web;
 
-import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
@@ -8,7 +7,6 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.RoomQueryRepositoryImpl;
 import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
@@ -58,12 +56,6 @@ class RoomGetHomeJoinedRoomsApiTest {
 
     @Autowired
     private UserRoomJpaRepository userRoomJpaRepository;
-
-    @Autowired
-    private RoomQueryRepositoryImpl roomQueryRepository;
-
-    @Autowired
-    private EntityManager em;
 
     private RoomJpaEntity room1;
     private RoomJpaEntity room2;
