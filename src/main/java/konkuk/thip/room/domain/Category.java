@@ -17,10 +17,10 @@ public enum Category {
      * TODO : DB에서 value를 통해 카테고리를 조회하는것보다 id로 조회하는게 성능상 좋으니, id 값도 같이 보관 ??
      */
     SCIENCE_IT("과학/IT", "과학/IT_image"),
-    LITERATURE("문학", "과학/IT_image"),
-    ART("예술", "과학/IT_image"),
-    SOCIAL_SCIENCE("사회과학", "과학/IT_image"),
-    HUMANITY("인문학", "과학/IT_image");
+    LITERATURE("문학", "문학_image"),
+    ART("예술", "예술_image"),
+    SOCIAL_SCIENCE("사회과학", "사회과학_image"),
+    HUMANITY("인문학", "인문학_image");
 
     private final String value;
     private final String imageUrl;

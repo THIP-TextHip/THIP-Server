@@ -187,6 +187,7 @@ class RoomRecruitingDetailViewApiTest {
                 .andExpect(jsonPath("$.data.isHost", is(false)))
                 .andExpect(jsonPath("$.data.isJoining", is(true)))
                 .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomImageUrl", is("과학/IT_image")))      // 방 대표 이미지 추가
                 .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))
