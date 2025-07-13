@@ -1,5 +1,7 @@
 package konkuk.thip.room.adapter.in.web.response;
 
+import lombok.Builder;
+
 import java.util.List;
 
 public record RoomRecruitingDetailViewResponse(
@@ -23,6 +25,7 @@ public record RoomRecruitingDetailViewResponse(
         String bookDescription,
         List<RecommendRoom> recommendRooms
 ) {
+    @Builder
     public record RecommendRoom(
             String roomImageUrl,
             String roomName,

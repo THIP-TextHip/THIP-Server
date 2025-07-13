@@ -158,13 +158,13 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .fetch();
 
         return tuples.stream()
-                .map(t -> new RoomRecruitingDetailViewResponse.RecommendRoom(
-                        null, // roomImageUrl은 추후 구현
-                        t.get(room.title),
-                        t.get(memberCountExpr).intValue(),
-                        t.get(room.recruitCount),
-                        DateUtil.formatAfterTime(t.get(room.startDate))
-                ))
+                .map(t -> RoomRecruitingDetailViewResponse.RecommendRoom.builder()
+                        .roomImageUrl(null)     // roomImageUrl은 추후 구현
+                        .roomName(t.get(room.title))
+                        .memberCount(t.get(memberCountExpr).intValue())
+                        .recruitCount(t.get(room.recruitCount))
+                        .recruitEndDate(DateUtil.formatAfterTime(t.get(room.startDate)))
+                        .build())
                 .toList();
     }
 }
