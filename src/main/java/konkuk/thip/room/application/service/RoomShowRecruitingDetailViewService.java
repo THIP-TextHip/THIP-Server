@@ -58,7 +58,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
                 participants.isJoiningToRoom(userId),
                 room.getId(),
                 room.getTitle(),
-                null, // roomImageUrl 미구현
+                room.getCategory().getImageUrl(),
                 room.isPublic(),
                 DateUtil.formatDate(room.getStartDate()),
                 DateUtil.formatDate(room.getEndDate()),
