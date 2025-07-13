@@ -23,12 +23,18 @@ public abstract class PostJpaEntity extends BaseJpaEntity {
     @Column(length = 6100, nullable = false)
     private String content;
 
+    private Integer likeCount = 0;
+
+    private Integer commentCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    public PostJpaEntity(String content, UserJpaEntity userJpaEntity) {
+    public PostJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity) {
         this.content = content;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
         this.userJpaEntity = userJpaEntity;
     }
 }

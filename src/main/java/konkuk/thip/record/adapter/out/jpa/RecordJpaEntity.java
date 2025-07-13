@@ -26,8 +26,8 @@ public class RecordJpaEntity extends PostJpaEntity {
     private RoomJpaEntity roomJpaEntity;
 
     @Builder
-    public RecordJpaEntity(String content, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity) {
-        super(content, userJpaEntity);
+    public RecordJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity) {
+        super(content, likeCount, commentCount, userJpaEntity);
         this.page = page;
         this.isOverview = isOverview;
         this.roomJpaEntity = roomJpaEntity;
