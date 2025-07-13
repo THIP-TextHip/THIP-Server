@@ -28,6 +28,7 @@ public class TestEntityFactory {
     public static CategoryJpaEntity createLiteratureCategory(AliasJpaEntity alias) {
         return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
                 .value("문학")
+                .imageUrl("문학_image")
                 .aliasForCategoryJpaEntity(alias)
                 .build();
     }
@@ -43,6 +44,7 @@ public class TestEntityFactory {
     public static CategoryJpaEntity createScienceCategory(AliasJpaEntity alias) {
         return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
                 .value("과학/IT")
+                .imageUrl("과학/IT_image")
                 .aliasForCategoryJpaEntity(alias)
                 .build();
     }
