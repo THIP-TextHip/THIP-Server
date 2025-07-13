@@ -11,6 +11,7 @@ import konkuk.thip.user.domain.User;
 import konkuk.thip.user.domain.UserRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
     private final FollowingQueryPort followingQueryPort;
 
     @Override
+    @Transactional(readOnly = true)
     public RoomGetMemberListResponse getRoomMemberList(Long roomId) {
 
         // 1. 방 검증 및 방 조회
