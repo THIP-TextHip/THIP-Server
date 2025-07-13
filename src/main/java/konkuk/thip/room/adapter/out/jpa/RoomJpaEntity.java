@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 
+//TODO 방에 이방에 참여중인 인원수 추가
 @Entity
 @Table(name = "rooms")
 @Getter

@@ -1,13 +1,17 @@
 package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.common.dto.BaseResponse;
+import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
+import konkuk.thip.room.application.port.in.RoomGetHomeJoinedListUseCase;
 import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import jakarta.validation.Valid;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.application.port.in.RoomVerifyPasswordUseCase;
+import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 public class RoomQueryController {
 
     private final RoomSearchUseCase roomSearchUseCase;
+    private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
+    private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
 
     @GetMapping("/rooms/search")
@@ -38,6 +44,16 @@ public class RoomQueryController {
                                                  @Valid @RequestBody final RoomVerifyPasswordRequest roomVerifyPasswordRequest
                                                  ) {
         return BaseResponse.ok(roomVerifyPasswordUseCase.verifyRoomPassword(roomVerifyPasswordRequest.toQuery(roomId)));
+    }
+
+    //[모임 홈] 참여중인 내 모임방 조회
+    @GetMapping("/rooms/home/joined")
+    public BaseResponse<RoomGetHomeJoinedListResponse> getHomeJoinedRooms(@UserId final Long userId,
+                                                                         @RequestParam("page") final int page) {
+        return BaseResponse.ok(roomGetHomeJoinedListUseCase.getHomeJoinedRoomList(
+                RoomGetHomeJoinedListQuery.builder()
+                        .userId(userId)
+                        .page(page).build()));
     }
 
     // 독서메이트 조회
