@@ -38,7 +38,7 @@ class RoomGetMemberListControllerTest {
         return request;
     }
 
-    private void assertBad(Map<String, Object> req, String msg) throws Exception {
+    private void assertRoomNotFound(Map<String, Object> req, String msg) throws Exception {
         mockMvc.perform(get("/rooms/{roomId}/users", req.get("roomId"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -62,12 +62,12 @@ class RoomGetMemberListControllerTest {
         }
 
         @Test
-        @DisplayName("DB에 존재하지 않는 roomId가 들어오면 400 error")
+        @DisplayName("DB에 존재하지 않는 roomId가 들어오면 404 error")
         void not_found_roomId() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.remove("roomId");
             req.put("roomId", 99999L);
-            assertBad(req, "존재하지 않는 ROOM 입니다.");
+            assertRoomNotFound(req, "존재하지 않는 ROOM 입니다.");
         }
     }
 }
