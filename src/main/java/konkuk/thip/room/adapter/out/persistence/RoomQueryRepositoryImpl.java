@@ -11,6 +11,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
@@ -141,6 +142,34 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 // deadLine: 마감 임박순 = startDate 빠른 순서대로(오름차순)
                 return room.startDate.asc();
         }
+    }
+
+    @Override
+    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, String category, int count) {
+        NumberExpression<Long> memberCountExpr = userRoom.userRoomId.count();
+        List<Tuple> tuples = queryFactory
+                .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate)
+                .from(room)
+                .leftJoin(userRoom).on(userRoom.roomJpaEntity.eq(room))
+                .where(
+                        room.categoryJpaEntity.value.eq(category)
+                                .and(room.startDate.after(LocalDate.now()))     // 모집 마감 시각 > 현재 시각
+                                .and(room.roomId.ne(roomId))       // 현재 방 제외
+                )
+                .groupBy(room.roomId, room.title, room.recruitCount, room.startDate)
+                .orderBy(room.startDate.asc())
+                .limit(count)
+                .fetch();
+
+        return tuples.stream()
+                .map(t -> RoomRecruitingDetailViewResponse.RecommendRoom.builder()
+                        .roomImageUrl(null)     // roomImageUrl은 추후 구현
+                        .roomName(t.get(room.title))
+                        .memberCount(t.get(memberCountExpr).intValue())
+                        .recruitCount(t.get(room.recruitCount))
+                        .recruitEndDate(DateUtil.formatAfterTime(t.get(room.startDate)))
+                        .build())
+                .toList();
     }
 
     @Override

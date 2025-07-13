@@ -3,8 +3,11 @@ package konkuk.thip.common.util;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateUtil {
+
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     //마지막 활동 시간 포맷팅 -> ex. 1분 전, 1시간 전, 1일 전
     public static String formatBeforeTime(LocalDateTime createdAt) {
@@ -27,16 +30,20 @@ public class DateUtil {
 
         long days = d.toDays();
         if (days > 0) {
-            return days + "일 뒤 ";
+            return days + "일 뒤";
         }
 
         long hours = d.toHours();
         if (hours > 0) {
-            return hours + "시간 뒤 ";
+            return hours + "시간 뒤";
         }
 
         long minutes = d.toMinutes();
-        return minutes + "분 뒤 ";
+        return minutes + "분 뒤";
+    }
+
+    public static String formatDate(LocalDate date) {
+        return date.format(DATE_FORMATTER);
     }
 }
 
