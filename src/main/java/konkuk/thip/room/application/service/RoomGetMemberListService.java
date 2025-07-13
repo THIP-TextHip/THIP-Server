@@ -26,11 +26,11 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
     @Override
     public RoomGetMemberListResponse getRoomMemberList(Long roomId) {
 
-        // 1. 방 정보 조회
+        // 1. 방 검증 및 방 조회
         Room room = roomCommandPort.findById(roomId);
 
         // 2. 방 참여자(UserRoom) 전체 조회
-        List<UserRoom> userRooms = userRoomCommandPort.findAllByRoomId(roomId);
+        List<UserRoom> userRooms = userRoomCommandPort.findAllByRoomId(room.getId());
 
         // 3. 각 참여자의 userId로 유저정보, 구독자 수(팔로워 수) 조회
         List<RoomGetMemberListResponse.MemberSearchResult> userList = userRooms.stream()
