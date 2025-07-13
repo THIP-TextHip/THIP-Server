@@ -1,7 +1,9 @@
 package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.common.dto.BaseResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
+import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import jakarta.validation.Valid;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class RoomQueryController {
 
     private final RoomSearchUseCase roomSearchUseCase;
+    private final RoomGetMemberListUseCase roomGetMemberListUseCase;
 
     @GetMapping("/rooms/search")
     public BaseResponse<RoomSearchResponse> searchRooms(
@@ -35,6 +38,12 @@ public class RoomQueryController {
                                                  @Valid @RequestBody final RoomVerifyPasswordRequest roomVerifyPasswordRequest
                                                  ) {
         return BaseResponse.ok(roomVerifyPasswordUseCase.verifyRoomPassword(roomVerifyPasswordRequest.toQuery(roomId)));
+    }
+
+    // 독서메이트 조회
+    @GetMapping("/rooms/{roomId}/users")
+    public BaseResponse<RoomGetMemberListResponse> getRoomMemberList(@PathVariable("roomId") final Long roomId){
+        return BaseResponse.ok(roomGetMemberListUseCase.getRoomMemberList(roomId));
     }
 
 }
