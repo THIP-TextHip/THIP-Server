@@ -36,7 +36,6 @@ public class RoomQueryController {
     ) {
         return BaseResponse.ok(roomSearchUseCase.searchRoom(keyword, category, sort, page));
     }
-    private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
 
     //비공개 방 비밀번호 입력 검증
     @PostMapping("/rooms/{roomId}/password")
