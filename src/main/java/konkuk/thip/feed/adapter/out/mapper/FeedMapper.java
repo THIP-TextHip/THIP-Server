@@ -19,6 +19,8 @@ public class FeedMapper {
                 .userJpaEntity(userJpaEntity)
                 .isPublic(feed.getIsPublic())
                 .reportCount(feed.getReportCount())
+                .likeCount(feed.getLikeCount())
+                .commentCount(feed.getCommentCount())
                 .bookJpaEntity(bookJpaEntity)
                 .build();
     }
@@ -30,6 +32,8 @@ public class FeedMapper {
                 .creatorId(feedJpaEntity.getUserJpaEntity().getUserId())
                 .isPublic(feedJpaEntity.getIsPublic())
                 .reportCount(feedJpaEntity.getReportCount())
+                .likeCount(feedJpaEntity.getLikeCount())
+                .commentCount(feedJpaEntity.getCommentCount())
                 .targetBookId(feedJpaEntity.getBookJpaEntity().getBookId())
                 .tagList(tagJpaEntityList.stream()
                         .map(TagJpaEntity::getValue)

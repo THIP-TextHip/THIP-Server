@@ -12,4 +12,6 @@ public interface BookCommandPort {
     Book findById(Long id);
 
     void updateForPageCount(Book book);
+
+    Book findBookByRoomId(Long roomId);
 }
