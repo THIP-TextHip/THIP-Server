@@ -1,7 +1,10 @@
 package konkuk.thip.room.adapter.in.web.response;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record RoomGetHomeJoinedListResponse(
         List<RoomSearchResult> roomList,
         String nickname,
@@ -11,6 +14,8 @@ public record RoomGetHomeJoinedListResponse(
         boolean first
 ) {
 
+
+    @Builder
     public record RoomSearchResult(
             Long roomId,
             String bookImageUrl,

@@ -43,13 +43,14 @@ public class RoomGetHomeJoinedListService implements RoomGetHomeJoinedListUseCas
         Page<RoomGetHomeJoinedListResponse.RoomSearchResult> result = roomQueryPort.searchHomeJoinedRooms(query.userId(), LocalDate.now(), pageable);
 
         // 5. response 구성
-        return new RoomGetHomeJoinedListResponse(
-                result.getContent(),
-                nickname,
-                query.page(),
-                result.getNumberOfElements(),
-                result.isLast(),
-                result.isFirst());
+        return RoomGetHomeJoinedListResponse.builder()
+                .roomList(result.getContent())
+                .nickname(nickname)
+                .page(query.page())
+                .size(result.getNumberOfElements())
+                .last(result.isLast())
+                .first(result.isFirst())
+                .build();
     }
 
     private void validatePage(int page) {
