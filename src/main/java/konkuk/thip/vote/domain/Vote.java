@@ -2,10 +2,12 @@ package konkuk.thip.vote.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.INVALID_VOTE_PAGE_RANGE;
+import static konkuk.thip.common.exception.code.ErrorCode.VOTE_CANNOT_BE_OVERVIEW;
 
 @Getter
 @SuperBuilder
@@ -21,6 +23,12 @@ public class Vote extends BaseDomainEntity {
 
     private boolean isOverview;
 
+    @Builder.Default
+    private Integer likeCount = 0;
+
+    @Builder.Default
+    private Integer commentCount = 0;
+
     private Long roomId;
 
     public static Vote withoutId(String content, Long creatorId, Integer page, boolean isOverview, Long roomId) {
@@ -30,6 +38,8 @@ public class Vote extends BaseDomainEntity {
                 .creatorId(creatorId)
                 .page(page)
                 .isOverview(isOverview)
+                .likeCount(0)
+                .commentCount(0)
                 .roomId(roomId)
                 .build();
     }

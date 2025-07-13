@@ -1,7 +1,5 @@
 package konkuk.thip.record.adapter.in.web.response;
 
-import konkuk.thip.user.domain.User;
-import konkuk.thip.vote.domain.Vote;
 import konkuk.thip.vote.domain.VoteItem;
 import lombok.Builder;
 
@@ -21,30 +19,27 @@ public record VoteDto(
         boolean isWriter,
         Long voteId,
         List<VoteItemDto> voteItems
-) implements RecordSearchResponse.PostDto {
+) implements RecordSearchResponse.RecordSearchResult {
     @Override
     public String type() {
         return "VOTE";
     }
 
-    public static VoteDto of(
-            Vote vote, String postDate, User user, int likeCount, int commentCount, boolean isLiked, boolean isWriter,
-            List<VoteItemDto> voteItems
-    ) {
-        return VoteDto.builder()
-                .postDate(postDate)
-                .page(vote.getPage())
-                .userId(vote.getCreatorId())
-                .nickName(user.getNickname())
-                .profileImageUrl(user.getAlias().getImageUrl())
-                .content(vote.getContent())
-                .likeCount(likeCount)
-                .commentCount(commentCount)
-                .isLiked(isLiked)
-                .isWriter(isWriter)
-                .voteId(vote.getId())
-                .voteItems(voteItems)
-                .build();
+    public VoteDto withIsLikedAndVoteItems(boolean isLiked, List<VoteItemDto> voteItems) {
+        return new VoteDto(
+                postDate,
+                page,
+                userId,
+                nickName,
+                profileImageUrl,
+                content,
+                likeCount,
+                commentCount,
+                isLiked,
+                isWriter,
+                voteId,
+                voteItems
+        );
     }
 
     public record VoteItemDto(
