@@ -32,13 +32,13 @@ public class Feed extends BaseDomainEntity {
 
     private List<Tag> tagList;
 
-    public static Feed withoutId(String content, Long creatorId, Boolean isPublic, int reportCount, Long targetBookId, List<Tag> tagList) {
+    public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId, List<Tag> tagList) {
         return Feed.builder()
                 .id(null)
                 .content(content)
                 .creatorId(creatorId)
                 .isPublic(isPublic)
-                .reportCount(reportCount)
+                .reportCount(0)
                 .likeCount(0)
                 .commentCount(0)
                 .targetBookId(targetBookId)
