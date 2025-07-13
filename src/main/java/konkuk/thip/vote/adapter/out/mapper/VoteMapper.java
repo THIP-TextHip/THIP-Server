@@ -15,6 +15,8 @@ public class VoteMapper {
                 .userJpaEntity(userJpaEntity)
                 .page(vote.getPage())
                 .isOverview(vote.isOverview())
+                .likeCount(vote.getLikeCount())
+                .commentCount(vote.getCommentCount())
                 .roomJpaEntity(roomJpaEntity)
                 .build();
     }
@@ -26,6 +28,8 @@ public class VoteMapper {
                 .creatorId(voteJpaEntity.getUserJpaEntity().getUserId())
                 .page(voteJpaEntity.getPage())
                 .isOverview(voteJpaEntity.isOverview())
+                .likeCount(voteJpaEntity.getLikeCount())
+                .commentCount(voteJpaEntity.getCommentCount())
                 .roomId(voteJpaEntity.getRoomJpaEntity().getRoomId())
                 .createdAt(voteJpaEntity.getCreatedAt())
                 .modifiedAt(voteJpaEntity.getModifiedAt())

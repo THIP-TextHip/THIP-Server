@@ -28,8 +28,8 @@ public class FeedJpaEntity extends PostJpaEntity {
     private BookJpaEntity bookJpaEntity;
 
     @Builder
-    public FeedJpaEntity(String content, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity) {
-        super(content, userJpaEntity);
+    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity) {
+        super(content, likeCount, commentCount, userJpaEntity);
         this.isPublic = isPublic;
         this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
