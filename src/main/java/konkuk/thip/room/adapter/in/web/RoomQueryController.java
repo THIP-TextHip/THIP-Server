@@ -5,8 +5,12 @@ import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.application.port.in.*;
+import konkuk.thip.room.application.port.in.RoomGetHomeJoinedListUseCase;
+import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
+import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import jakarta.validation.Valid;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
@@ -21,8 +25,10 @@ import org.springframework.web.bind.annotation.*;
 public class RoomQueryController {
 
     private final RoomSearchUseCase roomSearchUseCase;
+    private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
     private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
     private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
+    private final RoomGetMemberListUseCase roomGetMemberListUseCase;
     private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
     private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
 
@@ -60,6 +66,12 @@ public class RoomQueryController {
                 RoomGetHomeJoinedListQuery.builder()
                         .userId(userId)
                         .page(page).build()));
+    }
+
+    // 독서메이트 조회
+    @GetMapping("/rooms/{roomId}/users")
+    public BaseResponse<RoomGetMemberListResponse> getRoomMemberList(@PathVariable("roomId") final Long roomId){
+        return BaseResponse.ok(roomGetMemberListUseCase.getRoomMemberList(roomId));
     }
 
     // 진행중인 방 상세보기

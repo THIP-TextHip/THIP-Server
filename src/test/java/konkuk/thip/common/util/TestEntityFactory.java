@@ -135,4 +135,11 @@ public class TestEntityFactory {
                 .userJpaEntity(user)
                 .build();
     }
+
+    public static FollowingJpaEntity createFollowing(UserJpaEntity user,UserJpaEntity followingUser) {
+        return FollowingJpaEntity.builder()
+                .userJpaEntity(user)
+                .followingUserJpaEntity(followingUser)
+                .build();
+    }
 }
