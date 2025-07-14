@@ -9,6 +9,11 @@ import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import static konkuk.thip.common.exception.code.ErrorCode.ALIAS_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
@@ -36,5 +41,13 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return userMapper.toDomainEntity(userJpaEntity);
+    }
+
+    @Override
+    public Map<Long, User> findByIds(List<Long> userIds) {
+        List<UserJpaEntity> entities = userJpaRepository.findAllById(userIds);
+        return entities.stream()
+                .map(userMapper::toDomainEntity)
+                .collect(Collectors.toMap(User::getId, Function.identity()));
     }
 }
