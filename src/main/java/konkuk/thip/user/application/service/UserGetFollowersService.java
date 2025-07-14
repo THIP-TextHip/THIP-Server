@@ -16,7 +16,7 @@ public class UserGetFollowersService implements UserGetFollowersUsecase {
     private final FollowingQueryPort followingQueryPort;
     private final UserCommandPort userCommandPort;
 
-    private static final int DEFAULT_PAGE_SIZE = 2;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Override
     @Transactional(readOnly = true)
