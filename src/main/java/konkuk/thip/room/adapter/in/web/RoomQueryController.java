@@ -2,15 +2,13 @@ package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.application.port.in.RoomGetHomeJoinedListUseCase;
-import konkuk.thip.room.application.port.in.RoomSearchUseCase;
+import konkuk.thip.room.application.port.in.*;
 import jakarta.validation.Valid;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
-import konkuk.thip.room.application.port.in.RoomShowRecruitingDetailViewUseCase;
-import konkuk.thip.room.application.port.in.RoomVerifyPasswordUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +24,7 @@ public class RoomQueryController {
     private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
     private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
     private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
+    private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
 
     @GetMapping("/rooms/search")
     public BaseResponse<RoomSearchResponse> searchRooms(
@@ -45,6 +44,7 @@ public class RoomQueryController {
         return BaseResponse.ok(roomVerifyPasswordUseCase.verifyRoomPassword(roomVerifyPasswordRequest.toQuery(roomId)));
     }
 
+    // 모집중인 방 상세보기
     @GetMapping("/rooms/{roomId}/recruiting")
     public BaseResponse<RoomRecruitingDetailViewResponse> getRecruitingRoomDetailView(
             @UserId final Long userId,
@@ -60,6 +60,15 @@ public class RoomQueryController {
                 RoomGetHomeJoinedListQuery.builder()
                         .userId(userId)
                         .page(page).build()));
+    }
+
+    // 진행중인 방 상세보기
+    @GetMapping("/rooms/{roomId}/playing")
+    public BaseResponse<RoomPlayingDetailViewResponse> getPlayingRoomDetailView(
+            @UserId final Long userId,
+            @PathVariable("roomId") final Long roomId
+    ) {
+        return BaseResponse.ok(roomShowPlayingDetailViewUseCase.getPlayingRoomDetailView(userId, roomId));
     }
 
 }
