@@ -1,9 +1,13 @@
 package konkuk.thip.common.util;
 
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class DateUtil {
 
@@ -44,6 +48,16 @@ public class DateUtil {
 
     public static String formatDate(LocalDate date) {
         return date.format(DATE_FORMATTER);
+    }
+
+    //문자열을 LocalDateTime으로 변환
+    public static LocalDateTime parseDateTime(String dateTimeStr) {
+        try {
+            return LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            throw new InvalidStateException(ErrorCode.API_INVALID_TYPE, new IllegalArgumentException(
+                    dateTimeStr + "는 LocalDateTime으로 변환할 수 없는 문자열입니다. 예외 메시지: " +  e));
+        }
     }
 }
 
