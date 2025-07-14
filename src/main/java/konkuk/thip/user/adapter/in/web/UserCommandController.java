@@ -35,8 +35,8 @@ public class UserCommandController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/users/signup")
-    public BaseResponse<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest request,
-                                                   @Oauth2Id String oauth2Id,
+    public BaseResponse<UserSignupResponse> signup(@Valid @RequestBody final UserSignupRequest request,
+                                                   @Oauth2Id final String oauth2Id,
                                                    HttpServletResponse response) {
         Long userId = userSignupUseCase.signup(request.toCommand(oauth2Id));
         String accessToken = jwtUtil.createAccessToken(userId);
@@ -45,7 +45,7 @@ public class UserCommandController {
     }
 
     @PostMapping("/users/nickname")
-    public BaseResponse<UserVerifyNicknameResponse> verifyNickname(@Valid @RequestBody UserVerifyNicknameRequest request) {
+    public BaseResponse<UserVerifyNicknameResponse> verifyNickname(@Valid @RequestBody final UserVerifyNicknameRequest request) {
         return BaseResponse.ok(UserVerifyNicknameResponse.of(
                 userVerifyNicknameUseCase.isNicknameUnique(request.nickname()))
         );
@@ -53,9 +53,9 @@ public class UserCommandController {
 
     // 팔루우 상태 변경 : true -> 팔로우, false -> 언팔로우
     @PostMapping("/users/following/{followingUserId}")
-    public BaseResponse<UserFollowResponse> followUser(@UserId Long userId,
-                                            @PathVariable Long followingUserId,
-                                            @RequestBody @Valid UserFollowRequest request) {
+    public BaseResponse<UserFollowResponse> followUser(@UserId final Long userId,
+                                            @PathVariable final Long followingUserId,
+                                            @RequestBody @Valid final UserFollowRequest request) {
         return BaseResponse.ok(UserFollowResponse.of(userFollowUsecase.changeFollowingState(
                 UserFollowCommand.toCommand(userId, followingUserId, request.type())
         )));
