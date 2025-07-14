@@ -47,7 +47,7 @@ class UserFollowApiTest {
 
     @AfterEach
     void tearDown() {
-        followingJpaRepository.deleteAll();
+        followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAll();
         aliasJpaRepository.deleteAll();
     }
