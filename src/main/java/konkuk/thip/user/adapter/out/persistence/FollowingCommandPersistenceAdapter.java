@@ -23,7 +23,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
 
     private final FollowingMapper followingMapper;
 
-    @Override
+    @Override //ACTIVE, INACTIVE 모두 조회
     public Optional<Following> findByUserIdAndTargetUserId(Long userId, Long targetUserId) {
         Optional<FollowingJpaEntity> followingJpaEntity = followingJpaRepository.findByUserAndTargetUser(userId, targetUserId);
         return followingJpaEntity.map(followingMapper::toDomainEntity);
@@ -31,7 +31,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
 
     @Override
     public void save(Following following) { // insert용
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(following.getUserId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(following.getFollowerUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
         UserJpaEntity targetUser = userJpaRepository.findById(following.getFollowingUserId()).orElseThrow(
@@ -42,7 +42,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
 
     @Override
     public void updateStatus(Following following) { // 상태변경 용
-        FollowingJpaEntity entity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
+        FollowingJpaEntity entity = followingJpaRepository.findByUserAndTargetUser(following.getFollowerUserId(), following.getFollowingUserId())
                 .orElseThrow(() -> new EntityNotFoundException(FOLLOW_NOT_FOUND));
 
         entity.setStatus(following.getStatus());
