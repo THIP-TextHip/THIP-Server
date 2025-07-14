@@ -2,7 +2,9 @@ package konkuk.thip.vote.adapter.out.persistence;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
+import konkuk.thip.vote.adapter.out.jpa.QVoteItemJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.QVoteJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,12 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    private final QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
+    private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
+    private final QVoteItemJpaEntity voteItem = QVoteItemJpaEntity.voteItemJpaEntity;
+
     @Override
     public List<VoteJpaEntity> findVotesByRoom(Long roomId, String type, Integer pageStart, Integer pageEnd, Long userId) {
-        QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
-        QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
-
         return jpaQueryFactory
                 .select(vote)
                 .from(vote)
@@ -42,5 +45,40 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
             return post.userJpaEntity.userId.eq(userId);
         }
         return null;
+    }
+
+    @Override
+    public List<RoomPlayingDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count) {
+        // 1. Fetch top votes by total participation count
+        List<VoteJpaEntity> topVotes = jpaQueryFactory
+                .select(vote)
+                .from(vote)
+                .leftJoin(voteItem).on(voteItem.voteJpaEntity.eq(vote))
+                .where(vote.roomJpaEntity.roomId.eq(roomId))
+                .groupBy(vote)
+                .orderBy(voteItem.count.sum().desc())       // 해당 투표에 참여한 총 참여자 수 기준 내림차순 정렬
+                .limit(count)
+                .fetch();
+
+        // 2. Map to DTOs including vote items
+        return topVotes.stream()
+                .map(vote -> {
+                    List<RoomPlayingDetailViewResponse.CurrentVote.VoteItem> voteItems = jpaQueryFactory
+                            .select(voteItem)
+                            .from(voteItem)
+                            .where(voteItem.voteJpaEntity.eq(vote))
+                            .orderBy(voteItem.count.desc())
+                            .fetch()
+                            .stream()
+                            .map(item -> new RoomPlayingDetailViewResponse.CurrentVote.VoteItem(item.getItemName()))
+                            .toList();
+                    return new RoomPlayingDetailViewResponse.CurrentVote(
+                            vote.getContent(),
+                            vote.getPage(),
+                            vote.isOverview(),
+                            voteItems
+                    );
+                })
+                .toList();
     }
 }
