@@ -53,7 +53,7 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
                 .followerList(followerList)
                 .size(followerList.size())
                 .nextCursor(nextCursor)
-                .isFirst(nextCursor == null) // cursor가 null이면 첫 페이지
+                .isFirst(cursor == null) // cursor가 null이면 첫 페이지
                 .isLast(isLast)
                 .build();
     }
