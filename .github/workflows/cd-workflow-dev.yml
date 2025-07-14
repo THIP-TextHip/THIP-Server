@@ -27,10 +27,10 @@ jobs:
           server-id: github
           settings-path: ${{ github.workspace }}
 
-      - name: 🧾 Create application.yml from secret
+      - name: 🧾 Create application.yml from secret (base64)
         run: |
           mkdir -p ${{ env.RESOURCE_PATH }}
-          echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
+          echo "${{ secrets.APPLICATION_YML_DEV }}" | base64 --decode > ${{ env.RESOURCE_PATH }}/application.yml
         shell: bash
 
       - name: 🐘 Cache Gradle dependencies
