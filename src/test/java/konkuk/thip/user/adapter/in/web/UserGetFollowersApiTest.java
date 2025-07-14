@@ -1,5 +1,6 @@
 package konkuk.thip.user.adapter.in.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -33,6 +34,9 @@ class UserFollowersApiTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private AliasJpaRepository aliasJpaRepository;
@@ -84,11 +88,11 @@ class UserFollowersApiTest {
                 .andExpect(jsonPath("$.data.nextCursor").exists());
 
         // 커서 추출
-        String nextCursor = firstPageResult
-                .andReturn()
-                .getResponse()
-                .getContentAsString()
-                .replaceAll(".*\"nextCursor\"\\s*:\\s*\"([^\"]+)\".*", "$1");
+        String responseBody = firstPageResult.andReturn().getResponse().getContentAsString();
+        String nextCursor = objectMapper.readTree(responseBody)
+                .path("data")
+                .path("nextCursor")
+                .asText();
 
         // 2. 두 번째 요청 (cursor 사용)
         ResultActions secondPageResult = mockMvc.perform(
