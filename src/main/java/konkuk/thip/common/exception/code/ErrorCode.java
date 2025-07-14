@@ -98,6 +98,7 @@ public enum ErrorCode implements ResponseCode {
      * 140000 : userRoom error
      */
     USER_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 USER_ROOM (방과 사용자 관계) 입니다."),
+    USER_NOT_BELONG_TO_ROOM(HttpStatus.BAD_REQUEST, 140001, "현재 모임방에 속하지 않는 유저입니다."),
 
     /**
      * 150000 : Category error
