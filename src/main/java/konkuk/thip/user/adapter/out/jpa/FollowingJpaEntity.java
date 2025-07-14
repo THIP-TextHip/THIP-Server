@@ -2,7 +2,6 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.common.entity.StatusType;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
