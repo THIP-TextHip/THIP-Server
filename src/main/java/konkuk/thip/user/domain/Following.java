@@ -15,13 +15,13 @@ public class Following extends BaseDomainEntity {
 
     private Long id;
 
-    private Long userId;
+    private Long followerUserId;
 
     private Long followingUserId;
 
     public static Following withoutId(Long userId, Long followingUserId) {
         return Following.builder()
-                .userId(userId)
+                .followerUserId(userId)
                 .followingUserId(followingUserId)
                 .status(StatusType.ACTIVE)
                 .build();

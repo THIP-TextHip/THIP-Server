@@ -136,9 +136,9 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static FollowingJpaEntity createFollowing(UserJpaEntity user,UserJpaEntity followingUser) {
+    public static FollowingJpaEntity createFollowing(UserJpaEntity followerUser,UserJpaEntity followingUser) {
         return FollowingJpaEntity.builder()
-                .userJpaEntity(user)
+                .followerUserJpaEntity(followerUser)
                 .followingUserJpaEntity(followingUser)
                 .build();
     }

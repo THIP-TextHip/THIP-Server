@@ -41,7 +41,7 @@ class UserFollowServiceTest {
             Long userId = 1L, targetUserId = 2L;
             Following inactiveFollowing = Following.builder()
                     .id(10L)
-                    .userId(userId)
+                    .followerUserId(userId)
                     .followingUserId(targetUserId)
                     .status(StatusType.INACTIVE)
                     .build();
@@ -79,7 +79,7 @@ class UserFollowServiceTest {
             verify(followingCommandPort).save(captor.capture());
 
             Following saved = captor.getValue();
-            assertThat(saved.getUserId()).isEqualTo(userId);
+            assertThat(saved.getFollowerUserId()).isEqualTo(userId);
             assertThat(saved.getFollowingUserId()).isEqualTo(targetUserId);
             assertThat(saved.getStatus()).isEqualTo(StatusType.ACTIVE);
         }
@@ -96,7 +96,7 @@ class UserFollowServiceTest {
             Long userId = 1L, targetUserId = 2L;
             Following activeFollowing = Following.builder()
                     .id(10L)
-                    .userId(userId)
+                    .followerUserId(userId)
                     .followingUserId(targetUserId)
                     .status(StatusType.ACTIVE)
                     .build();
