@@ -28,7 +28,6 @@ public class RoomQueryController {
     private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
     private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
     private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
-    private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
 
     @GetMapping("/rooms/search")
