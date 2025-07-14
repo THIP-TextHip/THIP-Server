@@ -14,4 +14,12 @@ public class BaseDomainEntity {
     private LocalDateTime modifiedAt;
 
     private StatusType status;
+
+    protected void changeStatus() {
+        if (this.status == StatusType.ACTIVE) {
+            this.status = StatusType.INACTIVE;
+        } else {
+            this.status = StatusType.ACTIVE;
+        }
+    }
 }
