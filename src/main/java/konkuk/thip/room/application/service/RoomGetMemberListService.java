@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -34,18 +35,25 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         // 2. 방 참여자(UserRoom) 전체 조회
         List<UserRoom> userRooms = userRoomCommandPort.findAllByRoomId(room.getId());
 
-        // 3. 각 참여자의 userId로 유저정보, 구독자 수(팔로워 수) 조회
+
+        // 3. 참여자 userId 목록 추출
+        List<Long> userIds = userRooms.stream()
+                .map(UserRoom::getUserId)
+                .toList();
+
+        // 4. 배치 쿼리로 유저 정보, 팔로워 수 조회
+        Map<Long, User> userMap = userCommandPort.findByIds(userIds);
+        Map<Long, Integer> subscriberCountMap = followingQueryPort.countByFollowingUserIds(userIds);
+
+        // 5. 각 userRoom에 대해 DTO 조립
         List<RoomGetMemberListResponse.MemberSearchResult> userList = userRooms.stream()
                 .map(userRoom -> {
-
-                    Long memberUserId = userRoom.getUserId();
-                    // 팔로워 수 = Following 테이블에서 followingUserId == memberUserId 인 row 개수
-                    int subscriberCount = followingQueryPort.countByFollowingUserId(memberUserId);
-                    // 유저 정보 조회
-                    User user = userCommandPort.findById(memberUserId);
+                    Long userId = userRoom.getUserId();
+                    User user = userMap.get(userId);
+                    int subscriberCount = subscriberCountMap.getOrDefault(userId, 0);
 
                     return RoomGetMemberListResponse.MemberSearchResult.builder()
-                            .userId(memberUserId)
+                            .userId(userId)
                             .nickname(user.getNickname())
                             .imageUrl(user.getAlias().getImageUrl())
                             .alias(user.getAlias().getValue())
@@ -54,7 +62,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
                 })
                 .toList();
 
-        // 4. DTO 조립 후 반환
+        // 6. DTO 반환
         return RoomGetMemberListResponse.builder()
                 .userList(userList)
                 .build();
