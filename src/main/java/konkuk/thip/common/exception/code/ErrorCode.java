@@ -42,7 +42,7 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 75000 : follow error
      */
-    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 750001, "존재하지 않는 FOLLOW 입니다."),
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 75001, "존재하지 않는 FOLLOW 입니다."),
     USER_ALREADY_UNFOLLOWED(HttpStatus.BAD_REQUEST, 75002, "이미 언팔로우한 사용자입니다."),
     USER_CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, 75003, "사용자는 자신을 팔로우할 수 없습니다."),
 
