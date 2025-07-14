@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("[통합] UserVerifyNicknameController 테스트")
+@DisplayName("[통합] 닉네임 중복 검증 api 테스트")
 class UserVerifyNicknameControllerTest {
 
     @Autowired

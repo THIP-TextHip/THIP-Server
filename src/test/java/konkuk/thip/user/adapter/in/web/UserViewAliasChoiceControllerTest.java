@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("[통합] UserViewAliasChoiceController 테스트")
+@DisplayName("[통합] 사용자 칭호 선택 api 테스트")
 class UserViewAliasChoiceControllerTest {
 
     @Autowired
