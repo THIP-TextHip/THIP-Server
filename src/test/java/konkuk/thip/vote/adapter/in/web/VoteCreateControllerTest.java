@@ -114,6 +114,7 @@ class VoteCreateControllerTest {
 
         CategoryJpaEntity category = categoryJpaRepository.save(CategoryJpaEntity.builder()
                 .value("과학/IT")
+                .imageUrl("과학/IT_image")
                 .aliasForCategoryJpaEntity(alias)
                 .build());
 

@@ -2,6 +2,7 @@ package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
@@ -10,6 +11,7 @@ import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import jakarta.validation.Valid;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
+import konkuk.thip.room.application.port.in.RoomShowRecruitingDetailViewUseCase;
 import konkuk.thip.room.application.port.in.RoomVerifyPasswordUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ public class RoomQueryController {
     private final RoomSearchUseCase roomSearchUseCase;
     private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
     private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
+    private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
+    private final RoomGetHomeJoinedListUseCase roomGetHomeJoinedListUseCase;
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
 
     @GetMapping("/rooms/search")
@@ -43,6 +47,13 @@ public class RoomQueryController {
                                                  @Valid @RequestBody final RoomVerifyPasswordRequest roomVerifyPasswordRequest
                                                  ) {
         return BaseResponse.ok(roomVerifyPasswordUseCase.verifyRoomPassword(roomVerifyPasswordRequest.toQuery(roomId)));
+    }
+
+    @GetMapping("/rooms/{roomId}/recruiting")
+    public BaseResponse<RoomRecruitingDetailViewResponse> getRecruitingRoomDetailView(
+            @UserId final Long userId,
+            @PathVariable("roomId") final Long roomId) {
+        return BaseResponse.ok(roomShowRecruitingDetailViewUseCase.getRecruitingRoomDetailView(userId, roomId));
     }
 
     //[모임 홈] 참여중인 내 모임방 조회
