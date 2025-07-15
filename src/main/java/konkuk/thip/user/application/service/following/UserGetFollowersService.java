@@ -1,4 +1,4 @@
-package konkuk.thip.user.application.service.follow;
+package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
 import konkuk.thip.user.application.port.in.UserGetFollowersUsecase;
