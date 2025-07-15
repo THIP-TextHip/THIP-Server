@@ -80,7 +80,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_1")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(1) // user3이 user1을 팔로우
+                .followingCount(2) // user1이 user2, user3를 팔로우
                 .build());
 
         user2 = userJpaRepository.save(UserJpaEntity.builder()
@@ -89,7 +89,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_2")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(1) // user1이 user2를 팔로우
+                .followingCount(1) // user2가 user3를 팔로우
                 .build());
 
         user3 = userJpaRepository.save(UserJpaEntity.builder()
@@ -98,7 +98,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_3")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(2) // user1, user2가 user3을 팔로우
+                .followingCount(2) // user3가 user1을 팔로우
                 .build());
 
         book = bookJpaRepository.save(TestEntityFactory.createBook());
@@ -191,9 +191,9 @@ class RoomGetMemberListApiTest {
         // user2가 팔로우하는 사람: user3 (1명)
         // user3이 팔로우하는 사람: user1 (1명)
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user1.getUserId() + ")].followingCount").value(contains(1)))
+                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user1.getUserId() + ")].followingCount").value(contains(2)))
                 .andExpect(jsonPath("$.data.userList[?(@.userId==" + user2.getUserId() + ")].followingCount").value(contains(1)))
-                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user3.getUserId() + ")].followingCount").value(contains(2)));
+                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user3.getUserId() + ")].followingCount").value(contains(1)));
     }
 
     @Test
