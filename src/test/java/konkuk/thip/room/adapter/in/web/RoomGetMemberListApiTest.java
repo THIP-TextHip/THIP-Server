@@ -178,7 +178,7 @@ class RoomGetMemberListApiTest {
     }
 
     @Test
-    @DisplayName("팔로워(구독자) 수가 올바르게 집계된다.")
+    @DisplayName("팔로워 수가 올바르게 집계된다.")
     void getRoomMemberList_subscriberCount() throws Exception {
         //given
         Long roomId = room1.getRoomId();
