@@ -1,6 +1,7 @@
 package konkuk.thip.comment.adapter.out.persistence;
 
 import konkuk.thip.comment.adapter.out.mapper.CommentMapper;
+import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.comment.application.port.out.CommentQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

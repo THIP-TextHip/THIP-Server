@@ -6,6 +6,7 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestQuerydslConfig;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
+import konkuk.thip.record.adapter.out.persistence.repository.RecordQueryRepositoryImpl;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;

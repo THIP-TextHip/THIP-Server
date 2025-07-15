@@ -3,19 +3,21 @@ package konkuk.thip.record.adapter.in.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.record.adapter.in.web.request.RecordCreateRequest;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.record.adapter.out.persistence.RecordJpaRepository;
+import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomParticipantJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,12 +69,12 @@ class RecordCreateControllerTest {
     private RecordJpaRepository recordJpaRepository;
 
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @AfterEach
     void tearDown() {
         recordJpaRepository.deleteAll();
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         categoryJpaRepository.deleteAll();
@@ -92,15 +94,15 @@ class RecordCreateControllerTest {
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         //UserRoomJpaEntity 생성 및 저장
-        UserRoomJpaEntity userRoom = UserRoomJpaEntity.builder()
+        RoomParticipantJpaEntity userRoom = RoomParticipantJpaEntity.builder()
                 .currentPage(10)
                 .userPercentage(80.0)
-                .userRoomRole(UserRoomRole.HOST)
+                .roomParticipantRole(RoomParticipantRole.HOST)
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
                 .build();
 
-        userRoomJpaRepository.save(userRoom);
+        roomParticipantJpaRepository.save(userRoom);
     }
 
     @Test

@@ -3,6 +3,7 @@ package konkuk.thip.user.application.service;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.service.following.UserFollowService;
 import konkuk.thip.user.domain.Following;
 import konkuk.thip.common.entity.StatusType;
 import org.junit.jupiter.api.BeforeEach;

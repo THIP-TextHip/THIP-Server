@@ -6,9 +6,9 @@ import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.user.domain.User;
-import konkuk.thip.user.domain.UserRoom;
+import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class RoomGetMemberListService implements RoomGetMemberListUseCase {
 
     private final RoomCommandPort roomCommandPort;
-    private final UserRoomCommandPort userRoomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final UserCommandPort userCommandPort;
     private final FollowingQueryPort followingQueryPort;
 
@@ -33,12 +33,12 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         Room room = roomCommandPort.findById(roomId);
 
         // 2. 방 참여자(UserRoom) 전체 조회
-        List<UserRoom> userRooms = userRoomCommandPort.findAllByRoomId(room.getId());
+        List<RoomParticipant> roomParticipants = roomParticipantCommandPort.findAllByRoomId(room.getId());
 
 
         // 3. 참여자 userId 목록 추출
-        List<Long> userIds = userRooms.stream()
-                .map(UserRoom::getUserId)
+        List<Long> userIds = roomParticipants.stream()
+                .map(RoomParticipant::getUserId)
                 .toList();
 
         // 4. 배치 쿼리로 유저 정보, 팔로워 수 조회
@@ -46,7 +46,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         Map<Long, Integer> subscriberCountMap = followingQueryPort.countByFollowingUserIds(userIds);
 
         // 5. 각 userRoom에 대해 DTO 조립
-        List<RoomGetMemberListResponse.MemberSearchResult> userList = userRooms.stream()
+        List<RoomGetMemberListResponse.MemberSearchResult> userList = roomParticipants.stream()
                 .map(userRoom -> {
                     Long userId = userRoom.getUserId();
                     User user = userMap.get(userId);

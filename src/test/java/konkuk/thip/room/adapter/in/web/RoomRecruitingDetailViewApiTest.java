@@ -1,17 +1,19 @@
 package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomParticipantJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,11 +59,11 @@ class RoomRecruitingDetailViewApiTest {
     private RoomJpaRepository roomJpaRepository;
 
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @AfterEach
     void tearDown() {
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -144,15 +146,15 @@ class RoomRecruitingDetailViewApiTest {
         List<UserJpaEntity> savedUsers = userJpaRepository.saveAll(users);
 
         // UserRoom 매핑 리스트 생성 및 저장
-        List<UserRoomJpaEntity> mappings = savedUsers.stream()
-                .map(user -> UserRoomJpaEntity.builder()
+        List<RoomParticipantJpaEntity> mappings = savedUsers.stream()
+                .map(user -> RoomParticipantJpaEntity.builder()
                         .userJpaEntity(user)
                         .roomJpaEntity(roomJpaEntity)
-                        .userRoomRole(UserRoomRole.MEMBER)
+                        .roomParticipantRole(RoomParticipantRole.MEMBER)
                         .build())
                 .toList();
 
-        userRoomJpaRepository.saveAll(mappings);
+        roomParticipantJpaRepository.saveAll(mappings);
     }
 
     @Test
@@ -161,7 +163,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserJpaEntity joiningUser = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
+        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
         RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_2, 5);
@@ -209,12 +211,12 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserRoomJpaEntity firstMember = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1);
-        userRoomJpaRepository.delete(firstMember);
-        UserRoomJpaEntity roomCreator = userRoomJpaRepository.save(UserRoomJpaEntity.builder()
+        RoomParticipantJpaEntity firstMember = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1);
+        roomParticipantJpaRepository.delete(firstMember);
+        RoomParticipantJpaEntity roomCreator = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(firstMember.getUserJpaEntity())
                 .roomJpaEntity(firstMember.getRoomJpaEntity())
-                .userRoomRole(UserRoomRole.HOST)
+                .roomParticipantRole(RoomParticipantRole.HOST)
                 .build());      // firstMember 을 MEMBER -> HOST 로 수정
 
         RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
@@ -262,7 +264,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserJpaEntity joiningUser = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
+        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
         RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_2, 5);
@@ -314,7 +316,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserJpaEntity joiningUser = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
+        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
         RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);

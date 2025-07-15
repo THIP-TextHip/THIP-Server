@@ -11,8 +11,8 @@ import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
-import konkuk.thip.user.domain.UserRoom;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final RecordCommandPort recordCommandPort;
     private final RoomCommandPort roomCommandPort;
     private final BookCommandPort bookCommandPort;
-    private final UserRoomCommandPort userRoomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
 
     @Transactional
     @Override
@@ -43,39 +43,39 @@ public class RecordCreateService implements RecordCreateUseCase {
         );
 
         // 2. UserRoom, Room, Book 조회
-        UserRoom userRoom = userRoomCommandPort.findByUserIdAndRoomId(command.userId(), command.roomId());
+        RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(command.userId(), command.roomId());
         Room room = roomCommandPort.findById(record.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 3. 유효성 검증
         validateRoom(room);
-        validateUserRoom(userRoom);
+        validateUserRoom(roomParticipant);
         validateRecord(record, book);
 
         // 4. UserRoom의 currentPage, userPercentage 업데이트
-        updateRoomProgress(userRoom, record, book, room);
+        updateRoomProgress(roomParticipant, record, book, room);
 
         // 5. Record 저장
         return recordCommandPort.saveRecord(record);
     }
 
-    private void updateRoomProgress(UserRoom userRoom, Record record, Book book, Room room) {
-        if(userRoom.updateUserProgress(record.getPage(), book.getPageCount())) {
+    private void updateRoomProgress(RoomParticipant roomParticipant, Record record, Book book, Room room) {
+        if(roomParticipant.updateUserProgress(record.getPage(), book.getPageCount())) {
             // userPercentage가 업데이트되었으면 Room의 roomPercentage 업데이트
-            List<UserRoom> userRoomList = userRoomCommandPort.findAllByRoomId(record.getRoomId());
-            Double totalUserPercentage = userRoomList.stream()
-                    .map(UserRoom::getUserPercentage)
+            List<RoomParticipant> roomParticipantList = roomParticipantCommandPort.findAllByRoomId(record.getRoomId());
+            Double totalUserPercentage = roomParticipantList.stream()
+                    .map(RoomParticipant::getUserPercentage)
                     .reduce(0.0, Double::sum);
-            room.updateRoomPercentage(totalUserPercentage / userRoomList.size());
+            room.updateRoomPercentage(totalUserPercentage / roomParticipantList.size());
         }
     }
 
-    private void validateUserRoom(UserRoom userRoom) {
+    private void validateUserRoom(RoomParticipant roomParticipant) {
         // UserRoom의 총평 작성 가능 여부 검증
-        if (!userRoom.canWriteOverview()) {
+        if (!roomParticipant.canWriteOverview()) {
             String message = String.format(
                     "총평(isOverview)은 사용자 진행률이 80%% 이상일 때만 가능합니다. 현재 사용자 진행률 = %.2f%%",
-                    userRoom.getUserPercentage()
+                    roomParticipant.getUserPercentage()
             );
             throw new InvalidStateException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
         }

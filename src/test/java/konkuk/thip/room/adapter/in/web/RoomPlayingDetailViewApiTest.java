@@ -1,22 +1,23 @@
 package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomParticipantJpaRepository;
 import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
-import konkuk.thip.vote.adapter.out.persistence.VoteItemJpaRepository;
-import konkuk.thip.vote.adapter.out.persistence.VoteJpaRepository;
+import konkuk.thip.vote.adapter.out.persistence.repository.VoteItemJpaRepository;
+import konkuk.thip.vote.adapter.out.persistence.repository.VoteJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class RoomPlayingDetailViewApiTest {
     private RoomJpaRepository roomJpaRepository;
 
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @Autowired
     private VoteJpaRepository voteJpaRepository;
@@ -75,7 +76,7 @@ class RoomPlayingDetailViewApiTest {
     void tearDown() {
         voteItemJpaRepository.deleteAll();
         voteJpaRepository.deleteAll();
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -129,15 +130,15 @@ class RoomPlayingDetailViewApiTest {
         List<UserJpaEntity> savedUsers = userJpaRepository.saveAll(users);
 
         // UserRoom 매핑 리스트 생성 및 저장
-        List<UserRoomJpaEntity> mappings = savedUsers.stream()
-                .map(user -> UserRoomJpaEntity.builder()
+        List<RoomParticipantJpaEntity> mappings = savedUsers.stream()
+                .map(user -> RoomParticipantJpaEntity.builder()
                         .userJpaEntity(user)
                         .roomJpaEntity(roomJpaEntity)
-                        .userRoomRole(UserRoomRole.MEMBER)
+                        .roomParticipantRole(RoomParticipantRole.MEMBER)
                         .build())
                 .toList();
 
-        userRoomJpaRepository.saveAll(mappings);
+        roomParticipantJpaRepository.saveAll(mappings);
     }
 
     private void createVoteToRoom(UserJpaEntity creator, RoomJpaEntity roomJpaEntity, int count) {
@@ -172,12 +173,12 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        UserRoomJpaEntity userRoomJpaEntity = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
-        userRoomJpaRepository.delete(userRoomJpaEntity);
-        UserRoomJpaEntity joiningMember = userRoomJpaRepository.save(UserRoomJpaEntity.builder()
-                .userJpaEntity(userRoomJpaEntity.getUserJpaEntity())
-                .roomJpaEntity(userRoomJpaEntity.getRoomJpaEntity())
-                .userRoomRole(UserRoomRole.MEMBER)        // Member
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
+        RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
+                .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
+                .roomJpaEntity(roomParticipantJpaEntity.getRoomJpaEntity())
+                .roomParticipantRole(RoomParticipantRole.MEMBER)        // Member
                 .currentPage(50)        // 현재 member의 마지막 활동 page
                 .userPercentage(10.6)       // 현재 member의 활동 percentage
                 .build());
@@ -220,12 +221,12 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        UserRoomJpaEntity userRoomJpaEntity = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
-        userRoomJpaRepository.delete(userRoomJpaEntity);
-        UserRoomJpaEntity roomHost = userRoomJpaRepository.save(UserRoomJpaEntity.builder()
-                .userJpaEntity(userRoomJpaEntity.getUserJpaEntity())
-                .roomJpaEntity(userRoomJpaEntity.getRoomJpaEntity())
-                .userRoomRole(UserRoomRole.HOST)        // HOST
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
+        RoomParticipantJpaEntity roomHost = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
+                .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
+                .roomJpaEntity(roomParticipantJpaEntity.getRoomJpaEntity())
+                .roomParticipantRole(RoomParticipantRole.HOST)        // HOST
                 .currentPage(50)        // 현재 member의 마지막 활동 page
                 .userPercentage(10.6)       // 현재 member의 활동 percentage
                 .build());
@@ -268,12 +269,12 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        UserRoomJpaEntity userRoomJpaEntity = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
-        userRoomJpaRepository.delete(userRoomJpaEntity);
-        UserRoomJpaEntity joiningMember = userRoomJpaRepository.save(UserRoomJpaEntity.builder()
-                .userJpaEntity(userRoomJpaEntity.getUserJpaEntity())
-                .roomJpaEntity(userRoomJpaEntity.getRoomJpaEntity())
-                .userRoomRole(UserRoomRole.MEMBER)        // Member
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
+        RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
+                .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
+                .roomJpaEntity(roomParticipantJpaEntity.getRoomJpaEntity())
+                .roomParticipantRole(RoomParticipantRole.MEMBER)        // Member
                 .currentPage(50)        // 현재 member의 마지막 활동 page
                 .userPercentage(10.6)       // 현재 member의 활동 percentage
                 .build());
@@ -294,12 +295,12 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        UserRoomJpaEntity userRoomJpaEntity = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
-        userRoomJpaRepository.delete(userRoomJpaEntity);
-        UserRoomJpaEntity joiningMember = userRoomJpaRepository.save(UserRoomJpaEntity.builder()
-                .userJpaEntity(userRoomJpaEntity.getUserJpaEntity())
-                .roomJpaEntity(userRoomJpaEntity.getRoomJpaEntity())
-                .userRoomRole(UserRoomRole.MEMBER)        // Member
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
+        RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
+                .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
+                .roomJpaEntity(roomParticipantJpaEntity.getRoomJpaEntity())
+                .roomParticipantRole(RoomParticipantRole.MEMBER)        // Member
                 .currentPage(50)        // 현재 member의 마지막 활동 page
                 .userPercentage(10.6)       // 현재 member의 활동 percentage
                 .build());
@@ -346,12 +347,12 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        UserRoomJpaEntity userRoomJpaEntity = userRoomJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
-        userRoomJpaRepository.delete(userRoomJpaEntity);
-        UserRoomJpaEntity joiningMember = userRoomJpaRepository.save(UserRoomJpaEntity.builder()
-                .userJpaEntity(userRoomJpaEntity.getUserJpaEntity())
-                .roomJpaEntity(userRoomJpaEntity.getRoomJpaEntity())
-                .userRoomRole(UserRoomRole.MEMBER)        // Member
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
+        RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
+                .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
+                .roomJpaEntity(roomParticipantJpaEntity.getRoomJpaEntity())
+                .roomParticipantRole(RoomParticipantRole.MEMBER)        // Member
                 .currentPage(50)        // 현재 member의 마지막 활동 page
                 .userPercentage(10.6)       // 현재 member의 활동 percentage
                 .build());

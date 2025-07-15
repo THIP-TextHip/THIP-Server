@@ -20,6 +20,7 @@ public class RoomMapper {
                 .startDate(room.getStartDate())
                 .endDate(room.getEndDate())
                 .recruitCount(room.getRecruitCount())
+                .memberCount(room.getMemberCount())
                 .bookJpaEntity(bookJpaEntity)
                 .categoryJpaEntity(categoryJpaEntity)
                 .build();
@@ -36,6 +37,7 @@ public class RoomMapper {
                 .startDate(roomJpaEntity.getStartDate())
                 .endDate(roomJpaEntity.getEndDate())
                 .recruitCount(roomJpaEntity.getRecruitCount())
+                .memberCount(roomJpaEntity.getMemberCount())
                 .bookId(roomJpaEntity.getBookJpaEntity().getBookId())
                 .category(Category.from(roomJpaEntity.getCategoryJpaEntity().getValue()))
                 .createdAt(roomJpaEntity.getCreatedAt())
