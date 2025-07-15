@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 팔로워 조회 API 통합 테스트")
-class UserFollowersApiTest {
+class UserGetFollowersApiTest {
 
     @Autowired
     private MockMvc mockMvc;
