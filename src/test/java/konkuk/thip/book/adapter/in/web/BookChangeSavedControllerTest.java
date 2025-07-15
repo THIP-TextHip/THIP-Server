@@ -8,7 +8,7 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
-import konkuk.thip.saved.adapter.out.persistence.SavedBookJpaRepository;
+import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
