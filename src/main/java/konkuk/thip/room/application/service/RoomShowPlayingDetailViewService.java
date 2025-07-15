@@ -8,7 +8,7 @@ import konkuk.thip.room.application.port.in.RoomShowPlayingDetailViewUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.user.application.port.out.UserRoomCommandPort;
-import konkuk.thip.user.domain.RoomParticipants;
+import konkuk.thip.room.domain.RoomParticipants;
 import konkuk.thip.user.domain.UserRoom;
 import konkuk.thip.vote.application.port.out.VoteQueryPort;
 import lombok.RequiredArgsConstructor;

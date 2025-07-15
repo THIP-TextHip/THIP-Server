@@ -10,7 +10,7 @@ import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.user.application.port.out.UserRoomCommandPort;
 import konkuk.thip.user.domain.UserRoom;
-import konkuk.thip.user.domain.RoomParticipants;
+import konkuk.thip.room.domain.RoomParticipants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

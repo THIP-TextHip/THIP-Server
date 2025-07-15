@@ -1,7 +1,8 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.room.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.adapter.out.jpa.UserRoomRole;
+import konkuk.thip.user.domain.UserRoom;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
