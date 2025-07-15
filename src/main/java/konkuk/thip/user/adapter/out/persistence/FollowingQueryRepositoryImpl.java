@@ -2,10 +2,12 @@ package konkuk.thip.user.adapter.out.persistence;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,5 +36,18 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                         tuple -> tuple.get(following.followingUserJpaEntity.userId),
                         tuple -> tuple.get(following.count()).intValue()
                 ));
+    }
+
+    @Override
+    public Optional<FollowingJpaEntity> findByUserAndTargetUser(Long userId, Long targetUserId) {
+        QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
+
+        FollowingJpaEntity followingJpaEntity = jpaQueryFactory
+                .selectFrom(following)
+                .where(following.userJpaEntity.userId.eq(userId)
+                        .and(following.followingUserJpaEntity.userId.eq(targetUserId)))
+                .fetchOne();
+
+        return Optional.ofNullable(followingJpaEntity);
     }
 }

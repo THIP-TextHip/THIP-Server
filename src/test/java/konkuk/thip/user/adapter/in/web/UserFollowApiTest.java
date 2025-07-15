@@ -1,0 +1,101 @@
+package konkuk.thip.user.adapter.in.web;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.FollowingJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@AutoConfigureMockMvc(addFilters = false)
+@DisplayName("[통합] 팔로잉 상태 변경 API 통합 테스트")
+class UserFollowApiTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private AliasJpaRepository aliasJpaRepository;
+
+    @Autowired
+    private FollowingJpaRepository followingJpaRepository;
+
+    @AfterEach
+    void tearDown() {
+        followingJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAll();
+        aliasJpaRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("팔로우 요청 후 언팔로우 요청 시 상태가 변경되는지 확인한다.")
+    void changeFollowingState_follow_then_unfollow() throws Exception {
+        // 사용자 2명 저장
+        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+
+        UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
+                .nickname("user100")
+                .imageUrl("http://image")
+                .oauth2Id("oauth2_user100")
+                .role(UserRole.USER)
+                .aliasForUserJpaEntity(alias)
+                .build());
+
+        UserJpaEntity target = userJpaRepository.save(UserJpaEntity.builder()
+                .nickname("user200")
+                .imageUrl("http://image")
+                .oauth2Id("oauth2_user200")
+                .role(UserRole.USER)
+                .aliasForUserJpaEntity(alias)
+                .build());
+
+        // 팔로우 요청
+        mockMvc.perform(post("/users/following/{followingUserId}", target.getUserId())
+                        .requestAttr("userId", user.getUserId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\": true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isFollowing").value(true));
+
+        // DB에 팔로우 상태가 ACTIVE로 저장되었는지 확인
+        FollowingJpaEntity followEntity = followingJpaRepository.findByUserAndTargetUser(user.getUserId(), target.getUserId()).orElseThrow();
+        assertThat(followEntity.getStatus().name()).isEqualTo("ACTIVE");
+
+        // 언팔로우 요청
+        mockMvc.perform(post("/users/following/{followingUserId}", target.getUserId())
+                        .requestAttr("userId", user.getUserId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\": false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isFollowing").value(false));
+
+        // DB에 상태가 INACTIVE로 변경되었는지 확인
+        FollowingJpaEntity updatedEntity = followingJpaRepository.findByUserAndTargetUser(user.getUserId(), target.getUserId()).orElseThrow();
+        assertThat(updatedEntity.getStatus().name()).isEqualTo("INACTIVE");
+    }
+}

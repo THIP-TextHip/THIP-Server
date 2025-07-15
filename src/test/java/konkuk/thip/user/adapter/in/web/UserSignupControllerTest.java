@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@DisplayName("[통합] UserSignupController 테스트")
+@DisplayName("[통합] 회원가입 api 테스트")
 class UserSignupControllerTest {
 
     @Autowired
