@@ -3,7 +3,7 @@ package konkuk.thip.book.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.in.web.request.PostBookIsSavedRequest;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.adapter.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;

@@ -3,7 +3,7 @@ package konkuk.thip.record.adapter.in.web;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.adapter.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.record.adapter.in.web.request.RecordCreateRequest;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
