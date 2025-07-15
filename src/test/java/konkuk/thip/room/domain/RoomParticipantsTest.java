@@ -1,9 +1,7 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.room.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.domain.RoomParticipants;
-import konkuk.thip.room.domain.RoomParticipant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

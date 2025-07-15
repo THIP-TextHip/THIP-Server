@@ -1,6 +1,5 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.room.domain;
 
-import konkuk.thip.room.domain.RoomParticipant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
