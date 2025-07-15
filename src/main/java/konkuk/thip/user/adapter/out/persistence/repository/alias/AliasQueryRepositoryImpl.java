@@ -1,4 +1,4 @@
-package konkuk.thip.user.adapter.out.persistence.repository;
+package konkuk.thip.user.adapter.out.persistence.repository.alias;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

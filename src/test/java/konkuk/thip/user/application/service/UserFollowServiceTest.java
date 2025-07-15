@@ -1,11 +1,13 @@
 package konkuk.thip.user.application.service;
 
+import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.service.following.UserFollowService;
 import konkuk.thip.user.domain.Following;
-import konkuk.thip.common.entity.StatusType;
+import konkuk.thip.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,12 +25,14 @@ import static org.mockito.Mockito.*;
 class UserFollowServiceTest {
 
     private FollowingCommandPort followingCommandPort;
+    private UserCommandPort userCommandPort;
     private UserFollowService userFollowService;
 
     @BeforeEach
     void setUp() {
         followingCommandPort = mock(FollowingCommandPort.class);
-        userFollowService = new UserFollowService(followingCommandPort);
+        userCommandPort = mock(UserCommandPort.class);
+        userFollowService = new UserFollowService(followingCommandPort, userCommandPort);
     }
 
     @Nested
@@ -36,19 +40,22 @@ class UserFollowServiceTest {
     class Follow {
 
         @Test
-        @DisplayName("기존 inactive row가 존재하면 active로 변경")
+        @DisplayName("기존 inactive row가 존재하면 active로 변경 + followerCount 증가")
         void activate_existingFollowing() {
             // given
             Long userId = 1L, targetUserId = 2L;
             Following inactiveFollowing = Following.builder()
                     .id(10L)
-                    .followerUserId(userId)
+                    .userId(userId)
                     .followingUserId(targetUserId)
                     .status(StatusType.INACTIVE)
                     .build();
 
+            User user = createUserWithFollowingCount(0);
+
             when(followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId))
                     .thenReturn(Optional.of(inactiveFollowing));
+            when(userCommandPort.findById(targetUserId)).thenReturn(user);
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, true);
 
@@ -58,16 +65,20 @@ class UserFollowServiceTest {
             // then
             assertThat(result).isTrue();
             assertThat(inactiveFollowing.getStatus()).isEqualTo(StatusType.ACTIVE);
-            verify(followingCommandPort).updateStatus(inactiveFollowing);
+            assertThat(user.getFollowerCount()).isEqualTo(1); // followerCount 증가 확인
+            verify(followingCommandPort).updateStatus(inactiveFollowing, user);
         }
 
         @Test
-        @DisplayName("팔로우 관계가 존재하지 않으면 새로 생성")
+        @DisplayName("팔로우 관계가 존재하지 않으면 새로 생성 + followerCount 증가")
         void create_newFollowing() {
             // given
             Long userId = 1L, targetUserId = 2L;
             when(followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId))
                     .thenReturn(Optional.empty());
+
+            User user = createUserWithFollowingCount(0);
+            when(userCommandPort.findById(targetUserId)).thenReturn(user);
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, true);
 
@@ -76,11 +87,13 @@ class UserFollowServiceTest {
 
             // then
             assertThat(result).isTrue();
+            assertThat(user.getFollowerCount()).isEqualTo(1); // followerCount 증가 확인
+
             ArgumentCaptor<Following> captor = ArgumentCaptor.forClass(Following.class);
-            verify(followingCommandPort).save(captor.capture());
+            verify(followingCommandPort).save(captor.capture(), eq(user));
 
             Following saved = captor.getValue();
-            assertThat(saved.getFollowerUserId()).isEqualTo(userId);
+            assertThat(saved.getUserId()).isEqualTo(userId);
             assertThat(saved.getFollowingUserId()).isEqualTo(targetUserId);
             assertThat(saved.getStatus()).isEqualTo(StatusType.ACTIVE);
         }
@@ -91,19 +104,22 @@ class UserFollowServiceTest {
     class Unfollow {
 
         @Test
-        @DisplayName("active row가 존재하면 inactive로 변경")
+        @DisplayName("active row가 존재하면 inactive로 변경 + followerCount 감소")
         void deactivate_existingFollowing() {
             // given
             Long userId = 1L, targetUserId = 2L;
             Following activeFollowing = Following.builder()
                     .id(10L)
-                    .followerUserId(userId)
+                    .userId(userId)
                     .followingUserId(targetUserId)
                     .status(StatusType.ACTIVE)
                     .build();
 
+            User user = createUserWithFollowingCount(1);
+
             when(followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId))
                     .thenReturn(Optional.of(activeFollowing));
+            when(userCommandPort.findById(targetUserId)).thenReturn(user);
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, false);
 
@@ -113,7 +129,8 @@ class UserFollowServiceTest {
             // then
             assertThat(result).isFalse();
             assertThat(activeFollowing.getStatus()).isEqualTo(StatusType.INACTIVE);
-            verify(followingCommandPort).updateStatus(activeFollowing);
+            assertThat(user.getFollowerCount()).isEqualTo(0); // followerCount 감소 확인
+            verify(followingCommandPort).updateStatus(activeFollowing, user);
         }
 
         @Test
@@ -142,5 +159,16 @@ class UserFollowServiceTest {
         assertThatThrownBy(() -> userFollowService.changeFollowingState(command))
                 .isInstanceOf(InvalidStateException.class)
                 .hasMessageContaining(USER_CANNOT_FOLLOW_SELF.getMessage());
+    }
+
+    private User createUserWithFollowingCount(int count) {
+        return User.builder()
+                .id(1L)
+                .nickname("tester")
+                .userRole("USER")
+                .oauth2Id("oauth-id")
+                .followerCount(count)
+                .alias(null)
+                .build();
     }
 }

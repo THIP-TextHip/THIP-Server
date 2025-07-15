@@ -140,7 +140,7 @@ public class TestEntityFactory {
 
     public static FollowingJpaEntity createFollowing(UserJpaEntity followerUser,UserJpaEntity followingUser) {
         return FollowingJpaEntity.builder()
-                .followerUserJpaEntity(followerUser)
+                .userJpaEntity(followerUser)
                 .followingUserJpaEntity(followingUser)
                 .build();
     }

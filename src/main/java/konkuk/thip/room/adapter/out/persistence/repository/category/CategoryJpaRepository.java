@@ -1,4 +1,4 @@
-package konkuk.thip.room.adapter.out.persistence.repository;
+package konkuk.thip.room.adapter.out.persistence.repository.category;
 
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

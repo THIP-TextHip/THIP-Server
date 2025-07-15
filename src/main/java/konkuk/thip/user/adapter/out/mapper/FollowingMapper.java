@@ -10,7 +10,7 @@ public class FollowingMapper {
 
     public FollowingJpaEntity toJpaEntity(UserJpaEntity followerUserJpaEntity, UserJpaEntity followingUserJpaEntity) {
         return FollowingJpaEntity.builder()
-                .followerUserJpaEntity(followerUserJpaEntity)
+                .userJpaEntity(followerUserJpaEntity)
                 .followingUserJpaEntity(followingUserJpaEntity)
                 .build();
     }
@@ -18,7 +18,7 @@ public class FollowingMapper {
     public Following toDomainEntity(FollowingJpaEntity followingJpaEntity) {
         return Following.builder()
                 .id(followingJpaEntity.getFollowingId())
-                .followerUserId(followingJpaEntity.getFollowerUserJpaEntity().getUserId())
+                .userId(followingJpaEntity.getUserJpaEntity().getUserId())
                 .followingUserId(followingJpaEntity.getFollowingUserJpaEntity().getUserId())
                 .createdAt(followingJpaEntity.getCreatedAt())
                 .modifiedAt(followingJpaEntity.getModifiedAt())

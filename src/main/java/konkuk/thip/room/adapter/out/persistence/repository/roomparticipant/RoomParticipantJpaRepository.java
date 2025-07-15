@@ -1,4 +1,4 @@
-package konkuk.thip.room.adapter.out.persistence.repository;
+package konkuk.thip.room.adapter.out.persistence.repository.roomparticipant;
 
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

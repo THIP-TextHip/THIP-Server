@@ -49,7 +49,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
 
         FollowingJpaEntity followingJpaEntity = jpaQueryFactory
                 .selectFrom(following)
-                .where(following.followerUserJpaEntity.userId.eq(userId)
+                .where(following.userJpaEntity.userId.eq(userId)
                         .and(following.followingUserJpaEntity.userId.eq(targetUserId)))
                 .fetchOne();
 
@@ -72,8 +72,8 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
 
         return jpaQueryFactory
                 .selectFrom(following)
-                .join(following.followerUserJpaEntity, user).fetchJoin() // N+1 문제 방지를 위해 fetchJoin
-                .join(user.aliasForUserJpaEntity, alias).fetchJoin()
+                .leftJoin(following.userJpaEntity, user).fetchJoin() // N+1 문제 방지를 위해 fetchJoin
+                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
                 .where(condition)
                 .orderBy(following.createdAt.desc())
                 .limit(size)
