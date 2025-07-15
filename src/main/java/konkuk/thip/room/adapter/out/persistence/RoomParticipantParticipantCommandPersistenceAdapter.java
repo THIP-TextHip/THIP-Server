@@ -22,7 +22,7 @@ public class RoomParticipantParticipantCommandPersistenceAdapter implements Room
     @Override
     public RoomParticipant findByUserIdAndRoomId(Long userId, Long roomId) {
         RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findByUserJpaEntity_UserIdAndRoomJpaEntity_RoomId(userId, roomId).orElseThrow(
-                () -> new EntityNotFoundException(ErrorCode.USER_ROOM_NOT_FOUND)
+                () -> new EntityNotFoundException(ErrorCode.ROOM_PARTICIPANT_NOT_FOUND)
         );
 
         return roomParticipantMapper.toDomainEntity(roomParticipantJpaEntity);

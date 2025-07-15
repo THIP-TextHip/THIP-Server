@@ -105,9 +105,9 @@ public enum ErrorCode implements ResponseCode {
     RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM(HttpStatus.BAD_REQUEST, 120003, "만료된 방에는 기록을 남길 수 없습니다."),
 
     /**
-     * 140000 : userRoom error
+     * 140000 : roomParticipant error
      */
-    USER_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 USER_ROOM (방과 사용자 관계) 입니다."),
+    ROOM_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 RoomParticipant (방과 사용자 관계) 입니다."),
     USER_NOT_BELONG_TO_ROOM(HttpStatus.BAD_REQUEST, 140001, "현재 모임방에 속하지 않는 유저입니다."),
 
     /**
