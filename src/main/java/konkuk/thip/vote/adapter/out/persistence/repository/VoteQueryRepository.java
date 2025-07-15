@@ -1,4 +1,4 @@
-package konkuk.thip.vote.adapter.out.persistence;
+package konkuk.thip.vote.adapter.out.persistence.repository;
 
 import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;

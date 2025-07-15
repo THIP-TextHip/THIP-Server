@@ -11,7 +11,7 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
-import konkuk.thip.vote.adapter.out.persistence.VoteJpaRepository;
+import konkuk.thip.vote.adapter.out.persistence.repository.VoteJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

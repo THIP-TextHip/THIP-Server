@@ -7,17 +7,17 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "user_votes")
+@Table(name = "vote_participants")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserVoteJpaEntity extends BaseJpaEntity {
+public class VoteParticipantJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uservote_id")
-    private Long userVoteId;
+    private Long voteParticipantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

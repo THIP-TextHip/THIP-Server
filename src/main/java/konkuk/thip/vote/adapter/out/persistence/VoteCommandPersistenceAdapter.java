@@ -10,6 +10,8 @@ import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.vote.adapter.out.mapper.VoteItemMapper;
 import konkuk.thip.vote.adapter.out.mapper.VoteMapper;
+import konkuk.thip.vote.adapter.out.persistence.repository.VoteItemJpaRepository;
+import konkuk.thip.vote.adapter.out.persistence.repository.VoteJpaRepository;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.domain.Vote;
 import konkuk.thip.vote.domain.VoteItem;

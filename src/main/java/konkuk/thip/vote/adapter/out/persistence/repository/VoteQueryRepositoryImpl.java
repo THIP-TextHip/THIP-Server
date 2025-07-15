@@ -1,4 +1,4 @@
-package konkuk.thip.vote.adapter.out.persistence;
+package konkuk.thip.vote.adapter.out.persistence.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

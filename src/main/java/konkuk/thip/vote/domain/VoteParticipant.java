@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class UserVote extends BaseDomainEntity {
+public class VoteParticipant extends BaseDomainEntity {
 
     private Long id;
 
