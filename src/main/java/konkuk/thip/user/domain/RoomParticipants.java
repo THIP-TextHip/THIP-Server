@@ -1,10 +1,13 @@
 package konkuk.thip.user.domain;
 
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.adapter.out.jpa.UserRoomRole;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+
+import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_BELONG_TO_ROOM;
 
 @Getter
 @RequiredArgsConstructor
@@ -32,5 +35,21 @@ public class RoomParticipants {
         return participants.stream()
                 .filter(userRoom -> userRoom.getUserId().equals(userId))
                 .anyMatch(userRoom -> userRoom.getUserRoomRole().equals(UserRoomRole.HOST.getType()));
+    }
+
+    public int getCurrentPageOfUser(Long userId) {
+        return participants.stream()
+                .filter(userRoom -> userRoom.getUserId().equals(userId))
+                .map(UserRoom::getCurrentPage)
+                .findFirst()
+                .orElseThrow(() -> new InvalidStateException(USER_NOT_BELONG_TO_ROOM));
+    }
+
+    public double getUserPercentageOfUser(Long userId) {
+        return participants.stream()
+                .filter(userRoom -> userRoom.getUserId().equals(userId))
+                .map(UserRoom::getUserPercentage)
+                .findFirst()
+                .orElseThrow(() -> new InvalidStateException(USER_NOT_BELONG_TO_ROOM));
     }
 }

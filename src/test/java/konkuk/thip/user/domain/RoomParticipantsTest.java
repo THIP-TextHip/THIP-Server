@@ -1,5 +1,6 @@
 package konkuk.thip.user.domain;
 
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.adapter.out.jpa.UserRoomRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,5 +61,55 @@ class RoomParticipantsTest {
         assertTrue(participants.isHostOfRoom(2L));
         assertFalse(participants.isHostOfRoom(1L));
         assertFalse(participants.isHostOfRoom(3L));
+    }
+
+    @Test
+    @DisplayName("유저가 현재 모임방에서 마지막으로 활동한 페이지(= currentPage) 를 반환한다.")
+    void get_current_page_of_user_test() {
+        //given
+        UserRoom ur = createUserRoom(1L, 123L, 10L, UserRoomRole.MEMBER);
+        RoomParticipants participants = RoomParticipants.from(List.of(ur));
+
+        //when
+        int page = participants.getCurrentPageOfUser(123L);
+
+        //then
+        assertEquals(0, page);
+    }
+
+    @Test
+    @DisplayName("현재 모임방에 속하지 않는 유저가 getCurrentPageOfUser 메서드를 호출하면, InvalidStateException이 발생한다.")
+    void get_current_page_of_user_not_belong_test() {
+        //given
+        UserRoom ur = createUserRoom(1L, 123L, 10L, UserRoomRole.MEMBER);
+        RoomParticipants participants = RoomParticipants.from(List.of(ur));
+
+        //when & then
+        assertThrows(InvalidStateException.class, () -> participants.getCurrentPageOfUser(999L));
+    }
+
+    @Test
+    @DisplayName("유저가 현재 모임방에서 활동한 percentage(= userPercentage) 를 반환한다.")
+    void get_user_percentage_of_user_test() {
+        //given
+        UserRoom ur = createUserRoom(1L, 123L, 10L, UserRoomRole.MEMBER);
+        RoomParticipants participants = RoomParticipants.from(List.of(ur));
+
+        //when
+        double percentage = participants.getUserPercentageOfUser(123L);
+
+        //then
+        assertEquals(0.0, percentage);
+    }
+
+    @Test
+    @DisplayName("현재 모임방에 속하지 않는 유저가 getUserPercentageOfUser 메서드를 호출하면, InvalidStateException이 발생한다.")
+    void get_user_percentage_of_user_not_belong_test() {
+        //given
+        UserRoom ur = createUserRoom(1L, 123L, 10L, UserRoomRole.MEMBER);
+        RoomParticipants participants = RoomParticipants.from(List.of(ur));
+
+        //when & then
+        assertThrows(InvalidStateException.class, () -> participants.getUserPercentageOfUser(999L));
     }
 }
