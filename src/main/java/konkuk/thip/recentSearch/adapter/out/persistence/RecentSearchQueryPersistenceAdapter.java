@@ -1,6 +1,7 @@
 package konkuk.thip.recentSearch.adapter.out.persistence;
 
 import konkuk.thip.recentSearch.adapter.out.mapper.RecentSearchMapper;
+import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
