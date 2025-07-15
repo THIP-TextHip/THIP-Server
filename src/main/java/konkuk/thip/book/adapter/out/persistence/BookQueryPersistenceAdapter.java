@@ -1,6 +1,7 @@
 package konkuk.thip.book.adapter.out.persistence;
 
 import konkuk.thip.book.adapter.out.mapper.BookMapper;
+import konkuk.thip.book.adapter.out.persistence.adapter.BookJpaRepository;
 import konkuk.thip.book.application.port.out.BookQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

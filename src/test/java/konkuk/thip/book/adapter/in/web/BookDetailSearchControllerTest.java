@@ -1,6 +1,6 @@
 package konkuk.thip.book.adapter.in.web;
 
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.adapter.BookJpaRepository;
 import konkuk.thip.book.application.service.BookSearchService;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.security.util.JwtUtil;

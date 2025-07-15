@@ -2,7 +2,7 @@ package konkuk.thip.feed.adapter.out.jpa;
 
 import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.adapter.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.persistence.FeedJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;

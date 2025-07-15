@@ -1,4 +1,4 @@
-package konkuk.thip.book.adapter.out.persistence;
+package konkuk.thip.book.adapter.out.persistence.adapter;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
