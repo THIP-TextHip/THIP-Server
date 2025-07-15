@@ -4,6 +4,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;

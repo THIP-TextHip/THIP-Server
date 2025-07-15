@@ -3,7 +3,7 @@ package konkuk.thip.vote.adapter.out.persistence;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;

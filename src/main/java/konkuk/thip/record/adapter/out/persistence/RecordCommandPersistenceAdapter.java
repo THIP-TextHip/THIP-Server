@@ -6,7 +6,7 @@ import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository
 import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
 import lombok.RequiredArgsConstructor;

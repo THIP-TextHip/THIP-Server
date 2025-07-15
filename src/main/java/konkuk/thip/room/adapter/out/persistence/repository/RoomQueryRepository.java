@@ -1,4 +1,4 @@
-package konkuk.thip.room.adapter.out.persistence;
+package konkuk.thip.room.adapter.out.persistence.repository;
 
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;

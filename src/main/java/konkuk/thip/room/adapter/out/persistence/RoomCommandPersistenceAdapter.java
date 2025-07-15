@@ -6,6 +6,8 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
+import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;

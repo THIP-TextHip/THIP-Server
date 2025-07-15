@@ -1,4 +1,4 @@
-package konkuk.thip.room.adapter.out.persistence;
+package konkuk.thip.room.adapter.out.persistence.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
