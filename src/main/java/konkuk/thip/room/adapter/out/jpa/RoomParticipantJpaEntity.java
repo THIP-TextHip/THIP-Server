@@ -15,7 +15,7 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userroom_id")
+    @Column(name = "room_participant_id")
     private Long roomParticipantId;
 
     @Builder.Default
@@ -27,7 +27,7 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
     private double userPercentage = 0.0;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role",nullable = false)
+    @Column(name = "room_participant_role",nullable = false)
     private RoomParticipantRole roomParticipantRole;
 
     @ManyToOne(fetch = FetchType.LAZY)

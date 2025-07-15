@@ -16,7 +16,7 @@ public class VoteParticipantJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "uservote_id")
+    @Column(name = "vote_participant_id")
     private Long voteParticipantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
