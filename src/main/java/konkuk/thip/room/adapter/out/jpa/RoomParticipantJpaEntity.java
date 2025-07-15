@@ -6,7 +6,7 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "room_participant")
+@Table(name = "room_participants")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
