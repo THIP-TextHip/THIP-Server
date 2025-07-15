@@ -98,7 +98,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_3")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(2) // user3가 user1을 팔로우
+                .followingCount(1) // user3가 user1을 팔로우
                 .build());
 
         book = bookJpaRepository.save(TestEntityFactory.createBook());
