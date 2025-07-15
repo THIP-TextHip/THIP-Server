@@ -28,7 +28,7 @@ public class UserJpaEntity extends BaseJpaEntity {
     private String oauth2Id;
 
     @Builder.Default
-    private Integer followingCount = 0;
+    private Integer followingCount = 0; // 팔로잉 수
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -4,7 +4,9 @@ import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.Following;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.USER_CANNOT_FOLLOW_SEL
 public class UserFollowService implements UserFollowUsecase {
 
     private final FollowingCommandPort followingCommandPort;
+    private final UserCommandPort userCommandPort;
 
     @Override
     @Transactional
@@ -31,17 +34,20 @@ public class UserFollowService implements UserFollowUsecase {
         validateParams(userId, targetUserId);
 
         Optional<Following> optionalFollowing = followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId);
+        User user = userCommandPort.findById(userId);
 
         if (optionalFollowing.isPresent()) { // 이미 팔로우 관계가 존재하는 경우
             Following following = optionalFollowing.get();
             boolean isFollowing = following.changeFollowingState(type);
-            followingCommandPort.updateStatus(following);
+            user.updateFollowingCount(isFollowing);
+            followingCommandPort.updateStatus(following, user);
             return isFollowing;
         } else { // 팔로우 관계가 존재하지 않는 경우
             if (!type) {
                 throw new InvalidStateException(USER_ALREADY_UNFOLLOWED); // 언팔로우 요청인데 팔로우 관계가 존재하지 않으므로 이미 언팔로우 상태
             }
-            followingCommandPort.save(Following.withoutId(userId, targetUserId));
+            user.increaseFollowingCount();
+            followingCommandPort.save(Following.withoutId(userId, targetUserId), user);
             return true; // 새로 팔로우한 경우
         }
     }
