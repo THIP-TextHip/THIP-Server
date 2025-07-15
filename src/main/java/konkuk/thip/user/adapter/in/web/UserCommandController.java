@@ -6,6 +6,7 @@ import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.Oauth2Id;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.user.adapter.in.web.request.UserFollowRequest;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.in.web.response.UserFollowResponse;
@@ -14,8 +15,6 @@ import konkuk.thip.user.adapter.in.web.response.UserVerifyNicknameResponse;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
 import konkuk.thip.user.application.port.in.UserVerifyNicknameUseCase;
-import konkuk.thip.user.adapter.in.web.request.UserFollowRequest;
-import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,7 +56,7 @@ public class UserCommandController {
                                             @PathVariable final Long followingUserId,
                                             @RequestBody @Valid final UserFollowRequest request) {
         return BaseResponse.ok(UserFollowResponse.of(userFollowUsecase.changeFollowingState(
-                UserFollowCommand.toCommand(userId, followingUserId, request.type())
+                UserFollowRequest.toCommand(userId, followingUserId, request.type())
         )));
     }
 }
