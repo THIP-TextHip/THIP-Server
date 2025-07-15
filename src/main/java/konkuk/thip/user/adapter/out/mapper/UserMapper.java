@@ -16,6 +16,7 @@ public class UserMapper {
                 .imageUrl(user.getAlias().getImageUrl())
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
+                .followingCount(user.getFollowingCount())
                 .aliasForUserJpaEntity(aliasJpaEntity)
                 .build();
     }
@@ -26,6 +27,7 @@ public class UserMapper {
                 .nickname(userJpaEntity.getNickname())
                 .userRole(userJpaEntity.getRole().getType())
                 .oauth2Id(userJpaEntity.getOauth2Id())
+                .followingCount(userJpaEntity.getFollowingCount())
                 .alias(Alias.from(userJpaEntity.getAliasForUserJpaEntity().getValue()))
                 .createdAt(userJpaEntity.getCreatedAt())
                 .modifiedAt(userJpaEntity.getModifiedAt())

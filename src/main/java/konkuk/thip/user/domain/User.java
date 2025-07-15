@@ -16,6 +16,8 @@ public class User extends BaseDomainEntity {
 
     private String oauth2Id;
 
+    private Integer followingCount;
+
     private Alias alias;
 
     public static User withoutId(String nickname, String userRole, String oauth2Id, Alias alias) {
@@ -24,6 +26,7 @@ public class User extends BaseDomainEntity {
                 .nickname(nickname)
                 .userRole(userRole)
                 .oauth2Id(oauth2Id)
+                .followingCount(0)
                 .alias(alias)
                 .build();
     }

@@ -27,6 +27,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "oauth2_id", length = 50, nullable = false)
     private String oauth2Id;
 
+    @Builder.Default
+    private Integer followingCount = 0;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
