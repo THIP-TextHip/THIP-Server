@@ -1,4 +1,4 @@
-package konkuk.thip.record.adapter.out.persistence;
+package konkuk.thip.record.adapter.out.persistence.repository;
 
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import org.springframework.data.domain.Page;

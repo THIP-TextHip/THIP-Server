@@ -1,4 +1,4 @@
-package konkuk.thip.record.adapter.out.persistence;
+package konkuk.thip.record.adapter.out.persistence.repository;
 
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

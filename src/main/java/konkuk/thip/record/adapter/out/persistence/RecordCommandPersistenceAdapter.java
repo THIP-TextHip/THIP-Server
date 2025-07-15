@@ -2,6 +2,7 @@ package konkuk.thip.record.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.record.adapter.out.mapper.RecordMapper;
+import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;

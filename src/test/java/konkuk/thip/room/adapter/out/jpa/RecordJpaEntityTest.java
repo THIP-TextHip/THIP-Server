@@ -5,7 +5,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.record.adapter.out.persistence.RecordJpaRepository;
+import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
