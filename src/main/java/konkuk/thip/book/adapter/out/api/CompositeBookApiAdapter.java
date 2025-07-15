@@ -3,6 +3,7 @@ package konkuk.thip.book.adapter.out.api;
 import konkuk.thip.book.adapter.out.api.aladin.AladinApiClient;
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
+import konkuk.thip.book.adapter.out.api.naver.NaverApiClient;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.domain.Book;
 import lombok.RequiredArgsConstructor;

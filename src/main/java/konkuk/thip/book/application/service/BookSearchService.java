@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
+import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.recentSearch.adapter.out.jpa.SearchType.BOOK_SEARCH;
 

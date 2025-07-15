@@ -1,4 +1,4 @@
-package konkuk.thip.book.adapter.out.api;
+package konkuk.thip.book.adapter.out.api.naver;
 
 import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
