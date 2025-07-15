@@ -8,7 +8,7 @@ import konkuk.thip.room.application.port.in.RoomShowRecruitingDetailViewUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.domain.Room;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.room.domain.RoomParticipants;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
     private final RoomCommandPort roomCommandPort;
     private final RoomQueryPort roomQueryPort;
     private final BookCommandPort bookCommandPort;
-    private final UserRoomCommandPort userRoomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
 
     @Override
     @Transactional(readOnly = true)
@@ -36,7 +36,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 2. Room과 연관된 UserRoom 조회, RoomParticipants 일급 컬렉션 생성
-        List<RoomParticipant> findByRoomId = userRoomCommandPort.findAllByRoomId(roomId);
+        List<RoomParticipant> findByRoomId = roomParticipantCommandPort.findAllByRoomId(roomId);
         RoomParticipants roomParticipants = RoomParticipants.from(findByRoomId);
 
         // 3. 다른 모임방 추천

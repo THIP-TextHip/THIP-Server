@@ -5,7 +5,7 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.mapper.RoomParticipantMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomParticipantJpaRepository;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RoomParticipantCommandPersistenceAdapter implements UserRoomCommandPort {
+public class RoomParticipantParticipantCommandPersistenceAdapter implements RoomParticipantCommandPort {
 
     private final RoomParticipantJpaRepository roomParticipantJpaRepository;
     private final RoomParticipantMapper roomParticipantMapper;

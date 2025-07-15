@@ -7,7 +7,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.room.application.port.in.RoomShowPlayingDetailViewUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipants;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.vote.application.port.out.VoteQueryPort;
@@ -25,7 +25,7 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
 
     private final RoomCommandPort roomCommandPort;
     private final BookCommandPort bookCommandPort;
-    private final UserRoomCommandPort userRoomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final VoteQueryPort voteQueryPort;
 
     @Override
@@ -37,7 +37,7 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
 
         // 2. Room과 연관된 UserRoom 조회, RoomParticipants 일급 컬렉션 생성
         // TODO. Room 도메인에 memberCount 값 추가된 후 리펙토링
-        List<RoomParticipant> findByRoomId = userRoomCommandPort.findAllByRoomId(roomId);
+        List<RoomParticipant> findByRoomId = roomParticipantCommandPort.findAllByRoomId(roomId);
         RoomParticipants roomParticipants = RoomParticipants.from(findByRoomId);
 
         // 3. 투표 참여율이 가장 높은 투표 조회

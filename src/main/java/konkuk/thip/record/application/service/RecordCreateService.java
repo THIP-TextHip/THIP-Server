@@ -11,7 +11,7 @@ import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final RecordCommandPort recordCommandPort;
     private final RoomCommandPort roomCommandPort;
     private final BookCommandPort bookCommandPort;
-    private final UserRoomCommandPort userRoomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
 
     @Transactional
     @Override
@@ -43,7 +43,7 @@ public class RecordCreateService implements RecordCreateUseCase {
         );
 
         // 2. UserRoom, Room, Book 조회
-        RoomParticipant roomParticipant = userRoomCommandPort.findByUserIdAndRoomId(command.userId(), command.roomId());
+        RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(command.userId(), command.roomId());
         Room room = roomCommandPort.findById(record.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
 
@@ -62,7 +62,7 @@ public class RecordCreateService implements RecordCreateUseCase {
     private void updateRoomProgress(RoomParticipant roomParticipant, Record record, Book book, Room room) {
         if(roomParticipant.updateUserProgress(record.getPage(), book.getPageCount())) {
             // userPercentage가 업데이트되었으면 Room의 roomPercentage 업데이트
-            List<RoomParticipant> roomParticipantList = userRoomCommandPort.findAllByRoomId(record.getRoomId());
+            List<RoomParticipant> roomParticipantList = roomParticipantCommandPort.findAllByRoomId(record.getRoomId());
             Double totalUserPercentage = roomParticipantList.stream()
                     .map(RoomParticipant::getUserPercentage)
                     .reduce(0.0, Double::sum);

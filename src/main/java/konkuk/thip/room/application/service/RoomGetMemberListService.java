@@ -6,7 +6,7 @@ import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
-import konkuk.thip.user.application.port.out.UserRoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.user.domain.User;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class RoomGetMemberListService implements RoomGetMemberListUseCase {
 
     private final RoomCommandPort roomCommandPort;
-    private final UserRoomCommandPort userRoomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final UserCommandPort userCommandPort;
     private final FollowingQueryPort followingQueryPort;
 
@@ -33,7 +33,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         Room room = roomCommandPort.findById(roomId);
 
         // 2. 방 참여자(UserRoom) 전체 조회
-        List<RoomParticipant> roomParticipants = userRoomCommandPort.findAllByRoomId(room.getId());
+        List<RoomParticipant> roomParticipants = roomParticipantCommandPort.findAllByRoomId(room.getId());
 
 
         // 3. 참여자 userId 목록 추출
