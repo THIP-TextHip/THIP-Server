@@ -31,12 +31,6 @@ class UserFollowControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Map<String, Object> buildValidRequest() {
-        Map<String, Object> req = new HashMap<>();
-        req.put("type", true);
-        return req;
-    }
-
     private void assertBad(Map<String, Object> req, String msg) throws Exception {
         mockMvc.perform(post("/users/following/{followingUserId}", 2L)
                         .requestAttr("userId", 1L)

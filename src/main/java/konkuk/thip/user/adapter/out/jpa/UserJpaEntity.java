@@ -38,4 +38,8 @@ public class UserJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 
+    public void updateFollowingCount(int followingCount) {
+        this.followingCount = followingCount;
+    }
+
 }
