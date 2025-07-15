@@ -1,5 +1,5 @@
 package konkuk.thip.attendancecheck.application.port.out;
 
-public interface AttendnaceCheckQueryPort {
+public interface AttendanceCheckQueryPort {
 
 }
