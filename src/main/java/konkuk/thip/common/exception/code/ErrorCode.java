@@ -72,7 +72,7 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 90000 : recentSearch error
      */
-    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 900000,"알맞은 검색어 타입을 찾을 수 없습니다."),
+    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 90000,"알맞은 검색어 타입을 찾을 수 없습니다."),
 
     /**
      * 100000 : room error
@@ -109,6 +109,7 @@ public enum ErrorCode implements ResponseCode {
      */
     ROOM_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 RoomParticipant (방과 사용자 관계) 입니다."),
     USER_NOT_BELONG_TO_ROOM(HttpStatus.BAD_REQUEST, 140001, "현재 모임방에 속하지 않는 유저입니다."),
+    ROOM_PARTICIPANT_ROLE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140002, "일치하는 방에서의 사용자 역할이 없습니다."),
 
     /**
      * 150000 : Category error

@@ -1,6 +1,8 @@
 
 package konkuk.thip.room.adapter.out.jpa;
 
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import lombok.Getter;
 
 @Getter
@@ -21,9 +23,7 @@ public enum RoomParticipantRole {
                 return roomParticipantRole;
             }
         }
-        //컨트롤러 어드바이스 추가하고 예외처리
-        //throw new GlobalException(NO_SUCH_TYPE_USER);
-        return null;
+        throw new InvalidStateException(ErrorCode.ROOM_PARTICIPANT_ROLE_NOT_MATCH, new IllegalArgumentException("요청된 사용자 역할: " + type));
     }
 
 
