@@ -1,4 +1,4 @@
-package konkuk.thip.user.application.service;
+package konkuk.thip.user.application.service.follow;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
