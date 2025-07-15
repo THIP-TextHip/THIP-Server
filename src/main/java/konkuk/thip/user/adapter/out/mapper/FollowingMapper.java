@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class FollowingMapper {
 
-    public FollowingJpaEntity toJpaEntity(UserJpaEntity userJpaEntity, UserJpaEntity followingUserJpaEntity) {
+    public FollowingJpaEntity toJpaEntity(UserJpaEntity followerUserJpaEntity, UserJpaEntity followingUserJpaEntity) {
         return FollowingJpaEntity.builder()
-                .userJpaEntity(userJpaEntity)
+                .followerUserJpaEntity(followerUserJpaEntity)
                 .followingUserJpaEntity(followingUserJpaEntity)
                 .build();
     }
@@ -18,7 +18,7 @@ public class FollowingMapper {
     public Following toDomainEntity(FollowingJpaEntity followingJpaEntity) {
         return Following.builder()
                 .id(followingJpaEntity.getFollowingId())
-                .userId(followingJpaEntity.getUserJpaEntity().getUserId())
+                .followerUserId(followingJpaEntity.getFollowerUserJpaEntity().getUserId())
                 .followingUserId(followingJpaEntity.getFollowingUserJpaEntity().getUserId())
                 .createdAt(followingJpaEntity.getCreatedAt())
                 .modifiedAt(followingJpaEntity.getModifiedAt())

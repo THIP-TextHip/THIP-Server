@@ -21,7 +21,7 @@ public class FollowingJpaEntity extends BaseJpaEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserJpaEntity userJpaEntity;
+    private UserJpaEntity followerUserJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_user_id")
