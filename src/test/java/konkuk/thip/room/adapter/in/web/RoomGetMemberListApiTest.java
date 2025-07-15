@@ -187,9 +187,9 @@ class RoomGetMemberListApiTest {
         ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
 
         //then
-        // user1: user3이 팔로우(1명)
-        // user2: user1이 팔로우(1명)
-        // user3: user1, user2가 팔로우(2명)
+        // user1이 팔로우하는 사람: user2, user3 (2명)
+        // user2가 팔로우하는 사람: user3 (1명)
+        // user3이 팔로우하는 사람: user1 (1명)
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.userList[?(@.userId==" + user1.getUserId() + ")].followingCount").value(contains(1)))
                 .andExpect(jsonPath("$.data.userList[?(@.userId==" + user2.getUserId() + ")].followingCount").value(contains(1)))
