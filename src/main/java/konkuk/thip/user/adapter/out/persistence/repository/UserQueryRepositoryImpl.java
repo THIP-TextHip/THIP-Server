@@ -1,4 +1,4 @@
-package konkuk.thip.user.adapter.out.persistence;
+package konkuk.thip.user.adapter.out.persistence.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;

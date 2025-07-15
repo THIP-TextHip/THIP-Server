@@ -4,6 +4,7 @@ import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.persistence.repository.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

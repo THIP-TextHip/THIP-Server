@@ -4,6 +4,7 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.user.adapter.out.jpa.UserRoomJpaEntity;
 import konkuk.thip.user.adapter.out.mapper.UserRoomMapper;
+import konkuk.thip.user.adapter.out.persistence.repository.UserRoomJpaRepository;
 import konkuk.thip.user.application.port.out.UserRoomCommandPort;
 import konkuk.thip.user.domain.UserRoom;
 import lombok.RequiredArgsConstructor;

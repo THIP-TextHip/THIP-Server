@@ -1,6 +1,8 @@
 package konkuk.thip.user.adapter.out.persistence;
 
 import konkuk.thip.user.adapter.out.mapper.UserMapper;
+import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import lombok.RequiredArgsConstructor;
