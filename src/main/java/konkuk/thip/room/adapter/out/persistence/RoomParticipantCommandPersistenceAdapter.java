@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RoomParticipantParticipantCommandPersistenceAdapter implements RoomParticipantCommandPort {
+public class RoomParticipantCommandPersistenceAdapter implements RoomParticipantCommandPort {
 
     private final RoomParticipantJpaRepository roomParticipantJpaRepository;
     private final RoomParticipantMapper roomParticipantMapper;
