@@ -1,6 +1,5 @@
 package konkuk.thip.user.adapter.in.web;
 
-import jakarta.persistence.EntityManager;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
@@ -32,9 +31,6 @@ class UserFollowApiTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Autowired
     private UserJpaRepository userJpaRepository;
