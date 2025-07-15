@@ -4,7 +4,7 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.mapper.UserMapper;
-import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;

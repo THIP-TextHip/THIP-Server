@@ -5,7 +5,7 @@ import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.mapper.FollowingMapper;
 import konkuk.thip.user.adapter.out.mapper.UserMapper;
-import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;

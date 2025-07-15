@@ -1,4 +1,4 @@
-package konkuk.thip.user.adapter.out.persistence.repository;
+package konkuk.thip.user.adapter.out.persistence.repository.alias;
 
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
