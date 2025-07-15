@@ -9,7 +9,7 @@ public interface FollowingCommandPort {
 
     Optional<Following> findByUserIdAndTargetUserId(Long userId, Long targetUserId);
 
-    void save(Following following, User user);
+    void save(Following following, User targetUser);
 
-    void updateStatus(Following following, User user);
+    void updateStatus(Following following, User targetUser);
 }

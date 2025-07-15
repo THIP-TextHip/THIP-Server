@@ -18,7 +18,7 @@ public class User extends BaseDomainEntity {
 
     private String oauth2Id;
 
-    private Integer followingCount; // 팔로잉 수
+    private Integer followerCount; // 팔로워 수
 
     private Alias alias;
 
@@ -28,28 +28,28 @@ public class User extends BaseDomainEntity {
                 .nickname(nickname)
                 .userRole(userRole)
                 .oauth2Id(oauth2Id)
-                .followingCount(0)
+                .followerCount(0)
                 .alias(alias)
                 .build();
     }
 
-    public void updateFollowingCount(boolean isFollowing) {
+    public void updateFollowerCount(boolean isFollowing) {
         if (isFollowing) {
-            increaseFollowingCount();
+            increaseFollowerCount();
         } else {
-            decreaseFollowingCount();
+            decreaseFollowerCount();
         }
     }
 
-    public void increaseFollowingCount() {
-        followingCount++;
+    public void increaseFollowerCount() {
+        followerCount++;
     }
 
-    private void decreaseFollowingCount() {
-        if(followingCount == 0) {
+    private void decreaseFollowerCount() {
+        if(followerCount == 0) {
             throw new InvalidStateException(ErrorCode.FOLLOW_COUNT_IS_ZERO);
         }
-        followingCount--;
+        followerCount--;
     }
 
 }

@@ -28,7 +28,7 @@ public class UserJpaEntity extends BaseJpaEntity {
     private String oauth2Id;
 
     @Builder.Default
-    private Integer followingCount = 0; // 팔로잉 수
+    private Integer followerCount = 0; // 팔로워 수
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -38,8 +38,8 @@ public class UserJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 
-    public void updateFollowingCount(int followingCount) {
-        this.followingCount = followingCount;
+    public void updateFollowerCount(int followerCount) {
+        this.followerCount = followerCount;
     }
 
 }

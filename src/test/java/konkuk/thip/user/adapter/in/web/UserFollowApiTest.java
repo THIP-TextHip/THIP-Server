@@ -82,8 +82,8 @@ class UserFollowApiTest {
         FollowingJpaEntity followEntity = followingJpaRepository.findByUserAndTargetUser(followingUser.getUserId(), target.getUserId()).orElseThrow();
         assertThat(followEntity.getStatus().name()).isEqualTo("ACTIVE");
 
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(followingUser.getUserId()).orElseThrow();
-        assertThat(userJpaEntity.getFollowingCount()).isEqualTo(1); // 팔로우 수 증가 확인
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(target.getUserId()).orElseThrow();
+        assertThat(userJpaEntity.getFollowerCount()).isEqualTo(1); // 팔로워 수 증가 확인
 
         // 언팔로우 요청
         mockMvc.perform(post("/users/following/{followingUserId}", target.getUserId())
@@ -97,7 +97,7 @@ class UserFollowApiTest {
         FollowingJpaEntity updatedEntity = followingJpaRepository.findByUserAndTargetUser(followingUser.getUserId(), target.getUserId()).orElseThrow();
         assertThat(updatedEntity.getStatus().name()).isEqualTo("INACTIVE");
 
-        userJpaEntity = userJpaRepository.findById(followingUser.getUserId()).orElseThrow();
-        assertThat(userJpaEntity.getFollowingCount()).isEqualTo(0); // 팔로우 수 감소 확인
+        userJpaEntity = userJpaRepository.findById(target.getUserId()).orElseThrow();
+        assertThat(userJpaEntity.getFollowerCount()).isEqualTo(0); // 팔로워 수 감소 확인
     }
 }

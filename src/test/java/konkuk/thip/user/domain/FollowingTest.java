@@ -21,7 +21,7 @@ class FollowingTest {
         @DisplayName("inactive 상태에서 follow 요청 → active로 변경")
         void follow_from_inactive() {
             Following following = Following.builder()
-                    .followerUserId(1L)
+                    .userId(1L)
                     .followingUserId(2L)
                     .status(StatusType.INACTIVE)
                     .build();
@@ -36,7 +36,7 @@ class FollowingTest {
         @DisplayName("이미 active 상태에서 follow 요청 → 예외 발생")
         void follow_from_active_should_throw() {
             Following following = Following.builder()
-                    .followerUserId(1L)
+                    .userId(1L)
                     .followingUserId(2L)
                     .status(StatusType.ACTIVE)
                     .build();
@@ -55,7 +55,7 @@ class FollowingTest {
         @DisplayName("active 상태에서 unfollow 요청 → inactive로 변경")
         void unfollow_from_active() {
             Following following = Following.builder()
-                    .followerUserId(1L)
+                    .userId(1L)
                     .followingUserId(2L)
                     .status(StatusType.ACTIVE)
                     .build();
@@ -70,7 +70,7 @@ class FollowingTest {
         @DisplayName("이미 inactive 상태에서 unfollow 요청 → 예외 발생")
         void unfollow_from_inactive_should_throw() {
             Following following = Following.builder()
-                    .followerUserId(1L)
+                    .userId(1L)
                     .followingUserId(2L)
                     .status(StatusType.INACTIVE)
                     .build();
@@ -86,7 +86,7 @@ class FollowingTest {
     void create_following_should_be_active() {
         Following following = Following.withoutId(1L, 2L);
 
-        assertThat(following.getFollowerUserId()).isEqualTo(1L);
+        assertThat(following.getUserId()).isEqualTo(1L);
         assertThat(following.getFollowingUserId()).isEqualTo(2L);
         assertThat(following.getStatus()).isEqualTo(StatusType.ACTIVE);
     }

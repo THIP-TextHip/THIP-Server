@@ -80,7 +80,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_1")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(2) // user1이 user2, user3를 팔로우
+                .followerCount(2) // user1이 user2, user3를 팔로우
                 .build());
 
         user2 = userJpaRepository.save(UserJpaEntity.builder()
@@ -89,7 +89,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_2")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(1) // user2가 user3를 팔로우
+                .followerCount(1) // user2가 user3를 팔로우
                 .build());
 
         user3 = userJpaRepository.save(UserJpaEntity.builder()
@@ -98,7 +98,7 @@ class RoomGetMemberListApiTest {
                 .oauth2Id("kakao_3")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
-                .followingCount(1) // user3가 user1을 팔로우
+                .followerCount(1) // user3가 user1을 팔로우
                 .build());
 
         book = bookJpaRepository.save(TestEntityFactory.createBook());
@@ -150,17 +150,17 @@ class RoomGetMemberListApiTest {
                 .andExpect(jsonPath("$.data.userList[0].nickname").exists())
                 .andExpect(jsonPath("$.data.userList[0].imageUrl").exists())
                 .andExpect(jsonPath("$.data.userList[0].alias").exists())
-                .andExpect(jsonPath("$.data.userList[0].followingCount").isNumber())
+                .andExpect(jsonPath("$.data.userList[0].followerCount").isNumber())
                 .andExpect(jsonPath("$.data.userList[1].userId").value(user2.getUserId().intValue()))
                 .andExpect(jsonPath("$.data.userList[1].nickname").exists())
                 .andExpect(jsonPath("$.data.userList[1].imageUrl").exists())
                 .andExpect(jsonPath("$.data.userList[1].alias").exists())
-                .andExpect(jsonPath("$.data.userList[1].followingCount").isNumber())
+                .andExpect(jsonPath("$.data.userList[1].followerCount").isNumber())
                 .andExpect(jsonPath("$.data.userList[2].userId").value(user3.getUserId().intValue()))
                 .andExpect(jsonPath("$.data.userList[2].nickname").exists())
                 .andExpect(jsonPath("$.data.userList[2].imageUrl").exists())
                 .andExpect(jsonPath("$.data.userList[2].alias").exists())
-                .andExpect(jsonPath("$.data.userList[2].followingCount").isNumber());
+                .andExpect(jsonPath("$.data.userList[2].followerCount").isNumber());
     }
 
     @Test
@@ -191,13 +191,13 @@ class RoomGetMemberListApiTest {
         // user2가 팔로우하는 사람: user3 (1명)
         // user3이 팔로우하는 사람: user1 (1명)
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user1.getUserId() + ")].followingCount").value(contains(2)))
-                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user2.getUserId() + ")].followingCount").value(contains(1)))
-                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user3.getUserId() + ")].followingCount").value(contains(1)));
+                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user1.getUserId() + ")].followerCount").value(contains(2)))
+                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user2.getUserId() + ")].followerCount").value(contains(1)))
+                .andExpect(jsonPath("$.data.userList[?(@.userId==" + user3.getUserId() + ")].followerCount").value(contains(1)));
     }
 
     @Test
-    @DisplayName("팔로워가 한 명도 없는 사용자는 followingCount가 0으로 조회된다.")
+    @DisplayName("팔로워가 한 명도 없는 사용자는 followerCount가 0으로 조회된다.")
     void getRoomMemberList_noSubscriber() throws Exception {
         //given
         UserJpaEntity userNoFollower = userJpaRepository.save(TestEntityFactory.createUser(aliasJpaRepository.findAll().get(0)));
@@ -209,6 +209,6 @@ class RoomGetMemberListApiTest {
 
         //then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userList[?(@.userId==" + userNoFollower.getUserId() + ")].followingCount").value(contains(0)));
+                .andExpect(jsonPath("$.data.userList[?(@.userId==" + userNoFollower.getUserId() + ")].followerCount").value(contains(0)));
     }
 }

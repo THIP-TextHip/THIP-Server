@@ -34,20 +34,20 @@ public class UserFollowService implements UserFollowUsecase {
         validateParams(userId, targetUserId);
 
         Optional<Following> optionalFollowing = followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId);
-        User user = userCommandPort.findById(userId);
+        User targetUser = userCommandPort.findById(targetUserId);
 
         if (optionalFollowing.isPresent()) { // 이미 팔로우 관계가 존재하는 경우
             Following following = optionalFollowing.get();
             boolean isFollowing = following.changeFollowingState(type);
-            user.updateFollowingCount(isFollowing);
-            followingCommandPort.updateStatus(following, user);
+            targetUser.updateFollowerCount(isFollowing);
+            followingCommandPort.updateStatus(following, targetUser);
             return isFollowing;
         } else { // 팔로우 관계가 존재하지 않는 경우
             if (!type) {
                 throw new InvalidStateException(USER_ALREADY_UNFOLLOWED); // 언팔로우 요청인데 팔로우 관계가 존재하지 않으므로 이미 언팔로우 상태
             }
-            user.increaseFollowingCount();
-            followingCommandPort.save(Following.withoutId(userId, targetUserId), user);
+            targetUser.increaseFollowerCount();
+            followingCommandPort.save(Following.withoutId(userId, targetUserId), targetUser);
             return true; // 새로 팔로우한 경우
         }
     }

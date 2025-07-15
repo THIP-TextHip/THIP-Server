@@ -19,7 +19,7 @@ public record UserFollowersResponse(
             String nickname,
             String profileImageUrl,
             String aliasName,
-            Integer followingCount
+            Integer followerCount
     ){
     }
 

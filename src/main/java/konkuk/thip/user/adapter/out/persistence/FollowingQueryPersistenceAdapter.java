@@ -29,7 +29,7 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
                 followingJpaRepository.findFollowersByUserIdBeforeCreatedAt(userId, nextCursor, size);
 
         List<UserJpaEntity> followers = followerEntities.stream()
-                .map(FollowingJpaEntity::getFollowerUserJpaEntity) // 팔로워 사용자
+                .map(FollowingJpaEntity::getUserJpaEntity) // 팔로워 사용자
                 .toList();
 
         List<UserFollowersResponse.Follower> followerList = followers.stream()
@@ -38,7 +38,7 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
                         .nickname(follower.getNickname())
                         .profileImageUrl(follower.getAliasForUserJpaEntity().getImageUrl())
                         .aliasName(follower.getAliasForUserJpaEntity().getValue())
-                        .followingCount(follower.getFollowingCount())
+                        .followerCount(follower.getFollowerCount())
                         .build())
                 .toList();
 

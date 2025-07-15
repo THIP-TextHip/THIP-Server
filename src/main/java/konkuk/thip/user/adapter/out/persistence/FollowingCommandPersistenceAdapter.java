@@ -37,31 +37,31 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
     }
 
     @Override
-    public void save(Following following, User user) { // insert용
-        UserJpaEntity targetUser = userJpaRepository.findById(following.getFollowingUserId()).orElseThrow(
+    public void save(Following following, User targetUser) { // insert용
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(following.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        UserJpaEntity followingUser = updateUserFollowingCount(user);
-        followingJpaRepository.save(followingMapper.toJpaEntity(followingUser, targetUser));
+        UserJpaEntity targetUserJpaEntity = updateUserFollowingCount(targetUser);
+        followingJpaRepository.save(followingMapper.toJpaEntity(userJpaEntity, targetUserJpaEntity));
 
     }
 
     @Override
-    public void updateStatus(Following following, User user) { // 상태변경 용
-        updateUserFollowingCount(user);
+    public void updateStatus(Following following, User targetUser) { // 상태변경 용
+        updateUserFollowingCount(targetUser);
 
-        FollowingJpaEntity entity = followingJpaRepository.findByUserAndTargetUser(following.getFollowerUserId(), following.getFollowingUserId())
+        FollowingJpaEntity entity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
                 .orElseThrow(() -> new EntityNotFoundException(FOLLOW_NOT_FOUND));
 
         entity.setStatus(following.getStatus());
     }
 
-    private UserJpaEntity updateUserFollowingCount(User user) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(user.getId()).orElseThrow(
+    private UserJpaEntity updateUserFollowingCount(User targetUser) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(targetUser.getId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
-        userJpaEntity.updateFollowingCount(user.getFollowingCount());
+        userJpaEntity.updateFollowerCount(targetUser.getFollowerCount());
         userJpaRepository.save(userJpaEntity);
         return userJpaEntity;
     }

@@ -52,7 +52,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
                             .nickname(user.getNickname())
                             .imageUrl(user.getAlias().getImageUrl())
                             .alias(user.getAlias().getValue())
-                            .followingCount(user.getFollowingCount())
+                            .followerCount(user.getFollowerCount())
                             .build();
                 })
                 .toList();
