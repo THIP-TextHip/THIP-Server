@@ -1,4 +1,4 @@
-package konkuk.thip.user.adapter.out.persistence.repository;
+package konkuk.thip.user.adapter.out.persistence.repository.following;
 
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
