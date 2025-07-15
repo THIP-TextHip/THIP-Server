@@ -1,4 +1,4 @@
-package konkuk.thip.comment.adapter.out.persistence;
+package konkuk.thip.comment.adapter.out.persistence.repository;
 
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
