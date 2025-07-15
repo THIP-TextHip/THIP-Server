@@ -41,14 +41,14 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(following.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        UserJpaEntity targetUserJpaEntity = updateUserFollowingCount(targetUser);
+        UserJpaEntity targetUserJpaEntity = updateUserFollowerCount(targetUser);
         followingJpaRepository.save(followingMapper.toJpaEntity(userJpaEntity, targetUserJpaEntity));
 
     }
 
     @Override
     public void updateStatus(Following following, User targetUser) { // 상태변경 용
-        updateUserFollowingCount(targetUser);
+        updateUserFollowerCount(targetUser);
 
         FollowingJpaEntity entity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
                 .orElseThrow(() -> new EntityNotFoundException(FOLLOW_NOT_FOUND));
@@ -56,7 +56,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
         entity.setStatus(following.getStatus());
     }
 
-    private UserJpaEntity updateUserFollowingCount(User targetUser) {
+    private UserJpaEntity updateUserFollowerCount(User targetUser) {
         UserJpaEntity userJpaEntity = userJpaRepository.findById(targetUser.getId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
