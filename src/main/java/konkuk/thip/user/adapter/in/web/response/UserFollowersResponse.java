@@ -13,6 +13,7 @@ public record UserFollowersResponse(
         boolean isFirst,
         boolean isLast
 ) {
+    @Builder
     public record Follower(
             Long userId,
             String nickname,
@@ -20,15 +21,15 @@ public record UserFollowersResponse(
             String aliasName,
             Integer followingCount
     ){
-        public static Follower of(Long userId, String nickname, String profileImageUrl, String aliasName, Integer followingCount) {
-            return new Follower(
-                    userId,
-                    nickname,
-                    profileImageUrl,
-                    aliasName,
-                    followingCount
-            );
-        }
+//        public static Follower of(Long userId, String nickname, String profileImageUrl, String aliasName, Integer followingCount) {
+//            return new Follower(
+//                    userId,
+//                    nickname,
+//                    profileImageUrl,
+//                    aliasName,
+//                    followingCount
+//            );
+//        }
     }
 
 }
