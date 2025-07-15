@@ -9,11 +9,11 @@ import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRoomRole;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.FollowingJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.UserRoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomParticipantJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,7 +55,7 @@ class RoomGetMemberListApiTest {
     private RoomJpaRepository roomJpaRepository;
 
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @Autowired
     private FollowingJpaRepository followingJpaRepository;
@@ -82,9 +82,9 @@ class RoomGetMemberListApiTest {
         room1 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         // 유저1(호스트), 유저2(멤버), 유저3(멤버)로 참여
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1, user1, UserRoomRole.HOST, 80.0));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1, user2, UserRoomRole.MEMBER, 60.0));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1, user3, UserRoomRole.MEMBER, 50.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, user1, RoomParticipantRole.HOST, 80.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, user2, RoomParticipantRole.MEMBER, 60.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, user3, RoomParticipantRole.MEMBER, 50.0));
 
 
         // 팔로잉 관계 설정
@@ -100,7 +100,7 @@ class RoomGetMemberListApiTest {
     @AfterEach
     void tearDown() {
         followingJpaRepository.deleteAllInBatch();
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -176,7 +176,7 @@ class RoomGetMemberListApiTest {
     void getRoomMemberList_noSubscriber() throws Exception {
         //given
         UserJpaEntity userNoFollower = userJpaRepository.save(TestEntityFactory.createUser(aliasJpaRepository.findAll().get(0)));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1, userNoFollower, UserRoomRole.MEMBER, 10.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, userNoFollower, RoomParticipantRole.MEMBER, 10.0));
         Long roomId = room1.getRoomId();
 
         //when

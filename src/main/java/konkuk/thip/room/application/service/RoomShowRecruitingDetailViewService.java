@@ -9,7 +9,7 @@ import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.user.application.port.out.UserRoomCommandPort;
-import konkuk.thip.user.domain.UserRoom;
+import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.room.domain.RoomParticipants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 2. Room과 연관된 UserRoom 조회, RoomParticipants 일급 컬렉션 생성
-        List<UserRoom> findByRoomId = userRoomCommandPort.findAllByRoomId(roomId);
+        List<RoomParticipant> findByRoomId = userRoomCommandPort.findAllByRoomId(roomId);
         RoomParticipants roomParticipants = RoomParticipants.from(findByRoomId);
 
         // 3. 다른 모임방 추천

@@ -6,13 +6,15 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.persistence.repository.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.UserRoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomParticipantJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.FeedJpaRepository;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
@@ -47,7 +49,7 @@ class BookDetailSearchControllerTest {
     @Autowired
     private RoomJpaRepository roomJpaRepository;
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired
     private FeedJpaRepository feedJpaRepository;
     @Autowired
@@ -98,10 +100,10 @@ class BookDetailSearchControllerTest {
                 .categoryJpaEntity(category)
                 .build());
 
-        userRoomJpaRepository.save(UserRoomJpaEntity.builder()
+        roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .currentPage(10)
                 .userPercentage(10.0)
-                .userRoomRole(UserRoomRole.MEMBER)
+                .roomParticipantRole(RoomParticipantRole.MEMBER)
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
                 .build());
@@ -124,7 +126,7 @@ class BookDetailSearchControllerTest {
     void tearDown() {
         savedBookJpaRepository.deleteAll();
         feedJpaRepository.deleteAll();
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -155,7 +157,7 @@ class BookDetailSearchControllerTest {
         BookJpaEntity book = bookJpaRepository.findAll().get(0);
 
         // 기존 방 삭제
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
 
         // startDate가 과거인 새로운 방 생성 (모집 중 아님)
@@ -184,7 +186,7 @@ class BookDetailSearchControllerTest {
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
         feedJpaRepository.deleteAll();
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());
         assertThat(result.recruitingReadCount()).isEqualTo(0);

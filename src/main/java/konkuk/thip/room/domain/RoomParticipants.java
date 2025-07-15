@@ -1,8 +1,7 @@
 package konkuk.thip.room.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.user.adapter.out.jpa.UserRoomRole;
-import konkuk.thip.user.domain.UserRoom;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -17,9 +16,9 @@ public class RoomParticipants {
      * 특정 Room 과 연관된 UserRoom 들을 모은 일급 컬렉션
      */
 
-    private final List<UserRoom> participants;
+    private final List<RoomParticipant> participants;
 
-    public static RoomParticipants from(List<UserRoom> participants) {
+    public static RoomParticipants from(List<RoomParticipant> participants) {
         return new RoomParticipants(participants);
     }
 
@@ -35,13 +34,13 @@ public class RoomParticipants {
     public boolean isHostOfRoom(Long userId) {
         return participants.stream()
                 .filter(userRoom -> userRoom.getUserId().equals(userId))
-                .anyMatch(userRoom -> userRoom.getUserRoomRole().equals(UserRoomRole.HOST.getType()));
+                .anyMatch(userRoom -> userRoom.getRoomParticipantRole().equals(RoomParticipantRole.HOST.getType()));
     }
 
     public int getCurrentPageOfUser(Long userId) {
         return participants.stream()
                 .filter(userRoom -> userRoom.getUserId().equals(userId))
-                .map(UserRoom::getCurrentPage)
+                .map(RoomParticipant::getCurrentPage)
                 .findFirst()
                 .orElseThrow(() -> new InvalidStateException(USER_NOT_BELONG_TO_ROOM));
     }
@@ -49,7 +48,7 @@ public class RoomParticipants {
     public double getUserPercentageOfUser(Long userId) {
         return participants.stream()
                 .filter(userRoom -> userRoom.getUserId().equals(userId))
-                .map(UserRoom::getUserPercentage)
+                .map(RoomParticipant::getUserPercentage)
                 .findFirst()
                 .orElseThrow(() -> new InvalidStateException(USER_NOT_BELONG_TO_ROOM));
     }

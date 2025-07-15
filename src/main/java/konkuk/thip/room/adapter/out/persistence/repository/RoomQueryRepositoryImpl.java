@@ -15,7 +15,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QUserRoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,7 +34,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     private final JPAQueryFactory queryFactory;
     private final QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
-    private final QUserRoomJpaEntity userRoom = QUserRoomJpaEntity.userRoomJpaEntity;
+    private final QRoomParticipantJpaEntity userRoom = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
 
 
     @Override
@@ -58,7 +58,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .when(room.title.containsIgnoreCase(keyword)).then(1)
                 .otherwise(0);
 
-        NumberExpression<Long> memberCountExpr = userRoom.userRoomId.count();       // 방 별 멤버수 표현식
+        NumberExpression<Long> memberCountExpr = userRoom.roomParticipantId.count();       // 방 별 멤버수 표현식
 
         List<Tuple> tuples = queryFactory
                 .select(
@@ -146,7 +146,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     @Override
     public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, String category, int count) {
-        NumberExpression<Long> memberCountExpr = userRoom.userRoomId.count();
+        NumberExpression<Long> memberCountExpr = userRoom.roomParticipantId.count();
         List<Tuple> tuples = queryFactory
                 .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate)
                 .from(room)
@@ -175,7 +175,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     @Override
     public Page<RoomGetHomeJoinedListResponse.RoomSearchResult> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
 
-        QUserRoomJpaEntity userRoomSub = new QUserRoomJpaEntity("userRoomSub");
+        QRoomParticipantJpaEntity userRoomSub = new QRoomParticipantJpaEntity("userRoomSub");
 
         // 1. 검색 조건(where) 조립
         // 유저가 참여한 방만: userId 조건

@@ -1,12 +1,12 @@
 package konkuk.thip.user.application.port.out;
 
-import konkuk.thip.user.domain.UserRoom;
+import konkuk.thip.room.domain.RoomParticipant;
 
 import java.util.List;
 
 public interface UserRoomCommandPort {
 
-    UserRoom findByUserIdAndRoomId(Long userId, Long roomId);
-    List<UserRoom> findAllByRoomId(Long roomId);
+    RoomParticipant findByUserIdAndRoomId(Long userId, Long roomId);
+    List<RoomParticipant> findAllByRoomId(Long roomId);
 
 }

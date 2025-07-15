@@ -1,22 +1,22 @@
-package konkuk.thip.user.adapter.out.jpa;
+package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.*;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "user_rooms")
+@Table(name = "room_participant")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserRoomJpaEntity extends BaseJpaEntity {
+public class RoomParticipantJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userroom_id")
-    private Long userRoomId;
+    private Long roomParticipantId;
 
     @Builder.Default
     @Column(name = "current_page",nullable = false)
@@ -28,7 +28,7 @@ public class UserRoomJpaEntity extends BaseJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role",nullable = false)
-    private UserRoomRole userRoomRole;
+    private RoomParticipantRole roomParticipantRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

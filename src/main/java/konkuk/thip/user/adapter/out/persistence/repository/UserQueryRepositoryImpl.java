@@ -2,7 +2,7 @@ package konkuk.thip.user.adapter.out.persistence.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QUserRoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +17,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
     @Override
     public Set<Long> findUserIdsByBookId(Long bookId) {
-        QUserRoomJpaEntity userRoom = QUserRoomJpaEntity.userRoomJpaEntity;
+        QRoomParticipantJpaEntity userRoom = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
         QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
 
         return new HashSet<>(

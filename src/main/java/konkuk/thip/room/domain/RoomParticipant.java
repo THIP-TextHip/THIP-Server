@@ -1,4 +1,4 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
-public class UserRoom extends BaseDomainEntity {
+public class RoomParticipant extends BaseDomainEntity {
 
     private Long id;
 
@@ -14,7 +14,7 @@ public class UserRoom extends BaseDomainEntity {
 
     private double userPercentage;
 
-    private String userRoomRole;
+    private String roomParticipantRole;
 
     private Long userId;
 
