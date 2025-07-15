@@ -10,7 +10,7 @@ import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
