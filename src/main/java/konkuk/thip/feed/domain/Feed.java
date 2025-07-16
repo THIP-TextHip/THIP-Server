@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @SuperBuilder
@@ -32,7 +33,10 @@ public class Feed extends BaseDomainEntity {
 
     private List<Tag> tagList;
 
-    public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId, List<Tag> tagList) {
+    private List<Content> contentList;
+
+    public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId, List<Tag> tagList, List<String> imageUrls) {
+
         return Feed.builder()
                 .id(null)
                 .content(content)
@@ -42,8 +46,19 @@ public class Feed extends BaseDomainEntity {
                 .likeCount(0)
                 .commentCount(0)
                 .targetBookId(targetBookId)
-                .tagList(tagList)
+                .tagList(tagList != null ? tagList : List.of())
+                .contentList(convertToContentList(imageUrls))
                 .build();
     }
+
+    private static List<Content> convertToContentList(List<String> imageUrls) {
+        if (imageUrls == null) return List.of();
+
+        return imageUrls.stream()
+                .filter(url -> url != null && !url.isBlank())
+                .map(url -> Content.builder().contentUrl(url).build())
+                .collect(Collectors.toList());
+    }
+
 
 }
