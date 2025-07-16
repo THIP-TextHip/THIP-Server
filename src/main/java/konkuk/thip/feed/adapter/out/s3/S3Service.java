@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.util.IOUtils;
 import konkuk.thip.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
@@ -125,7 +127,7 @@ public class S3Service {
         try{
             amazonS3.deleteObject(new DeleteObjectRequest(bucket, key));
         }catch (Exception e){
-            throw new BusinessException(IO_EXCEPTION_ON_IMAGE_DELETE);
+            log.error("Failed to delete image from S3. Key: {}, Error: {}", key, e.getMessage(), e);
         }
     }
 
