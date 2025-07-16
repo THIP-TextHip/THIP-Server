@@ -44,6 +44,10 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(name = "recruit_count",nullable = false)
     private int recruitCount;
 
+    @Builder.Default
+    @Column(name = "member_count",nullable = false)
+    private int memberCount = 1;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private BookJpaEntity bookJpaEntity;

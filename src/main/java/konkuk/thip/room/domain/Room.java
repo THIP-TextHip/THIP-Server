@@ -38,6 +38,8 @@ public class Room extends BaseDomainEntity {
 
     private int recruitCount;
 
+    private int memberCount;
+
     private Long bookId;
 
     private Category category;
@@ -59,6 +61,7 @@ public class Room extends BaseDomainEntity {
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitCount(recruitCount)
+                .memberCount(1) // 처음 Room 생성 시 방장 1명
                 .bookId(bookId)
                 .category(category)
                 .build();

@@ -1,16 +1,18 @@
 package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,11 +58,11 @@ class RoomSearchApiTest {
     private RoomJpaRepository roomJpaRepository;
 
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @AfterEach
     void tearDown() {
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -143,15 +145,15 @@ class RoomSearchApiTest {
         List<UserJpaEntity> savedUsers = userJpaRepository.saveAll(users);
 
         // UserRoom 매핑 리스트 생성 및 저장
-        List<UserRoomJpaEntity> mappings = savedUsers.stream()
-                .map(user -> UserRoomJpaEntity.builder()
+        List<RoomParticipantJpaEntity> mappings = savedUsers.stream()
+                .map(user -> RoomParticipantJpaEntity.builder()
                         .userJpaEntity(user)
                         .roomJpaEntity(roomJpaEntity)
-                        .userRoomRole(UserRoomRole.MEMBER)
+                        .roomParticipantRole(RoomParticipantRole.MEMBER)
                         .build())
                 .toList();
 
-        userRoomJpaRepository.saveAll(mappings);
+        roomParticipantJpaRepository.saveAll(mappings);
     }
 
     @Test

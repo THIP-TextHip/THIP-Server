@@ -6,10 +6,12 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.mapper.SavedBookMapper;
 import konkuk.thip.saved.adapter.out.mapper.SavedFeedMapper;
+import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
+import konkuk.thip.saved.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.book.domain.SavedBooks;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

@@ -3,10 +3,11 @@ package konkuk.thip.recentSearch.adapter.out.persistence;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
 import konkuk.thip.recentSearch.adapter.out.mapper.RecentSearchMapper;
+import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
 import konkuk.thip.recentSearch.domain.RecentSearch;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

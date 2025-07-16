@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     // 서버 내부 오류 예외 처리
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> runtimeExceptionHandler(RuntimeException e) {
-        log.error("[RuntimeExceptionHandler] {}", e.getMessage());
+        log.error("[RuntimeExceptionHandler] {}", e.getMessage(), e); // 메시지와 스택트레이스 출력
         return ResponseEntity
                 .status(API_SERVER_ERROR.getHttpStatus())
                 .body(ErrorResponse.of(API_SERVER_ERROR));

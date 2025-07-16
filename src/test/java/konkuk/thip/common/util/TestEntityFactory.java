@@ -5,6 +5,8 @@ import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
@@ -112,11 +114,11 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static UserRoomJpaEntity createUserRoom(RoomJpaEntity room, UserJpaEntity user, UserRoomRole userRoomRole, double userPercentage) {
-        return UserRoomJpaEntity.builder()
+    public static RoomParticipantJpaEntity createUserRoom(RoomJpaEntity room, UserJpaEntity user, RoomParticipantRole roomParticipantRole, double userPercentage) {
+        return RoomParticipantJpaEntity.builder()
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
-                .userRoomRole(userRoomRole)
+                .roomParticipantRole(roomParticipantRole)
                 .currentPage(0)
                 .userPercentage(userPercentage)
                 .build();
@@ -150,9 +152,9 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static FollowingJpaEntity createFollowing(UserJpaEntity user,UserJpaEntity followingUser) {
+    public static FollowingJpaEntity createFollowing(UserJpaEntity followerUser,UserJpaEntity followingUser) {
         return FollowingJpaEntity.builder()
-                .userJpaEntity(user)
+                .userJpaEntity(followerUser)
                 .followingUserJpaEntity(followingUser)
                 .build();
     }

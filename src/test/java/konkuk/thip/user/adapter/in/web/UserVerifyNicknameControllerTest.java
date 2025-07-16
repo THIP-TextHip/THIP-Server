@@ -6,8 +6,8 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("[통합] UserVerifyNicknameController 테스트")
+@DisplayName("[통합] 닉네임 중복 검증 api 테스트")
 class UserVerifyNicknameControllerTest {
 
     @Autowired

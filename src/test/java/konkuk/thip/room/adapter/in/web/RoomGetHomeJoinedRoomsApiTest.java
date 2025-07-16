@@ -1,16 +1,17 @@
 package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.CategoryJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,7 +56,7 @@ class RoomGetHomeJoinedRoomsApiTest {
     private RoomJpaRepository roomJpaRepository;
 
     @Autowired
-    private UserRoomJpaRepository userRoomJpaRepository;
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     private RoomJpaEntity room1;
     private RoomJpaEntity room2;
@@ -83,16 +84,16 @@ class RoomGetHomeJoinedRoomsApiTest {
         room2 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         // 1번방에 유저 1이 호스트, 유저2가 멤버
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1,user1,UserRoomRole.HOST, 80.0));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1,user2,UserRoomRole.MEMBER, 60.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1,user1, RoomParticipantRole.HOST, 80.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1,user2, RoomParticipantRole.MEMBER, 60.0));
 
         // 2번방에 유저 1이 호스트
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room2,user1,UserRoomRole.HOST,60.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room2,user1, RoomParticipantRole.HOST,60.0));
     }
 
     @AfterEach
     void tearDown() {
-        userRoomJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAll();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -150,9 +151,9 @@ class RoomGetHomeJoinedRoomsApiTest {
         );
 
         // 모두 동일한 진행률(70%)로 참여
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room1, newUser, UserRoomRole.MEMBER, 70.0));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room2, newUser, UserRoomRole.MEMBER, 70.0));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(room3, newUser, UserRoomRole.MEMBER, 70.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, newUser, RoomParticipantRole.MEMBER, 70.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room2, newUser, RoomParticipantRole.MEMBER, 70.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room3, newUser, RoomParticipantRole.MEMBER, 70.0));
 
         Long userId = newUser.getUserId();
 
@@ -193,8 +194,8 @@ class RoomGetHomeJoinedRoomsApiTest {
                 TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(1), LocalDate.now().plusDays(2))
         );
 
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(recruitRoom, newUser, UserRoomRole.MEMBER, 20.0));
-        userRoomJpaRepository.save(TestEntityFactory.createUserRoom(activeRoom, newUser, UserRoomRole.MEMBER, 50.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(recruitRoom, newUser, RoomParticipantRole.MEMBER, 20.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(activeRoom, newUser, RoomParticipantRole.MEMBER, 50.0));
 
 
         // when

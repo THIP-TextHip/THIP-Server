@@ -4,7 +4,7 @@ import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 
 import java.util.List;
 
-import static konkuk.thip.book.adapter.out.api.NaverApiUtil.PAGE_SIZE;
+import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
 
 public record GetBookSearchListResponse(
         List<BookDto> searchResult, // 책 목록

@@ -1,11 +1,13 @@
 package konkuk.thip.room.adapter.out.persistence;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;

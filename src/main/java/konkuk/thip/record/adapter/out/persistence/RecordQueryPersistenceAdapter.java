@@ -1,6 +1,7 @@
 package konkuk.thip.record.adapter.out.persistence;
 
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
+import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.record.application.port.out.RecordQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -27,6 +27,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "oauth2_id", length = 50, nullable = false)
     private String oauth2Id;
 
+    @Builder.Default
+    private Integer followerCount = 0; // 팔로워 수
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
@@ -34,5 +37,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
+
+    public void updateFollowerCount(int followerCount) {
+        this.followerCount = followerCount;
+    }
 
 }

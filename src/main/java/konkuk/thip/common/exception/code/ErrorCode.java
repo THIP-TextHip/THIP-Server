@@ -37,6 +37,15 @@ public enum ErrorCode implements ResponseCode {
      * 70000 : user error
      */
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 70000, "존재하지 않는 USER 입니다."),
+    USER_ALREADY_FOLLOWED(HttpStatus.BAD_REQUEST, 70001, "이미 팔로우한 사용자입니다."),
+
+    /**
+     * 75000 : follow error
+     */
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 75000, "존재하지 않는 FOLLOW 입니다."),
+    USER_ALREADY_UNFOLLOWED(HttpStatus.BAD_REQUEST, 75001, "이미 언팔로우한 사용자입니다."),
+    USER_CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, 75002, "사용자는 자신을 팔로우할 수 없습니다."),
+    FOLLOW_COUNT_IS_ZERO(HttpStatus.BAD_REQUEST, 75003, "사용자의 팔로우 수가 0일때는 언팔로우는 불가능합니다."),
 
     /**
      * 80000 : book error
@@ -62,7 +71,7 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 90000 : recentSearch error
      */
-    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 900000,"알맞은 검색어 타입을 찾을 수 없습니다."),
+    INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 90000,"알맞은 검색어 타입을 찾을 수 없습니다."),
 
     /**
      * 100000 : room error
@@ -95,9 +104,11 @@ public enum ErrorCode implements ResponseCode {
     RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM(HttpStatus.BAD_REQUEST, 120003, "만료된 방에는 기록을 남길 수 없습니다."),
 
     /**
-     * 140000 : userRoom error
+     * 140000 : roomParticipant error
      */
-    USER_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 USER_ROOM (방과 사용자 관계) 입니다."),
+    ROOM_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 RoomParticipant (방과 사용자 관계) 입니다."),
+    USER_NOT_BELONG_TO_ROOM(HttpStatus.BAD_REQUEST, 140001, "현재 모임방에 속하지 않는 유저입니다."),
+    ROOM_PARTICIPANT_ROLE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140002, "일치하는 방에서의 사용자 역할이 없습니다."),
 
     /**
      * 150000 : Category error
