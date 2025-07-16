@@ -29,9 +29,9 @@ public class FeedCommandController {
     private final S3Service s3Service;
 
     @PostMapping("/feeds")
-    public BaseResponse<FeedCreateResponse> createFeed(@RequestPart("request") @Valid FeedCreateRequest request,
-                                                       @RequestPart(value = "images", required = false) List<MultipartFile> images,
-                                                       @UserId Long userId) {
+    public BaseResponse<FeedCreateResponse> createFeed(@RequestPart("request") @Valid final FeedCreateRequest request,
+                                                       @RequestPart(value = "images", required = false) final List<MultipartFile> images,
+                                                       @UserId final Long userId) {
 
         // 이미지 개수 제한: 3개 초과 입력 시 예외 발생
         validateImageCount(images);
