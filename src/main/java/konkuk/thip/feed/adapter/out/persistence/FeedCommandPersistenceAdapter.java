@@ -1,7 +1,7 @@
 package konkuk.thip.feed.adapter.out.persistence;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.book.adapter.out.persistence.BookJpaRepository;
+import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
@@ -16,7 +16,7 @@ import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
