@@ -106,11 +106,19 @@ public enum ErrorCode implements ResponseCode {
     CATEGORY_NOT_MATCH(HttpStatus.BAD_REQUEST, 150001, "일치하는 카테고리 이름이 없습니다."),
 
     /**
-     * 160000 : Feed error
+     * 160000 : Feed,Tag error
      */
     FEED_NOT_FOUND(HttpStatus.NOT_FOUND, 160000, "존재하지 않는 FEED 입니다."),
-    TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다.")
+    TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다."),
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, 160002, "존재하지 않는 TAG 입니다."),
 
+    /**
+     * 170000 : Image File error
+     */
+    EMPTY_FILE_EXCEPTION(HttpStatus.BAD_REQUEST, 170001, "업로드하려는 이미지가 비어있습니다."),
+    EXCEPTION_ON_IMAGE_UPLOAD(HttpStatus.BAD_REQUEST, 170002, "이미지 업로드에 실패하였습니다."),
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170003, "올바르지 않은 파일 형식입니다."),
+    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다.")
     ;
 
     private final HttpStatus httpStatus;
