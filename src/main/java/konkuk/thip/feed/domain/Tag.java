@@ -52,12 +52,8 @@ public enum Tag {
         }
 
         if (!invalidValues.isEmpty()) {
-            String message = String.format(
-                    "다음 태그 이름이 유효하지 않습니다: " + invalidValues
-            );
-            throw new InvalidStateException( TAG_NAME_NOT_MATCH,
-                    new IllegalArgumentException(message)
-            );
+            String message = "다음 태그 이름이 유효하지 않습니다: " + String.join(", ", invalidValues);
+            throw new InvalidStateException(TAG_NAME_NOT_MATCH, new IllegalArgumentException(message));
         }
 
         return tags;
