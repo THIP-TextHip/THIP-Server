@@ -1,9 +1,11 @@
 package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.room.domain.Category;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.TAG_NAME_NOT_MATCH;
 
@@ -11,7 +13,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.TAG_NAME_NOT_MATCH;
 @RequiredArgsConstructor
 public enum Tag {
     BOOK_RECOMMEND("책추천"),
-    TODAYS_BOOK("오늘의책"),
+    TODAY_BOOK("오늘의책"),
     READING_LOG("독서기록"),
     BOOK_REVIEW("책리뷰"),
     QUOTE("책속한줄"),
@@ -36,4 +38,29 @@ public enum Tag {
         }
         throw new InvalidStateException(TAG_NAME_NOT_MATCH);
     }
+
+    public static List<Tag> fromList(List<String> values) {
+        List<Tag> tags = new ArrayList<>();
+        List<String> invalidValues = new ArrayList<>();
+
+        for (String value : values) {
+            try {
+                tags.add(Tag.from(value));
+            } catch (InvalidStateException e) {
+                invalidValues.add(value);
+            }
+        }
+
+        if (!invalidValues.isEmpty()) {
+            String message = String.format(
+                    "다음 태그 이름이 유효하지 않습니다: " + invalidValues
+            );
+            throw new InvalidStateException( TAG_NAME_NOT_MATCH,
+                    new IllegalArgumentException(message)
+            );
+        }
+
+        return tags;
+    }
+
 }
