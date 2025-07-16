@@ -82,7 +82,7 @@ public class S3Service {
      */
     private String uploadImageToS3(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
-        String extension = originalFilename.substring(originalFilename.lastIndexOf(".")); //확장자 명
+        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1); //확장자 명
 
         // UUID + 원본 파일명을 합쳐 S3에 저장 (중복 방지)
         String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename;
