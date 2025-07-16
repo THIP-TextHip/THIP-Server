@@ -8,6 +8,7 @@ import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -22,6 +23,7 @@ public class FeedMapper {
                 .likeCount(feed.getLikeCount())
                 .commentCount(feed.getCommentCount())
                 .bookJpaEntity(bookJpaEntity)
+                .contentList(new ArrayList<>())
                 .build();
     }
 
