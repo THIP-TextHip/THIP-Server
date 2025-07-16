@@ -14,7 +14,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.UserRoomJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.FeedJpaRepository;
+import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.persistence.SavedBookJpaRepository;
 import org.junit.jupiter.api.*;

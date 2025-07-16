@@ -1,8 +1,8 @@
-package konkuk.thip.post.adapter.out.mapper;
+package konkuk.thip.feed.adapter.out.mapper;
 
-import konkuk.thip.post.adapter.out.jpa.ContentJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
+import konkuk.thip.feed.domain.Content;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
-import konkuk.thip.post.domain.Content;
 import org.springframework.stereotype.Component;
 
 @Component

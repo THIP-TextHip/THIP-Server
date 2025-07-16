@@ -1,4 +1,4 @@
-package konkuk.thip.feed.adapter.out.persistence;
+package konkuk.thip.feed.adapter.out.persistence.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
