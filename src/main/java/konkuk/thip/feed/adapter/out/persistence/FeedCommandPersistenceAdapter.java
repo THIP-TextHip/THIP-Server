@@ -53,9 +53,9 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         FeedJpaEntity savedFeed = feedJpaRepository.save(feedJpaEntity);
 
         // Content가 존재하면 ContentJpaEntity 생성 및 Feed 연관관계 설정
-        saveContents(feed, feedJpaEntity);
+        saveContents(feed, savedFeed);
         // 태그가 존재하면 태그 피드 매핑 생성 및 저장
-        saveFeedTags(feed, feedJpaEntity);
+        saveFeedTags(feed, savedFeed);
 
         return savedFeed.getPostId();
     }
