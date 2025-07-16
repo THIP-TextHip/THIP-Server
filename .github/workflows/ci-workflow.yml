@@ -34,13 +34,6 @@ jobs:
           server-id: github
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-
-#      - name: 🧾 Create application.yml from secret
-#        run: |
-#          mkdir -p ${{ env.RESOURCE_PATH }}
-#          mkdir -p ${{ env.TEST_RESOURCE_PATH }}
-#          echo "${{ secrets.APPLICATION_YML_DEV }}" > ${{ env.RESOURCE_PATH }}/application.yml
-#          echo "${{ secrets.APPLICATION_YML_TEST }}" > ${{ env.TEST_RESOURCE_PATH }}/application-test.yml
       - name: 🧾 Create application.yml from secret (base64)
         run: |
           mkdir -p ${{ env.RESOURCE_PATH }}
