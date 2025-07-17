@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.util.IOUtils;
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InvalidStateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -34,6 +34,8 @@ public class S3Service {
 
     private final AmazonS3 amazonS3; // AWS S3 클라이언트
 
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
@@ -42,18 +44,18 @@ public class S3Service {
      * @param image 업로드할 이미지 파일
      * @return S3의 public 이미지 URL
      */
-    public String getImageFromUser(MultipartFile image) {
+    public String uploadUserImageAndGetUrl(MultipartFile image) {
         //입력받은 이미지 파일이 빈 파일인지 검증
         if(image.isEmpty() || Objects.isNull(image.getOriginalFilename())){
             throw new BusinessException(EMPTY_FILE_EXCEPTION);
         }
-        return uploadImage(image);
+        return uploadAndReturnUrl(image);
     }
 
     /**
      * 이미지 파일 확장자 검증 후 S3 업로드 (실제 업로드는 내부 메서드에서 처리)
      */
-    private String uploadImage(MultipartFile image) {
+    private String uploadAndReturnUrl(MultipartFile image) {
         this.validateImageFileExtension(image.getOriginalFilename());
         try {
             return uploadImageToS3(image);
@@ -68,14 +70,13 @@ public class S3Service {
     private void validateImageFileExtension(String filename) {
         int lastDotIndex = filename.lastIndexOf(".");
         if (lastDotIndex == -1) {
-            throw new BusinessException(INVALID_FILE_EXTENSION);
+            throw new InvalidStateException(INVALID_FILE_EXTENSION);
         }
 
         String extension = filename.substring(lastDotIndex + 1).toLowerCase();
-        List<String> allowedExtentionList = Arrays.asList("jpg", "jpeg", "png", "gif");
 
-        if (!allowedExtentionList.contains(extension)) {
-            throw new BusinessException(INVALID_FILE_EXTENSION);
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new InvalidStateException(INVALID_FILE_EXTENSION);
         }
     }
 
