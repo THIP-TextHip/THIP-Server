@@ -122,6 +122,7 @@ public enum ErrorCode implements ResponseCode {
     FEED_NOT_FOUND(HttpStatus.NOT_FOUND, 160000, "존재하지 않는 FEED 입니다."),
     TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, 160002, "존재하지 않는 TAG 입니다."),
+    INVALID_FEED_CREATE(HttpStatus.BAD_REQUEST, 160003, "유효하지 않은 FEED 생성 요청 입니다."),
 
     /**
      * 170000 : Image File error
