@@ -21,11 +21,10 @@ public record FeedCreateRequest(
 
         List<String> tagList
 ) {
-        public FeedCreateCommand toCommand(List<String> imageUrls,Long userId) {
+        public FeedCreateCommand toCommand(Long userId) {
                 return new FeedCreateCommand(
                         isbn,
                         contentBody,
-                        imageUrls,
                         isPublic,
                         category,
                         tagList,

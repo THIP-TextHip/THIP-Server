@@ -13,7 +13,7 @@ public class TestS3MockConfig {
         S3Service mockS3Service = Mockito.mock(S3Service.class);
 
         // 필요한 메서드 Mock
-        Mockito.when(mockS3Service.getImageFromUser(Mockito.any()))
+        Mockito.when(mockS3Service.uploadUserImageAndGetUrl(Mockito.any()))
                 .thenAnswer(invocation -> {
                     // 실제로는 업로드된 URL을 반환해야 함
                     // 가짜 URL 반환

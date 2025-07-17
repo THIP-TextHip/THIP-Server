@@ -8,8 +8,6 @@ public record FeedCreateCommand(
 
         String contentBody,
 
-        List<String> imageUrls,
-
         Boolean isPublic,
 
         String category,
