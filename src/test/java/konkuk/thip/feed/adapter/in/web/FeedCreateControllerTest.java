@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
+import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_CREATE;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -54,7 +54,7 @@ class FeedCreateControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
+                .andExpect(jsonPath("$.code").value(INVALID_FEED_CREATE.getCode()))
                 .andExpect(jsonPath("$.message", containsString(message)));
     }
 
@@ -121,7 +121,7 @@ class FeedCreateControllerTest {
         void duplicatedTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("tagList", List.of("중복", "중복"));
-            assertBadRequest(req, "태그에 중복된 값이 있습니다.");
+            assertBadRequest(req, "태그는 중복 될 수 없습니다.");
         }
     }
 
@@ -158,7 +158,7 @@ class FeedCreateControllerTest {
             );
 
             result.andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
+                    .andExpect(jsonPath("$.code").value(INVALID_FEED_CREATE.getCode()))
                     .andExpect(jsonPath("$.message",containsString("이미지는 최대 3개까지 업로드할 수 있습니다.")));
 
         }
