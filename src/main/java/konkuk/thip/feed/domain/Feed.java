@@ -5,7 +5,6 @@ import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,8 +89,8 @@ public class Feed extends BaseDomainEntity {
         }
     }
 
-    public static void validateImageCount(List<MultipartFile> images) {
-        if (images != null && images.size() > 3) {
+    public static void validateImageCount(int imageSize) {
+        if (imageSize > 3) {
             throw new InvalidStateException(INVALID_FEED_CREATE, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
         }
     }

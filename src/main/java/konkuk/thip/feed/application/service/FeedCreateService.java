@@ -34,7 +34,8 @@ public class FeedCreateService implements FeedCreateUseCase {
 
         // 1. 피드 생성 비지니스 정책 검증
         Feed.validateCategoryAndTags(command.category(), command.tagList());
-        Feed.validateImageCount(images);
+        Feed.validateImageCount(images != null ? images.size() : 0);
+
 
         // 2. Category 검증 및 조회
         validateCategoryAndTagList(command.category(), command.tagList());
