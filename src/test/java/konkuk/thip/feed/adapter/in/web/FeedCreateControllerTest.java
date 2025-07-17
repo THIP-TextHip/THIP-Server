@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_CREATE;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -46,7 +47,7 @@ class FeedCreateControllerTest {
         return request;
     }
 
-    private void assertBadRequest(Map<String, Object> request, String message) throws Exception {
+    private void assertBadRequest_InvalidFeedCreate(Map<String, Object> request, String message) throws Exception {
         mockMvc.perform(multipart("/feeds")
                         .file(new MockMultipartFile(
                                 "request", "", MediaType.APPLICATION_JSON_VALUE,
@@ -55,6 +56,18 @@ class FeedCreateControllerTest {
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(INVALID_FEED_CREATE.getCode()))
+                .andExpect(jsonPath("$.message", containsString(message)));
+    }
+
+    private void assertBadRequest_InvalidParam(Map<String, Object> request, String message) throws Exception {
+        mockMvc.perform(multipart("/feeds")
+                        .file(new MockMultipartFile(
+                                "request", "", MediaType.APPLICATION_JSON_VALUE,
+                                objectMapper.writeValueAsBytes(request)))
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                        .requestAttr("userId", 1L))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString(message)));
     }
 
@@ -67,7 +80,7 @@ class FeedCreateControllerTest {
         void blankIsbn() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("isbn", "");
-            assertBadRequest(req, "ISBN은 필수입니다.");
+            assertBadRequest_InvalidParam(req, "ISBN은 필수입니다.");
         }
 
         @Test
@@ -75,7 +88,7 @@ class FeedCreateControllerTest {
         void blankContent() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("contentBody", "");
-            assertBadRequest(req, "콘텐츠 내용은 필수입니다.");
+            assertBadRequest_InvalidParam(req, "콘텐츠 내용은 필수입니다.");
         }
 
         @Test
@@ -83,7 +96,7 @@ class FeedCreateControllerTest {
         void missing_is_public() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("isPublic", null);
-            assertBadRequest(req, "방 공개 설정 여부는 필수입니다.");
+            assertBadRequest_InvalidParam(req, "방 공개 설정 여부는 필수입니다.");
         }
 
     }
@@ -97,7 +110,7 @@ class FeedCreateControllerTest {
         void onlyCategory() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("tagList", List.of());
-            assertBadRequest(req, "카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다.");
+            assertBadRequest_InvalidFeedCreate(req, "카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다.");
         }
 
         @Test
@@ -105,7 +118,7 @@ class FeedCreateControllerTest {
         void onlyTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("category", null);
-            assertBadRequest(req, "카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다.");
+            assertBadRequest_InvalidFeedCreate(req, "카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다.");
         }
 
         @Test
@@ -113,7 +126,7 @@ class FeedCreateControllerTest {
         void tooManyTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("tagList", List.of("1", "2", "3", "4", "5", "6"));
-            assertBadRequest(req, "태그는 최대 5개까지 입력할 수 있습니다.");
+            assertBadRequest_InvalidFeedCreate(req, "태그는 최대 5개까지 입력할 수 있습니다.");
         }
 
         @Test
@@ -121,7 +134,7 @@ class FeedCreateControllerTest {
         void duplicatedTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("tagList", List.of("중복", "중복"));
-            assertBadRequest(req, "태그는 중복 될 수 없습니다.");
+            assertBadRequest_InvalidFeedCreate(req, "태그는 중복 될 수 없습니다.");
         }
     }
 
