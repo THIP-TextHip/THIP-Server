@@ -40,6 +40,8 @@ public enum Tag {
     }
 
     public static List<Tag> fromList(List<String> values) {
+        if (values == null || values.isEmpty()) return List.of();
+
         List<Tag> tags = new ArrayList<>();
         List<String> invalidValues = new ArrayList<>();
 
