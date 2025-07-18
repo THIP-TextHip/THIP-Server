@@ -7,7 +7,7 @@ import konkuk.thip.room.adapter.in.web.request.RoomCreateRequest;
 import konkuk.thip.room.adapter.in.web.request.RoomJoinRequest;
 import konkuk.thip.room.adapter.in.web.response.RoomCreateResponse;
 import konkuk.thip.room.application.port.in.RoomCreateUseCase;
-import konkuk.thip.room.application.port.in.RoomJoinUsecase;
+import konkuk.thip.room.application.port.in.RoomJoinUseCase;
 import konkuk.thip.room.application.port.in.RoomRecruitCloseUsecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoomCommandController {
 
     private final RoomCreateUseCase roomCreateUseCase;
-    private final RoomJoinUsecase roomJoinUsecase;
+    private final RoomJoinUseCase roomJoinUsecase;
     private final RoomRecruitCloseUsecase roomRecruitCloseUsecase;
 
     /**

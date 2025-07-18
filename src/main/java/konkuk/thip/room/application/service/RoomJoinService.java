@@ -3,7 +3,7 @@ package konkuk.thip.room.application.service;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.room.application.port.in.RoomJoinUsecase;
+import konkuk.thip.room.application.port.in.RoomJoinUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
@@ -19,7 +19,7 @@ import static konkuk.thip.room.adapter.out.jpa.RoomParticipantRole.MEMBER;
 
 @Service
 @RequiredArgsConstructor
-public class RoomJoinService implements RoomJoinUsecase {
+public class RoomJoinService implements RoomJoinUseCase {
 
     private final RoomParticipantQueryPort roomParticipantQueryPort;
     private final RoomCommandPort roomCommandPort;
@@ -64,7 +64,7 @@ public class RoomJoinService implements RoomJoinUsecase {
 
             // 방장이 참여 취소를 요청한 경우
             RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
-            roomParticipant.validateHostCancelRoom();
+            roomParticipant.cancelParticipation();
 
             roomParticipantCommandPort.deleteByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
 
