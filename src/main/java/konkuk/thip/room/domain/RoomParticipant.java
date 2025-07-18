@@ -61,7 +61,7 @@ public class RoomParticipant extends BaseDomainEntity {
     public void closeRoomRecruit() {
         if (checkRole(RoomParticipantRole.MEMBER)) {
             throw new BusinessException(ErrorCode.ROOM_RECRUIT_CANNOT_CLOSED,
-                new IllegalArgumentException("방 참여자는 방 모집 마감을 할 수 없습니다. 오직 호스트만 모집 마감이 가능합니다."));
+                new IllegalArgumentException("사용자는 방의 멤버입니다. 오직 호스트만 모집 마감이 가능합니다."));
         }
     }
 

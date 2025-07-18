@@ -28,7 +28,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUsecase {
         try {
             roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(userId, roomId);
         } catch (EntityNotFoundException e) {
-            throw new InvalidStateException(ErrorCode.ROOM_RECRUIT_CANNOT_CLOSED, new IllegalArgumentException("사용자가 방에 참여하지 않은 상태에서 방 모집 마감은 불가능합니다."));
+            throw new InvalidStateException(ErrorCode.ROOM_RECRUIT_CANNOT_CLOSED, new IllegalArgumentException("사용자가 방에 참여하지 않은 상태입니다."));
         }
         // 2. 방 모집 마감
         roomParticipant.closeRoomRecruit();
