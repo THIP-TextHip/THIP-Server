@@ -1,6 +1,8 @@
 package konkuk.thip.feed.application.port.out;
 
 
-public interface FeedCommandPort {
+import konkuk.thip.feed.domain.Feed;
 
+public interface FeedCommandPort {
+    Long save(Feed feed);
 }

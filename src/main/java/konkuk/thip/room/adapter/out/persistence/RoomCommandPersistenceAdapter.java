@@ -9,6 +9,7 @@ import konkuk.thip.room.adapter.out.mapper.RoomMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -30,7 +31,6 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
         RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
-
         return roomMapper.toDomainEntity(roomJpaEntity);
     }
 
@@ -46,6 +46,13 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
         RoomJpaEntity roomJpaEntity = roomMapper.toJpaEntity(room, bookJpaEntity, categoryJpaEntity);
         return roomJpaRepository.save(roomJpaEntity).getRoomId();
+    }
+
+    @Override
+    public Category findCategoryByValue(String value) {
+        CategoryJpaEntity categoryJpaEntity = categoryJpaRepository.findByValue(value).orElseThrow(
+                () -> new EntityNotFoundException(CATEGORY_NOT_FOUND));
+        return Category.from(categoryJpaEntity.getValue());
     }
 
     @Override
