@@ -3,6 +3,7 @@ package konkuk.thip.room.application.port.out;
 import konkuk.thip.room.domain.RoomParticipant;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RoomParticipantCommandPort {
 
@@ -12,5 +13,7 @@ public interface RoomParticipantCommandPort {
     void save(RoomParticipant roomParticipant);
 
     void deleteByUserIdAndRoomId(Long userId, Long roomId);
+
+    Optional<RoomParticipant> findByUserIdAndRoomIdOptional(Long userId, Long roomId);
 
 }

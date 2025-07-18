@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.ROOM_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -66,5 +67,11 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
         );
 
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
+    }
+
+    @Override
+    public Optional<RoomParticipant> findByUserIdAndRoomIdOptional(Long userId, Long roomId) {
+        return roomParticipantJpaRepository.findByUserIdAndRoomId(userId, roomId)
+                .map(roomParticipantMapper::toDomainEntity);
     }
 }

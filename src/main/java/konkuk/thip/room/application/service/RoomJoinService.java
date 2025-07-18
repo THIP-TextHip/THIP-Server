@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static konkuk.thip.room.adapter.out.jpa.RoomParticipantRole.MEMBER;
 
 @Service
@@ -38,8 +40,10 @@ public class RoomJoinService implements RoomJoinUseCase {
             throw new InvalidStateException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL);
         }
 
-        boolean isParticipate = roomParticipantQueryPort.existByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
         room.validateRoomExpired();
+
+        Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
+        boolean isParticipate = roomParticipantOptional.isPresent();
 
         // 참여하기 요청
         if(type.isJoinType()) {
@@ -63,7 +67,7 @@ public class RoomJoinService implements RoomJoinUseCase {
             }
 
             // 방장이 참여 취소를 요청한 경우
-            RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
+            RoomParticipant roomParticipant = roomParticipantOptional.get();
             roomParticipant.cancelParticipation();
 
             roomParticipantCommandPort.deleteByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
