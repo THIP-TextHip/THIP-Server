@@ -5,7 +5,6 @@ import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -239,6 +238,30 @@ class RoomTest {
                 START, END, 5, 123L, validCategory
         );
         assertDoesNotThrow(() -> room.verifyPassword("1234"));
+    }
+
+    @Test
+    @DisplayName("increaseMemberCount: 정원이 다 찬 상태에서 호출하면 InvalidStateException 발생")
+    void increaseMemberCount_exceed_limit() {
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                START, END, 1, 123L, validCategory // recruitCount = 1 (방장 포함)
+        );
+        // 이미 memberCount = 1 이므로 더 이상 참여 불가
+        InvalidStateException ex = assertThrows(InvalidStateException.class, room::increaseMemberCount);
+        assertEquals(ErrorCode.ROOM_MEMBER_COUNT_EXCEEDED, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("decreaseMemberCount: 인원이 1명(방장만 존재)일 때 호출하면 InvalidStateException 발생")
+    void decreaseMemberCount_underflow() {
+        Room room = Room.withoutId(
+                "제목", "설명", false, "1234",
+                START, END, 5, 123L, validCategory
+        );
+        // memberCount = 1 인 상태에서 감소 시도
+        InvalidStateException ex = assertThrows(InvalidStateException.class, room::decreaseMemberCount);
+        assertEquals(ErrorCode.ROOM_MEMBER_COUNT_UNDERFLOW, ex.getErrorCode());
     }
 
 }
