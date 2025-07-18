@@ -8,12 +8,14 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.vote.adapter.out.persistence.repository.VoteItemJpaRepository;
@@ -34,7 +36,6 @@ import java.util.stream.IntStream;
 
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_BELONG_TO_ROOM;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,7 +77,7 @@ class RoomPlayingDetailViewApiTest {
     void tearDown() {
         voteItemJpaRepository.deleteAll();
         voteJpaRepository.deleteAll();
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -173,7 +174,7 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId()).get(0);
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
         RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
@@ -221,7 +222,7 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId()).get(0);
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
         RoomParticipantJpaEntity roomHost = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
@@ -269,7 +270,7 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId()).get(0);
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
         RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
@@ -295,7 +296,7 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId()).get(0);
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
         RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())
@@ -347,7 +348,7 @@ class RoomPlayingDetailViewApiTest {
         //given
         RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(room, 4);
-        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(room.getRoomId()).get(0);
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId()).get(0);
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
         RoomParticipantJpaEntity joiningMember = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(roomParticipantJpaEntity.getUserJpaEntity())

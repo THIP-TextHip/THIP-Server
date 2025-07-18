@@ -82,8 +82,8 @@ class RoomJoinApiTest {
                 .title("방이름")
                 .description("설명")
                 .isPublic(true)
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(5))
+                .startDate(LocalDate.now().plusDays(1))
+                .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .categoryJpaEntity(category)
@@ -178,7 +178,7 @@ class RoomJoinApiTest {
 
         // 참여자 삭제 확인
         boolean exists = roomParticipantJpaRepository
-                .existByUserIdAndRoomId(participant.getUserId(), room.getRoomId()) == 1;
+                .existByUserIdAndRoomId(participant.getUserId(), room.getRoomId());
         assertThat(exists).isFalse();
 
         // 인원수 감소 확인

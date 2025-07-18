@@ -74,7 +74,7 @@ class RecordCreateControllerTest {
     @AfterEach
     void tearDown() {
         recordJpaRepository.deleteAll();
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         categoryJpaRepository.deleteAll();

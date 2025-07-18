@@ -125,7 +125,7 @@ class RoomGetMemberListApiTest {
     @AfterEach
     void tearDown() {
         followingJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();

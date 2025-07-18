@@ -63,7 +63,7 @@ class RoomRecruitingDetailViewApiTest {
 
     @AfterEach
     void tearDown() {
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -163,7 +163,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
+        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
         RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_2, 5);
@@ -211,7 +211,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        RoomParticipantJpaEntity firstMember = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1);
+        RoomParticipantJpaEntity firstMember = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1);
         roomParticipantJpaRepository.delete(firstMember);
         RoomParticipantJpaEntity roomCreator = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .userJpaEntity(firstMember.getUserJpaEntity())
@@ -264,7 +264,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
+        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
         RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(science_room_2, 5);
@@ -316,7 +316,7 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
         saveUsersToRoom(targetRoom, 4);
-        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
+        UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
         RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
         saveUsersToRoom(room_3, 6);
