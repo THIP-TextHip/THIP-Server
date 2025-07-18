@@ -11,7 +11,7 @@ public enum RoomParticipantRole {
     HOST("호스트"),
     MEMBER("팀원");
 
-    private String type;
+    private final String type;
 
     RoomParticipantRole(String type) {
         this.type = type;
