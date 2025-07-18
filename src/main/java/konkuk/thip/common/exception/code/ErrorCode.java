@@ -114,8 +114,10 @@ public enum ErrorCode implements ResponseCode {
     ROOM_JOIN_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140003, "일치하는 방 참여 상태가 없습니다."),
     USER_CANNOT_JOIN_OR_CANCEL(HttpStatus.BAD_REQUEST, 140004, "존재하지 않는 방은 참여하기 또는 취소하기가 불가능합니다."),
     USER_ALREADY_PARTICIPATE(HttpStatus.BAD_REQUEST, 140005, "사용자가 이미 방에 참여한 상태입니다."),
-    USER_NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
+    USER_NOT_PARTICIPATED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
     HOST_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140007, "방장은 참여 취소를 할 수 없습니다."),
+    USER_NOT_PARTICIPATED_CANNOT_CLOSE(HttpStatus.BAD_REQUEST, 140008, "사용자가 방에 참여하지 않은 상태에서 방 모집 마감은 불가능합니다."),
+    MEMBER_CANNOT_CLOSE(HttpStatus.BAD_REQUEST, 140009, "방 참여자는 방 모집 마감을 할 수 없습니다. 오직 호스트만 모집 마감이 가능합니다."),
 
     /**
      * 150000 : Category error
