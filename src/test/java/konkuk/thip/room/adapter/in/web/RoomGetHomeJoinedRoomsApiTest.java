@@ -93,7 +93,7 @@ class RoomGetHomeJoinedRoomsApiTest {
 
     @AfterEach
     void tearDown() {
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();

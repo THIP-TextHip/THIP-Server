@@ -1,30 +1,33 @@
 package konkuk.thip.book.adapter.in.web;
 
+import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.application.service.BookSearchService;
-import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
+import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
-import org.junit.jupiter.api.*;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
@@ -119,7 +122,7 @@ class BookDetailSearchControllerTest {
     void tearDown() {
         savedBookJpaRepository.deleteAll();
         feedJpaRepository.deleteAll();
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
@@ -150,7 +153,7 @@ class BookDetailSearchControllerTest {
         BookJpaEntity book = bookJpaRepository.findAll().get(0);
 
         // 기존 방 삭제
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
 
         // startDate가 과거인 새로운 방 생성 (모집 중 아님)
@@ -179,7 +182,7 @@ class BookDetailSearchControllerTest {
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
         feedJpaRepository.deleteAll();
-        roomParticipantJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());
         assertThat(result.recruitingReadCount()).isEqualTo(0);

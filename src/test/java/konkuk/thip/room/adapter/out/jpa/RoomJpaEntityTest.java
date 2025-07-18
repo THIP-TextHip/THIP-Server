@@ -43,7 +43,8 @@ class RoomJpaEntityTest {
     @DisplayName("RoomJpaEntity 저장 및 조회 테스트")
     void saveAndFindRoom() {
         // given
-        BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
+        String isbn = "1234567890";
+        BookJpaEntity book = bookRepository.save(TestEntityFactory.createBookWithISBN(isbn));
         AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
         CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         RoomJpaEntity room = roomRepository.save(TestEntityFactory.createRoom(book, category));
@@ -61,6 +62,6 @@ class RoomJpaEntityTest {
         assertThat(foundRoom.getRecruitCount()).isEqualTo(3);
         assertThat(foundRoom.getBookJpaEntity().getTitle()).isEqualTo("책제목");
         assertThat(foundRoom.getBookJpaEntity().getAuthorName()).isEqualTo("저자");
-        assertThat(foundRoom.getBookJpaEntity().getIsbn()).isEqualTo("isbn");
+        assertThat(foundRoom.getBookJpaEntity().getIsbn()).isEqualTo(isbn);
     }
 }
