@@ -82,6 +82,8 @@ public enum ErrorCode implements ResponseCode {
     ROOM_PASSWORD_NOT_REQUIRED(HttpStatus.BAD_REQUEST, 100003, "공개방은 비밀번호가 필요하지 않습니다."),
     ROOM_RECRUITMENT_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, 100004, "모집기간이 만료된 방입니다."),
     INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
+    ROOM_MEMBER_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, 100006, "방의 최대 인원 수를 초과했습니다."),
+    ROOM_MEMBER_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 100007, "방의 인원 수가 1 이하(방장 포함)입니다."),
 
     /**
      * 110000 : vote error
@@ -109,6 +111,11 @@ public enum ErrorCode implements ResponseCode {
     ROOM_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 RoomParticipant (방과 사용자 관계) 입니다."),
     USER_NOT_BELONG_TO_ROOM(HttpStatus.BAD_REQUEST, 140001, "현재 모임방에 속하지 않는 유저입니다."),
     ROOM_PARTICIPANT_ROLE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140002, "일치하는 방에서의 사용자 역할이 없습니다."),
+    ROOM_JOIN_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140003, "일치하는 방 참여 상태가 없습니다."),
+    USER_CANNOT_JOIN_OR_CANCEL(HttpStatus.BAD_REQUEST, 140004, "존재하지 않는 방은 참여하기 또는 취소하기가 불가능합니다."),
+    USER_ALREADY_PARTICIPATE(HttpStatus.BAD_REQUEST, 140005, "사용자가 이미 방에 참여한 상태입니다."),
+    USER_NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
+    HOST_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140007, "방장은 참여 취소를 할 수 없습니다."),
 
     /**
      * 150000 : Category error
