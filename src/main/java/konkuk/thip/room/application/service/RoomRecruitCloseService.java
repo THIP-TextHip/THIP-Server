@@ -10,6 +10,7 @@ import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUsecase {
 
     //todo 모집 마감시 방 참여자들에게 모집 마감 알림 전송
     @Override
+    @Transactional
     public void closeRoomRecruit(Long userId, Long roomId) {
         // 1. 방 참여자 조회
         RoomParticipant roomParticipant;
