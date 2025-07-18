@@ -171,5 +171,14 @@ public class Room extends BaseDomainEntity {
         }
     }
 
+    public void startRoom() {
+        validateRoomExpired();
+
+        if (startDate.isBefore(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
+            throw new InvalidStateException(ErrorCode.ROOM_ALREADY_STARTED);
+        }
+        startDate = LocalDate.now();
+    }
+
 
 }
