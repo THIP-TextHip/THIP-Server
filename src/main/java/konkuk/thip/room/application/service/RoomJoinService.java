@@ -59,7 +59,7 @@ public class RoomJoinService implements RoomJoinUsecase {
         if(!type.isJoinType()) {
             // 참여하지 않은 상태
             if(!isParticipate) {
-                throw new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED);
+                throw new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL);
             }
 
             // 방장이 참여 취소를 요청한 경우
