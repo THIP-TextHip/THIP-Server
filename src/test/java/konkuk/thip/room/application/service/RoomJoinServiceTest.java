@@ -93,7 +93,7 @@ class RoomJoinServiceTest {
 
             assertThatThrownBy(() -> roomJoinService.changeJoinState(command))
                     .isInstanceOf(InvalidStateException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_PARTICIPATED);
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL);
         }
 
         @Test
