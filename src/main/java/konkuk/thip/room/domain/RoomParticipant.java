@@ -1,8 +1,13 @@
 package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.Objects;
 
 @Getter
 @SuperBuilder
@@ -20,6 +25,16 @@ public class RoomParticipant extends BaseDomainEntity {
 
     private Long roomId;
 
+    public static RoomParticipant withoutId(Long userId, Long roomId, String roomParticipantRole) {
+        return RoomParticipant.builder()
+                .currentPage(0)
+                .userPercentage(0.0)
+                .userId(userId)
+                .roomId(roomId)
+                .roomParticipantRole(roomParticipantRole)
+                .build();
+    }
+
     public boolean canWriteOverview() {
         return userPercentage >= 80;
     }
@@ -34,4 +49,13 @@ public class RoomParticipant extends BaseDomainEntity {
 
         return false;
     }
+
+    // 방장이 참여 취소를 요청한 경우
+    public void validateHostCancelRoom() {
+        if (Objects.equals(this.roomParticipantRole, RoomParticipantRole.HOST.getType())) {
+            throw new BusinessException(ErrorCode.HOST_CANNOT_CANCEL);
+        }
+    }
+
+
 }

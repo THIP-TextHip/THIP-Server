@@ -9,4 +9,8 @@ public interface RoomParticipantCommandPort {
     RoomParticipant findByUserIdAndRoomId(Long userId, Long roomId);
     List<RoomParticipant> findAllByRoomId(Long roomId);
 
+    void save(RoomParticipant roomParticipant);
+
+    void deleteByUserIdAndRoomId(Long userId, Long roomId);
+
 }

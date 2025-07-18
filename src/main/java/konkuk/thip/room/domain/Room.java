@@ -119,14 +119,7 @@ public class Room extends BaseDomainEntity {
 
     public void verifyPassword(String rawPassword) {
 
-        // 모집기간 만료 체크
-        LocalDate deadline = this.startDate.minusDays(1);
-        if (isRecruitmentPeriodExpired()) {
-            String message = String.format("모집기간(%s까지)이 만료된 방에는 참여할 수 없습니다.", deadline);
-            throw new BusinessException(
-                    ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, new IllegalArgumentException(message)
-            );
-        }
+        validateRoomExpired();
 
         // 공개방일 경우 비밀번호 입력 요청 예외 처리
         if (this.isPublic()) {
@@ -139,10 +132,44 @@ public class Room extends BaseDomainEntity {
         }
     }
 
+    public void validateRoomExpired() {
+        // 모집기간 만료 체크
+        LocalDate deadline = this.startDate.minusDays(1);
+        if (isRecruitmentPeriodExpired()) {
+            String message = String.format("모집기간(%s까지)이 만료된 방에는 참여할 수 없습니다.", deadline);
+            throw new BusinessException(
+                    ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, new IllegalArgumentException(message)
+            );
+        }
+    }
+
     public boolean isRecruitmentPeriodExpired() {
         LocalDate today = LocalDate.now();
         // 모집 마감일: startDate.minusDays(1)
         return today.isAfter(this.startDate.minusDays(1));
     }
+
+    public void increaseMemberCount() {
+        checkJoinPossible();
+        memberCount++;
+    }
+
+    public void decreaseMemberCount() {
+        checkCancelPossible();
+        memberCount--;
+    }
+
+    private void checkJoinPossible() {
+        if (memberCount >= recruitCount) {
+            throw new InvalidStateException(ErrorCode.ROOM_MEMBER_COUNT_EXCEEDED);
+        }
+    }
+
+    private void checkCancelPossible() {
+        if (memberCount <= 1) { // 방장 포함 항상 1명 이상이어야 함
+            throw new InvalidStateException(ErrorCode.ROOM_MEMBER_COUNT_UNDERFLOW);
+        }
+    }
+
 
 }

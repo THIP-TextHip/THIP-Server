@@ -10,4 +10,6 @@ public interface RoomCommandPort {
     Long save(Room room);
 
     Category findCategoryByValue(String value);
+
+    void updateMemberCount(Room room);
 }

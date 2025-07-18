@@ -54,4 +54,15 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
                 () -> new EntityNotFoundException(CATEGORY_NOT_FOUND));
         return Category.from(categoryJpaEntity.getValue());
     }
+
+    @Override
+    public void updateMemberCount(Room room) {
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(room.getId()).orElseThrow(
+                () -> new EntityNotFoundException(ROOM_NOT_FOUND)
+        );
+
+        roomJpaEntity.updateMemberCount(room.getMemberCount());
+
+        roomJpaRepository.save(roomJpaEntity);
+    }
 }

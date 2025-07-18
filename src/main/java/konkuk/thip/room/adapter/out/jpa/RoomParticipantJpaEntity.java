@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Table(name = "room_participants")
 @Getter
+@SQLDelete(sql = "UPDATE room_participants SET status = 'INACTIVE' WHERE room_participant_id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder

@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("방 생성 api 통합 테스트")
+@DisplayName("[통합] 방 생성 api 통합 테스트")
 class RoomCreateAPITest {
 
     @Autowired
