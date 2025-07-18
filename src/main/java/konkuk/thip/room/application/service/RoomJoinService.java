@@ -66,7 +66,7 @@ public class RoomJoinService implements RoomJoinUseCase {
                 throw new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL);
             }
 
-            // 방장이 참여 취소를 요청한 경우
+            // 참여 취소
             RoomParticipant roomParticipant = roomParticipantOptional.get();
             roomParticipant.cancelParticipation();
 
