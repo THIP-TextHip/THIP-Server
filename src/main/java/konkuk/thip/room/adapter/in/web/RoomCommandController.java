@@ -35,7 +35,7 @@ public class RoomCommandController {
      * 방 참여하기/취소하기 요청
      */
     @PostMapping("/rooms/{roomId}/join")
-    public BaseResponse joinRoom(@Valid @RequestBody final RoomJoinRequest request,
+    public BaseResponse<Void> joinRoom(@Valid @RequestBody final RoomJoinRequest request,
                                  @UserId final Long userId,
                                  @PathVariable final Long roomId) {
 
