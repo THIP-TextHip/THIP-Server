@@ -39,6 +39,7 @@ public class RoomJoinService implements RoomJoinUsecase {
         }
 
         boolean isParticipate = roomParticipantQueryPort.existByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
+        room.validateRoomExpired();
 
         // 참여하기 요청
         if(type.isJoinType()) {
