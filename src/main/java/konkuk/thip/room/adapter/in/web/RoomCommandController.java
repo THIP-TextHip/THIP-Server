@@ -50,7 +50,7 @@ public class RoomCommandController {
      */
     @PostMapping("/rooms/{roomId}/close")
     public BaseResponse<Void> closeRoomRecruit(@UserId Long userId, @PathVariable Long roomId) {
-        roomRecruitCloseUsecase.closeRoomJoin(userId, roomId);
+        roomRecruitCloseUsecase.closeRoomRecruit(userId, roomId);
         return BaseResponse.ok(null);
     }
 }

@@ -1,5 +1,5 @@
 package konkuk.thip.room.application.port.in;
 
 public interface RoomRecruitCloseUsecase {
-    void closeRoomJoin(Long userId, Long roomId);
+    void closeRoomRecruit(Long userId, Long roomId);
 }

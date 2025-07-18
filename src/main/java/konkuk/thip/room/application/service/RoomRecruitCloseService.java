@@ -20,7 +20,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUsecase {
 
     //todo 모집 마감시 방 참여자들에게 모집 마감 알림 전송
     @Override
-    public void closeRoomJoin(Long userId, Long roomId) {
+    public void closeRoomRecruit(Long userId, Long roomId) {
         // 1. 방 참여자 조회
         RoomParticipant roomParticipant;
         try {
@@ -29,7 +29,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUsecase {
             throw new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CLOSE);
         }
         // 2. 호스트인지 여부
-        roomParticipant.closeRoomJoin();
+        roomParticipant.closeRoomRecruit();
 
         // 3. 모집 마감시 방 시작일을 현재 시간으로 변경
         Room room = roomCommandPort.findById(roomId);
