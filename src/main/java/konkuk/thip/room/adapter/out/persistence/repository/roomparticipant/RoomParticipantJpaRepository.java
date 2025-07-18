@@ -10,15 +10,16 @@ import java.util.Optional;
 
 public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticipantJpaEntity, Long>, RoomParticipantQueryRepository{
 
-    @Query(value = "SELECT * FROM room_participants WHERE user_id = :userId AND room_id = :roomId", nativeQuery = true)
+    @Query(value = "SELECT * FROM room_participants WHERE user_id = :userId AND room_id = :roomId AND status = 'ACTIVE'", nativeQuery = true)
     Optional<RoomParticipantJpaEntity> findByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
-    List<RoomParticipantJpaEntity> findAllByRoomJpaEntity_RoomId(Long roomId);
+    @Query(value = "SELECT * FROM room_participants WHERE room_id = :roomId AND status = 'ACTIVE'", nativeQuery = true)
+    List<RoomParticipantJpaEntity> findAllByRoomId(Long roomId);
 
     @Query(
             value = "SELECT EXISTS (SELECT 1 FROM room_participants rp WHERE rp.user_id = :userId AND rp.room_id = :roomId AND rp.status = 'ACTIVE')",
             nativeQuery = true
     )
-    Long existByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
+    boolean existByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
 }
