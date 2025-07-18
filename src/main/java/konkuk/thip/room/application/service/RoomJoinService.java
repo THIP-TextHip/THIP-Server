@@ -40,7 +40,10 @@ public class RoomJoinService implements RoomJoinUseCase {
             throw new InvalidStateException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL);
         }
 
-        room.validateRoomExpired();
+        room.validateRoomRecruitExpired();
+        if(room.isExpired()) {
+            throw new InvalidStateException(ErrorCode.ROOM_IS_EXPIRED);
+        }
 
         Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
         boolean isParticipate = roomParticipantOptional.isPresent();
