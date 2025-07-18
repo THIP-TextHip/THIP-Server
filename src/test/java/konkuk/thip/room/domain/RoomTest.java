@@ -264,4 +264,32 @@ class RoomTest {
         assertEquals(ErrorCode.ROOM_MEMBER_COUNT_UNDERFLOW, ex.getErrorCode());
     }
 
+    @Test
+    @DisplayName("정상적으로 모집 마감 시 startDate가 오늘로 변경된다")
+    void startRoomProgress_success() {
+        Room room = Room.withoutId(
+                "방 제목", "방 설명", true, null,
+                START, END, 5, 1L, validCategory
+        );
+
+        room.startRoomProgress();
+
+        assertEquals(today, room.getStartDate());
+    }
+
+    @Test
+    @DisplayName("모집 기간이 만료된 방을 모집 마감하려고 하면 BusinessException 발생")
+    void startRoomProgress_recruitmentExpired() {
+        Room room = Room.withoutId(
+                "방 제목", "방 설명", true, null,
+                today.plusDays(1), END, 5, 1L, validCategory
+        );
+
+        // 강제로 모집기간 만료된 상태로 변경
+        room.startRoomProgress(); // startDate = 오늘
+
+        BusinessException ex = assertThrows(BusinessException.class, room::startRoomProgress);
+        assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());
+    }
+
 }
