@@ -1,17 +1,21 @@
 package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
+import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.user.adapter.out.jpa.*;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
-import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
-import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class TestEntityFactory {
 
@@ -65,7 +69,7 @@ public class TestEntityFactory {
         return BookJpaEntity.builder()
                 .title("책제목")
                 .authorName("저자")
-                .isbn("isbn")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
                 .bestSeller(false)
                 .publisher("출판사")
                 .imageUrl("img")
