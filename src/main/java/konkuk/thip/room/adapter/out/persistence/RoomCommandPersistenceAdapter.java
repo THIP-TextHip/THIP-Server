@@ -65,4 +65,15 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
         roomJpaRepository.save(roomJpaEntity);
     }
+
+    @Override
+    public void updateRoomStartDate(Room room) {
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(room.getId()).orElseThrow(
+                () -> new EntityNotFoundException(ROOM_NOT_FOUND)
+        );
+
+        roomJpaEntity.updateStartDate(room.getStartDate());
+
+        roomJpaRepository.save(roomJpaEntity);
+    }
 }

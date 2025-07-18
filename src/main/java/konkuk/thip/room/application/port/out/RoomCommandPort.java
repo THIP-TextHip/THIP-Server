@@ -12,4 +12,6 @@ public interface RoomCommandPort {
     Category findCategoryByValue(String value);
 
     void updateMemberCount(Room room);
+
+    void updateRoomStartDate(Room room);
 }
