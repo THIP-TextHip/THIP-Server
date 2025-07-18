@@ -145,4 +145,27 @@ public class Room extends BaseDomainEntity {
         return today.isAfter(this.startDate.minusDays(1));
     }
 
+    public void increaseMemberCount() {
+        checkJoinPossible();
+        memberCount++;
+    }
+
+    public void decreaseMemberCount() {
+        checkCancelPossible();
+        memberCount--;
+    }
+
+    private void checkJoinPossible() {
+        if (memberCount >= recruitCount) {
+            throw new InvalidStateException(ErrorCode.ROOM_MEMBER_COUNT_EXCEEDED);
+        }
+    }
+
+    private void checkCancelPossible() {
+        if (memberCount <= 1) { // 방장 포함 항상 1명 이상이어야 함
+            throw new InvalidStateException(ErrorCode.ROOM_MEMBER_COUNT_UNDERFLOW);
+        }
+    }
+
+
 }
