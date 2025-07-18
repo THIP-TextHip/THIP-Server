@@ -171,7 +171,7 @@ public class Room extends BaseDomainEntity {
         }
     }
 
-    public void startRoom() {
+    public void startRoomProgress() {
         validateRoomExpired();
 
         if (startDate.isBefore(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {

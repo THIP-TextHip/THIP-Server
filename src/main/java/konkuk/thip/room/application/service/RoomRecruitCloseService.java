@@ -29,11 +29,11 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUsecase {
             throw new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CLOSE);
         }
         // 2. 호스트인지 여부
-        roomParticipant.validateMemberCloseRoom();
+        roomParticipant.closeRoomJoin();
 
         // 3. 모집 마감시 방 시작일을 현재 시간으로 변경
         Room room = roomCommandPort.findById(roomId);
-        room.startRoom();
+        room.startRoomProgress();
 
         // 4. Room 테이블 업데이트
         roomCommandPort.updateRoomStartDate(room);

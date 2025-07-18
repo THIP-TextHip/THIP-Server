@@ -57,7 +57,7 @@ public class RoomParticipant extends BaseDomainEntity {
         }
     }
 
-    public void validateMemberCloseRoom() {
+    public void closeRoomJoin() {
         if (checkRole(RoomParticipantRole.MEMBER)) {
             throw new BusinessException(ErrorCode.MEMBER_CANNOT_CLOSE);
         }
