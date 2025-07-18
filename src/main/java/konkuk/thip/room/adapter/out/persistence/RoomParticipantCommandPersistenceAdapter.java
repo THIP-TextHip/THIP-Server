@@ -40,7 +40,7 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
 
     @Override
     public List<RoomParticipant> findAllByRoomId(Long roomId) {
-        return roomParticipantJpaRepository.findAllByRoomJpaEntity_RoomId(roomId).stream()
+        return roomParticipantJpaRepository.findAllByRoomId(roomId).stream()
                 .map(roomParticipantMapper::toDomainEntity)
                 .toList();
     }

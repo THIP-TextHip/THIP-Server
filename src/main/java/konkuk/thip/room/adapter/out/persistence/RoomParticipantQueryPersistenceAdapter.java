@@ -13,7 +13,7 @@ public class RoomParticipantQueryPersistenceAdapter implements RoomParticipantQu
 
     @Override
     public boolean existByUserIdAndRoomId(Long userId, Long roomId) {
-        return roomParticipantJpaRepository.existByUserIdAndRoomId(userId, roomId) == 1;
+        return roomParticipantJpaRepository.existByUserIdAndRoomId(userId, roomId);
     }
 
 
