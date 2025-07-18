@@ -7,4 +7,6 @@ public interface RoomCommandPort {
     Room findById(Long id);
 
     Long save(Room room);
+
+    void updateMemberCount(Room room);
 }
