@@ -51,16 +51,20 @@ public class RoomParticipant extends BaseDomainEntity {
     }
 
     // 방장이 참여 취소를 요청한 경우
-    public void validateHostCancelRoom() {
-        if (Objects.equals(this.roomParticipantRole, RoomParticipantRole.HOST.getType())) {
+    public void cancelParticipation() {
+        if (checkRole(RoomParticipantRole.HOST)) {
             throw new BusinessException(ErrorCode.HOST_CANNOT_CANCEL);
         }
     }
 
     public void validateMemberCloseRoom() {
-        if (Objects.equals(this.roomParticipantRole, RoomParticipantRole.MEMBER.getType())) {
+        if (checkRole(RoomParticipantRole.MEMBER)) {
             throw new BusinessException(ErrorCode.MEMBER_CANNOT_CLOSE);
         }
+    }
+
+    private boolean checkRole(RoomParticipantRole host) {
+        return Objects.equals(this.roomParticipantRole, host.getType());
     }
 
 
