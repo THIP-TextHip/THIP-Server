@@ -84,6 +84,7 @@ public enum ErrorCode implements ResponseCode {
     INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
     ROOM_MEMBER_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, 100006, "방의 최대 인원 수를 초과했습니다."),
     ROOM_MEMBER_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 100007, "방의 인원 수가 1 이하(방장 포함)입니다."),
+    ROOM_ALREADY_STARTED(HttpStatus.BAD_REQUEST, 100009, "이미 시작된 방입니다."),
 
     /**
      * 110000 : vote error
