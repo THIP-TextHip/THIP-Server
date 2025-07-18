@@ -40,10 +40,7 @@ public class RoomJoinService implements RoomJoinUseCase {
             throw new InvalidStateException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL);
         }
 
-        room.validateRoomRecruitExpired();
-        if(room.isExpired()) {
-            throw new InvalidStateException(ErrorCode.ROOM_IS_EXPIRED);
-        }
+        validateRoom(room);
 
         Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
         boolean isParticipate = roomParticipantOptional.isPresent();
@@ -81,6 +78,11 @@ public class RoomJoinService implements RoomJoinUseCase {
 
         // 방의 상태 업데이트
         roomCommandPort.updateMemberCount(room);
+    }
+
+    private void validateRoom(Room room) {
+        room.validateRoomRecruitExpired();
+        room.validateRoomExpired();
     }
 
 

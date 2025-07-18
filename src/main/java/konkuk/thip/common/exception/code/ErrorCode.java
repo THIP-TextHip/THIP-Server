@@ -105,7 +105,6 @@ public enum ErrorCode implements ResponseCode {
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, 130000, "존재하지 않는 RECORD 입니다."),
     RECORD_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 130001, "총평이 될 수 없는 RECORD 입니다."),
     INVALID_RECORD_PAGE_RANGE(HttpStatus.BAD_REQUEST, 130002, "RECORD의 page 값이 유효하지 않습니다."),
-    RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM(HttpStatus.BAD_REQUEST, 120003, "만료된 방에는 기록을 남길 수 없습니다."),
 
     /**
      * 140000 : roomParticipant error

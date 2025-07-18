@@ -3,22 +3,21 @@ package konkuk.thip.record.application.service;
 import jakarta.transaction.Transactional;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.record.application.port.in.RecordCreateUseCase;
 import konkuk.thip.record.application.port.in.dto.RecordCreateCommand;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
-import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERVIEW;
 
 @Service
 @RequiredArgsConstructor
@@ -83,9 +82,7 @@ public class RecordCreateService implements RecordCreateUseCase {
 
     private void validateRoom(Room room) {
         // 방이 만료되었는지 검증
-        if (room.isExpired()) {
-            throw new BusinessException(RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM);
-        }
+        room.validateRoomExpired();
     }
 
     private void validateRecord(Record record, Book book) {

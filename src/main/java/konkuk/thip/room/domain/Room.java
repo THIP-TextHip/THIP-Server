@@ -119,7 +119,7 @@ public class Room extends BaseDomainEntity {
 
     public void verifyPassword(String rawPassword) {
 
-        validateRoomExpired();
+        validateRoomRecruitExpired();
 
         // 공개방일 경우 비밀번호 입력 요청 예외 처리
         if (this.isPublic()) {
@@ -132,7 +132,7 @@ public class Room extends BaseDomainEntity {
         }
     }
 
-    public void validateRoomExpired() {
+    public void validateRoomRecruitExpired() {
         // 모집기간 만료 체크
         LocalDate deadline = this.startDate.minusDays(1);
         if (isRecruitmentPeriodExpired()) {
@@ -172,12 +172,19 @@ public class Room extends BaseDomainEntity {
     }
 
     public void startRoomProgress() {
+        validateRoomRecruitExpired();
         validateRoomExpired();
 
         if (startDate.isBefore(LocalDate.now()) || startDate.isEqual(LocalDate.now())) {
             throw new InvalidStateException(ErrorCode.ROOM_ALREADY_STARTED);
         }
         startDate = LocalDate.now();
+    }
+
+    public void validateRoomExpired() {
+        if (this.isExpired()) {
+            throw new InvalidStateException(ErrorCode.ROOM_IS_EXPIRED);
+        }
     }
 
 
