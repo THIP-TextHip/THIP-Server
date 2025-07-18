@@ -16,7 +16,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.FeedJpaRepository;
+import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
 import org.junit.jupiter.api.*;
@@ -38,9 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BookDetailSearchControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
     private BookSearchService bookSearchService;
     @Autowired
     private UserJpaRepository userJpaRepository;
@@ -59,10 +56,6 @@ class BookDetailSearchControllerTest {
     @Autowired
     private CategoryJpaRepository categoryJpaRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-
     @BeforeEach
     void setup() {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
@@ -77,7 +70,7 @@ class BookDetailSearchControllerTest {
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title("작별하지 않는다")
-                .isbn("9788954682152")
+                .isbn("9791168342941")
                 .authorName("한강")
                 .bestSeller(false)
                 .publisher("문학동네")
@@ -137,7 +130,7 @@ class BookDetailSearchControllerTest {
     @Test
     @DisplayName("책 상세 검색 결과를 정상적으로 반환.")
     void searchDetailBooks_ReturnsCorrectResult() {
-        String isbn = "9788954682152";
+        String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());
@@ -152,7 +145,7 @@ class BookDetailSearchControllerTest {
     @Test
     @DisplayName("모집 중인 방이 없으면 recruitingRoomCount가 0")
     void searchDetailBooks_NoRecruitingRooms_ReturnsZero() {
-        String isbn = "9788954682152";
+        String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
         BookJpaEntity book = bookJpaRepository.findAll().get(0);
 
@@ -182,7 +175,7 @@ class BookDetailSearchControllerTest {
     @Test
     @DisplayName("피드와 방 참여자가 모두 없으면 recruitingReadCount가 0")
     void searchDetailBooks_NoFeedOrRoomParticipants_ReturnsZero() {
-        String isbn = "9788954682152";
+        String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
         feedJpaRepository.deleteAll();
@@ -195,7 +188,7 @@ class BookDetailSearchControllerTest {
     @Test
     @DisplayName("사용자가 책을 저장하지 않았으면 isSaved가 false")
     void searchDetailBooks_BookNotSaved_ReturnsFalse() {
-        String isbn = "9788954682152";
+        String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
         savedBookJpaRepository.deleteAll();

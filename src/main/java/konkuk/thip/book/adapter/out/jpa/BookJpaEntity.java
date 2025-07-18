@@ -36,7 +36,7 @@ public class BookJpaEntity extends BaseJpaEntity {
     @Column(name = "page_count")
     private Integer pageCount;
 
-    @Column(length = 1000)
+    @Column(length = 3000)
     private String description;
 
     public void changePageCount(Integer pageCount) {

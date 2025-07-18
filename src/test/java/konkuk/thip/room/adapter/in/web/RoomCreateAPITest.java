@@ -89,12 +89,12 @@ class RoomCreateAPITest {
     private void saveBookWithPageCount() {
         bookJpaRepository.save(BookJpaEntity.builder()
                 .title("작별하지 않는다")
-                .isbn("9788954682152")      // 실제 isbn 값
-                .authorName("한강")
+                .isbn("9791168342941")      // 실제 isbn 값
+                .authorName("박곰희")
                 .bestSeller(false)
                 .publisher("문학동네")
                 .imageUrl("https://image1.jpg")
-                .pageCount(332)             // pageCount 값이 null이 아닌 책
+                .pageCount(296)             // pageCount 값이 null이 아닌 책
                 .description("한강의 소설")
                 .build());
     }
@@ -102,19 +102,19 @@ class RoomCreateAPITest {
     private void saveBookWithoutPageCount() {
         bookJpaRepository.save(BookJpaEntity.builder()
                 .title("작별하지 않는다")
-                .isbn("9788954682152")      // 실제 isbn 값
-                .authorName("한강")
+                .isbn("9791168342941")      // 실제 isbn 값
+                .authorName("박곰희")
                 .bestSeller(false)
                 .publisher("문학동네")
                 .imageUrl("https://image1.jpg")
-                .pageCount(null)            // pageCount 값이 null 인 책 -> 실제 페이지 정보 332
+                .pageCount(null)            // pageCount 값이 null 인 책 -> 실제 페이지 정보 296
                 .description("한강의 소설")
                 .build());
     }
 
     private Map<String, Object> buildRoomCreateRequest() {
         Map<String, Object> request = new HashMap<>();
-        request.put("isbn", "9788954682152");
+        request.put("isbn", "9791168342941");
         request.put("category", "문학");           // 실제 카테고리 값
         request.put("roomName", "방이름");
         request.put("description", "방설명");
@@ -217,7 +217,7 @@ class RoomCreateAPITest {
 
         // update 된 책 검증
         BookJpaEntity updatedBookJpaEntity = bookJpaRepository.findById(bookId).orElse(null);
-        assertThat(updatedBookJpaEntity.getPageCount()).isEqualTo(332);
+        assertThat(updatedBookJpaEntity.getPageCount()).isEqualTo(296);
     }
 
     @Test
@@ -269,7 +269,7 @@ class RoomCreateAPITest {
                         "isbn", "authorName", "pageCount"
                 )
                 .containsExactly(
-                        "9788954682152", "한강", 332
+                        "9791168342941", "박곰희", 296
                 );
     }
 

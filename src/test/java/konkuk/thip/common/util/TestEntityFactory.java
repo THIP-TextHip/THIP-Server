@@ -1,6 +1,7 @@
 package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
@@ -66,6 +67,19 @@ public class TestEntityFactory {
                 .title("책제목")
                 .authorName("저자")
                 .isbn("isbn")
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(100)
+                .description("설명")
+                .build();
+    }
+
+    public static BookJpaEntity createBookWithISBN(String isbn) {
+        return BookJpaEntity.builder()
+                .title("책제목")
+                .authorName("저자")
+                .isbn(isbn)
                 .bestSeller(false)
                 .publisher("출판사")
                 .imageUrl("img")
@@ -142,6 +156,13 @@ public class TestEntityFactory {
         return FollowingJpaEntity.builder()
                 .userJpaEntity(followerUser)
                 .followingUserJpaEntity(followingUser)
+                .build();
+    }
+
+    public static TagJpaEntity createTag(CategoryJpaEntity category,String value) {
+        return TagJpaEntity.builder()
+                .categoryJpaEntity(category)
+                .value(value)
                 .build();
     }
 }

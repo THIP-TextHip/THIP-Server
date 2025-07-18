@@ -1,4 +1,4 @@
-package konkuk.thip.post.domain;
+package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;

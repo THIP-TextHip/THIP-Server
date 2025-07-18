@@ -1,4 +1,4 @@
-package konkuk.thip.feed.adapter.out.persistence;
+package konkuk.thip.feed.adapter.out.persistence.repository;
 
 import java.util.Set;
 
