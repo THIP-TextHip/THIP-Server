@@ -43,41 +43,47 @@ public class RoomJoinService implements RoomJoinUseCase {
         validateRoom(room);
 
         Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
-        boolean isParticipate = roomParticipantOptional.isPresent();
 
         // 참여하기 요청
         if(type.isJoinType()) {
-            // 이미 참여한 상태
-            if(isParticipate) {
-                throw new InvalidStateException(ErrorCode.USER_ALREADY_PARTICIPATE);
-            }
-
-            RoomParticipant roomParticipant = RoomParticipant.withoutId(roomJoinCommand.userId(), roomJoinCommand.roomId(), MEMBER.getType());
-            roomParticipantCommandPort.save(roomParticipant);
-
-            //Room의 memberCount 업데이트
-            room.increaseMemberCount();
+            handleJoin(roomJoinCommand, roomParticipantOptional, room);
         }
 
         // 취소하기 요청
         if(!type.isJoinType()) {
-            // 참여하지 않은 상태
-            if(!isParticipate) {
-                throw new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL);
-            }
-
-            // 참여 취소
-            RoomParticipant roomParticipant = roomParticipantOptional.get();
-            roomParticipant.cancelParticipation();
-
-            roomParticipantCommandPort.deleteByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
-
-            //Room의 memberCount 업데이트
-            room.decreaseMemberCount();
+            handleCancel(roomJoinCommand, roomParticipantOptional, roomParticipantOptional, room);
         }
 
         // 방의 상태 업데이트
         roomCommandPort.updateMemberCount(room);
+    }
+
+    private void handleCancel(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Optional<RoomParticipant> roomParticipantOptional, Room room) {
+        // 참여하지 않은 상태
+        RoomParticipant participant = participantOptional.orElseThrow(() ->
+                new InvalidStateException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL)
+        );
+
+        // 참여 취소
+        participant.cancelParticipation();
+
+        roomParticipantCommandPort.deleteByUserIdAndRoomId(roomJoinCommand.userId(), roomJoinCommand.roomId());
+
+        //Room의 memberCount 업데이트
+        room.decreaseMemberCount();
+    }
+
+    private void handleJoin(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Room room) {
+        // 이미 참여한 상태
+        participantOptional.ifPresent(p -> {
+            throw new InvalidStateException(ErrorCode.USER_ALREADY_PARTICIPATE);
+        });
+
+        RoomParticipant roomParticipant = RoomParticipant.withoutId(roomJoinCommand.userId(), roomJoinCommand.roomId(), MEMBER.getType());
+        roomParticipantCommandPort.save(roomParticipant);
+
+        //Room의 memberCount 업데이트
+        room.increaseMemberCount();
     }
 
     private void validateRoom(Room room) {

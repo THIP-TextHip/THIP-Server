@@ -57,6 +57,7 @@ public class RoomParticipant extends BaseDomainEntity {
         }
     }
 
+    // 방 참여자가 방 모집 마감을 요청한 경우
     public void closeRoomRecruit() {
         if (checkRole(RoomParticipantRole.MEMBER)) {
             throw new BusinessException(ErrorCode.ROOM_RECRUIT_CANNOT_CLOSED,
