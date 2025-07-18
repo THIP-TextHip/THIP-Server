@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static konkuk.thip.room.adapter.out.jpa.RoomParticipantRole.MEMBER;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -57,7 +58,8 @@ class RoomJoinServiceTest {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(true);
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.of(RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType())));
 
             assertThatThrownBy(() -> roomJoinService.changeJoinState(command))
                     .isInstanceOf(InvalidStateException.class)
@@ -70,7 +72,8 @@ class RoomJoinServiceTest {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(false);
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.empty());
 
             roomJoinService.changeJoinState(command);
 
@@ -89,7 +92,8 @@ class RoomJoinServiceTest {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(false);
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.empty());
 
             assertThatThrownBy(() -> roomJoinService.changeJoinState(command))
                     .isInstanceOf(InvalidStateException.class)
@@ -103,8 +107,8 @@ class RoomJoinServiceTest {
             RoomParticipant participant = RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType());
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(true);
-            given(roomParticipantCommandPort.findByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(participant);
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.of(participant));
 
             room.increaseMemberCount(); // 현재 2명 이상으로 만들어 줌
 
