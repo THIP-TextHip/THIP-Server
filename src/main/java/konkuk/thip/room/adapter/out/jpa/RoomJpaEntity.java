@@ -55,4 +55,8 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryJpaEntity categoryJpaEntity;
+
+    public void updateMemberCount(int count) {
+        this.memberCount = count;
+    }
 }
