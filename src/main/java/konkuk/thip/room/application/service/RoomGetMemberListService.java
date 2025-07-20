@@ -28,7 +28,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
     public RoomGetMemberListResponse getRoomMemberList(Long roomId) {
 
         // 1. 방 검증 및 방 조회
-        Room room = roomCommandPort.findById(roomId);
+        Room room = roomCommandPort.getByIdOrThrow(roomId);
 
         // 2. 방 참여자(UserRoom) 전체 조회
         List<RoomParticipant> roomParticipants = roomParticipantCommandPort.findAllByRoomId(room.getId());

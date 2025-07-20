@@ -1,11 +1,10 @@
 package konkuk.thip.room.application.service;
 
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
-import konkuk.thip.room.application.port.out.RoomParticipantQueryPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static konkuk.thip.room.adapter.out.jpa.RoomParticipantRole.MEMBER;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mock;
 
 @DisplayName("[단위] 방 참여/취소 서비스 단위 테스트")
 class RoomJoinServiceTest {
-    private RoomParticipantQueryPort roomParticipantQueryPort;
     private RoomCommandPort roomCommandPort;
     private RoomParticipantCommandPort roomParticipantCommandPort;
     private RoomJoinService roomJoinService;
@@ -36,12 +35,10 @@ class RoomJoinServiceTest {
 
     @BeforeEach
     void setUp() {
-        roomParticipantQueryPort = mock(RoomParticipantQueryPort.class);
         roomCommandPort = mock(RoomCommandPort.class);
         roomParticipantCommandPort = mock(RoomParticipantCommandPort.class);
 
         roomJoinService = new RoomJoinService(
-                roomParticipantQueryPort,
                 roomCommandPort,
                 roomParticipantCommandPort
         );
@@ -56,11 +53,12 @@ class RoomJoinServiceTest {
         void alreadyParticipated() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(true);
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.of(RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType())));
 
             assertThatThrownBy(() -> roomJoinService.changeJoinState(command))
-                    .isInstanceOf(InvalidStateException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_ALREADY_PARTICIPATE);
         }
 
@@ -69,13 +67,14 @@ class RoomJoinServiceTest {
         void successJoin() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(false);
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.empty());
 
             roomJoinService.changeJoinState(command);
 
             then(roomParticipantCommandPort).should().save(any(RoomParticipant.class));
-            then(roomCommandPort).should().updateMemberCount(any(Room.class));
+            then(roomCommandPort).should().update(any(Room.class));
         }
     }
 
@@ -88,12 +87,13 @@ class RoomJoinServiceTest {
         void notParticipated() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(false);
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.empty());
 
             assertThatThrownBy(() -> roomJoinService.changeJoinState(command))
-                    .isInstanceOf(InvalidStateException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_PARTICIPATED);
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL);
         }
 
         @Test
@@ -102,16 +102,16 @@ class RoomJoinServiceTest {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
             RoomParticipant participant = RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType());
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(room);
-            given(roomParticipantQueryPort.existByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(true);
-            given(roomParticipantCommandPort.findByUserIdAndRoomId(USER_ID, ROOM_ID)).willReturn(participant);
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
+                    .willReturn(Optional.of(participant));
 
             room.increaseMemberCount(); // 현재 2명 이상으로 만들어 줌
 
             roomJoinService.changeJoinState(command);
 
             then(roomParticipantCommandPort).should().deleteByUserIdAndRoomId(USER_ID, ROOM_ID);
-            then(roomCommandPort).should().updateMemberCount(any(Room.class));
+            then(roomCommandPort).should().update(any(Room.class));
         }
     }
 
