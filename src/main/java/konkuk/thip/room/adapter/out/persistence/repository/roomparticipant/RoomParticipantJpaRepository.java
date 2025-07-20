@@ -14,7 +14,7 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
     Optional<RoomParticipantJpaEntity> findByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
     @Query(value = "SELECT * FROM room_participants WHERE room_id = :roomId AND status = 'ACTIVE'", nativeQuery = true)
-    List<RoomParticipantJpaEntity> findAllByRoomId(Long roomId);
+    List<RoomParticipantJpaEntity> findAllByRoomId(@Param("roomId") Long roomId);
 
     @Query(
             value = "SELECT EXISTS (SELECT 1 FROM room_participants rp WHERE rp.user_id = :userId AND rp.room_id = :roomId AND rp.status = 'ACTIVE')",
