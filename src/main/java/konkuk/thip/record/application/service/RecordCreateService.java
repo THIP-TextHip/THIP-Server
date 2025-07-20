@@ -3,7 +3,7 @@ package konkuk.thip.record.application.service;
 import jakarta.transaction.Transactional;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.record.application.port.in.RecordCreateUseCase;
 import konkuk.thip.record.application.port.in.dto.RecordCreateCommand;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
@@ -76,7 +76,7 @@ public class RecordCreateService implements RecordCreateUseCase {
                     "총평(isOverview)은 사용자 진행률이 80%% 이상일 때만 가능합니다. 현재 사용자 진행률 = %.2f%%",
                     roomParticipant.getUserPercentage()
             );
-            throw new InvalidStateException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
+            throw new BusinessException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
         }
     }
 

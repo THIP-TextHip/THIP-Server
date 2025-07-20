@@ -1,13 +1,9 @@
 package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
-import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Objects;
 
 @Getter
 @SuperBuilder
@@ -50,23 +46,16 @@ public class RoomParticipant extends BaseDomainEntity {
         return false;
     }
 
-    // 방장이 참여 취소를 요청한 경우
-    public void cancelParticipation() {
-        if (checkRole(RoomParticipantRole.HOST)) {
-            throw new BusinessException(ErrorCode.HOST_CANNOT_CANCEL);
-        }
+    public boolean isHost() {
+        return checkRole(RoomParticipantRole.HOST);
     }
 
-    // 방 참여자가 방 모집 마감을 요청한 경우
-    public void closeRoomRecruit() {
-        if (checkRole(RoomParticipantRole.MEMBER)) {
-            throw new BusinessException(ErrorCode.ROOM_RECRUIT_CANNOT_CLOSED,
-                new IllegalArgumentException("사용자는 방의 멤버입니다. 오직 호스트만 모집 마감이 가능합니다."));
-        }
+    public boolean isMember() {
+        return checkRole(RoomParticipantRole.MEMBER);
     }
 
-    private boolean checkRole(RoomParticipantRole host) {
-        return Objects.equals(this.roomParticipantRole, host.getType());
+    private boolean checkRole(RoomParticipantRole roomParticipantRole) {
+        return this.roomParticipantRole.equals(roomParticipantRole.getType());
     }
 
 

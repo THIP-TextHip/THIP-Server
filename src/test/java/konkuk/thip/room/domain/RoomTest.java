@@ -192,7 +192,7 @@ class RoomTest {
     }
 
     @Test
-    @DisplayName("verifyPassword: 모집기간 만료 시 BusinessException(ROOM_RECRUITMENT_PERIOD_EXPIRED) 발생")
+    @DisplayName("verifyPassword: 모집기간 만료 시 InvalidStateException(ROOM_RECRUITMENT_PERIOD_EXPIRED) 발생")
     void verifyPassword_recruitmentPeriodExpired() {
         LocalDate startExpired = today.plusDays(2);
         Room room = Room.withoutId(
@@ -200,20 +200,20 @@ class RoomTest {
                 startExpired, END, 5, 123L, validCategory
         );
         setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
-        BusinessException ex = assertThrows(BusinessException.class,
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
                 () -> room.verifyPassword("1234"));
         assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());
         assertTrue(ex.getCause().getMessage().contains("모집기간"));
     }
 
     @Test
-    @DisplayName("verifyPassword: 공개방에 비밀번호 입력 시 BusinessException(ROOM_PASSWORD_NOT_REQUIRED) 발생")
+    @DisplayName("verifyPassword: 공개방에 비밀번호 입력 시 InvalidStateException(ROOM_PASSWORD_NOT_REQUIRED) 발생")
     void verifyPassword_publicRoom() {
         Room room = Room.withoutId(
                 "제목", "설명", true, null,
                 START, END, 5, 123L, validCategory
         );
-        BusinessException ex = assertThrows(BusinessException.class,
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
                 () -> room.verifyPassword("1234"));
         assertEquals(ErrorCode.ROOM_PASSWORD_NOT_REQUIRED, ex.getErrorCode());
     }
@@ -278,7 +278,7 @@ class RoomTest {
     }
 
     @Test
-    @DisplayName("모집 기간이 만료된 방을 모집 마감하려고 하면 BusinessException 발생")
+    @DisplayName("모집 기간이 만료된 방을 모집 마감하려고 하면 InvalidStateException 발생")
     void startRoomProgress_recruitmentExpired() {
         Room room = Room.withoutId(
                 "방 제목", "방 설명", true, null,
@@ -288,7 +288,7 @@ class RoomTest {
         // 강제로 모집기간 만료된 상태로 변경
         room.startRoomProgress(); // startDate = 오늘
 
-        BusinessException ex = assertThrows(BusinessException.class, room::startRoomProgress);
+        InvalidStateException ex = assertThrows(InvalidStateException.class, room::startRoomProgress);
         assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());
     }
 
