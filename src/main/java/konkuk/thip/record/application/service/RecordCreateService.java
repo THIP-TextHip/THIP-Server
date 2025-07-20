@@ -42,8 +42,8 @@ public class RecordCreateService implements RecordCreateUseCase {
         );
 
         // 2. UserRoom, Room, Book 조회
-        RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(command.userId(), command.roomId());
-        Room room = roomCommandPort.findById(record.getRoomId());
+        RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(command.userId(), command.roomId());
+        Room room = roomCommandPort.getByIdOrThrow(record.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 3. 유효성 검증

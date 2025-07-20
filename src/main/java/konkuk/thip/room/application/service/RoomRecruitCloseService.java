@@ -31,7 +31,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUsecase {
         validateCloseable(roomParticipant);
 
         // 3. 모집 마감시 방 시작일을 현재 시간으로 변경
-        Room room = roomCommandPort.findById(roomId);
+        Room room = roomCommandPort.getByIdOrThrow(roomId);
         room.startRoomProgress();
 
         // 4. Room 테이블 업데이트

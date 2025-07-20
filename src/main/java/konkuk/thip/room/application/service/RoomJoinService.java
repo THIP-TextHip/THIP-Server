@@ -30,7 +30,7 @@ public class RoomJoinService implements RoomJoinUseCase {
         RoomJoinType type = RoomJoinType.from(roomJoinCommand.type());
 
         // 방이 존재하지 않거나 만료된 경우
-        Room room = roomCommandPort.findByIdOptional(roomJoinCommand.roomId())
+        Room room = roomCommandPort.findById(roomJoinCommand.roomId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL));
 
         validateRoom(room);

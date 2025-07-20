@@ -20,7 +20,7 @@ public class RoomVerifyPasswordService implements RoomVerifyPasswordUseCase {
     public Void verifyRoomPassword(RoomVerifyPasswordQuery query) {
 
         //방 검증
-        Room room = roomCommandPort.findById(query.roomId());
+        Room room = roomCommandPort.getByIdOrThrow(query.roomId());
 
         //도메인에서 비밀번호 검증 로직 수행
         room.verifyPassword(query.password());

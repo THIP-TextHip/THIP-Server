@@ -53,7 +53,7 @@ class RoomJoinServiceTest {
         void alreadyParticipated() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
 
-            given(roomCommandPort.findByIdOptional(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.of(RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType())));
 
@@ -67,7 +67,7 @@ class RoomJoinServiceTest {
         void successJoin() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
 
-            given(roomCommandPort.findByIdOptional(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.empty());
 
@@ -87,7 +87,7 @@ class RoomJoinServiceTest {
         void notParticipated() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
 
-            given(roomCommandPort.findByIdOptional(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.empty());
 
@@ -102,7 +102,7 @@ class RoomJoinServiceTest {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
             RoomParticipant participant = RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType());
 
-            given(roomCommandPort.findByIdOptional(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.of(participant));
 
