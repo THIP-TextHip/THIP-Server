@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -143,7 +144,9 @@ class RoomCloseJoinApiTest {
     @DisplayName("이미 시작된 방은 모집 마감 요청 시 실패")
     void closeRoomRecruit_fail_already_started() throws Exception {
         // startDate를 오늘로 설정해서 이미 시작된 상태로 만듦
-        room.updateStartDate(LocalDate.now());
+        Field field = RoomJpaEntity.class.getDeclaredField("startDate");
+        field.setAccessible(true);
+        field.set(room, LocalDate.now());
         roomJpaRepository.save(room);
 
         mockMvc.perform(post("/rooms/" + room.getRoomId() + "/close")
