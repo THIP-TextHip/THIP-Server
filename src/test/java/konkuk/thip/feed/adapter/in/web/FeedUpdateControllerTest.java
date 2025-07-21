@@ -95,8 +95,8 @@ class FeedUpdateControllerTest {
     class BasicValidation {
 
         @Test
-        @DisplayName("존재하지 않는 피드를 삭제(수정)하려는 경우 404 반환")
-        void deleteNonExistentFeed() throws Exception {
+        @DisplayName("존재하지 않는 피드를 수정하려는 경우 404 반환")
+        void updateNonExistentFeed() throws Exception {
             Map<String, Object> req = buildValidUpdateRequest();
             mockMvc.perform(patch("/feeds/99999")
                             .requestAttr("userId", 100L)
