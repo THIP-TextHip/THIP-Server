@@ -5,15 +5,15 @@ import io.jsonwebtoken.lang.Assert;
 
 import java.time.LocalDateTime;
 
-public record FollowerQueryDto(Long userId,
-                               String nickname,
-                               String profileImageUrl,
-                               String aliasName,
-                               Integer followerCount,
-                               LocalDateTime createdAt) {
+public record FollowQueryDto(Long userId,
+                             String nickname,
+                             String profileImageUrl,
+                             String aliasName,
+                             Integer followerCount,
+                             LocalDateTime createdAt) {
 
     @QueryProjection
-    public FollowerQueryDto {
+    public FollowQueryDto {
         Assert.notNull(userId, "userId must not be null");
         Assert.notNull(nickname, "nickname must not be null");
         Assert.notNull(profileImageUrl, "profileImageUrl must not be null");

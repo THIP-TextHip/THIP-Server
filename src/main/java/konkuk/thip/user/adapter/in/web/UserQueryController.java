@@ -3,7 +3,7 @@ package konkuk.thip.user.adapter.in.web;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
 import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
-import konkuk.thip.user.application.port.in.UserGetFollowersUsecase;
+import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserQueryController {
 
     private final UserViewAliasChoiceUseCase userViewAliasChoiceUseCase;
-    private final UserGetFollowersUsecase userGetFollowersUsecase;
+    private final UserGetFollowUsecase userGetFollowUsecase;
 
     /**
      * 사용자 별칭 선택 화면 조회
@@ -34,14 +34,14 @@ public class UserQueryController {
     @GetMapping("/users/{userId}/followers")
     public BaseResponse<UserFollowersResponse> showFollowers(@PathVariable final Long userId,
                                                              @RequestParam(required = false) final String cursor) {
-        return BaseResponse.ok(userGetFollowersUsecase.getUserFollowers(userId, cursor));
+        return BaseResponse.ok(userGetFollowUsecase.getUserFollowers(userId, cursor));
     }
 
     /**
      * 내 팔로잉 리스트 조회
      */
-//    @GetMapping("/users/my/following")
-//    public BaseResponse<UserFollowersResponse> showMyFollowing(@RequestParam(required = false) final String cursor) {
-//        return BaseResponse.ok(userGetFollowersUsecase.getMyFollowing(cursor));
-//    }
+    @GetMapping("/users/my/following")
+    public BaseResponse<UserFollowersResponse> showMyFollowing(@RequestParam(required = false) final String cursor) {
+        return BaseResponse.ok(userGetFollowUsecase.getMyFollowing(cursor));
+    }
 }

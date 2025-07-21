@@ -2,7 +2,7 @@ package konkuk.thip.user.adapter.out.persistence;
 
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.user.application.port.out.dto.FollowerQueryDto;
+import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import lombok.RequiredArgsConstructor;
@@ -18,19 +18,19 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
     private final FollowingJpaRepository followingJpaRepository;
 
     @Override
-    public CursorBasedList<FollowerQueryDto> getFollowersByUserId(Long userId, String cursor, int size) {
+    public CursorBasedList<FollowQueryDto> getFollowersByUserId(Long userId, String cursor, int size) {
         LocalDateTime cursorVal = null;
         if (cursor != null && !cursor.isBlank()) {
             cursorVal = DateUtil.parseDateTime(cursor);
         }
-        List<FollowerQueryDto> dtos = followingJpaRepository.findFollowerDtosByUserIdBeforeCreatedAt(
+        List<FollowQueryDto> dtos = followingJpaRepository.findFollowerDtosByUserIdBeforeCreatedAt(
                 userId,
                 cursorVal,
                 size
         );
 
         boolean hasNext = dtos.size() > size;
-        List<FollowerQueryDto> content = hasNext ? dtos.subList(0, size) : dtos;
+        List<FollowQueryDto> content = hasNext ? dtos.subList(0, size) : dtos;
         String  nextCursor = hasNext ? content.get(size - 1).createdAt().toString() : null;
 
         return CursorBasedList.of(content, nextCursor);

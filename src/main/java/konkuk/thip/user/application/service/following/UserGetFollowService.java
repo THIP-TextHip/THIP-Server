@@ -2,8 +2,8 @@ package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
-import konkuk.thip.user.application.port.out.dto.FollowerQueryDto;
-import konkuk.thip.user.application.port.in.UserGetFollowersUsecase;
+import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
+import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserGetFollowersService implements UserGetFollowersUsecase {
+public class UserGetFollowService implements UserGetFollowUsecase {
 
     private final FollowingQueryPort followingQueryPort;
     private final UserCommandPort userCommandPort;
@@ -25,7 +25,7 @@ public class UserGetFollowersService implements UserGetFollowersUsecase {
     public UserFollowersResponse getUserFollowers(Long userId, String cursor) {
         User user = userCommandPort.findById(userId);
 
-        CursorBasedList<FollowerQueryDto> result = followingQueryPort.getFollowersByUserId(
+        CursorBasedList<FollowQueryDto> result = followingQueryPort.getFollowersByUserId(
                 user.getId(), cursor, DEFAULT_PAGE_SIZE
         );
 
@@ -44,5 +44,11 @@ public class UserGetFollowersService implements UserGetFollowersUsecase {
                 .nextCursor(result.nextCursor())
                 .isLast(!result.hasNext())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserFollowersResponse getMyFollowing(String cursor) {
+        return null;
     }
 }

@@ -7,7 +7,7 @@ import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
-import konkuk.thip.user.application.port.out.dto.FollowerQueryDto;
+import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
 import konkuk.thip.user.application.port.out.dto.QFollowerQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -36,7 +36,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     }
 
     @Override
-    public List<FollowerQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+    public List<FollowQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
