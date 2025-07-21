@@ -2,11 +2,7 @@ package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
+import konkuk.thip.room.adapter.in.web.response.*;
 import konkuk.thip.room.application.port.in.*;
 import konkuk.thip.room.application.port.in.RoomGetHomeJoinedListUseCase;
 import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
@@ -20,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequiredArgsConstructor
 public class RoomQueryController {
@@ -30,6 +28,7 @@ public class RoomQueryController {
     private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
     private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
+    private final RoomShowMineUseCase roomShowMineUseCase;
 
     @GetMapping("/rooms/search")
     public BaseResponse<RoomSearchResponse> searchRooms(
@@ -82,4 +81,13 @@ public class RoomQueryController {
         return BaseResponse.ok(roomShowPlayingDetailViewUseCase.getPlayingRoomDetailView(userId, roomId));
     }
 
+    // 내 모임방 리스트 조회
+    @GetMapping("/rooms/my")
+    public BaseResponse<RoomShowMineResponse> getMyRooms(
+            @UserId final Long userId,
+            @RequestParam(value = "type", required = false, defaultValue = "playingAndRecruiting") final String type,
+            @RequestParam(value = "cursorDate", required = false) final LocalDate cursorDate,
+            @RequestParam(value = "cursorId", required = false) final Long cursorId) {
+        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursorDate, cursorId));
+    }
 }
