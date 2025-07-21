@@ -18,6 +18,9 @@ public class UserQueryController {
     private final UserViewAliasChoiceUseCase userViewAliasChoiceUseCase;
     private final UserGetFollowersUsecase userGetFollowersUsecase;
 
+    /**
+     * 사용자 별칭 선택 화면 조회
+     */
     @GetMapping("/users/alias")
     public BaseResponse<UserViewAliasChoiceResponse> showAliasChoiceView() {
         return BaseResponse.ok(UserViewAliasChoiceResponse.of(
@@ -25,6 +28,9 @@ public class UserQueryController {
         ));
     }
 
+    /**
+     * 사용자 팔로워 조회
+     */
     @GetMapping("/users/{userId}/followers")
     public BaseResponse<UserFollowersResponse> showFollowers(@PathVariable final Long userId,
                                                              @RequestParam(required = false) final String cursor) {
