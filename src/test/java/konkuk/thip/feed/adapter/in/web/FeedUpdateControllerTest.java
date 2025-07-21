@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
@@ -40,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-@DisplayName("[단위] 피드 생성 api controller 단위 테스트")
+@DisplayName("[단위] 피드 수정 api controller 단위 테스트")
 class FeedUpdateControllerTest {
 
     @Autowired
@@ -53,8 +51,6 @@ class FeedUpdateControllerTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private TagJpaRepository tagJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
-    @Autowired private FeedTagJpaRepository feedTagJpaRepository;
-    @Autowired private ContentJpaRepository contentJpaRepository;
 
     private Long savedFeedId;
     private Long creatorUserId;
