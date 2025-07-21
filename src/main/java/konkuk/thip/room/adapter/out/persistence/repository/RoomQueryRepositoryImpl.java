@@ -252,7 +252,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     // 1) 모집중인 방
     @Override
     public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findRecruitingRoomsUserParticipated(
-            Long userId, LocalDate lastDate, Long lastId, int pageSize
+            Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
@@ -268,13 +268,13 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 t.get(room.memberCount),
                 DateUtil.formatAfterTime(t.get(cursorExpr))
         );
-        return sliceQuery(base, cursorExpr, mapper, lastDate, lastId, pageSize, true, orders);
+        return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, true, orders);
     }
 
     // 2) 진행중인 방
     @Override
     public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingRoomsUserParticipated(
-            Long userId, LocalDate lastDate, Long lastId, int pageSize
+            Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
@@ -291,13 +291,13 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 t.get(room.memberCount),
                 DateUtil.formatAfterTime(t.get(cursorExpr))
         );
-        return sliceQuery(base, cursorExpr, mapper, lastDate, lastId, pageSize, true, orders);
+        return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, true, orders);
     }
 
     // 3) 진행＋모집 통합
     @Override
     public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingAndRecruitingRoomsUserParticipated(
-            Long userId, LocalDate lastDate, Long lastId, int pageSize
+            Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression playing   = room.startDate.loe(today).and(room.endDate.goe(today));
@@ -327,13 +327,13 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 t.get(room.memberCount),
                 DateUtil.formatAfterTime(t.get(cursorExpr))
         );
-        return sliceQuery(base, cursorExpr, mapper, lastDate, lastId, pageSize, true, orders);
+        return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, true, orders);
     }
 
     // 4) 만료된 방
     @Override
     public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findExpiredRoomsUserParticipated(
-            Long userId, LocalDate lastDate, Long lastId, int pageSize
+            Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
@@ -350,7 +350,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 t.get(room.memberCount),
                 null    // 만료된 방은 endDate=null
         );
-        return sliceQuery(base, cursorExpr, mapper, lastDate, lastId, pageSize, false, orders);
+        return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, false, orders);
     }
 
     /**
@@ -360,28 +360,28 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
             BooleanExpression baseCondition,
             DateExpression<LocalDate> cursorDateExpr,
             Function<Tuple,RoomShowMineResponse.MyRoom> mapper,
-            LocalDate lastCursorDate,
-            Long lastCursorId,
+            LocalDate dateCursor,
+            Long roomIdCursor,
             int pageSize,
             boolean ascending,
             OrderSpecifier<?>... orderSpecs
     ) {
         BooleanBuilder where = new BooleanBuilder(baseCondition);       // baseCondition + 커서 기반으로 where 절 구성
-        if (lastCursorDate != null && lastCursorId != null) {
+        if (dateCursor != null && roomIdCursor != null) {
             if (ascending) {        // 진행중, 모집중, 통합
                 where.and(
-                        cursorDateExpr.gt(lastCursorDate)       // lastCursorDate 보다 크거나
+                        cursorDateExpr.gt(dateCursor)       // dateCursor 보다 크거나
                                 .or(
-                                        cursorDateExpr.eq(lastCursorDate)
-                                                .and(room.roomId.goe(lastCursorId))       // 같으면 id가 lastCursorId 보다 크거나 같은 것
+                                        cursorDateExpr.eq(dateCursor)
+                                                .and(room.roomId.goe(roomIdCursor))       // 같으면 id가 roomIdCursor 보다 크거나 같은 것
                                 )
                 );
             } else {        // 내림차순일 때는 반대로 (만료된 방)
                 where.and(
-                        cursorDateExpr.lt(lastCursorDate)       // lastCursorDate 보다 작거나
+                        cursorDateExpr.lt(dateCursor)       // dateCursor 보다 작거나
                                 .or(
-                                        cursorDateExpr.eq(lastCursorDate)
-                                                .and(room.roomId.loe(lastCursorId))      // 같으면 id가 lastCursorId 보다 작거나 같은 것
+                                        cursorDateExpr.eq(dateCursor)
+                                                .and(room.roomId.loe(roomIdCursor))      // 같으면 id가 roomIdCursor 보다 작거나 같은 것
                                 )
                 );
             }
@@ -408,7 +408,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         LocalDate nextDate = null;
         Long nextId = null;
         if (hasNext) {
-            Tuple next = tuples.get(pageSize);
+            Tuple next = tuples.get(pageSize);      // 다음 페이지의 첫번째 레코드
             nextDate = next.get(cursorDateExpr);
             nextId   = next.get(room.roomId);
         }

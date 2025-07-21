@@ -45,23 +45,23 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findRecruitingRoomsUserParticipated(Long userId, LocalDate lastRoomStartDateCursor, Long lastRoomIdCursor, int pageSize) {
-        return roomJpaRepository.findRecruitingRoomsUserParticipated(userId, lastRoomStartDateCursor, lastRoomIdCursor, pageSize);
+    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
+        return roomJpaRepository.findRecruitingRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingRoomsUserParticipated(Long userId, LocalDate lastRoomEndDateCursor, Long lastRoomIdCursor, int pageSize) {
-        return roomJpaRepository.findPlayingRoomsUserParticipated(userId, lastRoomEndDateCursor, lastRoomIdCursor, pageSize);
+    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
+        return roomJpaRepository.findPlayingRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingAndRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long lastRoomIdCursor, int pageSize) {
-        return roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(userId, dateCursor, lastRoomIdCursor, pageSize);
+    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingAndRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
+        return roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findExpiredRoomsUserParticipated(Long userId, LocalDate lastRoomEndDateCursor, Long lastRoomIdCursor, int pageSize) {
-        return roomJpaRepository.findExpiredRoomsUserParticipated(userId, lastRoomEndDateCursor, lastRoomIdCursor, pageSize);
+    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
+        return roomJpaRepository.findExpiredRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
     }
 
 }
