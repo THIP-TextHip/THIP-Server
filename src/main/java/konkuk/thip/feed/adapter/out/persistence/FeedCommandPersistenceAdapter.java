@@ -61,9 +61,9 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         FeedJpaEntity savedFeed = feedJpaRepository.save(feedJpaEntity);
 
         // Content가 존재하면 ContentJpaEntity 생성 및 Feed 연관관계 설정
-        saveContents(feed, savedFeed);
+        applyFeedContents(feed, savedFeed);
         // 태그가 존재하면 태그 피드 매핑 생성 및 저장
-        saveFeedTags(feed, savedFeed);
+        applyFeedTags(feed, savedFeed);
 
         return savedFeed.getPostId();
     }
@@ -73,30 +73,25 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getId())
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
         feedJpaEntity.updateFrom(feed);
-        updateContents(feed, feedJpaEntity);
-        updateFeedTags(feed, feedJpaEntity);
+
+        feedJpaEntity.getContentList().clear(); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
+        applyFeedContents(feed, feedJpaEntity);
+
+        feedTagJpaRepository.deleteAllByFeedJpaEntity(feedJpaEntity); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
+        applyFeedTags(feed, feedJpaEntity);
 
         return feedJpaEntity.getPostId();
     }
 
-    private void addAllContents(Feed feed, FeedJpaEntity feedJpaEntity) {
+    private void applyFeedContents(Feed feed, FeedJpaEntity feedJpaEntity) {
         if (feed.getContentList().isEmpty()) return;
         List<ContentJpaEntity> contents = feed.getContentList().stream()
                 .map(content -> contentMapper.toJpaEntity(content, feedJpaEntity))
                 .toList();
-        contents.forEach(feedJpaEntity.getContentList()::add);
+        feedJpaEntity.getContentList().addAll(contents);
     }
 
-    private void saveContents(Feed feed, FeedJpaEntity feedJpaEntity) {
-        addAllContents(feed, feedJpaEntity);
-    }
-
-    private void updateContents(Feed feed, FeedJpaEntity feedJpaEntity) {
-        feedJpaEntity.getContentList().clear(); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
-        addAllContents(feed, feedJpaEntity);
-    }
-
-    private void addAllTags(Feed feed, FeedJpaEntity feedJpaEntity) {
+    private void applyFeedTags(Feed feed, FeedJpaEntity feedJpaEntity) {
         if (feed.getTagList().isEmpty()) return;
         for (Tag tag : feed.getTagList()) {
             TagJpaEntity tagJpaEntity = tagJpaRepository.findByValue(tag.getValue())
@@ -109,13 +104,6 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
             feedTagJpaRepository.save(feedTagJpaEntity);
         }
-    }
-    private void saveFeedTags(Feed feed, FeedJpaEntity feedJpaEntity) {
-        addAllTags(feed, feedJpaEntity);
-    }
-    private void updateFeedTags(Feed feed, FeedJpaEntity feedJpaEntity) {
-        feedTagJpaRepository.deleteAllByFeedJpaEntity(feedJpaEntity); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
-        addAllTags(feed, feedJpaEntity);
     }
 
 }
