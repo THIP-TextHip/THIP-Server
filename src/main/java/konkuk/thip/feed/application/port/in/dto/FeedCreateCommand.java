@@ -10,8 +10,6 @@ public record FeedCreateCommand(
 
         Boolean isPublic,
 
-        String category,
-
         List<String> tagList,
 
         Long userId
