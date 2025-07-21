@@ -109,7 +109,7 @@ class FeedUpdateControllerTest {
         }
 
         @Test
-        @DisplayName("피드 생성자가 아닌 유저가 수정하려는 경우 400 반환")
+        @DisplayName("피드 생성자가 아닌 유저가 수정하려는 경우 403 반환")
         void unauthorizedFeedEdit() throws Exception {
             Map<String, Object> req = buildValidUpdateRequest();
             mockMvc.perform(patch("/feeds/" + savedFeedId)
