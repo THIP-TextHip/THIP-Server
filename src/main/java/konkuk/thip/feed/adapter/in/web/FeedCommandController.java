@@ -33,9 +33,9 @@ public class FeedCommandController {
 
     // 피드 수정 (책 빼고 변경가능)
     @PatchMapping("/feeds/{feedId}")
-    public BaseResponse<FeedIdResponse> updateFeed(@RequestBody @Valid FeedUpdateRequest request,
+    public BaseResponse<FeedIdResponse> updateFeed(@RequestBody @Valid final FeedUpdateRequest request,
                                                    @PathVariable("feedId") final Long feedId,
-                                                   @UserId Long userId) {
+                                                   @UserId final Long userId) {
 
         return BaseResponse.ok(FeedIdResponse.of(feedUpdateUseCase.updateFeed(request.toCommand(userId,feedId))));
 
