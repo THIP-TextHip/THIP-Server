@@ -19,20 +19,25 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
 
     @Override
     public CursorBasedList<FollowQueryDto> getFollowersByUserId(Long userId, String cursor, int size) {
-        LocalDateTime cursorVal = null;
-        if (cursor != null && !cursor.isBlank()) {
-            cursorVal = DateUtil.parseDateTime(cursor);
-        }
-        List<FollowQueryDto> dtos = followingJpaRepository.findFollowerDtosByUserIdBeforeCreatedAt(
+        LocalDateTime cursorVal = cursor != null && !cursor.isBlank() ? DateUtil.parseDateTime(cursor) : null;
+        List<FollowQueryDto> followerDtos = followingJpaRepository.findFollowerDtosByUserIdBeforeCreatedAt(
                 userId,
                 cursorVal,
                 size
         );
 
-        boolean hasNext = dtos.size() > size;
-        List<FollowQueryDto> content = hasNext ? dtos.subList(0, size) : dtos;
-        String  nextCursor = hasNext ? content.get(size - 1).createdAt().toString() : null;
+        return CursorBasedList.of(followerDtos, size, followerDto -> followerDto.createdAt().toString());
+    }
 
-        return CursorBasedList.of(content, nextCursor);
+    @Override
+    public CursorBasedList<FollowQueryDto> getFollowingByUserId(Long userId, String cursor, int size) {
+        LocalDateTime cursorVal = cursor != null && !cursor.isBlank() ? DateUtil.parseDateTime(cursor) : null;
+        List<FollowQueryDto> followingDtos = followingJpaRepository.findFollowingDtosByUserIdBeforeCreatedAt(
+                userId,
+                cursorVal,
+                size
+        );
+
+        return CursorBasedList.of(followingDtos, size, followingDto -> followingDto.createdAt().toString());
     }
 }

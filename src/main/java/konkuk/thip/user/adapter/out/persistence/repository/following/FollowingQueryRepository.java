@@ -11,4 +11,5 @@ public interface FollowingQueryRepository {
     Optional<FollowingJpaEntity> findByUserAndTargetUser(Long userId, Long targetUserId);
 
     List<FollowQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size);
+    List<FollowQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size);
 }

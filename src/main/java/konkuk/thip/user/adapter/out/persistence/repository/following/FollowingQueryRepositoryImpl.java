@@ -8,7 +8,7 @@ import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
-import konkuk.thip.user.application.port.out.dto.QFollowerQueryDto;
+import konkuk.thip.user.application.port.out.dto.QFollowQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -37,33 +37,54 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
 
     @Override
     public List<FollowQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+        return findFollowDtos(
+                userId,
+                cursor,
+                size,
+                true // isFollowerQuery
+        );
+    }
+
+    @Override
+    public List<FollowQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+        return findFollowDtos(
+                userId,
+                cursor,
+                size,
+                false // isFollowingQuery
+        );
+    }
+
+    private List<FollowQueryDto> findFollowDtos(Long userId, LocalDateTime cursor, int size, boolean isFollowerQuery) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
         BooleanBuilder condition = new BooleanBuilder()
-                .and(following.followingUserJpaEntity.userId.eq(userId))
+                .and((isFollowerQuery ? following.followingUserJpaEntity.userId.eq(userId) : following.userJpaEntity.userId.eq(userId)))
                 .and(following.status.eq(StatusType.ACTIVE));
 
         if (cursor != null) {
             condition.and(following.createdAt.lt(cursor));
         }
 
+        QUserJpaEntity targetUser = isFollowerQuery ? following.userJpaEntity : following.followingUserJpaEntity;
+
         return jpaQueryFactory
-                .select(new QFollowerQueryDto(
-                        user.userId,
-                        user.nickname,
+                .select(new QFollowQueryDto(
+                        targetUser.userId,
+                        targetUser.nickname,
                         alias.imageUrl,
                         alias.value,
-                        user.followerCount,
+                        targetUser.followerCount,
                         following.createdAt
                 ))
                 .from(following)
-                .leftJoin(following.userJpaEntity, user)
+                .leftJoin(targetUser, user)
                 .leftJoin(user.aliasForUserJpaEntity, alias)
                 .where(condition)
                 .orderBy(following.createdAt.desc())
-                .limit(size + 1) // hasNext 판단 위해 +1
+                .limit(size + 1)
                 .fetch();
     }
 }

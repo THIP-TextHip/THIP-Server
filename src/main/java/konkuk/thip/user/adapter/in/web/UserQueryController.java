@@ -1,7 +1,11 @@
 package konkuk.thip.user.adapter.in.web;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import konkuk.thip.common.dto.BaseResponse;
+import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
+import konkuk.thip.user.adapter.in.web.response.UserFollowingResponse;
 import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
 import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
@@ -33,15 +37,18 @@ public class UserQueryController {
      */
     @GetMapping("/users/{userId}/followers")
     public BaseResponse<UserFollowersResponse> showFollowers(@PathVariable final Long userId,
-                                                             @RequestParam(required = false) final String cursor) {
-        return BaseResponse.ok(userGetFollowUsecase.getUserFollowers(userId, cursor));
+                                                             @RequestParam(required = false) final String cursor,
+                                                             @RequestParam(defaultValue = "10") @Max(value = 10) @Min(value = 1) final int size) {
+        return BaseResponse.ok(userGetFollowUsecase.getUserFollowers(userId, cursor, size));
     }
 
     /**
      * 내 팔로잉 리스트 조회
      */
     @GetMapping("/users/my/following")
-    public BaseResponse<UserFollowersResponse> showMyFollowing(@RequestParam(required = false) final String cursor) {
-        return BaseResponse.ok(userGetFollowUsecase.getMyFollowing(cursor));
+    public BaseResponse<UserFollowingResponse> showMyFollowing(@UserId final Long userId,
+                                                               @RequestParam(required = false) final String cursor,
+                                                               @RequestParam(defaultValue = "10") @Max(value = 10) @Min(value = 1) final int size) {
+        return BaseResponse.ok(userGetFollowUsecase.getMyFollowing(userId, cursor, size));
     }
 }

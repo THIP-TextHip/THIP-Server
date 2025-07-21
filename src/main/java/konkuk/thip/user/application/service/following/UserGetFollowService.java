@@ -2,6 +2,8 @@ package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
+import konkuk.thip.user.adapter.in.web.response.UserFollowingResponse;
+import konkuk.thip.user.application.mapper.FollowDtoMapper;
 import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
 import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
@@ -18,25 +20,21 @@ public class UserGetFollowService implements UserGetFollowUsecase {
     private final FollowingQueryPort followingQueryPort;
     private final UserCommandPort userCommandPort;
 
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private final FollowDtoMapper followDtoMapper;
+
+    private static final int MAX_PAGE_SIZE = 10;
 
     @Override
     @Transactional(readOnly = true)
-    public UserFollowersResponse getUserFollowers(Long userId, String cursor) {
+    public UserFollowersResponse getUserFollowers(Long userId, String cursor, int size) {
         User user = userCommandPort.findById(userId);
 
         CursorBasedList<FollowQueryDto> result = followingQueryPort.getFollowersByUserId(
-                user.getId(), cursor, DEFAULT_PAGE_SIZE
+                user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
         );
 
         var followers = result.contents().stream()
-                .map(dto -> UserFollowersResponse.Follower.builder()
-                        .userId(dto.userId())
-                        .nickname(dto.nickname())
-                        .profileImageUrl(dto.profileImageUrl())
-                        .aliasName(dto.aliasName())
-                        .followerCount(dto.followerCount())
-                        .build())
+                .map(followDtoMapper::toFollowerList)
                 .toList();
 
         return UserFollowersResponse.builder()
@@ -48,7 +46,21 @@ public class UserGetFollowService implements UserGetFollowUsecase {
 
     @Override
     @Transactional(readOnly = true)
-    public UserFollowersResponse getMyFollowing(String cursor) {
-        return null;
+    public UserFollowingResponse getMyFollowing(Long userId, String cursor, int size) {
+        User user = userCommandPort.findById(userId);
+
+        CursorBasedList<FollowQueryDto> result = followingQueryPort.getFollowingByUserId(
+                user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
+        );
+
+        var following = result.contents().stream()
+                .map(followDtoMapper::toFollowingList)
+                .toList();
+
+        return UserFollowingResponse.builder()
+                .followings(following)
+                .nextCursor(result.nextCursor())
+                .isLast(!result.hasNext())
+                .build();
     }
 }
