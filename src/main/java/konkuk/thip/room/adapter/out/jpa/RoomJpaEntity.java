@@ -69,4 +69,9 @@ public class RoomJpaEntity extends BaseJpaEntity {
         this.memberCount = room.getMemberCount();
         return this;
     }
+
+    // 테스트 메서드 편의용
+    public void updateMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
 }
