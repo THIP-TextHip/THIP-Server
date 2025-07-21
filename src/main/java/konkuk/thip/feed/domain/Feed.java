@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
@@ -36,7 +38,8 @@ public class Feed extends BaseDomainEntity {
 
     private List<Tag> tagList;
 
-    private List<Content> contentList;
+    @Builder.Default
+    private List<Content> contentList = new ArrayList<>();
 
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
@@ -56,42 +59,67 @@ public class Feed extends BaseDomainEntity {
     }
 
     private static List<Content> convertToContentList(List<String> imageUrls) {
-        if (imageUrls == null) return List.of();
-
+        if (imageUrls == null) return new ArrayList<>();
         return imageUrls.stream()
                 .filter(url -> url != null && !url.isBlank())
                 .map(url -> Content.builder().contentUrl(url).build())
                 .collect(Collectors.toList());
     }
 
-    public static void validateCategoryAndTags(String category, List<String> tagList) {
-
-        // 둘 다 없으면 카테고리도 태그도 없는 새 게시글 (예외 상황 아님)
-        boolean categoryEmpty = (category == null || category.trim().isEmpty());
+    public static void validateTags(List<String> tagList) {
         boolean tagListEmpty = (tagList == null || tagList.isEmpty());
-
-        // 둘 중 하나만 입력된 경우
-        if (categoryEmpty ^ tagListEmpty) {
-            throw new InvalidStateException(INVALID_FEED_CREATE, new IllegalArgumentException("카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다."));
-        }
 
         // 태그가 있는 경우, 개수 최대 5개 제한
         if (!tagListEmpty && tagList.size() > 5) {
-            throw new InvalidStateException(INVALID_FEED_CREATE, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
+            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
         }
 
         // 태그 중복 체크
         if (!tagListEmpty) {
             long distinctCount = tagList.stream().distinct().count();
             if (distinctCount != tagList.size()) {
-                throw new InvalidStateException(INVALID_FEED_CREATE, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
+                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
             }
         }
     }
 
     public static void validateImageCount(int imageSize) {
         if (imageSize > 3) {
-            throw new InvalidStateException(INVALID_FEED_CREATE, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
+            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
+        }
+    }
+
+    public void validateCreator(Long userId) {
+        if (!this.creatorId.equals(userId)) {
+            throw new InvalidStateException(FEED_UPDATE_FORBIDDEN);
+        }
+    }
+
+    public void updateContent(String newContent) {
+        this.content = newContent;
+    }
+
+    public void updateVisibility(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    public void updateTags(List<String> tagValues) {
+        this.tagList = Tag.fromList(tagValues);
+    }
+
+    public void updateImages(List<String> imageUrls) {
+        this.contentList = convertToContentList(imageUrls);
+    }
+
+    public void validateOwnsImages(List<String> candidateImageUrls) {
+        Set<String> myImageUrls = this.getContentList().stream()
+                .map(Content::getContentUrl)
+                .filter(url -> url != null && !url.isBlank())
+                .collect(Collectors.toSet());
+        for (String url : candidateImageUrls) {
+            if (!myImageUrls.contains(url)) {
+                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("해당 이미지는 이 피드에 존재하지 않습니다: " + url));
+            }
         }
     }
 
