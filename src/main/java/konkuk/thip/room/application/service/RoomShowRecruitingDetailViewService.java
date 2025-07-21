@@ -32,7 +32,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
     @Transactional(readOnly = true)
     public RoomRecruitingDetailViewResponse getRecruitingRoomDetailView(Long userId, Long roomId) {
         // 1. Room 조회, Book 조회
-        Room room = roomCommandPort.findById(roomId);
+        Room room = roomCommandPort.getByIdOrThrow(roomId);
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 2. Room과 연관된 UserRoom 조회, RoomParticipants 일급 컬렉션 생성

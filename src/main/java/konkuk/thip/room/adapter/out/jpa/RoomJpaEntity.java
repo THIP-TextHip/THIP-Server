@@ -3,6 +3,7 @@ package konkuk.thip.room.adapter.out.jpa;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.room.domain.Room;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -56,7 +57,16 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryJpaEntity categoryJpaEntity;
 
-    public void updateMemberCount(int count) {
-        this.memberCount = count;
+    public RoomJpaEntity updateFrom(Room room) {
+        this.title = room.getTitle();
+        this.description = room.getDescription();
+        this.isPublic = room.isPublic();
+        this.password = room.getHashedPassword();
+        this.roomPercentage = room.getRoomPercentage();
+        this.startDate = room.getStartDate();
+        this.endDate = room.getEndDate();
+        this.recruitCount = room.getRecruitCount();
+        this.memberCount = room.getMemberCount();
+        return this;
     }
 }

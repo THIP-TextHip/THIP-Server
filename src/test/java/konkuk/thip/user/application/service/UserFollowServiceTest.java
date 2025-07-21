@@ -1,7 +1,7 @@
 package konkuk.thip.user.application.service;
 
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -145,7 +145,7 @@ class UserFollowServiceTest {
 
             // when & then
             assertThatThrownBy(() -> userFollowService.changeFollowingState(command))
-                    .isInstanceOf(InvalidStateException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessageContaining(USER_ALREADY_UNFOLLOWED.getMessage());
         }
     }
@@ -157,7 +157,7 @@ class UserFollowServiceTest {
         UserFollowCommand command = new UserFollowCommand(userId, userId, true);
 
         assertThatThrownBy(() -> userFollowService.changeFollowingState(command))
-                .isInstanceOf(InvalidStateException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(USER_CANNOT_FOLLOW_SELF.getMessage());
     }
 

@@ -6,12 +6,14 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -26,11 +28,17 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
     private final RoomMapper roomMapper;
 
     @Override
-    public Room findById(Long id) {
+    public Room getByIdOrThrow(Long id) {
         RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
         return roomMapper.toDomainEntity(roomJpaEntity);
+    }
+
+    @Override
+    public Optional<Room> findById(Long id) {
+        return roomJpaRepository.findById(id)
+                .map(roomMapper::toDomainEntity);
     }
 
     @Override
@@ -48,13 +56,11 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
     }
 
     @Override
-    public void updateMemberCount(Room room) {
+    public void update(Room room) {
         RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(room.getId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
-        roomJpaEntity.updateMemberCount(room.getMemberCount());
-
-        roomJpaRepository.save(roomJpaEntity);
+        roomJpaRepository.save(roomJpaEntity.updateFrom(room));
     }
 }

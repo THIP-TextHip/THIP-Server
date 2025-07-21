@@ -57,7 +57,7 @@ public class VoteCreateService implements VoteCreateUseCase {
     }
 
     private void validateVote(Vote vote) {
-        Room room = roomCommandPort.findById(vote.getRoomId());
+        Room room = roomCommandPort.getByIdOrThrow(vote.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 페이지 유효성 검증

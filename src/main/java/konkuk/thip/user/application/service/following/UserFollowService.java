@@ -1,6 +1,6 @@
 package konkuk.thip.user.application.service.following;
 
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
@@ -44,7 +44,7 @@ public class UserFollowService implements UserFollowUsecase {
             return isFollowing;
         } else { // 팔로우 관계가 존재하지 않는 경우
             if (!type) {
-                throw new InvalidStateException(USER_ALREADY_UNFOLLOWED); // 언팔로우 요청인데 팔로우 관계가 존재하지 않으므로 이미 언팔로우 상태
+                throw new BusinessException(USER_ALREADY_UNFOLLOWED); // 언팔로우 요청인데 팔로우 관계가 존재하지 않으므로 이미 언팔로우 상태
             }
             targetUser.increaseFollowerCount();
             followingCommandPort.save(Following.withoutId(userId, targetUserId), targetUser);
@@ -54,7 +54,7 @@ public class UserFollowService implements UserFollowUsecase {
 
     private void validateParams(Long userId, Long targetUserId) {
         if(Objects.equals(userId, targetUserId)) {
-            throw new InvalidStateException(USER_CANNOT_FOLLOW_SELF);
+            throw new BusinessException(USER_CANNOT_FOLLOW_SELF);
         }
     }
 }
