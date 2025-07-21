@@ -1,7 +1,7 @@
 package konkuk.thip.user.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import io.jsonwebtoken.lang.Assert;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
