@@ -21,11 +21,11 @@ public abstract class PostJpaEntity extends BaseJpaEntity {
     private Long postId;
 
     @Column(length = 6100, nullable = false)
-    private String content;
+    protected String content;
 
-    private Integer likeCount = 0;
+    protected Integer likeCount = 0;
 
-    private Integer commentCount = 0;
+    protected Integer commentCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
