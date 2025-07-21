@@ -28,7 +28,7 @@ public class FeedUpdateService implements FeedUpdateUseCase {
         Feed.validateImageCount(command.remainImageUrls() != null ? command.remainImageUrls().size() : 0);
 
         // 2. 피드 조회 및 유효성 검증
-        Feed feed = feedCommandPort.findById(command.feedId());
+        Feed feed = feedCommandPort.getByIdOrThrow(command.feedId());
         feed.validateCreator(command.userId());
 
         // 3. 도메인 내부 상태 변경
