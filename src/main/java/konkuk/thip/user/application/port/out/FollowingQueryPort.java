@@ -1,8 +1,9 @@
 package konkuk.thip.user.application.port.out;
 
-import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
+import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.user.application.port.out.dto.FollowerQueryDto;
 
 public interface FollowingQueryPort {
-    UserFollowersResponse getFollowersByUserId(Long userId, String cursor, int size);
+    CursorBasedList<FollowerQueryDto> getFollowersByUserId(Long userId, String cursor, int size);
 }
 

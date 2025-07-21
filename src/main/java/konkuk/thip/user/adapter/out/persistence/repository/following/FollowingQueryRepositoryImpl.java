@@ -7,6 +7,8 @@ import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
+import konkuk.thip.user.application.port.out.dto.FollowerQueryDto;
+import konkuk.thip.user.application.port.out.dto.QFollowerQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +36,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     }
 
     @Override
-    public List<FollowingJpaEntity> findFollowersByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+    public List<FollowerQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
@@ -48,12 +50,20 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         }
 
         return jpaQueryFactory
-                .selectFrom(following)
-                .leftJoin(following.userJpaEntity, user).fetchJoin() // N+1 문제 방지를 위해 fetchJoin
-                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
+                .select(new QFollowerQueryDto(
+                        user.userId,
+                        user.nickname,
+                        alias.imageUrl,
+                        alias.value,
+                        user.followerCount,
+                        following.createdAt
+                ))
+                .from(following)
+                .leftJoin(following.userJpaEntity, user)
+                .leftJoin(user.aliasForUserJpaEntity, alias)
                 .where(condition)
                 .orderBy(following.createdAt.desc())
-                .limit(size)
+                .limit(size + 1) // hasNext 판단 위해 +1
                 .fetch();
     }
 }

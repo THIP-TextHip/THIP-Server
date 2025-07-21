@@ -1,6 +1,8 @@
 package konkuk.thip.user.application.service.following;
 
+import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
+import konkuk.thip.user.application.port.out.dto.FollowerQueryDto;
 import konkuk.thip.user.application.port.in.UserGetFollowersUsecase;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -22,6 +24,25 @@ public class UserGetFollowersService implements UserGetFollowersUsecase {
     @Transactional(readOnly = true)
     public UserFollowersResponse getUserFollowers(Long userId, String cursor) {
         User user = userCommandPort.findById(userId);
-        return followingQueryPort.getFollowersByUserId(user.getId(), cursor, DEFAULT_PAGE_SIZE);
+
+        CursorBasedList<FollowerQueryDto> result = followingQueryPort.getFollowersByUserId(
+                user.getId(), cursor, DEFAULT_PAGE_SIZE
+        );
+
+        var followers = result.contents().stream()
+                .map(dto -> UserFollowersResponse.Follower.builder()
+                        .userId(dto.userId())
+                        .nickname(dto.nickname())
+                        .profileImageUrl(dto.profileImageUrl())
+                        .aliasName(dto.aliasName())
+                        .followerCount(dto.followerCount())
+                        .build())
+                .toList();
+
+        return UserFollowersResponse.builder()
+                .followers(followers)
+                .nextCursor(result.nextCursor())
+                .isLast(!result.hasNext())
+                .build();
     }
 }

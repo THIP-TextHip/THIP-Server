@@ -82,8 +82,7 @@ class UserGetFollowersApiTest {
         );
 
         firstPageResult.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.followerList", hasSize(10)))
-                .andExpect(jsonPath("$.data.isFirst").value(true))
+                .andExpect(jsonPath("$.data.followers", hasSize(10)))
                 .andExpect(jsonPath("$.data.isLast").value(false))
                 .andExpect(jsonPath("$.data.nextCursor").exists());
 
@@ -101,8 +100,7 @@ class UserGetFollowersApiTest {
         );
 
         secondPageResult.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.followerList", hasSize(2)))
-                .andExpect(jsonPath("$.data.isFirst").value(false))
+                .andExpect(jsonPath("$.data.followers", hasSize(2)))
                 .andExpect(jsonPath("$.data.isLast").value(true))
                 .andExpect(jsonPath("$.data.nextCursor").doesNotExist());
     }

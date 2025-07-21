@@ -36,4 +36,12 @@ public class UserQueryController {
                                                              @RequestParam(required = false) final String cursor) {
         return BaseResponse.ok(userGetFollowersUsecase.getUserFollowers(userId, cursor));
     }
+
+    /**
+     * 내 팔로잉 리스트 조회
+     */
+//    @GetMapping("/users/my/following")
+//    public BaseResponse<UserFollowersResponse> showMyFollowing(@RequestParam(required = false) final String cursor) {
+//        return BaseResponse.ok(userGetFollowersUsecase.getMyFollowing(cursor));
+//    }
 }
