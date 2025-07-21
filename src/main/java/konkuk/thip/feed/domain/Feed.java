@@ -44,6 +44,9 @@ public class Feed extends BaseDomainEntity {
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
 
+        validateTags(tagValues);
+        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
+
         return Feed.builder()
                 .id(null)
                 .content(content)
@@ -95,20 +98,28 @@ public class Feed extends BaseDomainEntity {
         }
     }
 
-    public void updateContent(String newContent) {
+    public void updateContent(Long userId, String newContent) {
+        validateCreator(userId);
         this.content = newContent;
     }
 
-    public void updateVisibility(Boolean isPublic) {
+    public void updateVisibility(Long userId, Boolean isPublic) {
+        validateCreator(userId);
         this.isPublic = isPublic;
     }
 
-    public void updateTags(List<String> tagValues) {
-        this.tagList = Tag.fromList(tagValues);
+    public void updateTags(Long userId, List<String> newTagValues) {
+        validateCreator(userId);
+        validateTags(newTagValues);
+        this.tagList = Tag.fromList(newTagValues); // Tag.from(...) 등으로 변환
     }
 
-    public void updateImages(List<String> imageUrls) {
-        this.contentList = convertToContentList(imageUrls);
+    public void updateImages(Long userId, List<String> newImageUrls) {
+        validateCreator(userId);
+        validateImageCount(newImageUrls.size());
+        validateOwnsImages(newImageUrls);
+
+        this.contentList = convertToContentList(newImageUrls);
     }
 
     public void validateOwnsImages(List<String> candidateImageUrls) {

@@ -23,15 +23,14 @@ public class FeedUpdateService implements FeedUpdateUseCase {
     @Transactional
     public Long updateFeed(FeedUpdateCommand command) {
 
-        // 1. 유효성 검증
+        //1. 유효성 검증
         Feed.validateTags(command.tagList());
         Feed.validateImageCount(command.remainImageUrls() != null ? command.remainImageUrls().size() : 0);
 
-        // 2. 피드 조회 및 유효성 검증
+        // 2. 피드 조회
         Feed feed = feedCommandPort.findById(command.feedId());
-        feed.validateCreator(command.userId());
 
-        // 3. 도메인 내부 상태 변경
+        // 3. 도메인 내에서 내부 상태 변경 및 검증
         applyPartialFeedUpdate(feed, command);
 
         // 4. 업데이트
@@ -41,17 +40,16 @@ public class FeedUpdateService implements FeedUpdateUseCase {
     private void applyPartialFeedUpdate(Feed feed, FeedUpdateCommand command) {
 
         if (command.remainImageUrls() != null) {
-            feed.validateOwnsImages(command.remainImageUrls());
-            feed.updateImages(command.remainImageUrls());
+            feed.updateImages(command.userId(), command.remainImageUrls());
         }
         if (command.contentBody() != null) {
-            feed.updateContent(command.contentBody());
+            feed.updateContent(command.userId(), command.contentBody());
         }
         if (command.isPublic() != null) {
-            feed.updateVisibility(command.isPublic());
+            feed.updateVisibility(command.userId(), command.isPublic());
         }
         if (command.tagList() != null) {
-            feed.updateTags(command.tagList());
+            feed.updateTags(command.userId(), command.tagList());
         }
     }
 
