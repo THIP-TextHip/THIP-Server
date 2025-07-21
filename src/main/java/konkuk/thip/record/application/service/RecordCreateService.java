@@ -4,21 +4,20 @@ import jakarta.transaction.Transactional;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.record.application.port.in.RecordCreateUseCase;
 import konkuk.thip.record.application.port.in.dto.RecordCreateCommand;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
-import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERVIEW;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +42,8 @@ public class RecordCreateService implements RecordCreateUseCase {
         );
 
         // 2. UserRoom, Room, Book 조회
-        RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomId(command.userId(), command.roomId());
-        Room room = roomCommandPort.findById(record.getRoomId());
+        RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(command.userId(), command.roomId());
+        Room room = roomCommandPort.getByIdOrThrow(record.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 3. 유효성 검증
@@ -77,15 +76,13 @@ public class RecordCreateService implements RecordCreateUseCase {
                     "총평(isOverview)은 사용자 진행률이 80%% 이상일 때만 가능합니다. 현재 사용자 진행률 = %.2f%%",
                     roomParticipant.getUserPercentage()
             );
-            throw new InvalidStateException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
+            throw new BusinessException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
         }
     }
 
     private void validateRoom(Room room) {
         // 방이 만료되었는지 검증
-        if (room.isExpired()) {
-            throw new BusinessException(RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM);
-        }
+        room.validateRoomExpired();
     }
 
     private void validateRecord(Record record, Book book) {

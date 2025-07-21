@@ -84,6 +84,7 @@ public enum ErrorCode implements ResponseCode {
     INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
     ROOM_MEMBER_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, 100006, "방의 최대 인원 수를 초과했습니다."),
     ROOM_MEMBER_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 100007, "방의 인원 수가 1 이하(방장 포함)입니다."),
+    ROOM_IS_EXPIRED(HttpStatus.BAD_REQUEST, 100008, "방이 만료되었습니다."),
 
     /**
      * 110000 : vote error
@@ -103,7 +104,6 @@ public enum ErrorCode implements ResponseCode {
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, 130000, "존재하지 않는 RECORD 입니다."),
     RECORD_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 130001, "총평이 될 수 없는 RECORD 입니다."),
     INVALID_RECORD_PAGE_RANGE(HttpStatus.BAD_REQUEST, 130002, "RECORD의 page 값이 유효하지 않습니다."),
-    RECORD_CANNOT_WRITE_IN_EXPIRED_ROOM(HttpStatus.BAD_REQUEST, 120003, "만료된 방에는 기록을 남길 수 없습니다."),
 
     /**
      * 140000 : roomParticipant error
@@ -114,10 +114,11 @@ public enum ErrorCode implements ResponseCode {
     ROOM_JOIN_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140003, "일치하는 방 참여 상태가 없습니다."),
     USER_CANNOT_JOIN_OR_CANCEL(HttpStatus.BAD_REQUEST, 140004, "존재하지 않는 방은 참여하기 또는 취소하기가 불가능합니다."),
     USER_ALREADY_PARTICIPATE(HttpStatus.BAD_REQUEST, 140005, "사용자가 이미 방에 참여한 상태입니다."),
-    USER_NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
+    USER_NOT_PARTICIPATED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
     HOST_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140007, "방장은 참여 취소를 할 수 없습니다."),
-    INVALID_MY_ROOM_TYPE(HttpStatus.BAD_REQUEST, 140008, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 MY ROOM type 이 있습니다."),
-    INVALID_MY_ROOM_CURSOR(HttpStatus.BAD_REQUEST, 140009, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 cursor 가 있습니다"),
+    ROOM_RECRUIT_CANNOT_CLOSED(HttpStatus.BAD_REQUEST, 140008, "방 모집 마감을 할 수 없습니다."),
+    INVALID_MY_ROOM_TYPE(HttpStatus.BAD_REQUEST, 140009, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 MY ROOM type 이 있습니다."),
+    INVALID_MY_ROOM_CURSOR(HttpStatus.BAD_REQUEST, 140010, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 cursor 가 있습니다"),
 
     /**
      * 150000 : Category error
