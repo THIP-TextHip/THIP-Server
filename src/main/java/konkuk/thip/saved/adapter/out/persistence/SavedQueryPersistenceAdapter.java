@@ -3,9 +3,14 @@ package konkuk.thip.saved.adapter.out.persistence;
 import konkuk.thip.book.adapter.out.mapper.BookMapper;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
+import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
+import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
+import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.SavedFeeds;
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
-import konkuk.thip.saved.adapter.out.mapper.SavedBookMapper;
-import konkuk.thip.saved.adapter.out.mapper.SavedFeedMapper;
+import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
@@ -27,9 +32,9 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
     private final SavedBookJpaRepository savedBookJpaRepository;
     private final SavedFeedJpaRepository savedFeedJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final SavedBookMapper savedBookMapper;
+    private final TagJpaRepository tagJpaRepository;
     private final BookMapper bookMapper;
-    private final SavedFeedMapper savedFeedMapper;
+    private final FeedMapper feedMapper;
 
     @Override
     public boolean existsByUserIdAndBookId(Long userId, Long bookId) {
@@ -37,7 +42,7 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
     }
 
     @Override
-    public SavedBooks findByUserId(Long userId) {
+    public SavedBooks findSavedBooksByUserId(Long userId) {
 
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
@@ -49,6 +54,23 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
                 .collect(Collectors.toList());
 
         return new SavedBooks(books);
+    }
+
+    @Override
+    public SavedFeeds findSavedFeedsByUserId(Long userId) {
+        UserJpaEntity user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        List<SavedFeedJpaEntity> savedFeedEntities = savedFeedJpaRepository.findByUserJpaEntity_UserId(user.getUserId());
+
+        List<Feed> feeds = savedFeedEntities.stream()
+                .map(entity -> {
+                    FeedJpaEntity feedJpa = entity.getFeedJpaEntity();
+                    List<TagJpaEntity> tags = tagJpaRepository.findAllByFeedId(feedJpa.getPostId());
+                    return feedMapper.toDomainEntity(feedJpa, tags);
+                })
+                .toList();
+
+        return new SavedFeeds(feeds);
     }
 
 
