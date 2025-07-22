@@ -2,10 +2,17 @@ package konkuk.thip.saved.adapter.out.persistence.repository;
 
 import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity, Long> {
-    void deleteByUserJpaEntity_UserIdAndFeedJpaEntity_PostId(Long userId, Long feedId);
-    List<SavedFeedJpaEntity> findByUserJpaEntity_UserId(Long userId);
+    @Modifying
+    @Query(value = "DELETE FROM saved_feeds WHERE user_id = :userId AND post_id = :feedId", nativeQuery = true)
+    void deleteByUserIdAndFeedId(@Param("userId") Long userId, @Param("feedId") Long feedId);
+
+    @Query(value = "SELECT * FROM saved_feeds WHERE user_id = :userId", nativeQuery = true)
+    List<SavedFeedJpaEntity> findAllByUserId(@Param("userId") Long userId);
 }
