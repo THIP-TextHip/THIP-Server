@@ -2,6 +2,9 @@ package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
@@ -16,6 +19,8 @@ import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TestEntityFactory {
@@ -169,4 +174,52 @@ public class TestEntityFactory {
                 .value(value)
                 .build();
     }
+
+    public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic) {
+
+        return FeedJpaEntity.builder()
+                .content("기본 피드 본문입니다.")
+                .isPublic(isPublic)
+                .likeCount(0)
+                .commentCount(0)
+                .reportCount(0)
+                .userJpaEntity(user)
+                .bookJpaEntity(book)
+                .contentList(new ArrayList<>())
+                .build();
+    }
+
+    public static FeedTagJpaEntity createFeedTagMapping(FeedJpaEntity feed, TagJpaEntity tag) {
+        return FeedTagJpaEntity.builder()
+                .feedJpaEntity(feed)
+                .tagJpaEntity(tag)
+                .build();
+    }
+
+
+    public static FeedJpaEntity createFeedWithContents(UserJpaEntity user, BookJpaEntity book, List<String> imageUrls, boolean isPublic) {
+
+        FeedJpaEntity feed = FeedJpaEntity.builder()
+                .content("이미지 포함 피드")
+                .isPublic(isPublic)
+                .likeCount(0)
+                .commentCount(0)
+                .reportCount(0)
+                .userJpaEntity(user)
+                .bookJpaEntity(book)
+                .contentList(new ArrayList<>())
+                .build();
+
+        List<ContentJpaEntity> contents = imageUrls.stream()
+                .map(url -> ContentJpaEntity.builder()
+                        .contentUrl(url)
+                        .postJpaEntity(feed)
+                        .build())
+                .toList();
+
+        feed.getContentList().addAll(contents);
+        return feed;
+    }
+
+
 }

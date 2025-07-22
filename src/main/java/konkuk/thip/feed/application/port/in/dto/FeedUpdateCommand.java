@@ -2,9 +2,7 @@ package konkuk.thip.feed.application.port.in.dto;
 
 import java.util.List;
 
-public record FeedCreateCommand(
-
-        String isbn,
+public record FeedUpdateCommand(
 
         String contentBody,
 
@@ -12,7 +10,11 @@ public record FeedCreateCommand(
 
         List<String> tagList,
 
-        Long userId
+        List<String> remainImageUrls,
+
+        Long userId,
+
+        Long feedId
 )
 {
 }

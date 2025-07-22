@@ -10,7 +10,6 @@ import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.S3CommandPort;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.room.application.port.out.RoomCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,33 +22,30 @@ import java.util.List;
 public class FeedCreateService implements FeedCreateUseCase {
 
     private final S3CommandPort s3CommandPort;
-    private final RoomCommandPort roomCommandPort;
     private final BookCommandPort bookCommandPort;
     private final FeedCommandPort feedCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
 
     @Override
     @Transactional
+    //TODO 추후 예외 발생시 이미 s3에 업로드된 이미지 삭제 방식 논의
     public Long createFeed(FeedCreateCommand command, List<MultipartFile> images) {
 
         // 1. 피드 생성 비지니스 정책 검증
-        Feed.validateCategoryAndTags(command.category(), command.tagList());
+        Feed.validateTags(command.tagList());
         Feed.validateImageCount(images != null ? images.size() : 0);
 
-
-        // 2. Category 검증 및 조회
-        validateCategoryAndTagList(command.category(), command.tagList());
-
-        // 3. Book 검증 및 조회
+        // 2. Book 검증 및 조회
         Long targetBookId = findOrCreateBookByIsbn(command.isbn());
 
-        // 4. 이미지 업로드
-        List<String> imageUrls = (images == null || images.isEmpty())
-                ? List.of()
-                : s3CommandPort.uploadImages(images);
-
-        // 5. Feed 생성 및 저장 (Content도 함께 생성 및 저장 애그리거트 루트인 Feed가 생성책임 가지고있음)
+        // 3. 이미지 업로드
+        List<String> imageUrls = null;
         try {
+            imageUrls = (images == null || images.isEmpty())
+                    ? List.of()
+                    : s3CommandPort.uploadImages(images);
+
+            // 4. Feed 생성 및 저장 (Content도 함께 생성 및 저장 애그리거트 루트인 Feed가 생성책임 가지고있음)
             Feed feed = Feed.withoutId(
                     command.contentBody(),
                     command.userId(),
@@ -61,23 +57,11 @@ public class FeedCreateService implements FeedCreateUseCase {
             return feedCommandPort.save(feed);
 
         } catch (Exception e) {
-            if (imageUrls != null) {
+            if (imageUrls != null && !imageUrls.isEmpty()) {
                 s3CommandPort.deleteImages(imageUrls);
             }
             throw e;
         }
-    }
-
-    // TODO: 카테고리, 태그 관계가 명확해지면 카테고리 내의 도메인에서 검증하도록 리팩토링 예정
-    private void validateCategoryAndTagList(String categoryValue, List<String> tagList) {
-
-        boolean hasCategoryAndTags = categoryValue != null && !categoryValue.trim().isEmpty()
-                && tagList != null && !tagList.isEmpty();
-
-        // Category 검증 및 조회
-        if(hasCategoryAndTags) { roomCommandPort.findCategoryByValue(categoryValue); }
-
-        // TODO: Category로 tagList 검증
     }
 
     /**

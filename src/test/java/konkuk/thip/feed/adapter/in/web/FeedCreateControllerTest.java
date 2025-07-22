@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_CREATE;
+import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_COMMAND;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -55,7 +55,7 @@ class FeedCreateControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(INVALID_FEED_CREATE.getCode()))
+                .andExpect(jsonPath("$.code").value(INVALID_FEED_COMMAND.getCode()))
                 .andExpect(jsonPath("$.message", containsString(message)));
     }
 
@@ -102,24 +102,8 @@ class FeedCreateControllerTest {
     }
 
     @Nested
-    @DisplayName("카테고리/태그 입력 불일치 검증")
-    class CategoryTagValidation {
-
-        @Test
-        @DisplayName("카테고리만 있고 태그가 없을 때 400 반환")
-        void onlyCategory() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.put("tagList", List.of());
-            assertBadRequest_InvalidFeedCreate(req, "카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다.");
-        }
-
-        @Test
-        @DisplayName("태그만 있고 카테고리가 없을 때 400 반환")
-        void onlyTags() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.put("category", null);
-            assertBadRequest_InvalidFeedCreate(req, "카테고리와 태그는 모두 입력되거나 모두 비워져야 합니다.");
-        }
+    @DisplayName("태그 입력 불일치 검증")
+    class TagValidation {
 
         @Test
         @DisplayName("태그가 6개 이상이면 400 반환")
@@ -171,7 +155,7 @@ class FeedCreateControllerTest {
             );
 
             result.andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(INVALID_FEED_CREATE.getCode()))
+                    .andExpect(jsonPath("$.code").value(INVALID_FEED_COMMAND.getCode()))
                     .andExpect(jsonPath("$.message",containsString("이미지는 최대 3개까지 업로드할 수 있습니다.")));
 
         }

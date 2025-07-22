@@ -3,6 +3,7 @@ package konkuk.thip.feed.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.AccessLevel;
@@ -39,5 +40,13 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
         this.contentList = contentList;
+    }
+
+    public void updateFrom(Feed feed) {
+        this.content = feed.getContent();
+        this.isPublic = feed.getIsPublic();
+        this.reportCount = feed.getReportCount();
+        this.likeCount = feed.getLikeCount();
+        this.commentCount = feed.getCommentCount();
     }
 }

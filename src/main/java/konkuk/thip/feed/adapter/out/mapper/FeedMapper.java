@@ -6,13 +6,17 @@ import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class FeedMapper {
+
+    private final ContentMapper contentMapper;
 
     public FeedJpaEntity toJpaEntity(Feed feed, UserJpaEntity userJpaEntity, BookJpaEntity bookJpaEntity) {
         return FeedJpaEntity.builder()
@@ -41,6 +45,9 @@ public class FeedMapper {
                         .map(TagJpaEntity::getValue)
                         .map(Tag::from)
                         .toList())
+                .contentList(feedJpaEntity.getContentList().stream()
+                                .map(contentMapper::toDomainEntity)
+                                .toList())
                 .createdAt(feedJpaEntity.getCreatedAt())
                 .modifiedAt(feedJpaEntity.getModifiedAt())
                 .status(feedJpaEntity.getStatus())
