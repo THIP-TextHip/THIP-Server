@@ -17,8 +17,6 @@ public record FeedCreateRequest(
         @NotNull(message = "방 공개 설정 여부는 필수입니다.")
         Boolean isPublic,
 
-        String category,
-
         List<String> tagList
 ) {
         public FeedCreateCommand toCommand(Long userId) {
@@ -26,7 +24,6 @@ public record FeedCreateRequest(
                         isbn,
                         contentBody,
                         isPublic,
-                        category,
                         tagList,
                         userId
                 );
