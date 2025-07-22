@@ -261,13 +261,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
                 cursorExpr.asc(), room.roomId.asc()
         };
-        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = t -> new RoomShowMineResponse.MyRoom(      // tuple -> DTO 매핑 함수
-                t.get(room.roomId),
-                t.get(book.imageUrl),
-                t.get(room.title),
-                t.get(room.memberCount),
-                DateUtil.formatAfterTime(t.get(cursorExpr))
-        );
+        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = createMyRoomMapper(cursorExpr, true);
+
         return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, true, orders);
     }
 
@@ -284,13 +279,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
                 cursorExpr.asc(), room.roomId.asc()
         };
-        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = t -> new RoomShowMineResponse.MyRoom(      // tuple -> DTO 매핑 함수
-                t.get(room.roomId),
-                t.get(book.imageUrl),
-                t.get(room.title),
-                t.get(room.memberCount),
-                DateUtil.formatAfterTime(t.get(cursorExpr))
-        );
+        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = createMyRoomMapper(cursorExpr, true);
+
         return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, true, orders);
     }
 
@@ -320,13 +310,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 cursorExpr.asc(),
                 room.roomId.asc()
         };
-        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = t -> new RoomShowMineResponse.MyRoom(      // tuple -> DTO 매핑 함수
-                t.get(room.roomId),
-                t.get(book.imageUrl),
-                t.get(room.title),
-                t.get(room.memberCount),
-                DateUtil.formatAfterTime(t.get(cursorExpr))
-        );
+        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = createMyRoomMapper(cursorExpr, true);
+
         return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, true, orders);
     }
 
@@ -343,14 +328,24 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
                 cursorExpr.desc(), room.roomId.desc()       // 만료된 방은 가장 최근에 만료된 방부터 반환
         };
-        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = t -> new RoomShowMineResponse.MyRoom(      // tuple -> DTO 매핑 함수
-                t.get(room.roomId),
-                t.get(book.imageUrl),
-                t.get(room.title),
-                t.get(room.memberCount),
-                null    // 만료된 방은 endDate=null
-        );
+        Function<Tuple,RoomShowMineResponse.MyRoom> mapper = createMyRoomMapper(cursorExpr, false);
+
         return sliceQuery(base, cursorExpr, mapper, dateCursor, roomIdCursor, pageSize, false, orders);
+    }
+
+    /**
+     * t 에서 RoomShowMineResponse.MyRoom 으로 매핑하는 함수 생성
+     * @param cursorExpr 커서 기준 날짜 표현식
+     * @param formatCursor true 면 DateUtil.formatAfterTime, false 면 null 반환
+     */
+    private Function<Tuple, RoomShowMineResponse.MyRoom> createMyRoomMapper(DateExpression<LocalDate> cursorExpr, boolean formatCursor) {
+        return t -> new RoomShowMineResponse.MyRoom(
+                                t.get(room.roomId),
+                                t.get(book.imageUrl),
+                                t.get(room.title),
+                                t.get(room.memberCount),
+                                formatCursor ? DateUtil.formatAfterTime(t.get(cursorExpr)) : null
+        );
     }
 
     /**
