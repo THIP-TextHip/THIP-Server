@@ -2,6 +2,7 @@ package konkuk.thip.feed.adapter.out.persistence.repository.FeedTag;
 
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
+import konkuk.thip.saved.application.port.out.dto.FeedIdAndTagProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,11 +17,9 @@ public interface FeedTagJpaRepository extends JpaRepository<FeedTagJpaEntity, Lo
     void deleteAllByFeedJpaEntity(@Param("feedJpaEntity") FeedJpaEntity feedJpaEntity);
 
     @Query("""
-    SELECT ft.feedJpaEntity.postId, ft.tagJpaEntity
+    SELECT ft.feedJpaEntity.postId as feedId, ft.tagJpaEntity as tagJpaEntity
     FROM FeedTagJpaEntity ft
     WHERE ft.feedJpaEntity.postId IN :feedIds
     """)
-    List<Object[]> findFeedIdAndTagsByFeedIds(@Param("feedIds") List<Long> feedIds);
-
-
+    List<FeedIdAndTagProjection> findFeedIdAndTagsByFeedIds(@Param("feedIds") List<Long> feedIds);
 }

@@ -15,6 +15,7 @@ import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaReposito
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.book.domain.SavedBooks;
+import konkuk.thip.saved.application.port.out.dto.FeedIdAndTagProjection;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -63,20 +64,19 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         List<SavedFeedJpaEntity> savedFeedEntities =
-                savedFeedJpaRepository.findByUserJpaEntity_UserId(user.getUserId());
+                savedFeedJpaRepository.findAllByUserId(user.getUserId());
 
         List<Long> feedIds = savedFeedEntities.stream()
                 .map(entity -> entity.getFeedJpaEntity().getPostId())
                 .toList();
 
-        // 한 번의 쿼리로 Feed ID에 대한 Tag 전체 조회
-        List<Object[]> results = feedTagJpaRepository.findFeedIdAndTagsByFeedIds(feedIds);
+        // Projection 기반 조회
+        List<FeedIdAndTagProjection> results = feedTagJpaRepository.findFeedIdAndTagsByFeedIds(feedIds);
 
-        // 결과 데이터를 feedId → List<Tag> 형태로 그룹핑
         Map<Long, List<TagJpaEntity>> feedTagsMap = results.stream()
                 .collect(Collectors.groupingBy(
-                        row -> (Long) row[0],
-                        Collectors.mapping(row -> (TagJpaEntity) row[1], Collectors.toList())
+                        FeedIdAndTagProjection::getFeedId,
+                        Collectors.mapping(FeedIdAndTagProjection::getTagJpaEntity, Collectors.toList())
                 ));
 
         List<Feed> feeds = savedFeedEntities.stream()

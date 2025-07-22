@@ -64,7 +64,7 @@ public class SavedCommandPersistenceAdapter implements SavedCommandPort {
 
     @Override
     public void deleteFeed(Long userId, Long feedId) {
-        savedFeedJpaRepository.deleteByUserJpaEntity_UserIdAndFeedJpaEntity_PostId(userId, feedId);
+        savedFeedJpaRepository.deleteByUserIdAndFeedId(userId, feedId);
     }
 
 

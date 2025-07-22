@@ -91,7 +91,7 @@ class FeedChangeSavedAPITest {
                 .andExpect(jsonPath("$.data.isSaved").value(true));
 
         // 실제 저장되었는지 검증
-        List<SavedFeedJpaEntity> savedFeeds = savedFeedJpaRepository.findByUserJpaEntity_UserId(user.getUserId());
+        List<SavedFeedJpaEntity> savedFeeds = savedFeedJpaRepository.findAllByUserId(user.getUserId());
         boolean exists = savedFeeds.stream()
                 .anyMatch(entity -> entity.getFeedJpaEntity().getPostId().equals(feed.getPostId()));
         assertThat(exists).isTrue();
@@ -133,7 +133,7 @@ class FeedChangeSavedAPITest {
                 .andExpect(jsonPath("$.data.feedId").value(feed.getPostId()))
                 .andExpect(jsonPath("$.data.isSaved").value(false));
 
-        List<SavedFeedJpaEntity> savedFeeds = savedFeedJpaRepository.findByUserJpaEntity_UserId(user.getUserId());
+        List<SavedFeedJpaEntity> savedFeeds = savedFeedJpaRepository.findAllByUserId(user.getUserId());
         boolean exists = savedFeeds.stream()
                 .anyMatch(entity -> entity.getFeedJpaEntity().getPostId().equals(feed.getPostId()));
         assertThat(exists).isFalse();
