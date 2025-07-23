@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -74,6 +75,22 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         }
 
         return voteItems;
+    }
+
+    @Override
+    public Optional<Vote> findById(Long id) {
+        return voteJpaRepository.findById(id)
+                .map(voteMapper::toDomainEntity);
+    }
+
+
+    @Override
+    public void updateVote(Vote vote) {
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(vote.getId()).orElseThrow(
+                () -> new EntityNotFoundException(VOTE_NOT_FOUND)
+        );
+
+        voteJpaRepository.save(voteJpaEntity.updateFrom(vote));
     }
 
 }
