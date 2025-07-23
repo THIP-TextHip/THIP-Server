@@ -116,7 +116,7 @@ class CommentTest {
     }
 
     @Test
-    @DisplayName("createComment: 답글 생성 시 parentComment 가 null 이면 InvalidStateException 이 발생한다.")
+    @DisplayName("createComment: 답글 생성 시 부모 댓글과 게시글 ID가 일치하지 않으면 InvalidStateException 이 발생한다.")
     void createReplyComment_parentPostMismatch_shouldFail() {
         Comment parent = createParentComment(999L); // 다른 postId
 
