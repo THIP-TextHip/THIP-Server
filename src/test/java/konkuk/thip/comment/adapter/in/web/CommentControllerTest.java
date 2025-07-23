@@ -156,7 +156,7 @@ class CommentControllerTest {
         void invalidPostType() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("postType", "invalidType");
-            mockMvc.perform(post("/comments/{postId}", 1)  // 없는 ID
+            mockMvc.perform(post("/comments/{postId}", feed.getPostId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsBytes(req))
                             .requestAttr("userId", user.getUserId()))
