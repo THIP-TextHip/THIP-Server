@@ -142,7 +142,20 @@ public enum ErrorCode implements ResponseCode {
     EMPTY_FILE_EXCEPTION(HttpStatus.BAD_REQUEST, 170001, "업로드하려는 이미지가 비어있습니다."),
     EXCEPTION_ON_IMAGE_UPLOAD(HttpStatus.BAD_REQUEST, 170002, "이미지 업로드에 실패하였습니다."),
     INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170003, "올바르지 않은 파일 형식입니다."),
-    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다.")
+    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다."),
+
+    /**
+     * 180000 : Post error
+     */
+    POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [feed, record, vote] 중 하나여야 합니다."),
+
+    /**
+     * 190000 : Comment error
+     */
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 190000, "존재하지 않는 COMMENT 입니다."),
+    INVALID_COMMENT_CREATE(HttpStatus.BAD_REQUEST, 190001, "유효하지 않은 COMMENT 생성 요청 입니다."),
+
+
     ;
 
     private final HttpStatus httpStatus;
