@@ -40,8 +40,8 @@ public class CommentCreateService implements CommentCreateUseCase {
         // 2. 게시물 타입에 맞게 조회
         CommentCountUpdatable post = findPost(type, command.postId());
 
-        // TODO 피드: 내 게시글의 댓글, 내 댓글에 대한 답글
-        // TODO 기록 및 투표: 모임방의 내 게시글에 대한 댓글, 내 댓글에 대한 답글
+        // TODO 피드: 내 게시글의 댓글, 내 댓글에 대한 답글 알림 전송
+        // TODO 기록 및 투표: 모임방의 내 게시글에 대한 댓글, 내 댓글에 대한 답글 알림 전송
 
         // 3. 댓글 생성
         Long commentId = createCommentDomain(command);
