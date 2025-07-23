@@ -2,6 +2,7 @@ package konkuk.thip.vote.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.post.CommentCountUpdatable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +12,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.VOTE_CANNOT_BE_OVERVIE
 
 @Getter
 @SuperBuilder
-public class Vote extends BaseDomainEntity {
+public class Vote extends BaseDomainEntity implements CommentCountUpdatable {
 
     private Long id;
 
@@ -65,5 +66,10 @@ public class Vote extends BaseDomainEntity {
                     new IllegalArgumentException(message)
             );
         }
+    }
+
+    @Override
+    public void increaseCommentCount() {
+        commentCount++;
     }
 }
