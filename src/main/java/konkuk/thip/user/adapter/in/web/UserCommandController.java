@@ -33,6 +33,9 @@ public class UserCommandController {
     private final UserFollowUsecase userFollowUsecase;
     private final JwtUtil jwtUtil;
 
+    /**
+     * 사용자 회원가입
+     */
     @PostMapping("/users/signup")
     public BaseResponse<UserSignupResponse> signup(@Valid @RequestBody final UserSignupRequest request,
                                                    @Oauth2Id final String oauth2Id,
@@ -43,6 +46,9 @@ public class UserCommandController {
         return BaseResponse.ok(UserSignupResponse.of(userId));
     }
 
+    /**
+     * 닉네임 중복 확인
+     */
     @PostMapping("/users/nickname")
     public BaseResponse<UserVerifyNicknameResponse> verifyNickname(@Valid @RequestBody final UserVerifyNicknameRequest request) {
         return BaseResponse.ok(UserVerifyNicknameResponse.of(
@@ -50,7 +56,9 @@ public class UserCommandController {
         );
     }
 
-    // 팔루우 상태 변경 : true -> 팔로우, false -> 언팔로우
+    /**
+     * 사용자 팔로우 상태 변경 : true -> 팔로우, false -> 언팔로우
+     */
     @PostMapping("/users/following/{followingUserId}")
     public BaseResponse<UserFollowResponse> followUser(@UserId final Long userId,
                                             @PathVariable final Long followingUserId,

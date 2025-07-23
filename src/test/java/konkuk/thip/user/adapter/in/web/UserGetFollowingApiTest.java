@@ -29,9 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("[통합] 팔로워 조회 API 통합 테스트")
+@DisplayName("[통합] 내 팔로잉 리스트 조회 API 통합 테스트")
 @Transactional
-class UserGetFollowersApiTest {
+class UserGetFollowingApiTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,35 +48,36 @@ class UserGetFollowersApiTest {
     @Autowired
     private FollowingJpaRepository followingJpaRepository;
 
-    private UserJpaEntity targetUser; // 팔로워를 조회할 대상 사용자
-    private List<UserJpaEntity> followerUsers; // 팔로워 12명
+    private UserJpaEntity loginUser; // 팔로잉 리스트를 조회하는 로그인한 사용자
+    private List<UserJpaEntity> followingUsers; // 팔로잉 12명
 
     @BeforeEach
     void setUp() {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
-        // 대상 사용자
-        targetUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        // 로그인 사용자
+        loginUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
-        // 팔로워 12명 생성 및 저장
-        followerUsers = new ArrayList<>();
+        // 팔로잉 12명 생성 및 저장
+        followingUsers = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
-            UserJpaEntity follower = userJpaRepository.save(TestEntityFactory.createUser(alias));
-            followerUsers.add(follower);
-            followingJpaRepository.save(TestEntityFactory.createFollowing(follower, targetUser));
+            UserJpaEntity followingUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
+            followingUsers.add(followingUser);
+            followingJpaRepository.save(TestEntityFactory.createFollowing(loginUser, followingUser));
         }
     }
 
     @Test
-    @DisplayName("팔로워가 12명일 때 2페이지에 걸쳐 모두 조회되고 커서가 올바르게 작동한다.")
-    void getFollowersWithCursorPaging() throws Exception {
+    @DisplayName("로그인한 사용자의 팔로잉 수가 12명일 때 2페이지에 걸쳐 모두 조회되고 커서가 올바르게 작동한다.")
+    void getFollowingsWithCursorPaging() throws Exception {
         // 1. 첫 번째 요청 (cursor 없음)
         ResultActions firstPageResult = mockMvc.perform(
-                get("/users/{userId}/followers", targetUser.getUserId())
+                get("/users/my/following")
+                        .requestAttr("userId", loginUser.getUserId())
         );
 
         firstPageResult.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.followers", hasSize(10)))
+                .andExpect(jsonPath("$.data.followings", hasSize(10)))
                 .andExpect(jsonPath("$.data.isLast").value(false))
                 .andExpect(jsonPath("$.data.nextCursor").exists());
 
@@ -89,12 +90,13 @@ class UserGetFollowersApiTest {
 
         // 2. 두 번째 요청 (cursor 사용)
         ResultActions secondPageResult = mockMvc.perform(
-                get("/users/{userId}/followers", targetUser.getUserId())
+                get("/users/my/following")
                         .param("cursor", nextCursor)
+                        .requestAttr("userId", loginUser.getUserId())
         );
 
         secondPageResult.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.followers", hasSize(2)))
+                .andExpect(jsonPath("$.data.followings", hasSize(2)))
                 .andExpect(jsonPath("$.data.isLast").value(true))
                 .andExpect(jsonPath("$.data.nextCursor").doesNotExist());
     }
