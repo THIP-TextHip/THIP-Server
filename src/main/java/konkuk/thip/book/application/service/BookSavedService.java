@@ -61,7 +61,7 @@ public class BookSavedService implements BookSavedUseCase {
         }
 
         // 유저가 저장한 책 목록 조회
-        SavedBooks savedBooks = savedQueryPort.findByUserId(userId);
+        SavedBooks savedBooks = savedQueryPort.findSavedBooksByUserId(userId);
 
         if (isSave) {
             // 저장 요청 시 이미 저장되어 있으면 예외 발생

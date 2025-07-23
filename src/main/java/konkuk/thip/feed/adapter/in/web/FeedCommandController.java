@@ -4,9 +4,12 @@ import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.feed.adapter.in.web.request.FeedCreateRequest;
+import konkuk.thip.feed.adapter.in.web.request.FeedIsSavedRequest;
 import konkuk.thip.feed.adapter.in.web.request.FeedUpdateRequest;
 import konkuk.thip.feed.adapter.in.web.response.FeedIdResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedIsSavedResponse;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
+import konkuk.thip.feed.application.port.in.FeedSavedUseCase;
 import konkuk.thip.feed.application.port.in.FeedUpdateUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ public class FeedCommandController {
 
     private final FeedCreateUseCase feedCreateUseCase;
     private final FeedUpdateUseCase feedUpdateUseCase;
+    private final FeedSavedUseCase feedSavedUseCase;
 
     //피드 작성
     @PostMapping("/feeds")
@@ -40,4 +44,13 @@ public class FeedCommandController {
         return BaseResponse.ok(FeedIdResponse.of(feedUpdateUseCase.updateFeed(request.toCommand(userId,feedId))));
 
     }
+
+    //피드 저장상태 변경: true -> 저장, false -> 저장해제(삭제)
+    @PostMapping("/feeds/{feedId}/saved")
+    public BaseResponse<FeedIsSavedResponse> changeSavedFeed(@RequestBody final FeedIsSavedRequest request,
+                                                             @PathVariable("feedId") final Long feedId,
+                                                             @UserId final Long userId) {
+        return BaseResponse.ok(FeedIsSavedResponse.of(feedSavedUseCase.changeSavedFeed(FeedIsSavedRequest.toCommand(userId,feedId,request.type()))));
+    }
+
 }
