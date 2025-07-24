@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Objects;
+
+import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_LIKE_COUNT_UNDERFLOW;
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_COMMENT_CREATE;
 
 @Getter
@@ -18,10 +21,10 @@ public class Comment extends BaseDomainEntity {
     private String content;
 
     @Builder.Default
-    private Integer reportCount = 0;
+    private int reportCount = 0;
 
     @Builder.Default
-    private Integer likeCount = 0;
+    private int likeCount = 0;
 
     private Long targetPostId;
 
@@ -30,6 +33,20 @@ public class Comment extends BaseDomainEntity {
     private Long parentCommentId;
 
     private PostType postType;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment comment = (Comment) o;
+        return Objects.equals(id, comment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 
     public static Comment createComment(String content, Long postId, Long creatorId, String type,
                                  boolean isReplyRequest, Long parentId, Comment parent) {
@@ -96,4 +113,18 @@ public class Comment extends BaseDomainEntity {
         }
     }
 
+    public void updateLikeCount(Boolean like) {
+        if (like) {
+            likeCount++;
+        } else {
+            checkLikeCountNotUnderflow();
+            likeCount--;
+        }
+    }
+
+    private void checkLikeCountNotUnderflow() {
+        if (likeCount <= 0) {
+            throw new InvalidStateException(COMMENT_LIKE_COUNT_UNDERFLOW);
+        }
+    }
 }
