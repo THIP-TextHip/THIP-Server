@@ -4,6 +4,7 @@ import konkuk.thip.common.exception.InvalidStateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_LIKE_COUNT_UNDERFLOW;
 import static konkuk.thip.common.post.PostType.FEED;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -131,6 +132,47 @@ class CommentTest {
         ));
 
         assertEquals("댓글과 부모 댓글의 게시글이 일치하지 않습니다.", ex.getCause().getMessage());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == true 면 likeCount 가 1씩 증가한다.")
+    void updateLikeCount_likeTrue_increments() {
+        Comment comment = createParentComment(POST_ID);
+
+        comment.updateLikeCount(true);
+        assertEquals(1, comment.getLikeCount());
+
+        comment.updateLikeCount(true);
+        assertEquals(2, comment.getLikeCount());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == false 면 likeCount 가 1씩 감소한다.")
+    void updateLikeCount_likeFalse_decrements() {
+        Comment comment = createParentComment(POST_ID);
+        // 먼저 likeCount 증가 셋업
+        comment.updateLikeCount(true);
+        comment.updateLikeCount(true);
+        assertEquals(2, comment.getLikeCount());
+
+        comment.updateLikeCount(false);
+        assertEquals(1, comment.getLikeCount());
+
+        comment.updateLikeCount(false);
+        assertEquals(0, comment.getLikeCount());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == false 면 likeCount 가 0 이하로 내려가면 InvalidStateException이 발생한다.")
+    void updateLikeCount_likeFalse_underflow_throws() {
+        Comment comment = createParentComment(POST_ID);
+        assertEquals(0, comment.getLikeCount());
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
+            comment.updateLikeCount(false);
+        });
+
+        assertEquals(COMMENT_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
     }
 
 }
