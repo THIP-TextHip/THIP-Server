@@ -1,6 +1,8 @@
 package konkuk.thip.comment.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
+import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.common.post.PostType;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
@@ -36,6 +38,7 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "post_type", nullable = false, length = 10)
     private PostType postType;
 
@@ -46,5 +49,16 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;
+
+    public CommentJpaEntity updateFrom(Comment comment) {
+        this.reportCount = comment.getReportCount();
+        this.likeCount = comment.getLikeCount();
+        return this;
+    }
+
+    @VisibleForTesting
+    public void updateLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
 
 }
