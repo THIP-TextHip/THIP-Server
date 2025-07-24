@@ -36,6 +36,7 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "post_type", nullable = false, length = 10)
     private PostType postType;
 
