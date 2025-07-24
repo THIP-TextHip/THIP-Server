@@ -351,10 +351,17 @@ class BasicFeedShowAllApiTest {
                 "UPDATE posts SET created_at = ? WHERE post_id = ?",
                 Timestamp.valueOf(t12), f12.getPostId());
 
+        // DB에 저장된 f10의 createdAt 값을 native query 로 조회
+        LocalDateTime nextCursorVal = jdbcTemplate.queryForObject(
+                "SELECT created_at FROM posts WHERE post_id = ?",
+                (rs, rowNum) -> rs.getTimestamp("created_at").toLocalDateTime(), f10.getPostId()
+        );
+        String nextCursor = nextCursorVal.toString();
+
         //when //then
         mockMvc.perform(get("/feeds")
                         .requestAttr("userId", me.getUserId())
-                        .param("cursor", t10.toString()))        // 이전에 f10 까지 조회 -> f10의 createdAt이 커서
+                        .param("cursor", nextCursor))        // 이전에 f10 까지 조회 -> f10의 createdAt이 커서
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nextCursor", nullValue()))      // nextCursor 는 null
                 .andExpect(jsonPath("$.data.isLast", is(true)))
