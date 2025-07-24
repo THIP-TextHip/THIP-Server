@@ -75,7 +75,7 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
     public void update(Comment comment) {
 
         CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getId()).orElseThrow(
-                () -> new EntityNotFoundException(ROOM_NOT_FOUND)
+                () -> new EntityNotFoundException(COMMENT_NOT_FOUND)
         );
 
         commentJpaRepository.save(commentJpaEntity.updateFrom(comment));

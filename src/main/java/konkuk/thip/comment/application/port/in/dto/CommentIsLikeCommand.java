@@ -6,7 +6,7 @@ public record CommentIsLikeCommand(
 
         Long commentId,
 
-        Boolean isLike
+        boolean isLike
 )
 {
 }

@@ -36,7 +36,7 @@ public class CommentCommandController {
     public BaseResponse<CommentIsLikeResponse> likeComment(@RequestBody @Valid final CommentIsLikeRequest request,
                                                            @PathVariable("commentId") final Long commentId,
                                                            @UserId final Long userId) {
-        return BaseResponse.ok(CommentIsLikeResponse.of(commentLikeUseCase.changeLikeStatusComment(CommentIsLikeRequest.toCommand(userId, commentId,request.type()))));
+        return BaseResponse.ok(CommentIsLikeResponse.of(commentLikeUseCase.changeLikeStatusComment(request.toCommand(userId, commentId))));
     }
 
 }
