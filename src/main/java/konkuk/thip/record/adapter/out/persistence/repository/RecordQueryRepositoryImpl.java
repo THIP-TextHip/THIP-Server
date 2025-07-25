@@ -1,31 +1,28 @@
 package konkuk.thip.record.adapter.out.persistence.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
+import konkuk.thip.common.util.Cursor;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
-import konkuk.thip.record.adapter.in.web.response.RecordDto;
-import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
-import konkuk.thip.record.adapter.in.web.response.VoteDto;
 import konkuk.thip.record.adapter.out.jpa.QRecordJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
+import konkuk.thip.record.adapter.out.persistence.constants.SortType;
+import konkuk.thip.record.application.port.out.dto.PostQueryDto;
+import konkuk.thip.record.application.port.out.dto.QPostQueryDto;
+import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.QVoteJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
+import static konkuk.thip.record.adapter.out.persistence.constants.PostType.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,109 +30,71 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    private final QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
+    private final QRecordJpaEntity record = QRecordJpaEntity.recordJpaEntity;
+    private final QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
+    private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
+
     @Override
-    public Page<RecordSearchResponse.RecordSearchResult> findRecordsByRoom(Long roomId, String viewType, Integer pageStart, Integer pageEnd, Boolean isOverview, Long loginUserId, Pageable pageable) {
-        QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
-        QRecordJpaEntity record = QRecordJpaEntity.recordJpaEntity;
-        QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
+    public List<PostQueryDto> findMyRecords(Long roomId, Long userId, Cursor cursor) {
+        BooleanBuilder where = buildMyRecordCondition(roomId, userId);
+        SortType sortType = SortType.MINE;
 
-        BooleanBuilder where = new BooleanBuilder();
-        where.and(buildRecordCondition(roomId, pageStart, pageEnd, isOverview, post, record).
-                or(buildVoteCondition(roomId, pageStart, pageEnd, isOverview, post, vote)));
-
-        if ("mine".equals(viewType)) {
-            where.and(post.userJpaEntity.userId.eq(loginUserId));
+        if (!cursor.isFirstRequest()) {
+            where.and(buildCursorPredicateForSortType(sortType, cursor));
         }
 
-        List<OrderSpecifier<?>> orderSpecifiers = createOrderSpecifiers(pageable, record, vote, post);
-
-        List<PostJpaEntity> posts = queryFactory
-                .selectFrom(post)
-                .leftJoin(record).on(post.postId.eq(record.postId))
-                .leftJoin(vote).on(post.postId.eq(vote.postId))
-                .where(where)
-                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        List<RecordSearchResponse.RecordSearchResult> resultList = posts.stream()
-                .map(p -> {
-                    if (p instanceof RecordJpaEntity r) {
-                        return RecordDto.builder()
-                                .postDate(DateUtil.formatBeforeTime(r.getCreatedAt()))
-                                .page(r.getPage())
-                                .userId(r.getUserJpaEntity().getUserId())
-                                .nickName(r.getUserJpaEntity().getNickname())
-                                .profileImageUrl(r.getUserJpaEntity().getImageUrl())
-                                .content(r.getContent())
-                                .likeCount(safeInt(r.getLikeCount()))
-                                .commentCount(safeInt(r.getCommentCount()))
-                                .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
-                                .isWriter(loginUserId.equals(r.getUserJpaEntity().getUserId()))
-                                .recordId(r.getPostId())
-                                .build();
-                    } else if (p instanceof VoteJpaEntity v) {
-                        // VoteItem은 양방향 매핑이 없으므로 빈 리스트로 처리하고 서비스 레벨에서 파싱
-                        return VoteDto.builder()
-                                .postDate(DateUtil.formatBeforeTime(v.getCreatedAt()))
-                                .page(v.getPage())
-                                .userId(v.getUserJpaEntity().getUserId())
-                                .nickName(v.getUserJpaEntity().getNickname())
-                                .profileImageUrl(v.getUserJpaEntity().getImageUrl())
-                                .content(v.getContent())
-                                .likeCount(safeInt(v.getLikeCount()))
-                                .commentCount(safeInt(v.getCommentCount()))
-                                .isLiked(false) // 초기값은 false, 서비스 레벨에서 처리
-                                .isWriter(loginUserId.equals(v.getUserJpaEntity().getUserId()))
-                                .voteId(v.getPostId())
-                                .voteItems(new ArrayList<>()) // 빈 리스트로 초기화, 서비스 레벨에서 처리
-                                .build();
-                    } else {
-                        throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입: " + p.getClass().getSimpleName()));
-                    }
-                })
-                .map(result -> (RecordSearchResponse.RecordSearchResult) result)
-                .toList();
-
-        Long totalCount = queryFactory
-                .select(post.count())
+        return queryFactory
+                .select(selectPostQueryDto())
                 .from(post)
                 .leftJoin(record).on(post.postId.eq(record.postId))
                 .leftJoin(vote).on(post.postId.eq(vote.postId))
+                .join(post.userJpaEntity, user)
                 .where(where)
-                .fetchOne();
-        long total = (totalCount != null) ? totalCount : 0L;
-
-        return new PageImpl<>(resultList, pageable, total);
+                .orderBy(getOrderSpecifiers(sortType))
+                .limit(cursor.getPageSize() + 1)
+                .fetch();
     }
 
-    private Integer safeInt(Number number) {
-        return Optional.ofNullable(number).map(Number::intValue).orElse(0);
+    private BooleanBuilder buildMyRecordCondition(Long roomId, Long userId) {
+        BooleanBuilder where = new BooleanBuilder();
+
+        BooleanBuilder voteCondition = new BooleanBuilder();
+        voteCondition.and(post.instanceOf(VoteJpaEntity.class))
+                .and(vote.roomJpaEntity.roomId.eq(roomId));
+
+        BooleanBuilder recordCondition = new BooleanBuilder();
+        recordCondition.and(post.instanceOf(RecordJpaEntity.class))
+                .and(record.roomJpaEntity.roomId.eq(roomId));
+
+        where.and(voteCondition.or(recordCondition))
+                .and(post.userJpaEntity.userId.eq(userId));
+        return where;
     }
 
-    private List<OrderSpecifier<?>> createOrderSpecifiers(Pageable pageable, QRecordJpaEntity record, QVoteJpaEntity vote, QPostJpaEntity post) {
-        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
-        for (Sort.Order order : pageable.getSort()) {
-            String property = order.getProperty();
-            boolean asc = order.getDirection().isAscending();
+    @Override
+    public List<PostQueryDto> findGroupRecordsOrderBySortType(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview, SortType sortType) {
+        BooleanBuilder where = buildRecordVoteCondition(roomId, pageStart, pageEnd, isOverview);
 
-            if ("likeCount".equalsIgnoreCase(property)) {
-                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
-                        record.likeCount.coalesce(0).add(vote.likeCount.coalesce(0))));
-            } else if ("commentCount".equalsIgnoreCase(property)) {
-                orderSpecifiers.add(new OrderSpecifier<>(asc ? Order.ASC : Order.DESC,
-                        record.commentCount.coalesce(0).add(vote.commentCount.coalesce(0))));
-            } else if ("createdAt".equalsIgnoreCase(property)) {
-                orderSpecifiers.add(asc ? post.createdAt.asc() : post.createdAt.desc());
-            } else {
-                orderSpecifiers.add(post.createdAt.desc());
-            }
+        if (!cursor.isFirstRequest()) {
+            where.and(buildCursorPredicateForSortType(sortType, cursor));
         }
-        return orderSpecifiers;
+
+        return queryFactory
+                .select(selectPostQueryDto())
+                .from(post)
+                .leftJoin(record).on(post.postId.eq(record.postId))
+                .leftJoin(vote).on(post.postId.eq(vote.postId))
+                .join(post.userJpaEntity, user)
+                .where(where)
+                .orderBy(getOrderSpecifiers(sortType))
+                .limit(cursor.getPageSize() + 1)
+                .fetch();
     }
 
-    private BooleanBuilder buildVoteCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview, QPostJpaEntity post, QVoteJpaEntity vote) {
+    private BooleanBuilder buildRecordVoteCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview) {
+        BooleanBuilder where = new BooleanBuilder();
+
         BooleanBuilder voteCondition = new BooleanBuilder();
         voteCondition.and(post.instanceOf(VoteJpaEntity.class))
                 .and(vote.roomJpaEntity.roomId.eq(roomId));
@@ -146,10 +105,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
             voteCondition.and(vote.isOverview.isFalse())
                     .and(vote.page.between(pageStart, pageEnd));
         }
-        return voteCondition;
-    }
 
-    private BooleanBuilder buildRecordCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview, QPostJpaEntity post, QRecordJpaEntity record) {
         BooleanBuilder recordCondition = new BooleanBuilder();
         recordCondition.and(post.instanceOf(RecordJpaEntity.class))
                 .and(record.roomJpaEntity.roomId.eq(roomId));
@@ -160,6 +116,94 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
             recordCondition.and(record.isOverview.isFalse())
                     .and(record.page.between(pageStart, pageEnd));
         }
-        return recordCondition;
+
+        where.and(voteCondition.or(recordCondition));
+        return where;
+    }
+
+    // Case: pageExpr (Record, Vote 분기)
+    private NumberExpression<Integer> pageExpr() {
+        return new CaseBuilder()
+                .when(post.instanceOf(RecordJpaEntity.class)).then(record.page)
+                .when(post.instanceOf(VoteJpaEntity.class)).then(vote.page)
+                .otherwise(0);
+    }
+
+    // Case: isOverviewExpr (총평 여부를 정렬 기준으로 사용)
+    private NumberExpression<Integer> isOverviewExpr() {
+        return new CaseBuilder()
+                .when(post.instanceOf(RecordJpaEntity.class)).then(record.isOverview.castToNum(Integer.class))
+                .when(post.instanceOf(VoteJpaEntity.class)).then(vote.isOverview.castToNum(Integer.class))
+                .otherwise(0);
+    }
+
+    // Case: postTypeExpr ("RECORD" or "VOTE")
+    private StringExpression postTypeExpr() {
+        return new CaseBuilder()
+                .when(post.instanceOf(RecordJpaEntity.class)).then(RECORD.getType())
+                .when(post.instanceOf(VoteJpaEntity.class)).then(VOTE.getType())
+                .otherwise(UNKNOWN.getType());
+    }
+
+    private BooleanBuilder buildCursorPredicateForSortType(SortType sortType, Cursor cursor) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        switch (sortType) {
+            case CREATED_AT -> {
+                LocalDateTime createdAt = cursor.getLocalDateTime(0);
+                Long postId = cursor.getLong(1);
+                builder.and(post.createdAt.lt(createdAt)
+                        .or(post.createdAt.eq(createdAt).and(post.postId.lt(postId))));
+            }
+            case LIKE_COUNT -> {
+                Integer likeCount = cursor.getInteger(0);
+                Long postId = cursor.getLong(1);
+                builder.and(post.likeCount.lt(likeCount)
+                        .or(post.likeCount.eq(likeCount).and(post.postId.lt(postId))));
+            }
+            case COMMENT_COUNT -> {
+                Integer commentCount = cursor.getInteger(0);
+                Long postId = cursor.getLong(1);
+                builder.and(post.commentCount.lt(commentCount)
+                        .or(post.commentCount.eq(commentCount).and(post.postId.lt(postId))));
+            }
+            case MINE -> {
+                Integer isOverview = cursor.getInteger(0);
+                Integer page = cursor.getInteger(1);
+                Long postId = cursor.getLong(2);
+                builder.and(
+                        isOverviewExpr().lt(isOverview)
+                                .or(isOverviewExpr().eq(isOverview).and(pageExpr().lt(page)))
+                                .or(isOverviewExpr().eq(isOverview).and(pageExpr().eq(page)).and(post.postId.lt(postId)))
+                );
+            }
+        }
+
+        return builder;
+    }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(SortType sortType) {
+        return switch (sortType) {
+            case CREATED_AT -> new OrderSpecifier[] { post.createdAt.desc(), post.postId.desc() };
+            case LIKE_COUNT -> new OrderSpecifier[] { post.likeCount.desc(), post.postId.desc() };
+            case COMMENT_COUNT -> new OrderSpecifier[] { post.commentCount.desc(), post.postId.desc() };
+            case MINE -> new OrderSpecifier[] { isOverviewExpr().desc(), pageExpr().desc(), post.postId.desc() };
+        };
+    }
+
+    private QPostQueryDto selectPostQueryDto() {
+        return new QPostQueryDto(
+                post.postId,
+                postTypeExpr(), //추후에 상속 구조 해지시 type 필드로 구분
+                post.createdAt,
+                pageExpr(),
+                user.userId,
+                user.nickname,
+                user.imageUrl,
+                post.content,
+                post.likeCount,
+                post.commentCount,
+                isOverviewExpr().eq(1)
+        );
     }
 }
