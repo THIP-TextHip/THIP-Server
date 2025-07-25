@@ -10,6 +10,4 @@ public interface VoteCommandPort {
     Long saveVote(Vote vote);
 
     void saveAllVoteItems(List<VoteItem> voteItems);
-
-    List<VoteItem> findVoteItemsByVoteId(Long voteId);
 }
