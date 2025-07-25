@@ -14,7 +14,7 @@ public record VoteItemQueryDto(
     public VoteItemQueryDto {
         Assert.notNull(voteId, "voteId must not be null");
         Assert.notNull(voteItemId, "voteItemId must not be null");
-        Assert.notNull(itemName, "title must not be null");
+        Assert.notNull(itemName, "itemName must not be null");
         Assert.notNull(voteCount, "voteCount must not be null");
         Assert.notNull(isVoted, "isVoted must not be null");
     }
