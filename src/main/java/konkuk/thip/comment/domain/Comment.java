@@ -9,8 +9,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
-import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_LIKE_COUNT_UNDERFLOW;
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_COMMENT_CREATE;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_NOT_LIKED_CANNOT_CANCEL;
 
 @Getter
 @SuperBuilder
@@ -125,6 +125,20 @@ public class Comment extends BaseDomainEntity {
     private void checkLikeCountNotUnderflow() {
         if (likeCount <= 0) {
             throw new InvalidStateException(COMMENT_LIKE_COUNT_UNDERFLOW);
+        }
+    }
+
+    // 좋아요 생성 가능 여부 검증 (이미 좋아요한 상태면 예외)
+    public void validateCanLike(boolean alreadyLiked) {
+        if (alreadyLiked) {
+            throw new InvalidStateException(COMMENT_ALREADY_LIKED);
+        }
+    }
+
+    // 좋아요 취소 가능 여부 검증 (좋아요 안 한 상태면 예외)
+    public void validateCanUnlike(boolean alreadyLiked) {
+        if (!alreadyLiked) {
+            throw new InvalidStateException(COMMENT_NOT_LIKED_CANNOT_CANCEL);
         }
     }
 }

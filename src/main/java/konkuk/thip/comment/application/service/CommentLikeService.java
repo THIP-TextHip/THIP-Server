@@ -8,7 +8,6 @@ import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.comment.domain.Comment;
-import konkuk.thip.comment.domain.CommentLike;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,10 +31,10 @@ public class CommentLikeService implements CommentLikeUseCase {
 
         // 3. 좋아요 상태변경
         if (command.isLike()) {
-            CommentLike.validateCanLike(alreadyLiked); // 좋아요 가능 여부 검증
+            comment.validateCanLike(alreadyLiked); // 좋아요 가능 여부 검증
             commentLikeCommandPort.save(command.userId(), command.commentId());
         } else {
-            CommentLike.validateCanUnlike(alreadyLiked); // 좋아요 취소 가능 여부 검증
+            comment.validateCanUnlike(alreadyLiked); // 좋아요 취소 가능 여부 검증
             commentLikeCommandPort.delete(command.userId(), command.commentId());
         }
 
