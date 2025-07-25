@@ -168,13 +168,25 @@ public class RecordSearchService implements RecordSearchUseCase {
                 .toList();
     }
 
-    //todo : 블러 처리 contents 길이에 맞게 수정
     private String createBlurredString(String contents) {
         if (contents == null || contents.isEmpty()) {
-            return contents; // 빈 문자열이나 null은 그대로 반환
+            return contents;
         }
-        // 블러 처리 로직 (예: 내용의 일부를 '띱'으로 대체)
-        return contents.replaceAll(".", BLURRED_STRING); // 모든 문자를 '띱'으로 대체
+
+        int originalLength = contents.length();
+        int blurLen = BLURRED_STRING.length();
+
+        // 필요한 전체 반복 횟수 계산
+        int repeat = originalLength / blurLen;
+
+        StringBuilder sb = new StringBuilder(originalLength);
+
+        // 몫 만큼 반복
+        for (int i = 0; i < repeat + 1; i++) {
+            sb.append(BLURRED_STRING);
+        }
+
+        return sb.toString();
     }
 
     private void validateGroupRecordFilters(Integer pageStart, Integer pageEnd, Boolean isPageFilter, Boolean isOverview, int bookPageSize, double currentPercentage) {
@@ -192,10 +204,10 @@ public class RecordSearchService implements RecordSearchUseCase {
             }
         }
         if(isPageFilter && !isOverview) { // 페이지 필터만 적용된 경우는 pageStart와 pageEnd가 null이여도 됨
-            if(pageStart != null && pageStart < 0 && pageStart > bookPageSize) {
+            if(pageStart != null && (pageStart < 0 || pageStart > bookPageSize)) {
                 throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart는 책의 페이지 범위 내에 있어야 합니다."));
             }
-            if(pageEnd != null && pageEnd < 0 && pageEnd > bookPageSize) {
+            if(pageEnd != null && (pageEnd < 0 || pageEnd > bookPageSize)) {
                 throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageEnd는 책의 페이지 범위 내에 있어야 합니다."));
             }
             if(pageStart != null && pageEnd != null && pageStart > pageEnd) {
