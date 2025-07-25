@@ -2,29 +2,34 @@ package konkuk.thip.record.application.service;
 
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
-import konkuk.thip.record.adapter.in.web.response.RecordDto;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
-import konkuk.thip.record.adapter.in.web.response.VoteDto;
 import konkuk.thip.record.adapter.out.persistence.RecordSearchSortParams;
 import konkuk.thip.record.adapter.out.persistence.RecordSearchTypeParams;
+import konkuk.thip.record.application.port.in.dto.RecordSearchQuery;
 import konkuk.thip.record.application.port.in.dto.RecordSearchUseCase;
 import konkuk.thip.record.application.port.out.RecordQueryPort;
-import konkuk.thip.vote.application.port.out.VoteCommandPort;
+import konkuk.thip.record.application.port.out.dto.PostQueryDto;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.vote.application.port.out.VoteQueryPort;
+import konkuk.thip.vote.application.port.out.dto.VoteItemQueryDto;
 import konkuk.thip.vote.domain.VoteItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -33,116 +38,181 @@ public class RecordSearchService implements RecordSearchUseCase {
 
     private final RecordQueryPort recordQueryPort;
     private final BookCommandPort bookCommandPort;
-    private final VoteCommandPort voteCommandPort;
     private final VoteQueryPort voteQueryPort;
     private final PostLikeQueryPort postLikeQueryPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
 
     private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String BLURRED_STRING = "여긴 못 지나가지롱~~";
 
     @Override
     @Transactional(readOnly = true)
-    public RecordSearchResponse search(Long roomId, String type, String sort, Integer pageStart, Integer pageEnd, Boolean isOverview, Integer pageNum, Long userId) {
-        // 1. 유효성 검사
-        validatePageStartAndEnd(pageStart, pageEnd, isOverview);
-        pageNum = validatePageNum(pageNum);
+    public RecordSearchResponse search(RecordSearchQuery recordSearchQuery) {
+        // RecordSearchQuery에서 필드 반환
+        Integer pageStart = recordSearchQuery.pageStart();
+        Integer pageEnd = recordSearchQuery.pageEnd();
+        Boolean isOverview = recordSearchQuery.isOverview();
+        Boolean isPageFilter = recordSearchQuery.isPageFilter();
+        Long userId = recordSearchQuery.userId();
+        Long roomId = recordSearchQuery.roomId();
 
-        // isOverview가 false일 때 pageStart와 pageEnd가 모두 null이면 전체 페이지 조회
-        if(!isOverview && (pageStart == null || pageEnd == null)) {
-            Book book = bookCommandPort.findBookByRoomId(roomId);
-            pageStart = 1;
-            pageEnd = book.getPageCount();
-        }
+        Book book = bookCommandPort.findBookByRoomId(recordSearchQuery.roomId());
+        RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(recordSearchQuery.userId(), recordSearchQuery.roomId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_BELONG_TO_ROOM));
 
-        // 2. 정렬 조건 확인
-        RecordSearchSortParams sortVal = sort != null ? RecordSearchSortParams.from(sort) : RecordSearchSortParams.LATEST;
-        RecordSearchTypeParams typeVal = type != null ? RecordSearchTypeParams.from(type) : RecordSearchTypeParams.GROUP;
+        // cursor 파싱
+        Cursor cursor = Cursor.from(recordSearchQuery.nextCursor(), DEFAULT_PAGE_SIZE);
 
-        // 3. 페이지 인덱스 및 Pageable 객체 생성
-        int pageIndex = pageNum - 1;
-        Pageable pageable = PageRequest.of(pageIndex, DEFAULT_PAGE_SIZE, buildSort(sortVal));
-
-        // 4. 게시글 조회
-        Page<RecordSearchResponse.RecordSearchResult> result = recordQueryPort.findRecordsByRoom(
-                roomId,
-                typeVal.getValue(),
-                pageStart,
-                pageEnd,
-                isOverview,
-                userId,
-                pageable
-        );
-
-        // 5. isLiked와 voteItems를 포함한 최종 결과 리스트 생성
-        List<RecordSearchResponse.RecordSearchResult> finalList = result.getContent().stream()
-                .map(post -> {
-                    if (post instanceof RecordDto recordDto) {
-                        boolean isLiked = checkIfLiked(recordDto.recordId(), userId);
-                        return recordDto.withIsLiked(isLiked);
-                    } else if (post instanceof VoteDto voteDto) {
-                        boolean isLiked = checkIfLiked(voteDto.voteId(), userId);
-                        List<VoteItem> items = voteCommandPort.findVoteItemsByVoteId(voteDto.voteId());
-                        List<VoteDto.VoteItemDto> voteItemDtos = mapToVoteItemDtos(items, userId, voteDto.voteId());
-                        return voteDto.withIsLikedAndVoteItems(isLiked, voteItemDtos);
-                    } else {
-                        throw new InvalidStateException(ErrorCode.API_SERVER_ERROR, new IllegalStateException("지원되지 않는 게시물 타입입니다"));
+        // Type에 따라 그룹기록, 내 기록 조회 분기처리
+        CursorBasedList<PostQueryDto> cursorBasedList = switch(RecordSearchTypeParams.from(recordSearchQuery.type())) {
+            case GROUP -> {
+                validateGroupRecordFilters(pageStart, pageEnd, isPageFilter, isOverview, book.getPageCount(), roomParticipant.getUserPercentage());
+                // 총평 보기가 아닌 경우, pageStart와 pageEnd를 default 값 주입
+                if(!isOverview) {
+                    if(pageStart == null) {
+                        pageStart = 0;
                     }
-                })
-                .map(finalResult -> (RecordSearchResponse.RecordSearchResult) finalResult)
+                    if(pageEnd == null) {
+                        pageEnd = book.getPageCount();
+                    }
+                }
+                yield getGroupRecordBySortParams(recordSearchQuery.sort(), roomId, userId, cursor, pageStart, pageEnd, isPageFilter, isOverview);
+            }
+            case MINE -> {
+                validateMyRecordFilters(pageStart, pageEnd, isPageFilter, isOverview, recordSearchQuery.sort());
+                yield recordQueryPort.searchMyRecords(roomId, userId, cursor);
+            }
+        };
+
+        // VoteItem 한번에 조회 (투표 게시물에 대한 투표 항목 조회)
+        Map<Long, List<VoteItemQueryDto>> voteItemQueryMap = voteQueryPort.findVoteItemsByVoteIds(cursorBasedList.contents().stream()
+                .filter(postQueryDto -> postQueryDto.postType().equals("VOTE"))
+                .map(PostQueryDto::postId)
+                .collect(Collectors.toSet()), userId);
+
+        // 사용자가 좋아요를 누른 게시물 ID 목록 조회
+        Set<Long> likedPostIds = postLikeQueryPort.findPostIdsLikedByUser(cursorBasedList.contents().stream()
+                .map(PostQueryDto::postId)
+                .collect(Collectors.toSet()), userId);
+
+        // 게시물 DTO 변환
+        var postDtos = cursorBasedList.contents().stream()
+                .map(postQueryDto -> toPostDto(postQueryDto, roomParticipant, userId, voteItemQueryMap, likedPostIds))
                 .toList();
 
-        // 6. response 구성
-        return new RecordSearchResponse(
-                finalList,
-                pageNum,
-                result.getNumberOfElements(),
-                result.isLast(),
-                result.isFirst());
+        // RecordSearchResponse 생성
+        return RecordSearchResponse.builder()
+                .postList(postDtos)
+                .nextCursor(cursorBasedList.nextCursor())
+                .isLast(!cursorBasedList.hasNext())
+                .build();
     }
 
-    private void validatePageStartAndEnd(Integer pageStart, Integer pageEnd, Boolean isOverview) {
-        if((pageStart != null && pageEnd == null) || (pageStart == null && pageEnd != null)) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart와 pageEnd는 모두 설정되거나(특정 페이지 조회) 모두 설정되지 않아야 합니다.(전체 페이지 조회)"));
-        }
-        if (pageStart != null && pageEnd != null && pageStart > pageEnd) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart는 pageEnd보다 작거나 같아야 합니다."));
-        }
-        if (isOverview && (pageStart != null || pageEnd != null)) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart와 pageEnd는 isOverview가 true일 때 유효한 파라미터가 아닙니다."));
-        }
-    }
-
-    private Integer validatePageNum(Integer pageNum) {
-        if (pageNum == null) {
-            return 1; // 기본값으로 첫 페이지 반환
-        }
-        if (pageNum < 1) {
-            throw new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageNum은 1 이상의 값이어야 합니다."));
-        }
-        return pageNum;
-    }
-
-    private Sort buildSort(RecordSearchSortParams sort) {
-        return switch (sort) {
-            case LIKE -> Sort.by(Sort.Direction.DESC, "likeCount");
-            case COMMENT -> Sort.by(Sort.Direction.DESC, "commentCount");
-            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+    private CursorBasedList<PostQueryDto> getGroupRecordBySortParams(String sort, Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isPageFilter, Boolean isOverview) {
+        return switch(RecordSearchSortParams.from(sort)) {
+            case LATEST -> recordQueryPort.searchGroupRecordsByLatest(roomId, userId, cursor, pageStart, pageEnd, isOverview);
+            case LIKE -> recordQueryPort.searchGroupRecordsByLike(roomId, userId, cursor, pageStart, pageEnd, isOverview);
+            case COMMENT -> recordQueryPort.searchGroupRecordsByComment(roomId, userId, cursor, pageStart, pageEnd, isOverview);
         };
     }
 
-    private List<VoteDto.VoteItemDto> mapToVoteItemDtos(List<VoteItem> items, Long userId, Long voteId) {
-        int total = items.stream().mapToInt(VoteItem::getCount).sum();
-        return items.stream()
-                .map(item -> VoteDto.VoteItemDto.of(
-                        item,
-                        item.calculatePercentage(total),
-                        voteQueryPort.isUserVoted(userId, voteId)
-                        )
-                )
+    private RecordSearchResponse.PostDto toPostDto(PostQueryDto dto, RoomParticipant participant, Long userId, Map<Long, List<VoteItemQueryDto>> voteItemMap, Set<Long> likedPostIds) {
+        boolean isLocked = participant.getCurrentPage() < dto.page();
+        boolean isWriter = dto.userId().equals(userId);
+        String content = isLocked ? createBlurredString(dto.content()) : dto.content();
+
+        return RecordSearchResponse.PostDto.builder()
+                .postId(dto.postId())
+                .postDate(DateUtil.formatBeforeTime(dto.postDate()))
+                .postType(dto.postType())
+                .page(dto.page())
+                .userId(dto.userId())
+                .nickName(dto.nickName())
+                .profileImageUrl(dto.profileImageUrl())
+                .content(content)
+                .likeCount(dto.likeCount())
+                .commentCount(dto.commentCount())
+                .isLiked(likedPostIds.contains(dto.postId()))
+                .isWriter(isWriter)
+                .isLocked(isLocked)
+                .voteItems(getVoteItemDtosIfApplicable(dto, voteItemMap, isLocked))
+                .build();
+    }
+
+    private List<RecordSearchResponse.PostDto.VoteItemDto> getVoteItemDtosIfApplicable(PostQueryDto dto, Map<Long, List<VoteItemQueryDto>> voteItemMap, boolean isLocked) {
+        if ("RECORD".equals(dto.postType())) {
+            return List.of();
+        }
+
+        List<VoteItemQueryDto> items = voteItemMap.getOrDefault(dto.postId(), List.of());
+        return mapToVoteItemDtos(items, isLocked);
+    }
+
+    private List<RecordSearchResponse.PostDto.VoteItemDto> mapToVoteItemDtos(List<VoteItemQueryDto> items, boolean isLocked) {
+        // voteCount를 모아 리스트로 변환
+        List<Integer> counts = items.stream()
+                .map(VoteItemQueryDto::voteCount)
+                .toList();
+
+        // 도메인에게 계산 위임
+        List<Integer> percentages = VoteItem.calculatePercentages(counts);
+
+        // 계산 결과를 이용해 DTO 조립
+        return IntStream.range(0, items.size())
+                .mapToObj(i -> RecordSearchResponse.PostDto.VoteItemDto.of(
+                        items.get(i).voteItemId(),
+                        isLocked ? createBlurredString(items.get(i).itemName()) : items.get(i).itemName(),
+                        percentages.get(i),
+                        items.get(i).isVoted()
+                ))
                 .toList();
     }
 
-    private boolean checkIfLiked(Long postId, Long userId) {
-        return postLikeQueryPort.existsByPostIdAndUserId(postId, userId);
+    //todo : 블러 처리 contents 길이에 맞게 수정
+    private String createBlurredString(String contents) {
+        if (contents == null || contents.isEmpty()) {
+            return contents; // 빈 문자열이나 null은 그대로 반환
+        }
+        // 블러 처리 로직 (예: 내용의 일부를 '띱'으로 대체)
+        return contents.replaceAll(".", BLURRED_STRING); // 모든 문자를 '띱'으로 대체
+    }
+
+    private void validateGroupRecordFilters(Integer pageStart, Integer pageEnd, Boolean isPageFilter, Boolean isOverview, int bookPageSize, double currentPercentage) {
+        if(!isPageFilter && !isOverview) { // 어떤 필터도 적용되지 않는 경우
+            if (pageStart != null || pageEnd != null) {
+                throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("어떤 필터도 적용되지 않는 경우 pageStart와 pageEnd는 null이어야 합니다."));
+            }
+        }
+        if(!isPageFilter && isOverview) { // 총평보기 필터만 적용된 경우
+            if (pageStart != null || pageEnd != null) {
+                throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("총평보기 필터만 적용된 경우 pageStart와 pageEnd는 null이어야 합니다."));
+            }
+            if (currentPercentage < 80) {
+                throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("총평보기 필터가 적용된 경우 현재 독서 진행률은 80% 이상이어야 합니다."));
+            }
+        }
+        if(isPageFilter && !isOverview) { // 페이지 필터만 적용된 경우는 pageStart와 pageEnd가 null이여도 됨
+            if(pageStart != null && pageStart < 0 && pageStart > bookPageSize) {
+                throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart는 책의 페이지 범위 내에 있어야 합니다."));
+            }
+            if(pageEnd != null && pageEnd < 0 && pageEnd > bookPageSize) {
+                throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageEnd는 책의 페이지 범위 내에 있어야 합니다."));
+            }
+            if(pageStart != null && pageEnd != null && pageStart > pageEnd) {
+                throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("pageStart는 pageEnd보다 작아야 합니다."));
+            }
+        }
+        if(isPageFilter && isOverview) { // 페이지 필터와 총평보기 필터가 동시에 적용된 경우
+            throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("페이지 필터와 총평보기 필터는 동시에 적용될 수 없습니다."));
+        }
+    }
+
+    private void validateMyRecordFilters(Integer pageStart, Integer pageEnd, Boolean isPageFilter, Boolean isOverview, String sort) {
+        // 모든 파라미터중 하나라도 null이 아닌 경우 예외 발생
+        if (pageStart != null || pageEnd != null || isPageFilter || isOverview || sort != null) {
+            throw new BusinessException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("내 기록 조회에서는 roomId, type, cursor를 제외한 모든 파라미터는 null이어야 합니다."));
+        }
+
     }
 }
 
