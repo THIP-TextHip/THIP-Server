@@ -1,6 +1,6 @@
 package konkuk.thip.user.application.service;
 
-import konkuk.thip.user.adapter.in.web.response.UserIsFollowingRespone;
+import konkuk.thip.user.adapter.in.web.response.UserIsFollowingResponse;
 import konkuk.thip.user.application.port.in.UserIsFollowingUsecase;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +13,9 @@ public class UserIsFollowingService implements UserIsFollowingUsecase {
     private final FollowingCommandPort followingCommandPort;
 
     @Override
-    public UserIsFollowingRespone isFollowing(Long userId, Long targetUserId) {
+    public UserIsFollowingResponse isFollowing(Long userId, Long targetUserId) {
         boolean isFollowing = followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId)
                 .isPresent();
-        return new UserIsFollowingRespone(isFollowing);
+        return new UserIsFollowingResponse(isFollowing);
     }
 }

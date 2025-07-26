@@ -6,7 +6,7 @@ import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
 import konkuk.thip.user.adapter.in.web.response.UserFollowingResponse;
-import konkuk.thip.user.adapter.in.web.response.UserIsFollowingRespone;
+import konkuk.thip.user.adapter.in.web.response.UserIsFollowingResponse;
 import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
 import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.in.UserIsFollowingUsecase;
@@ -59,8 +59,8 @@ public class UserQueryController {
      * 팔로잉 여부 조회
      */
     @GetMapping("/users/{targetUserId}/is-following")
-    public BaseResponse<UserIsFollowingRespone> checkisFollowing(@UserId final Long userId,
-                                                                 @PathVariable final Long targetUserId) {
+    public BaseResponse<UserIsFollowingResponse> checkisFollowing(@UserId final Long userId,
+                                                                  @PathVariable final Long targetUserId) {
         return BaseResponse.ok(userIsFollowingUsecase.isFollowing(userId, targetUserId));
     }
 }
