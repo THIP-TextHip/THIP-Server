@@ -12,8 +12,10 @@ import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("[단위] 댓글 생성 api controller 단위 테스트")
 class CommentControllerTest {
 
@@ -62,6 +66,7 @@ class CommentControllerTest {
     @Autowired private RecordJpaRepository recordJpaRepository;
     @Autowired private CommentJpaRepository commentJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
 
     private AliasJpaEntity alias;
@@ -83,6 +88,7 @@ class CommentControllerTest {
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
         record = recordJpaRepository.save(TestEntityFactory.createRecord(user,room));
         vote = voteJpaRepository.save(TestEntityFactory.createVote(user,room));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
     }
 
 

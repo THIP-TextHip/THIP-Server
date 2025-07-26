@@ -117,6 +117,7 @@ public enum ErrorCode implements ResponseCode {
     USER_NOT_PARTICIPATED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
     HOST_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140007, "방장은 참여 취소를 할 수 없습니다."),
     ROOM_RECRUIT_CANNOT_CLOSED(HttpStatus.BAD_REQUEST, 140008, "방 모집 마감을 할 수 없습니다."),
+    ROOM_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 140009, "방 접근 권한이 없습니다."),
 
     /**
      * 150000 : Category error
@@ -131,7 +132,7 @@ public enum ErrorCode implements ResponseCode {
     TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, 160002, "존재하지 않는 TAG 입니다."),
     INVALID_FEED_COMMAND(HttpStatus.BAD_REQUEST, 160003, "유효하지 않은 FEED 생성/수정 요청 입니다."),
-    FEED_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, 160004, "피드 수정 권한이 없습니다."),
+    FEED_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 160004, "피드 접근 권한이 없습니다."),
     DUPLICATED_FEEDS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 160005, "중복된 피드가 존재합니다."),
     FEED_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 160006, "사용자가 이미 저장한 피드입니다."),
     FEED_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 160007, "사용자가 저장하지 않은 피드는 저장삭제 할 수 없습니다."),

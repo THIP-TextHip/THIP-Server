@@ -126,7 +126,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static RoomParticipantJpaEntity createUserRoom(RoomJpaEntity room, UserJpaEntity user, RoomParticipantRole roomParticipantRole, double userPercentage) {
+    public static RoomParticipantJpaEntity createRoomParticipant(RoomJpaEntity room, UserJpaEntity user, RoomParticipantRole roomParticipantRole, double userPercentage) {
         return RoomParticipantJpaEntity.builder()
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
