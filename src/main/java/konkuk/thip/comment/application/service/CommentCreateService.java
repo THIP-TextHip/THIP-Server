@@ -4,14 +4,15 @@ import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.dto.CommentCreateCommand;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.domain.Comment;
+import konkuk.thip.comment.domain.service.CommentAuthorizationService;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.service.PostQueryService;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.common.post.PostType;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
-import konkuk.thip.room.domain.service.RoomParticipantService;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.domain.Vote;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ public class CommentCreateService implements CommentCreateUseCase {
     private final RecordCommandPort recordCommandPort;
     private final VoteCommandPort voteCommandPort;
 
-    private final RoomParticipantService roomParticipantService;
+    private final PostQueryService postQueryService;
+    private final CommentAuthorizationService commentAuthorizationService;
 
     @Override
     @Transactional
@@ -41,9 +43,9 @@ public class CommentCreateService implements CommentCreateUseCase {
         PostType type = PostType.from(command.postType());
 
         // 2. 게시물 타입에 맞게 조회
-        CommentCountUpdatable post = findPost(type, command.postId());
+        CommentCountUpdatable post = postQueryService.findPost(type, command.postId());
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
-        validateCommentCreateAuthorization(type, post, command.userId());
+        commentAuthorizationService.validateUserCanAccessPostForComment(type, post, command.userId());
 
         // TODO 피드: 내 게시글의 댓글, 내 댓글에 대한 답글 알림 전송
         // TODO 기록 및 투표: 모임방의 내 게시글에 대한 댓글, 내 댓글에 대한 답글 알림 전송
@@ -58,26 +60,6 @@ public class CommentCreateService implements CommentCreateUseCase {
         updatePost(type, post);
 
         return commentId;
-    }
-
-    private CommentCountUpdatable findPost(PostType type, Long postId) {
-        return switch (type) {
-            case FEED -> feedCommandPort.getByIdOrThrow(postId);
-            case RECORD -> recordCommandPort.getByIdOrThrow(postId);
-            case VOTE -> voteCommandPort.getByIdOrThrow(postId);
-        };
-    }
-
-    private void validateCommentCreateAuthorization(PostType type, CommentCountUpdatable post, Long userId) {
-        // 2-1. RECORD, VOTE는 방 멤버 자격 검증 필요
-        if (type == PostType.RECORD || type == PostType.VOTE) {
-            roomParticipantService.validateUserIsRoomMember(post.getRoomId(), userId);
-        }
-        // 2-2. FEED는 비공개 글 일시, 작성자 자격 검증 필요
-        else {
-            Feed feed = (Feed) post;
-            feed.validateCreateComment(userId);
-        }
     }
 
     private Long createCommentDomain(CommentCreateCommand command) {
