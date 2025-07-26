@@ -12,7 +12,7 @@ public class UserIsFollowingService implements UserIsFollowingUsecase {
     private final FollowingCommandPort followingCommandPort;
 
     @Override
-    public Boolean isFollowing(Long userId, Long targetUserId) {
+    public boolean isFollowing(Long userId, Long targetUserId) {
         return followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId)
                 .isPresent();
     }
