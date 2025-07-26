@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import static konkuk.thip.common.exception.code.ErrorCode.FOLLOW_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @Repository
@@ -50,7 +51,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
         updateUserFollowerCount(targetUser);
 
         FollowingJpaEntity followingJpaEntity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(FOLLOW_NOT_FOUND));
 
         followingJpaRepository.delete(followingJpaEntity);
     }
