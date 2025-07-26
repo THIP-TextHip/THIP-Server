@@ -1,6 +1,7 @@
 package konkuk.thip.record.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.mapper.RecordMapper;
 import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
@@ -12,8 +13,9 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import static konkuk.thip.common.exception.code.ErrorCode.ROOM_NOT_FOUND;
-import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
+import java.util.Optional;
+
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,6 +39,21 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
         return recordJpaRepository.save(
                 recordMapper.toJpaEntity(record, userJpaEntity, roomJpaEntity)
         ).getPostId();
+    }
+
+    @Override
+    public Optional<Record> findById(Long id) {
+        return recordJpaRepository.findById(id)
+                .map(recordMapper::toDomainEntity);
+    }
+
+    @Override
+    public void update(Record record) {
+        RecordJpaEntity recordJpaEntity = recordJpaRepository.findById(record.getId()).orElseThrow(
+                () -> new EntityNotFoundException(RECORD_NOT_FOUND)
+        );
+
+        recordJpaRepository.save(recordJpaEntity.updateFrom(record));
     }
 
 }

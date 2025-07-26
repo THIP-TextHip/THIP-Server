@@ -2,6 +2,7 @@ package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.post.CommentCountUpdatable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -16,7 +17,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
-public class Feed extends BaseDomainEntity {
+public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
 
     private Long id;
 
@@ -106,9 +107,16 @@ public class Feed extends BaseDomainEntity {
         }
     }
 
-    public void validateCreator(Long userId) {
+    public void validateCreateComment(Long userId){
+        if (!this.isPublic && !this.creatorId.equals(userId)) {
+            validateCreator(userId);
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 댓글을 쓸 수 있습니다."));
+        }
+    }
+
+    private void validateCreator(Long userId) {
         if (!this.creatorId.equals(userId)) {
-            throw new InvalidStateException(FEED_UPDATE_FORBIDDEN);
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN);
         }
     }
 
@@ -148,4 +156,14 @@ public class Feed extends BaseDomainEntity {
         }
     }
 
+    @Override
+    public void increaseCommentCount() {
+        commentCount++;
+    }
+
+    @Override
+    //Feed는 RoomId 없음
+    public Long getRoomId() {
+        return null;
+    }
 }
