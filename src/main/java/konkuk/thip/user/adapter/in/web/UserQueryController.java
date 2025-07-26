@@ -61,6 +61,6 @@ public class UserQueryController {
     @GetMapping("/users/{targetUserId}/is-following")
     public BaseResponse<UserIsFollowingResponse> checkisFollowing(@UserId final Long userId,
                                                                   @PathVariable final Long targetUserId) {
-        return BaseResponse.ok(userIsFollowingUsecase.isFollowing(userId, targetUserId));
+        return BaseResponse.ok(UserIsFollowingResponse.of(userIsFollowingUsecase.isFollowing(userId, targetUserId)));
     }
 }
