@@ -29,7 +29,8 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         FollowingJpaEntity followingJpaEntity = jpaQueryFactory
                 .selectFrom(following)
                 .where(following.userJpaEntity.userId.eq(userId)
-                        .and(following.followingUserJpaEntity.userId.eq(targetUserId)))
+                        .and(following.followingUserJpaEntity.userId.eq(targetUserId))
+                        .and(following.status.eq(StatusType.ACTIVE)))
                 .fetchOne();
 
         return Optional.ofNullable(followingJpaEntity);

@@ -5,8 +5,8 @@ import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.mapper.FollowingMapper;
 import konkuk.thip.user.adapter.out.mapper.UserMapper;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
 import konkuk.thip.user.domain.Following;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static konkuk.thip.common.exception.code.ErrorCode.FOLLOW_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @Repository
@@ -30,7 +29,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
     private final FollowingMapper followingMapper;
     private final UserMapper userMapper;
 
-    @Override //ACTIVE, INACTIVE 모두 조회
+    @Override //ACTIVE만 조회
     public Optional<Following> findByUserIdAndTargetUserId(Long userId, Long targetUserId) {
         Optional<FollowingJpaEntity> followingJpaEntity = followingJpaRepository.findByUserAndTargetUser(userId, targetUserId);
         return followingJpaEntity.map(followingMapper::toDomainEntity);
@@ -47,13 +46,13 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
     }
 
     @Override
-    public void updateStatus(Following following, User targetUser) { // 상태변경 용
+    public void deleteFollowing(Following following, User targetUser) {
         updateUserFollowerCount(targetUser);
 
-        FollowingJpaEntity entity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
-                .orElseThrow(() -> new EntityNotFoundException(FOLLOW_NOT_FOUND));
+        FollowingJpaEntity followingJpaEntity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        entity.setStatus(following.getStatus());
+        followingJpaRepository.delete(followingJpaEntity);
     }
 
     private UserJpaEntity updateUserFollowerCount(User targetUser) {
@@ -61,7 +60,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
-        userJpaEntity.updateFollowerCount(targetUser.getFollowerCount());
+        userJpaEntity.updateFrom(targetUser);
         userJpaRepository.save(userJpaEntity);
         return userJpaEntity;
     }

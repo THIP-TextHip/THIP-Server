@@ -3,6 +3,7 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.user.domain.User;
 import lombok.*;
 
 @Entity
@@ -42,4 +43,10 @@ public class UserJpaEntity extends BaseJpaEntity {
         this.followerCount = followerCount;
     }
 
+    public void updateFrom(User user) {
+        this.nickname = user.getNickname();
+        this.imageUrl = user.getAlias().getImageUrl();
+        this.role = UserRole.from(user.getUserRole());
+        this.followerCount = user.getFollowerCount();
+    }
 }
