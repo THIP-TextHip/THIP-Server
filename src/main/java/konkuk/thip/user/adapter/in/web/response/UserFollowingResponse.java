@@ -5,20 +5,18 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record UserFollowersResponse(
-        List<Follower> followers,
+public record UserFollowingResponse(
+        List<Following> followings,
         String nextCursor,
         boolean isLast
 ) {
     @Builder
-    public record Follower(
+    public record Following(
             Long userId,
             String nickname,
             String profileImageUrl,
-            String aliasName,
-            Integer followerCount
+            String aliasName
     ){
-
     }
 
 }

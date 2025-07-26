@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -36,15 +37,16 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     private final FeedMapper feedMapper;
     private final ContentMapper contentMapper;
 
+
     @Override
-    public Feed findById(Long id) {
-        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
-
-        List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
-
-        return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
+    public Optional<Feed> findById(Long id) {
+        return feedJpaRepository.findById(id)
+                .map(feedJpaEntity -> {
+                    List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
+                    return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
+                });
     }
+
 
     @Override
     public Long save(Feed feed) {

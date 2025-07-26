@@ -64,6 +64,10 @@ dependencies {
 
 	//s3 버킷
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// MapStruct
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
