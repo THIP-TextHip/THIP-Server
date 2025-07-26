@@ -11,8 +11,10 @@ import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -58,6 +60,8 @@ class CommentCreateAPITest {
     @Autowired private RecordJpaRepository recordJpaRepository;
     @Autowired private CommentJpaRepository commentJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
+
 
 
     private AliasJpaEntity alias;
@@ -79,6 +83,7 @@ class CommentCreateAPITest {
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
         record = recordJpaRepository.save(TestEntityFactory.createRecord(user,room));
         vote = voteJpaRepository.save(TestEntityFactory.createVote(user,room));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
     }
 
     // 공통 JSON 생성 함수
