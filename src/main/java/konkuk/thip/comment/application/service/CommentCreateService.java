@@ -4,7 +4,6 @@ import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.dto.CommentCreateCommand;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.domain.Comment;
-import konkuk.thip.comment.domain.service.CommentAuthorizationService;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
 import konkuk.thip.common.post.service.PostQueryService;
@@ -32,7 +31,7 @@ public class CommentCreateService implements CommentCreateUseCase {
     private final VoteCommandPort voteCommandPort;
 
     private final PostQueryService postQueryService;
-    private final CommentAuthorizationService commentAuthorizationService;
+    private final CommentAuthorizationValidator commentAuthorizationValidator;
 
     @Override
     @Transactional
@@ -45,7 +44,7 @@ public class CommentCreateService implements CommentCreateUseCase {
         // 2. 게시물 타입에 맞게 조회
         CommentCountUpdatable post = postQueryService.findPost(type, command.postId());
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
-        commentAuthorizationService.validateUserCanAccessPostForComment(type, post, command.userId());
+        commentAuthorizationValidator.validateUserCanAccessPostForComment(type, post, command.userId());
 
         // TODO 피드: 내 게시글의 댓글, 내 댓글에 대한 답글 알림 전송
         // TODO 기록 및 투표: 모임방의 내 게시글에 대한 댓글, 내 댓글에 대한 답글 알림 전송

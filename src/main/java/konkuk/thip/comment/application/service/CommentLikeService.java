@@ -8,7 +8,8 @@ import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.comment.domain.Comment;
-import konkuk.thip.comment.domain.service.CommentAuthorizationService;
+import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.service.PostQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,8 @@ public class CommentLikeService implements CommentLikeUseCase {
     private final CommentLikeQueryPort commentLikeQueryPort;
     private final CommentLikeCommandPort commentLikeCommandPort;
 
-    private final CommentAuthorizationService commentAuthorizationService;
+    private final PostQueryService postQueryService;
+    private final CommentAuthorizationValidator commentAuthorizationValidator;
 
     @Override
     @Transactional
@@ -29,7 +31,8 @@ public class CommentLikeService implements CommentLikeUseCase {
         // 1. 댓글 조회 및 검증 (존재 여부)
         Comment comment = commentCommandPort.getByIdOrThrow(command.commentId());
         // 1-1. 게시글 타입에 따른 댓글 좋아요 권한 검증
-        commentAuthorizationService.validateUserCanAccessPostForComment(comment, command.userId());
+        CommentCountUpdatable post = postQueryService.findPost(comment.getPostType(), comment.getTargetPostId());
+        commentAuthorizationValidator.validateUserCanAccessPostForComment(comment.getPostType(), post, command.userId());
 
         // 2. 유저가 해당 댓글에 대해 좋아요 했는지 조회
         boolean alreadyLiked = commentLikeQueryPort.isLikedCommentByUser(command.userId(), command.commentId());
