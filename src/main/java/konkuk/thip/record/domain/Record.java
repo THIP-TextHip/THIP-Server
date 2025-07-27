@@ -3,6 +3,7 @@ package konkuk.thip.record.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.room.domain.RoomPost;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -12,7 +13,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERV
 
 @Getter
 @SuperBuilder
-public class Record extends BaseDomainEntity implements CommentCountUpdatable {
+public class Record extends BaseDomainEntity implements CommentCountUpdatable, RoomPost {
 
     private Long id;
 
