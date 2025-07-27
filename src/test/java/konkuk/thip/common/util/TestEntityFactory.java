@@ -202,6 +202,9 @@ public class TestEntityFactory {
                 .build();
     }
 
+    /**
+     * 공개/비공개 여부만을 설정하는 기본 피드 생성을 위한 팩토리 메서드
+     */
     public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic) {
 
         return FeedJpaEntity.builder()
@@ -248,6 +251,9 @@ public class TestEntityFactory {
         return feed;
     }
 
+    /**
+     * 커스텀 feed 생성을 위한 팩토리 메서드
+     */
     public static FeedJpaEntity createFeed(UserJpaEntity user,
                                            BookJpaEntity book,
                                            boolean isPublic,
