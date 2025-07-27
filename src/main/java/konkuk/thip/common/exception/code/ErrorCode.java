@@ -148,7 +148,7 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 180000 : Post error
      */
-    POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [feed, record, vote] 중 하나여야 합니다."),
+    POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [FEED, RECORD, VOTE] 중 하나여야 합니다."),
 
     /**
      * 190000 : Comment error
