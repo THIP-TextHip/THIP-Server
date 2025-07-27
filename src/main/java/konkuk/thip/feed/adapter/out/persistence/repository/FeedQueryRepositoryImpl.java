@@ -11,8 +11,6 @@ import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
-import konkuk.thip.post.adapter.out.jpa.QPostLikeJpaEntity;
-import konkuk.thip.saved.adapter.out.jpa.QSavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
@@ -37,8 +35,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
     private final QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
-    private final QSavedFeedJpaEntity savedFeed = QSavedFeedJpaEntity.savedFeedJpaEntity;
-    private final QPostLikeJpaEntity postLike = QPostLikeJpaEntity.postLikeJpaEntity;
     private final QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
 
     @Override
@@ -70,12 +66,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .map(entityMap::get)
                 .toList();
 
-        // 3) 플래그 조회
-        Set<Long> savedSet = fetchSavedSet(userId, feedIds);
-        Set<Long> likedSet = fetchLikedSet(userId, feedIds);
-
-        // 4) DTO 변환
-        return mapToDtoList(ordered, savedSet, likedSet);
+        // 3) DTO 변환
+        return mapToDtoList(ordered);
     }
 
     @Override
@@ -94,12 +86,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .map(entityMap::get)
                 .toList();
 
-        // 3) 플래그 조회
-        Set<Long> savedSet = fetchSavedSet(userId, feedIds);
-        Set<Long> likedSet = fetchLikedSet(userId, feedIds);
-
-        // 4) DTO 변환
-        return mapToDtoList(ordered, savedSet, likedSet);
+        // 3) DTO 변환
+        return mapToDtoList(ordered);
     }
 
     /**
@@ -172,58 +160,28 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     /**
      * 엔티티 목록 -> FeedQueryDto 목록 변환
      */
-    private List<FeedQueryDto> mapToDtoList(List<FeedJpaEntity> entities, Set<Long> savedSet, Set<Long> likedSet) {
+    private List<FeedQueryDto> mapToDtoList(List<FeedJpaEntity> entities) {
         return entities.stream()
                 .map(e -> {
                     String[] urls = e.getContentList().stream()
                             .map(ContentJpaEntity::getContentUrl)
                             .toArray(String[]::new);
-                    return new FeedQueryDto(
-                            e.getPostId(),
-                            e.getUserJpaEntity().getUserId(),
-                            e.getUserJpaEntity().getNickname(),
-                            e.getUserJpaEntity().getImageUrl(),
-                            e.getUserJpaEntity().getAliasForUserJpaEntity().getValue(),
-                            e.getCreatedAt(),
-                            e.getBookJpaEntity().getIsbn(),
-                            e.getBookJpaEntity().getTitle(),
-                            e.getBookJpaEntity().getAuthorName(),
-                            e.getContent(),
-                            urls,
-                            e.getLikeCount(),
-                            e.getCommentCount(),
-                            savedSet.contains(e.getPostId()),
-                            likedSet.contains(e.getPostId())
-                    );
+                    return FeedQueryDto.builder()
+                            .feedId(e.getPostId())
+                            .creatorId(e.getUserJpaEntity().getUserId())
+                            .creatorNickname(e.getUserJpaEntity().getNickname())
+                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
+                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                            .createdAt(e.getCreatedAt())
+                            .isbn(e.getBookJpaEntity().getIsbn())
+                            .bookTitle(e.getBookJpaEntity().getTitle())
+                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
+                            .contentBody(e.getContent())
+                            .contentUrls(urls)
+                            .likeCount(e.getLikeCount())
+                            .commentCount(e.getCommentCount())
+                            .build();
                 })
                 .toList();
-    }
-
-    /** feedIds 중 해당 userId가 저장한(post) ID 조회 */
-    private Set<Long> fetchSavedSet(Long userId, List<Long> feedIds) {
-        return new HashSet<>(
-                jpaQueryFactory
-                        .select(savedFeed.feedJpaEntity.postId)
-                        .from(savedFeed)
-                        .where(
-                                savedFeed.userJpaEntity.userId.eq(userId),
-                                savedFeed.feedJpaEntity.postId.in(feedIds)
-                        )
-                        .fetch()
-        );
-    }
-
-    /** feedIds 중 해당 userId가 좋아요 누른(post) ID 조회 */
-    private Set<Long> fetchLikedSet(Long userId, List<Long> feedIds) {
-        return new HashSet<>(
-                jpaQueryFactory
-                        .select(postLike.postJpaEntity.postId)
-                        .from(postLike)
-                        .where(
-                                postLike.userJpaEntity.userId.eq(userId),
-                                postLike.postJpaEntity.postId.in(feedIds)
-                        )
-                        .fetch()
-        );
     }
 }
