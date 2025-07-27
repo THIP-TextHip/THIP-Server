@@ -1,4 +1,4 @@
-package konkuk.thip.room.domain.service;
+package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.application.port.out.RoomParticipantQueryPort;
@@ -9,7 +9,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.ROOM_ACCESS_FORBIDDEN;
 
 @Component
 @RequiredArgsConstructor
-public class RoomParticipantService {
+public class RoomParticipantValidator{
     private final RoomParticipantQueryPort participantPort;
 
     // 사용자가 방에 속해있는지 검증

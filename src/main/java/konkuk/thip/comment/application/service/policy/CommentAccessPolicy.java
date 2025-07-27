@@ -1,4 +1,4 @@
-package konkuk.thip.comment.domain.policy;
+package konkuk.thip.comment.application.service.policy;
 
 import konkuk.thip.common.post.CommentCountUpdatable;
 import konkuk.thip.common.post.PostType;
