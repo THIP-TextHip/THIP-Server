@@ -12,8 +12,10 @@ public class CommentMapper {
     public CommentJpaEntity toJpaEntity(Comment comment, PostJpaEntity postJpaEntity, UserJpaEntity userJpaEntity, CommentJpaEntity commentJpaEntity) {
         return CommentJpaEntity.builder()
                 .content(comment.getContent())
+                .likeCount(comment.getLikeCount())
                 .reportCount(comment.getReportCount())
                 .postJpaEntity(postJpaEntity)
+                .postType(comment.getPostType())
                 .userJpaEntity(userJpaEntity)
                 .parent(commentJpaEntity)
                 .build();
@@ -24,7 +26,9 @@ public class CommentMapper {
                 .id(commentJpaEntity.getCommentId())
                 .content(commentJpaEntity.getContent())
                 .reportCount(commentJpaEntity.getReportCount())
+                .likeCount(commentJpaEntity.getLikeCount())
                 .targetPostId(commentJpaEntity.getPostJpaEntity().getPostId())
+                .postType(commentJpaEntity.getPostType())
                 .creatorId(commentJpaEntity.getUserJpaEntity().getUserId())
                 .parentCommentId(commentJpaEntity.getParent() != null ? commentJpaEntity.getParent().getCommentId() : null)
                 .createdAt(commentJpaEntity.getCreatedAt())

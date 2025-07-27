@@ -1,6 +1,7 @@
 package konkuk.thip.record.adapter.out.jpa;
 
 import jakarta.persistence.*;
+import konkuk.thip.record.domain.Record;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -31,6 +32,15 @@ public class RecordJpaEntity extends PostJpaEntity {
         this.page = page;
         this.isOverview = isOverview;
         this.roomJpaEntity = roomJpaEntity;
+    }
+
+    public RecordJpaEntity updateFrom(Record record) {
+        this.content = record.getContent();
+        this.likeCount = record.getLikeCount();
+        this.commentCount = record.getCommentCount();
+        this.page = record.getPage();
+        this.isOverview = record.isOverview();
+        return this;
     }
 
 }

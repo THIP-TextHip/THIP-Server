@@ -2,6 +2,8 @@ package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
+import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
+import konkuk.thip.common.post.PostType;
 import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
@@ -134,7 +136,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static RoomParticipantJpaEntity createUserRoom(RoomJpaEntity room, UserJpaEntity user, RoomParticipantRole roomParticipantRole, double userPercentage) {
+    public static RoomParticipantJpaEntity createRoomParticipant(RoomJpaEntity room, UserJpaEntity user, RoomParticipantRole roomParticipantRole, double userPercentage) {
         return RoomParticipantJpaEntity.builder()
                 .userJpaEntity(user)
                 .roomJpaEntity(room)
@@ -150,6 +152,8 @@ public class TestEntityFactory {
                 .userJpaEntity(user)
                 .page(22)
                 .isOverview(false)
+                .commentCount(0)
+                .likeCount(0)
                 .roomJpaEntity(room)
                 .build();
     }
@@ -160,15 +164,27 @@ public class TestEntityFactory {
                 .userJpaEntity(user)
                 .page(33)
                 .isOverview(true)
+                .commentCount(0)
+                .likeCount(0)
                 .roomJpaEntity(room)
                 .build();
     }
 
-    public static CommentJpaEntity createComment(PostJpaEntity post, UserJpaEntity user) {
+    public static CommentJpaEntity createComment(PostJpaEntity post, UserJpaEntity user,PostType postType) {
         return CommentJpaEntity.builder()
                 .content("댓글 내용")
                 .postJpaEntity(post)
                 .userJpaEntity(user)
+                .likeCount(0)
+                .reportCount(0)
+                .postType(postType)
+                .build();
+    }
+
+    public static CommentLikeJpaEntity createCommentLike(CommentJpaEntity comment, UserJpaEntity user) {
+        return CommentLikeJpaEntity.builder()
+                .userJpaEntity(user)
+                .commentJpaEntity(comment)
                 .build();
     }
 

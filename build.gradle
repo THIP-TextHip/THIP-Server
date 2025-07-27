@@ -69,8 +69,8 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-	// visibleForTesting
-	compileOnly 'com.google.guava:guava:33.0.0-jre' // 또는 최신 버전을 사용하세요.
+	//Google Guava
+	implementation 'com.google.guava:guava:33.2.0-jre'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

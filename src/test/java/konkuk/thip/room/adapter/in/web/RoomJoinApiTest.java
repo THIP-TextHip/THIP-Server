@@ -63,7 +63,7 @@ class RoomJoinApiTest {
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         createRoom(book, category,1); // 방장만 포함
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room, host, RoomParticipantRole.HOST, 0.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
     }
 
     private void setUpWithParticipant() {
@@ -73,8 +73,8 @@ class RoomJoinApiTest {
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         createRoom(book, category,2); // 방장과 참여자 포함
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room, host, RoomParticipantRole.HOST, 0.0));
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room, participant, RoomParticipantRole.MEMBER, 0.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, participant, RoomParticipantRole.MEMBER, 0.0));
     }
 
     private void createRoom(BookJpaEntity book, CategoryJpaEntity category, int memberCount) {
