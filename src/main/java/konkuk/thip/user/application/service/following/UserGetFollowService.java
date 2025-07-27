@@ -3,7 +3,7 @@ package konkuk.thip.user.application.service.following;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
 import konkuk.thip.user.adapter.in.web.response.UserFollowingResponse;
-import konkuk.thip.user.application.mapper.FollowDtoMapper;
+import konkuk.thip.user.application.mapper.FollowQueryMapper;
 import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
 import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
@@ -20,7 +20,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
     private final FollowingQueryPort followingQueryPort;
     private final UserCommandPort userCommandPort;
 
-    private final FollowDtoMapper followDtoMapper;
+    private final FollowQueryMapper followQueryMapper;
 
     private static final int MAX_PAGE_SIZE = 10;
 
@@ -34,7 +34,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
         );
 
         var followers = result.contents().stream()
-                .map(followDtoMapper::toFollowerList)
+                .map(followQueryMapper::toFollowerList)
                 .toList();
 
         return UserFollowersResponse.builder()
@@ -54,7 +54,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
         );
 
         var following = result.contents().stream()
-                .map(followDtoMapper::toFollowingList)
+                .map(followQueryMapper::toFollowingList)
                 .toList();
 
         return UserFollowingResponse.builder()
