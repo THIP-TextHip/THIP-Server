@@ -11,7 +11,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 @Getter
 public enum SwaggerResponseDescription {
 //
-//    //Auth
+    //Auth
     LOGIN(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
     ))),
@@ -19,13 +19,19 @@ public enum SwaggerResponseDescription {
 
     ))),
 
-//    //User
+    //User
     USER_SIGNUP(new LinkedHashSet<>(Set.of(
-    ))),
-    USER_CHOICE_ALIAS(new LinkedHashSet<>(Set.of(
+        ALIAS_NAME_NOT_MATCH
     ))),
 
     // Follow
+    CHANGE_FOLLOW_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            USER_ALREADY_FOLLOWED,
+            USER_ALREADY_UNFOLLOWED,
+            USER_CANNOT_FOLLOW_SELF,
+            FOLLOW_COUNT_IS_ZERO
+    ))),
     GET_USER_FOLLOW(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
     ))),
@@ -40,15 +46,14 @@ public enum SwaggerResponseDescription {
                 API_METHOD_NOT_ALLOWED,
                 API_SERVER_ERROR,
 
-//                API_BAD_REQUEST,
-//                API_MISSING_PARAM,
-//                API_INVALID_PARAM,
-//                API_INVALID_TYPE
+                API_MISSING_PARAM,
+                API_INVALID_PARAM,
+                API_INVALID_TYPE
 
-                AUTH_INVALID_TOKEN,
-                AUTH_EXPIRED_TOKEN,
-                AUTH_UNAUTHORIZED,
-                AUTH_TOKEN_NOT_FOUND
+//                AUTH_INVALID_TOKEN,
+//                AUTH_EXPIRED_TOKEN,
+//                AUTH_UNAUTHORIZED,
+//                AUTH_TOKEN_NOT_FOUND
 //                AUTH_LOGIN_FAILED,
 //                AUTH_UNSUPPORTED_SOCIAL_LOGIN,
 
