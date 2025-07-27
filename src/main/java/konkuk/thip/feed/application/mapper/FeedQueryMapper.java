@@ -18,6 +18,6 @@ public interface FeedQueryMapper {
             target = "postDate",
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
-    FeedShowAllResponse.Feed toFeedShowAllResponse(FeedQueryDto dto);
+    FeedShowAllResponse.FeedDto toFeedShowAllResponse(FeedQueryDto dto);
 
 }

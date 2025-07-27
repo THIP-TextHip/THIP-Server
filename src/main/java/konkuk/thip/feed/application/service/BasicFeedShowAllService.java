@@ -42,7 +42,7 @@ public class BasicFeedShowAllService implements FeedShowAllUseCase {
         CursorBasedList<FeedQueryDto> result = feedQueryPort.findLatestFeedsByCreatedAt(userId, cursorVal, PAGE_SIZE);
 
         // 3. response 로의 매핑
-        List<FeedShowAllResponse.Feed> feedList = result.contents().stream()
+        List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()
                 .map(feedQueryMapper::toFeedShowAllResponse)
                 .toList();
 
