@@ -7,6 +7,7 @@ import konkuk.thip.comment.application.port.in.dto.CommentIsLikeResult;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
+import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.post.CommentCountUpdatable;
 import konkuk.thip.common.post.service.PostQueryService;

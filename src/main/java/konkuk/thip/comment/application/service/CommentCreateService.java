@@ -3,6 +3,7 @@ package konkuk.thip.comment.application.service;
 import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.dto.CommentCreateCommand;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
+import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;

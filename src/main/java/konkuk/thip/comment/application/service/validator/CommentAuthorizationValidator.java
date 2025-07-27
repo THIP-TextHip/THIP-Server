@@ -1,4 +1,4 @@
-package konkuk.thip.comment.application.service;
+package konkuk.thip.comment.application.service.validator;
 
 import konkuk.thip.comment.application.service.policy.CommentAccessPolicy;
 import konkuk.thip.common.exception.InvalidStateException;

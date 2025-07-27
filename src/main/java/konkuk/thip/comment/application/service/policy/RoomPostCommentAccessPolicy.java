@@ -1,7 +1,7 @@
 package konkuk.thip.comment.application.service.policy;
 
 import konkuk.thip.common.post.CommentCountUpdatable;
-import konkuk.thip.room.application.service.RoomParticipantValidator;
+import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.RoomPost;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

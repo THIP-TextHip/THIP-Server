@@ -1,4 +1,4 @@
-package konkuk.thip.room.application.service;
+package konkuk.thip.room.application.service.validator;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.application.port.out.RoomParticipantQueryPort;
