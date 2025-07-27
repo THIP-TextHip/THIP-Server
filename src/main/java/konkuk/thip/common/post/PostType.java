@@ -12,9 +12,9 @@ import static konkuk.thip.common.exception.code.ErrorCode.POST_TYPE_NOT_MATCH;
 @RequiredArgsConstructor
 public enum PostType {
 
-    FEED("feed"),
-    RECORD("record"),
-    VOTE("vote");
+    FEED("FEED"),
+    RECORD("RECORD"),
+    VOTE("VOTE");
 
     private final String type;
 

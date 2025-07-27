@@ -17,8 +17,6 @@ public interface VoteCommandPort {
 
     void saveAllVoteItems(List<VoteItem> voteItems);
 
-    List<VoteItem> findVoteItemsByVoteId(Long voteId);
-
     Optional<Vote> findById(Long id);
 
     default Vote getByIdOrThrow(Long id) {

@@ -1,5 +1,6 @@
 package konkuk.thip.room.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -39,4 +40,14 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
+
+    @VisibleForTesting
+    public void updateCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    @VisibleForTesting
+    public void updateUserPercentage(double userPercentage) {
+        this.userPercentage = userPercentage;
+    }
 }

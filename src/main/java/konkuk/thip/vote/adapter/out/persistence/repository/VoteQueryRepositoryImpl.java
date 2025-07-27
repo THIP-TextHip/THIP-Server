@@ -1,16 +1,21 @@
 package konkuk.thip.vote.adapter.out.persistence.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.QVoteItemJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.QVoteJpaEntity;
+import konkuk.thip.vote.adapter.out.jpa.QVoteParticipantJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
+import konkuk.thip.vote.application.port.out.dto.QVoteItemQueryDto;
+import konkuk.thip.vote.application.port.out.dto.VoteItemQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,6 +26,7 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
     private final QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
     private final QVoteItemJpaEntity voteItem = QVoteItemJpaEntity.voteItemJpaEntity;
+    private final QVoteParticipantJpaEntity voteParticipant = QVoteParticipantJpaEntity.voteParticipantJpaEntity;
 
     @Override
     public List<VoteJpaEntity> findVotesByRoom(Long roomId, String type, Integer pageStart, Integer pageEnd, Long userId) {
@@ -80,5 +86,30 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
                     );
                 })
                 .toList();
+    }
+
+    @Override
+    public List<VoteItemQueryDto> mapVoteItemsByVoteIds(Set<Long> voteIds, Long userId) {
+        QVoteItemJpaEntity voteItem = QVoteItemJpaEntity.voteItemJpaEntity;
+        QVoteParticipantJpaEntity voteParticipant = QVoteParticipantJpaEntity.voteParticipantJpaEntity;
+
+        return jpaQueryFactory
+                .select(new QVoteItemQueryDto(
+                        voteItem.voteJpaEntity.postId,
+                        voteItem.voteItemId,
+                        voteItem.itemName,
+                        voteItem.count,
+                        JPAExpressions
+                                .selectOne()
+                                .from(voteParticipant)
+                                .where(
+                                        voteParticipant.voteItemJpaEntity.eq(voteItem),
+                                        voteParticipant.userJpaEntity.userId.eq(userId)
+                                )
+                                .exists() // isVoted : 로그인한 사용자가 해당 투표 아이템에 투표했는지 여부 서브 쿼리
+                ))
+                .from(voteItem)
+                .where(voteItem.voteJpaEntity.postId.in(voteIds))
+                .fetch();
     }
 }
