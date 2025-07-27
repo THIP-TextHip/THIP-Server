@@ -90,4 +90,8 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
         return new SavedFeeds(feeds);
     }
 
+    @Override
+    public List<Long> findSavedFeedIdsByUserIdAndFeedIds(Long userId, List<Long> feedIds) {
+        return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+    }
 }

@@ -15,4 +15,7 @@ public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity
 
     @Query(value = "SELECT * FROM saved_feeds WHERE user_id = :userId", nativeQuery = true)
     List<SavedFeedJpaEntity> findAllByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT s.feedJpaEntity.postId FROM SavedFeedJpaEntity s WHERE s.userJpaEntity.userId = :userId AND s.feedJpaEntity.postId IN :feedIds")
+    List<Long> findSavedFeedIdsByUserIdAndFeedIds(@Param("userId") Long userId, @Param("feedIds") List<Long> feedIds);
 }
