@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.common.entity.StatusType;
+import konkuk.thip.common.post.PostType;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.QRecordJpaEntity;
@@ -23,7 +24,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static konkuk.thip.record.adapter.out.persistence.constants.PostType.*;
+import static konkuk.thip.common.post.PostType.RECORD;
+import static konkuk.thip.common.post.PostType.VOTE;
+
 
 @Repository
 @RequiredArgsConstructor
@@ -145,7 +148,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         return new CaseBuilder()
                 .when(post.instanceOf(RecordJpaEntity.class)).then(RECORD.getType())
                 .when(post.instanceOf(VoteJpaEntity.class)).then(VOTE.getType())
-                .otherwise(UNKNOWN.getType());
+                .otherwise(PostType.from("UNKNOWN").getType()); // 타입 불일치 예외 발생
     }
 
     private BooleanBuilder buildCursorPredicateForSortType(SortType sortType, Cursor cursor) {

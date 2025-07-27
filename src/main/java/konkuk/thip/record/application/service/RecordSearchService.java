@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static konkuk.thip.common.post.PostType.RECORD;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -140,7 +142,7 @@ public class RecordSearchService implements RecordSearchUseCase {
     }
 
     private List<RecordSearchResponse.PostDto.VoteItemDto> getVoteItemDtosIfApplicable(PostQueryDto dto, Map<Long, List<VoteItemQueryDto>> voteItemMap, boolean isLocked) {
-        if ("RECORD".equals(dto.postType())) {
+        if (RECORD.getType().equals(dto.postType())) {
             return List.of();
         }
 
