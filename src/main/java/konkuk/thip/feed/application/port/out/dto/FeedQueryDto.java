@@ -1,7 +1,10 @@
 package konkuk.thip.feed.application.port.out.dto;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
+@Builder
 public record FeedQueryDto(
         Long feedId,
         Long creatorId,
@@ -15,7 +18,5 @@ public record FeedQueryDto(
         String contentBody,
         String[] contentUrls,
         int likeCount,
-        int commentCount,
-        boolean isSaved,
-        boolean isLiked
-) {}
+        int commentCount
+) { }
