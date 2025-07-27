@@ -1,11 +1,17 @@
 package konkuk.thip.record.application.port.out;
 
-import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.record.application.port.out.dto.PostQueryDto;
 
 public interface RecordQueryPort {
 
-     Page<RecordSearchResponse.RecordSearchResult> findRecordsByRoom(Long roomId, String type, Integer pageStart, Integer pageEnd, Boolean isOverview, Long userId, Pageable pageable);
+     CursorBasedList<PostQueryDto> searchMyRecords(Long roomId, Long userId, Cursor cursor);
 
+    CursorBasedList<PostQueryDto> searchGroupRecordsByLatest(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview);
+
+    CursorBasedList<PostQueryDto> searchGroupRecordsByLike(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview);
+
+    CursorBasedList<PostQueryDto> searchGroupRecordsByComment(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview);
 }
+

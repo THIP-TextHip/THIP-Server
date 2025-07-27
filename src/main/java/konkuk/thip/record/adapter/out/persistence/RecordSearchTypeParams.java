@@ -22,7 +22,7 @@ public enum RecordSearchTypeParams {
                 .filter(param -> param.getValue().equals(value))
                 .findFirst()
                 .orElseThrow(
-                        () -> new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("현재 타입 조건 param : " + value))
+                        () -> new InvalidStateException(ErrorCode.API_INVALID_PARAM, new IllegalArgumentException("type은 group 또는 mine이어야 합니다. 현재 타입 조건 param : " + value))
                 );
     }
 }
