@@ -2,12 +2,14 @@ package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.post.CommentCountUpdatable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,7 +17,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
-public class Feed extends BaseDomainEntity {
+public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
 
     private Long id;
 
@@ -40,6 +42,19 @@ public class Feed extends BaseDomainEntity {
 
     @Builder.Default
     private List<Content> contentList = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Feed feed = (Feed) o;
+        return Objects.equals(id, feed.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
@@ -92,9 +107,16 @@ public class Feed extends BaseDomainEntity {
         }
     }
 
-    public void validateCreator(Long userId) {
+    public void validateCreateComment(Long userId){
+        if (!this.isPublic && !this.creatorId.equals(userId)) {
+            validateCreator(userId);
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 댓글을 쓸 수 있습니다."));
+        }
+    }
+
+    private void validateCreator(Long userId) {
         if (!this.creatorId.equals(userId)) {
-            throw new InvalidStateException(FEED_UPDATE_FORBIDDEN);
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN);
         }
     }
 
@@ -132,6 +154,11 @@ public class Feed extends BaseDomainEntity {
                 throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("해당 이미지는 이 피드에 존재하지 않습니다: " + url));
             }
         }
+    }
+
+    @Override
+    public void increaseCommentCount() {
+        commentCount++;
     }
 
 }

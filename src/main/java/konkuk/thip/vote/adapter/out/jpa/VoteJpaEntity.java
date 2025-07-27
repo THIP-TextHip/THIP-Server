@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.vote.domain.Vote;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,5 +32,14 @@ public class VoteJpaEntity extends PostJpaEntity {
         this.page = page;
         this.isOverview = isOverview;
         this.roomJpaEntity = roomJpaEntity;
+    }
+
+    public VoteJpaEntity updateFrom(Vote vote) {
+        this.content = vote.getContent();
+        this.likeCount = vote.getLikeCount();
+        this.commentCount = vote.getCommentCount();
+        this.page = vote.getPage();
+        this.isOverview = vote.isOverview();
+        return this;
     }
 }

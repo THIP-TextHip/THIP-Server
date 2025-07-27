@@ -118,8 +118,8 @@ class FeedUpdateControllerTest {
                     .content(objectMapper.writeValueAsBytes(req))
                     )
                     .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.code").value(FEED_UPDATE_FORBIDDEN.getCode()))
-                    .andExpect(jsonPath("$.message", containsString("피드 수정 권한이 없습니다.")));
+                    .andExpect(jsonPath("$.code").value(FEED_ACCESS_FORBIDDEN.getCode()))
+                    .andExpect(jsonPath("$.message", containsString("피드 접근 권한이 없습니다.")));
         }
 
     }

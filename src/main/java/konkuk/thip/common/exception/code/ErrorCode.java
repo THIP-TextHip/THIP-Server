@@ -117,6 +117,7 @@ public enum ErrorCode implements ResponseCode {
     USER_NOT_PARTICIPATED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
     HOST_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140007, "방장은 참여 취소를 할 수 없습니다."),
     ROOM_RECRUIT_CANNOT_CLOSED(HttpStatus.BAD_REQUEST, 140008, "방 모집 마감을 할 수 없습니다."),
+    ROOM_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 140009, "방 접근 권한이 없습니다."),
 
     /**
      * 150000 : Category error
@@ -131,7 +132,10 @@ public enum ErrorCode implements ResponseCode {
     TAG_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 160001, "일치하는 태그 이름이 없습니다."),
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, 160002, "존재하지 않는 TAG 입니다."),
     INVALID_FEED_COMMAND(HttpStatus.BAD_REQUEST, 160003, "유효하지 않은 FEED 생성/수정 요청 입니다."),
-    FEED_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, 160004, "피드 수정 권한이 없습니다."),
+    FEED_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 160004, "피드 접근 권한이 없습니다."),
+    DUPLICATED_FEEDS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 160005, "중복된 피드가 존재합니다."),
+    FEED_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 160006, "사용자가 이미 저장한 피드입니다."),
+    FEED_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 160007, "사용자가 저장하지 않은 피드는 저장삭제 할 수 없습니다."),
 
     /**
      * 170000 : Image File error
@@ -139,7 +143,21 @@ public enum ErrorCode implements ResponseCode {
     EMPTY_FILE_EXCEPTION(HttpStatus.BAD_REQUEST, 170001, "업로드하려는 이미지가 비어있습니다."),
     EXCEPTION_ON_IMAGE_UPLOAD(HttpStatus.BAD_REQUEST, 170002, "이미지 업로드에 실패하였습니다."),
     INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170003, "올바르지 않은 파일 형식입니다."),
-    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다.")
+    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다."),
+
+    /**
+     * 180000 : Post error
+     */
+    POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [feed, record, vote] 중 하나여야 합니다."),
+
+    /**
+     * 190000 : Comment error
+     */
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 190000, "존재하지 않는 COMMENT 입니다."),
+    INVALID_COMMENT_CREATE(HttpStatus.BAD_REQUEST, 190001, "유효하지 않은 COMMENT 생성 요청 입니다."),
+    COMMENT_LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190002, "좋아요 수는 0 이하로 감소할 수 없습니다."),
+    COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, 190003, "사용자가 이미 좋아요한 댓글입니다."),
+    COMMENT_NOT_LIKED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 190004, "사용자가 좋아요하지 않은 댓글은 좋아요 취소 할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;

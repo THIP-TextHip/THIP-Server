@@ -96,8 +96,8 @@ class RoomCloseJoinApiTest {
                 .categoryJpaEntity(category)
                 .build());
 
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room, host, RoomParticipantRole.HOST, 0.0));
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room, member, RoomParticipantRole.MEMBER, 0.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, member, RoomParticipantRole.MEMBER, 0.0));
     }
 
     @AfterEach
