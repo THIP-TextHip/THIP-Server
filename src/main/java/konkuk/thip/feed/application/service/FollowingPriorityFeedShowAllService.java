@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @ConditionalOnProperty(
@@ -48,8 +49,8 @@ public class FollowingPriorityFeedShowAllService implements FeedShowAllUseCase {
                 .toList();
 
         // 3. 유저가 저장한 피드들, 좋아한 피드들 조회
-        List<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
-        List<Long> likedFeedIdsByUser = postLikeQueryPort.findLikedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+        Set<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+        Set<Long> likedFeedIdsByUser = postLikeQueryPort.findLikedFeedIdsByUserIdAndFeedIds(userId, feedIds);
 
         // 4. response 로의 매핑
         List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()
