@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(
         componentModel = "spring",
         imports = DateUtil.class,
@@ -14,10 +16,16 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface FeedQueryMapper {
 
+    @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
+    @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
     @Mapping(
             target = "postDate",
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
-    FeedShowAllResponse.FeedDto toFeedShowAllResponse(FeedQueryDto dto);
+    FeedShowAllResponse.FeedDto toFeedShowAllResponse(
+            FeedQueryDto dto,
+            List<Long> savedFeedIds,
+            List<Long> likedFeedIds
+    );
 
 }
