@@ -7,6 +7,8 @@ import konkuk.thip.feed.application.mapper.FeedQueryMapper;
 import konkuk.thip.feed.application.port.in.FeedShowAllUseCase;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
+import konkuk.thip.post.application.port.out.PostLikeQueryPort;
+import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class BasicFeedShowAllService implements FeedShowAllUseCase {
 
     private static final int PAGE_SIZE = 10;
     private final FeedQueryPort feedQueryPort;
+    private final SavedQueryPort savedQueryPort;
+    private final PostLikeQueryPort postLikeQueryPort;
     private final FeedQueryMapper feedQueryMapper;
 
     @Transactional(readOnly = true)
@@ -40,10 +44,17 @@ public class BasicFeedShowAllService implements FeedShowAllUseCase {
 
         // 2. [최신순으로] 피드 조회 with 페이징 처리
         CursorBasedList<FeedQueryDto> result = feedQueryPort.findLatestFeedsByCreatedAt(userId, cursorVal, PAGE_SIZE);
+        List<Long> feedIds = result.contents().stream()
+                .map(FeedQueryDto::feedId)
+                .toList();
 
-        // 3. response 로의 매핑
+        // 3. 유저가 저장한 피드들, 좋아한 피드들 조회
+        List<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+        List<Long> likedFeedIdsByUser = postLikeQueryPort.findLikedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+
+        // 4. response 로의 매핑
         List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()
-                .map(feedQueryMapper::toFeedShowAllResponse)
+                .map(dto -> feedQueryMapper.toFeedShowAllResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser))
                 .toList();
 
         return new FeedShowAllResponse(
