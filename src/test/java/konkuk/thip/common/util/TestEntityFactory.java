@@ -2,6 +2,7 @@ package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
+import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
 import konkuk.thip.common.post.PostType;
 import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
@@ -167,6 +168,13 @@ public class TestEntityFactory {
                 .likeCount(0)
                 .reportCount(0)
                 .postType(postType)
+                .build();
+    }
+
+    public static CommentLikeJpaEntity createCommentLike(CommentJpaEntity comment, UserJpaEntity user) {
+        return CommentLikeJpaEntity.builder()
+                .userJpaEntity(user)
+                .commentJpaEntity(comment)
                 .build();
     }
 

@@ -161,9 +161,4 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
         commentCount++;
     }
 
-    @Override
-    //Feed는 RoomId 없음
-    public Long getRoomId() {
-        return null;
-    }
 }

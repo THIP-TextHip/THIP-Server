@@ -19,4 +19,6 @@ public interface CommentCommandPort {
                 .orElseThrow(() -> new EntityNotFoundException(COMMENT_NOT_FOUND));
     }
 
+    void update(Comment comment);
+
 }

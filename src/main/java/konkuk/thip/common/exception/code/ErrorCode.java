@@ -155,8 +155,9 @@ public enum ErrorCode implements ResponseCode {
      */
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 190000, "존재하지 않는 COMMENT 입니다."),
     INVALID_COMMENT_CREATE(HttpStatus.BAD_REQUEST, 190001, "유효하지 않은 COMMENT 생성 요청 입니다."),
-
-
+    COMMENT_LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190002, "좋아요 수는 0 이하로 감소할 수 없습니다."),
+    COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, 190003, "사용자가 이미 좋아요한 댓글입니다."),
+    COMMENT_NOT_LIKED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 190004, "사용자가 좋아요하지 않은 댓글은 좋아요 취소 할 수 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
