@@ -1,7 +1,6 @@
 package konkuk.thip.comment.application.service.policy;
 
 import konkuk.thip.common.post.CommentCountUpdatable;
-import konkuk.thip.common.post.PostType;
 import konkuk.thip.room.application.service.RoomParticipantValidator;
 import konkuk.thip.room.domain.RoomPost;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +11,6 @@ import org.springframework.stereotype.Component;
 public class RoomPostCommentAccessPolicy implements CommentAccessPolicy {
 
     private final RoomParticipantValidator roomParticipantValidator;
-
-    @Override
-    public boolean supports(PostType type) {
-        return type == PostType.RECORD || type == PostType.VOTE;
-    }
 
     @Override
     public void validateCommentAccess(CommentCountUpdatable post, Long userId) {
