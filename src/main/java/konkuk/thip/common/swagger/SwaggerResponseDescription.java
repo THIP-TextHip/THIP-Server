@@ -36,6 +36,65 @@ public enum SwaggerResponseDescription {
             USER_NOT_FOUND
     ))),
 
+    // Room
+    ROOM_CREATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            BOOK_ALADIN_API_PARSING_ERROR,
+            BOOK_ALADIN_API_ISBN_NOT_FOUND
+
+    ))),
+    ROOM_JOIN_CANCEL(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ROOM_NOT_FOUND,
+            ROOM_RECRUITMENT_PERIOD_EXPIRED,
+            USER_CANNOT_JOIN_OR_CANCEL,
+            ROOM_MEMBER_COUNT_EXCEEDED,
+            USER_ALREADY_PARTICIPATE,
+            ROOM_MEMBER_COUNT_UNDERFLOW,
+            USER_NOT_PARTICIPATED_CANNOT_CANCEL,
+            HOST_CANNOT_CANCEL
+    ))),
+    ROOM_RECRUIT_CLOSE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ROOM_NOT_FOUND,
+            ROOM_RECRUITMENT_PERIOD_EXPIRED,
+            ROOM_RECRUIT_CANNOT_CLOSED
+    ))),
+
+    ROOM_SEARCH(new LinkedHashSet<>(Set.of(
+                INVALID_ROOM_SEARCH_SORT
+    ))),
+    ROOM_PASSWORD_CHECK(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND,
+            ROOM_PASSWORD_MISMATCH,
+            ROOM_RECRUITMENT_PERIOD_EXPIRED,
+            ROOM_PASSWORD_NOT_REQUIRED
+    ))),
+    ROOM_RECRUITING_DETAIL_VIEW(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND
+    ))),
+    ROOM_GET_HOME_JOINED_LIST(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND
+    ))),
+    ROOM_GET_MEMBER_LIST(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND
+    ))),
+    ROOM_PLAYING_DETAIL(new LinkedHashSet<>(Set.of(
+            BOOK_NOT_FOUND,
+            ROOM_NOT_FOUND
+    ))),
+
+
+    // Record
+    RECORD_CREATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ROOM_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            ROOM_IS_EXPIRED,
+            RECORD_CANNOT_BE_OVERVIEW,
+            INVALID_RECORD_PAGE_RANGE
+    ))),
+
 
   ;
     private final Set<ErrorCode> errorCodeList;
