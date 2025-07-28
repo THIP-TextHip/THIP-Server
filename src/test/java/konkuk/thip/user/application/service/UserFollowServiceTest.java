@@ -66,7 +66,7 @@ class UserFollowServiceTest {
             assertThat(result).isTrue();
             assertThat(inactiveFollowing.getStatus()).isEqualTo(StatusType.ACTIVE);
             assertThat(user.getFollowerCount()).isEqualTo(1); // followerCount 증가 확인
-            verify(followingCommandPort).updateStatus(inactiveFollowing, user);
+            verify(followingCommandPort).deleteFollowing(inactiveFollowing, user);
         }
 
         @Test
@@ -130,7 +130,7 @@ class UserFollowServiceTest {
             assertThat(result).isFalse();
             assertThat(activeFollowing.getStatus()).isEqualTo(StatusType.INACTIVE);
             assertThat(user.getFollowerCount()).isEqualTo(0); // followerCount 감소 확인
-            verify(followingCommandPort).updateStatus(activeFollowing, user);
+            verify(followingCommandPort).deleteFollowing(activeFollowing, user);
         }
 
         @Test

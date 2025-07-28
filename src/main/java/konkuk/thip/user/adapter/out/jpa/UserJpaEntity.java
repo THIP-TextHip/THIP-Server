@@ -3,7 +3,9 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.user.domain.User;
 import lombok.*;
+import org.springframework.util.Assert;
 
 @Entity
 @Table(name = "users")
@@ -38,8 +40,11 @@ public class UserJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 
-    public void updateFollowerCount(int followerCount) {
-        this.followerCount = followerCount;
+    public void updateFrom(User user) {
+        this.nickname = user.getNickname();
+        Assert.notNull(user.getAlias(), "Alias must not be null");
+        this.imageUrl = user.getAlias().getImageUrl();
+        this.role = UserRole.from(user.getUserRole());
+        this.followerCount = user.getFollowerCount();
     }
-
 }

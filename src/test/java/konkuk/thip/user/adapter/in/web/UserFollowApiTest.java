@@ -5,8 +5,8 @@ import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,7 +51,7 @@ class UserFollowApiTest {
     }
 
     @Test
-    @DisplayName("팔로우 요청 후 언팔로우 요청 시 상태가 변경되는지 확인한다.")
+    @DisplayName("팔로우 요청 후 언팔로우 요청 시 엔티티가 삭제되었는지 확인한다.")
     void changeFollowingState_follow_then_unfollow() throws Exception {
         // 사용자 2명 저장
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
@@ -93,9 +95,9 @@ class UserFollowApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.isFollowing").value(false));
 
-        // DB에 상태가 INACTIVE로 변경되었는지 확인
-        FollowingJpaEntity updatedEntity = followingJpaRepository.findByUserAndTargetUser(followingUser.getUserId(), target.getUserId()).orElseThrow();
-        assertThat(updatedEntity.getStatus().name()).isEqualTo("INACTIVE");
+        // DB에서 삭제되었는지 확인
+        Optional<FollowingJpaEntity> followingJpaEntityOptional = followingJpaRepository.findByUserAndTargetUser(followingUser.getUserId(), target.getUserId());
+        assertThat(followingJpaEntityOptional.isPresent()).isFalse();
 
         userJpaEntity = userJpaRepository.findById(target.getUserId()).orElseThrow();
         assertThat(userJpaEntity.getFollowerCount()).isEqualTo(0); // 팔로워 수 감소 확인

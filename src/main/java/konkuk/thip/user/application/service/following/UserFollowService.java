@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_UNFOLLOWED;
@@ -40,7 +39,7 @@ public class UserFollowService implements UserFollowUsecase {
             Following following = optionalFollowing.get();
             boolean isFollowing = following.changeFollowingState(type);
             targetUser.updateFollowerCount(isFollowing);
-            followingCommandPort.updateStatus(following, targetUser);
+            followingCommandPort.deleteFollowing(following, targetUser);
             return isFollowing;
         } else { // 팔로우 관계가 존재하지 않는 경우
             if (!type) {
@@ -53,7 +52,7 @@ public class UserFollowService implements UserFollowUsecase {
     }
 
     private void validateParams(Long userId, Long targetUserId) {
-        if(Objects.equals(userId, targetUserId)) {
+        if(userId.equals(targetUserId)) {
             throw new BusinessException(USER_CANNOT_FOLLOW_SELF);
         }
     }
