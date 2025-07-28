@@ -5,15 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
 import konkuk.thip.feed.application.port.in.FeedShowAllUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.FEED_SEARCH;
 
 @Tag(name = "Feed Query API", description = "피드 조회 관련 API")
 @RestController
@@ -26,7 +23,6 @@ public class FeedQueryController {
             summary = "피드 전체 조회",
             description = "사용자가 작성한 피드를 전체 조회합니다."
     )
-    @ExceptionDescription(FEED_SEARCH)
     @GetMapping("/feeds")
     public BaseResponse<FeedShowAllResponse> showAllFeeds(
             @Parameter(hidden = true) @UserId final Long userId,

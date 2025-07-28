@@ -139,7 +139,6 @@ public enum SwaggerResponseDescription {
             FEED_ALREADY_SAVED,
             FEED_NOT_SAVED_CANNOT_DELETE
     ))),
-    FEED_SEARCH(new LinkedHashSet<>(Set.of())),
 
 
   ;
