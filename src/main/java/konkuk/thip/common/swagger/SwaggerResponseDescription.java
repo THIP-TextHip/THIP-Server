@@ -163,6 +163,33 @@ public enum SwaggerResponseDescription {
             COMMENT_LIKE_COUNT_UNDERFLOW
     ))),
 
+    // Book
+    CHANGE_BOOK_SAVED_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            BOOK_ALREADY_SAVED,
+            BOOK_NOT_SAVED_CANNOT_DELETE
+//            DUPLICATED_BOOKS_IN_COLLECTION,
+//            BOOK_NOT_SAVED_DB_CANNOT_DELETE
+    ))),
+    BOOK_SEARCH(new LinkedHashSet<>(Set.of(
+            BOOK_SEARCH_PAGE_OUT_OF_RANGE,
+            BOOK_KEYWORD_REQUIRED,
+            BOOK_PAGE_NUMBER_INVALID,
+            BOOK_NAVER_API_PARSING_ERROR,
+            BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED,
+            BOOK_NAVER_API_RESPONSE_ERROR
+    ))),
+    BOOK_DETAIL_SEARCH(new LinkedHashSet<>(Set.of(
+            BOOK_NOT_FOUND,
+            BOOK_NAVER_API_PARSING_ERROR,
+            BOOK_NAVER_API_ISBN_NOT_FOUND,
+            BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED
+    ))),
+    POPULAR_BOOK_SEARCH(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            JSON_PROCESSING_ERROR
+    ))),
 
   ;
     private final Set<ErrorCode> errorCodeList;

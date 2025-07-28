@@ -50,11 +50,11 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 80000 : book error
      */
-    BOOK_KEYWORD_ENCODING_FAILED(HttpStatus.BAD_REQUEST, 80000, "검색어 인코딩에 실패했습니다."),
-    BOOK_NAVER_API_REQUEST_ERROR(HttpStatus.BAD_REQUEST, 80001,"네이버 API 요청에 실패하였습니다."),
+    BOOK_KEYWORD_ENCODING_FAILED(HttpStatus.INSUFFICIENT_STORAGE, 80000, "검색어 인코딩에 실패했습니다."),
+    BOOK_NAVER_API_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80001,"네이버 API 요청에 실패하였습니다."),
     BOOK_NAVER_API_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80002,"네이버 API 응답 파싱에 실패하였습니다."),
-    BOOK_NAVER_API_URL_ERROR(HttpStatus.BAD_REQUEST, 80003,"네이버 API URL이 잘못되었습니다."),
-    BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED(HttpStatus.BAD_REQUEST, 80004,"네이버 API 요청 중, HTTP 연결에 실패하였습니다."),
+    BOOK_NAVER_API_URL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80003,"네이버 API URL이 잘못되었습니다."),
+    BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 80004,"네이버 API 요청 중, HTTP 연결에 실패하였습니다."),
     BOOK_NAVER_API_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80005,"네이버 API 응답에 실패하였습니다."),
     BOOK_SEARCH_PAGE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, 80006,"검색어 페이지가 범위를 벗어났습니다."),
     BOOK_KEYWORD_REQUIRED(HttpStatus.BAD_REQUEST, 80007, "검색어는 필수 입력값입니다."),
