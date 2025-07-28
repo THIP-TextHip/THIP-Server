@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @ConditionalOnProperty(
@@ -45,13 +46,13 @@ public class BasicFeedShowAllService implements FeedShowAllUseCase {
 
         // 2. [최신순으로] 피드 조회 with 페이징 처리
         CursorBasedList<FeedQueryDto> result = feedQueryPort.findLatestFeedsByCreatedAt(userId, cursorVal, PAGE_SIZE);
-        List<Long> feedIds = result.contents().stream()
+        Set<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
-                .toList();
+                .collect(Collectors.toUnmodifiableSet());
 
         // 3. 유저가 저장한 피드들, 좋아한 피드들 조회
-        Set<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
-        Set<Long> likedFeedIdsByUser = postLikeQueryPort.findLikedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+        Set<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(feedIds, userId);
+        Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
 
         // 4. response 로의 매핑
         List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()
