@@ -51,13 +51,9 @@ public class UserCommandController {
         return BaseResponse.ok(UserSignupResponse.of(userId));
     }
 
-
-    /**
-     * 사용자 팔로우 상태 변경 : true -> 팔로우, false -> 언팔로우
-     */
     @Operation(
             summary = "사용자 팔로우 상태 변경",
-            description = "특정 사용자를 팔로우하거나 언팔로우합니다."
+            description = "특정 사용자를 팔로우하거나 언팔로우합니다. true 이면 팔로우, false 이면 언팔로우입니다."
     )
     @ExceptionDescription(CHANGE_FOLLOW_STATE)
     @PostMapping("/users/following/{followingUserId}")
