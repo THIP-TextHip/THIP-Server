@@ -1,5 +1,6 @@
 package konkuk.thip.feed.application.port.out.dto;
 
+import jakarta.annotation.Nullable;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -18,5 +19,6 @@ public record FeedQueryDto(
         String contentBody,
         String[] contentUrls,
         int likeCount,
-        int commentCount
+        int commentCount,
+        @Nullable Boolean isPriorityFeed
 ) { }
