@@ -1,14 +1,11 @@
 package konkuk.thip.room.adapter.in.web.response;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public record RoomShowMineResponse(
         List<MyRoom> roomList,
-        int size,       // 현제 페이지에 포함된 데이터 수
-        boolean last,
-        LocalDate nextCursorDate,       // 다음 페이지 시작 커서의 endDate 값
-        Long nextCursorId               // 다음 페이지 시작 커서의 roomId 값
+        String nextCursor,
+        boolean isLast
 ) {
     public record MyRoom(
             Long roomId,
