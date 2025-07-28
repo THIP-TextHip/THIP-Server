@@ -310,80 +310,6 @@ class RoomShowMineApiTest {
     }
 
     @Test
-    @DisplayName("cursorDate 만 받고 cursorId 는 받지 않은 경우, 400 error를 반환한다.")
-    void get_my_rooms_only_cursor_date_exist() throws Exception {
-        //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
-        changeRoomMemberCount(recruitingRoom1, 5);
-
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
-        changeRoomMemberCount(recruitingRoom2, 8);
-
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
-        changeRoomMemberCount(playingRoom1, 6);
-
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
-        changeRoomMemberCount(expiredRoom1, 7);
-
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
-
-        // user가 생성한 방에 참여한 상황 가정
-        saveSingleUserToRoom(recruitingRoom1, user);
-        saveSingleUserToRoom(recruitingRoom2, user);
-        saveSingleUserToRoom(playingRoom1, user);
-        saveSingleUserToRoom(expiredRoom1, user);
-
-        //when
-        ResultActions result = mockMvc.perform(get("/rooms/my")
-                .requestAttr("userId", user.getUserId())
-                .param("type", "playing")
-                .param("cursorDate", String.valueOf(LocalDate.now())));     // cursor 중 cursorDate 만 request param 으로 넘어온 경우
-
-        //then
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.isSuccess", is(false)))
-                .andExpect(jsonPath("$.code", is(INVALID_MY_ROOM_CURSOR.getCode())));
-    }
-
-    @Test
-    @DisplayName("cursorId 만 받고 cursorDate 는 받지 않은 경우, 400 error를 반환한다.")
-    void get_my_rooms_only_cursor_id_exist() throws Exception {
-        //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
-        changeRoomMemberCount(recruitingRoom1, 5);
-
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
-        changeRoomMemberCount(recruitingRoom2, 8);
-
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
-        changeRoomMemberCount(playingRoom1, 6);
-
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
-        changeRoomMemberCount(expiredRoom1, 7);
-
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
-
-        // user가 생성한 방에 참여한 상황 가정
-        saveSingleUserToRoom(recruitingRoom1, user);
-        saveSingleUserToRoom(recruitingRoom2, user);
-        saveSingleUserToRoom(playingRoom1, user);
-        saveSingleUserToRoom(expiredRoom1, user);
-
-        //when
-        ResultActions result = mockMvc.perform(get("/rooms/my")
-                .requestAttr("userId", user.getUserId())
-                .param("type", "playing")
-                .param("cursorId", String.valueOf(10L)));       // cursor 중 cursorId 만 request param 으로 넘어온 경우
-
-        //then
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.isSuccess", is(false)))
-                .andExpect(jsonPath("$.code", is(INVALID_MY_ROOM_CURSOR.getCode())));
-    }
-
-    @Test
     @DisplayName("한번에 최대 10개의 데이터만을 반환한다. 다음 페이지에 해당하는 데이터가 있을 경우, 다음 페이지의 cursor 값을 반환한다.")
     void get_my_rooms_page_1() throws Exception {
         //given
@@ -447,10 +373,7 @@ class RoomShowMineApiTest {
 
         //then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.size", is(10)))
-                .andExpect(jsonPath("$.data.last", is(false)))
-                .andExpect(jsonPath("$.data.nextCursorDate", is(recruitingRoom11.getStartDate().toString())))          // 11번째 데이터의 startDate가 nextCursorDate 이다
-                .andExpect(jsonPath("$.data.nextCursorId", is(recruitingRoom11.getRoomId().intValue())))               // 11번째 데이터의 id가 nextCursorId 이다
+                .andExpect(jsonPath("$.data.isLast", is(false)))
                 .andExpect(jsonPath("$.data.roomList", hasSize(10)))
                 // 정렬 조건 : 모집중인 방 == 방 활동 시작일 임박 순
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")))
@@ -523,18 +446,16 @@ class RoomShowMineApiTest {
         saveSingleUserToRoom(recruitingRoom12, user);
 
         //when
+        String nextCursor = recruitingRoom10.getStartDate().toString() + "|" + recruitingRoom10.getRoomId().toString();     // 이전 페이지의 마지막 레코드인 room10이 nextCursor이다
+
         ResultActions result = mockMvc.perform(get("/rooms/my")
                 .requestAttr("userId", user.getUserId())
                 .param("type", "recruiting")
-                .param("cursorDate", recruitingRoom11.getStartDate().toString())
-                .param("cursorId", recruitingRoom11.getRoomId().toString()));
+                .param("cursor", nextCursor));
 
         //then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.size", is(2)))
-                .andExpect(jsonPath("$.data.last", is(true)))
-                .andExpect(jsonPath("$.data.nextCursorDate", nullValue()))      // 다음 페이지가 없으므로 cursor 값은 null
-                .andExpect(jsonPath("$.data.nextCursorId", nullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 .andExpect(jsonPath("$.data.roomList", hasSize(2)))
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-11일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-12일뒤-활동시작")));
