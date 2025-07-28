@@ -46,17 +46,17 @@ public class RoomShowMineService implements RoomShowMineUseCase {
         boolean isExpiredType = myRoomType == MyRoomType.EXPIRED;
         List<RoomShowMineResponse.MyRoom> myRooms = result.contents().stream()
                 .map(dto -> {
-                    RoomShowMineResponse.MyRoom r = roomQueryMapper.toShowMyRoomResponse(dto);
+                    var myRoomResponse = roomQueryMapper.toShowMyRoomResponse(dto);
                     if (isExpiredType) {
                         return new RoomShowMineResponse.MyRoom(
-                                r.roomId(),
-                                r.bookImageUrl(),
-                                r.roomName(),
-                                r.memberCount(),
+                                myRoomResponse.roomId(),
+                                myRoomResponse.bookImageUrl(),
+                                myRoomResponse.roomName(),
+                                myRoomResponse.memberCount(),
                                 null
                         );
                     }
-                    return r;
+                    return myRoomResponse;
                 })
                 .toList();
 
