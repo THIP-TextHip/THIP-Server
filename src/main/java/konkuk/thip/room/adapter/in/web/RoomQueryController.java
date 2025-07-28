@@ -3,29 +3,16 @@ package konkuk.thip.room.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
-import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
+import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.adapter.in.web.response.*;
 import konkuk.thip.room.application.port.in.*;
-import konkuk.thip.room.application.port.in.RoomGetHomeJoinedListUseCase;
-import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
-import konkuk.thip.room.application.port.in.RoomSearchUseCase;
-import jakarta.validation.Valid;
-import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
@@ -123,10 +110,16 @@ public class RoomQueryController {
     }
 
     // 내 모임방 리스트 조회
+    @Operation(
+            summary = "내 모임방 리스트 조회",
+            description = "사용자가 참여중인 모임방 목록을 조회합니다. 타입에 따라 모집중인 방과 진행중인 방을 구분할 수 있습니다."
+    )
     @GetMapping("/rooms/my")
     public BaseResponse<RoomShowMineResponse> getMyRooms(
-            @UserId final Long userId,
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "조회할 방의 타입 (playingAndRecruiting: 진행중인 방과 모집중인 방, recruiting: 모집중인 방만, playing: 진행중인 방만, expired: 만료된 방만)", example = "playingAndRecruiting")
             @RequestParam(value = "type", required = false, defaultValue = "playingAndRecruiting") final String type,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
     }
