@@ -140,6 +140,29 @@ public enum SwaggerResponseDescription {
             FEED_NOT_SAVED_CANNOT_DELETE
     ))),
 
+    // Comment
+    COMMENT_CREATE(new LinkedHashSet<>(Set.of(
+            POST_TYPE_NOT_MATCH,
+            USER_NOT_FOUND,
+            FEED_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            VOTE_NOT_FOUND,
+            INVALID_COMMENT_CREATE,
+            FEED_ACCESS_FORBIDDEN,
+            ROOM_ACCESS_FORBIDDEN
+
+    ))),
+    CHANGE_COMMENT_LIKE_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            COMMENT_NOT_FOUND,
+            FEED_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            VOTE_NOT_FOUND,
+            COMMENT_ALREADY_LIKED,
+            COMMENT_NOT_LIKED_CANNOT_CANCEL,
+            COMMENT_LIKE_COUNT_UNDERFLOW
+    ))),
+
 
   ;
     private final Set<ErrorCode> errorCodeList;

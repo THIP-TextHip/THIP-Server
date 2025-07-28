@@ -1,5 +1,8 @@
 package konkuk.thip.comment.adapter.in.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import konkuk.thip.comment.adapter.in.web.request.CommentCreateRequest;
 import konkuk.thip.comment.adapter.in.web.request.CommentIsLikeRequest;
@@ -9,9 +12,17 @@ import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.CommentLikeUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.CHANGE_COMMENT_LIKE_STATE;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.COMMENT_CREATE;
+
+@Tag(name = "Comment Command API", description = "댓글 상태변경 관련 API")
 @RestController
 @RequiredArgsConstructor
 public class CommentCommandController {
@@ -24,18 +35,31 @@ public class CommentCommandController {
      * parentId:{Long},isReplyRequest:true 답글
      * parentId:null,isReplyRequest:false 댓글
      */
+    @Operation(
+            summary = "댓글 작성",
+            description = "사용자가 댓글을 작성합니다.\n" +
+                    "답글 작성 시 parentId를 지정하고 isReplyRequest를 true로 설정합니다. " +
+                    "댓글 작성 시 parentId는 null로 설정하고 isReplyRequest를 false로 설정합니다."
+    )
+    @ExceptionDescription(COMMENT_CREATE)
     @PostMapping("/comments/{postId}")
-    public BaseResponse<CommentIdResponse> createComment(@RequestBody @Valid final CommentCreateRequest request,
-                                                         @PathVariable("postId") final Long postId,
-                                                         @UserId final Long userId) {
+    public BaseResponse<CommentIdResponse> createComment(
+            @RequestBody @Valid final CommentCreateRequest request,
+            @Parameter(description = "댓글을 작성하려는 게시물 ID", example = "1") @PathVariable("postId") final Long postId,
+            @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(CommentIdResponse.of(commentCreateUseCase.createComment(request.toCommand(userId,postId))));
     }
 
-    //댓글 좋아요 상태 변경: true -> 좋아요, false -> 좋아요 취소
+    @Operation(
+            summary = "댓글 좋아요 상태 변경",
+            description = "사용자가 댓글의 좋아요 상태를 변경합니다. (true -> 좋아요, false -> 좋아요 취소)"
+    )
+    @ExceptionDescription(CHANGE_COMMENT_LIKE_STATE)
     @PostMapping("/comments/{commentId}/likes")
-    public BaseResponse<CommentIsLikeResponse> likeComment(@RequestBody @Valid final CommentIsLikeRequest request,
-                                                           @PathVariable("commentId") final Long commentId,
-                                                           @UserId final Long userId) {
+    public BaseResponse<CommentIsLikeResponse> likeComment(
+            @RequestBody @Valid final CommentIsLikeRequest request,
+            @Parameter(description = "좋아요 상태를 변경하려는 댓글 ID", example = "1") @PathVariable("commentId") final Long commentId,
+            @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(CommentIsLikeResponse.of(commentLikeUseCase.changeLikeStatusComment(request.toCommand(userId, commentId))));
     }
 
