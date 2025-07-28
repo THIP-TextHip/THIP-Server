@@ -1,13 +1,14 @@
 package konkuk.thip.room.adapter.out.persistence;
 
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomShowMineResponse;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
-import konkuk.thip.room.application.port.out.dto.CursorSliceOfMyRoomView;
+import konkuk.thip.room.application.port.out.dto.RoomShowMineQueryDto;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,23 +46,71 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
-        return roomJpaRepository.findRecruitingRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
+    public CursorBasedList<RoomShowMineQueryDto> findRecruitingRoomsUserParticipated(Long userId, Cursor cursor) {
+        LocalDate lastLocalDate = cursor.isFirstRequest() ? null : cursor.getLocalDate(0);
+        Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(1);
+        int pageSize = cursor.getPageSize();
+
+        List<RoomShowMineQueryDto> roomShowMineQueryDtos = roomJpaRepository.findRecruitingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize);
+
+        return CursorBasedList.of(roomShowMineQueryDtos, pageSize, roomShowMineQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(
+                    roomShowMineQueryDto.endDate().toString(),
+                    roomShowMineQueryDto.roomId().toString()
+            ));
+            return nextCursor.toEncodedString();
+        });
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
-        return roomJpaRepository.findPlayingRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
+    public CursorBasedList<RoomShowMineQueryDto> findPlayingRoomsUserParticipated(Long userId, Cursor cursor) {
+        LocalDate lastLocalDate = cursor.isFirstRequest() ? null : cursor.getLocalDate(0);
+        Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(1);
+        int pageSize = cursor.getPageSize();
+
+        List<RoomShowMineQueryDto> roomShowMineQueryDtos = roomJpaRepository.findPlayingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize);
+
+        return CursorBasedList.of(roomShowMineQueryDtos, pageSize, roomShowMineQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(
+                    roomShowMineQueryDto.endDate().toString(),
+                    roomShowMineQueryDto.roomId().toString()
+            ));
+            return nextCursor.toEncodedString();
+        });
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findPlayingAndRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
-        return roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
+    public CursorBasedList<RoomShowMineQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Cursor cursor) {
+        LocalDate lastLocalDate = cursor.isFirstRequest() ? null : cursor.getLocalDate(0);
+        Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(1);
+        int pageSize = cursor.getPageSize();
+
+        List<RoomShowMineQueryDto> roomShowMineQueryDtos = roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize);
+
+        return CursorBasedList.of(roomShowMineQueryDtos, pageSize, roomShowMineQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(
+                    roomShowMineQueryDto.endDate().toString(),
+                    roomShowMineQueryDto.roomId().toString()
+            ));
+            return nextCursor.toEncodedString();
+        });
     }
 
     @Override
-    public CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
-        return roomJpaRepository.findExpiredRoomsUserParticipated(userId, dateCursor, roomIdCursor, pageSize);
+    public CursorBasedList<RoomShowMineQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor) {
+        LocalDate lastLocalDate = cursor.isFirstRequest() ? null : cursor.getLocalDate(0);
+        Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(1);
+        int pageSize = cursor.getPageSize();
+
+        List<RoomShowMineQueryDto> roomShowMineQueryDtos = roomJpaRepository.findExpiredRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize);
+
+        return CursorBasedList.of(roomShowMineQueryDtos, pageSize, roomShowMineQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(
+                    roomShowMineQueryDto.endDate().toString(),
+                    roomShowMineQueryDto.roomId().toString()
+            ));
+            return nextCursor.toEncodedString();
+        });
     }
 
 }
