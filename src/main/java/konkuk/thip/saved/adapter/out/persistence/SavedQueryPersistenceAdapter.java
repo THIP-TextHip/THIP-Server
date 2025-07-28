@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -90,4 +91,8 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
         return new SavedFeeds(feeds);
     }
 
+    @Override
+    public Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId) {
+        return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+    }
 }

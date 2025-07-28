@@ -1,6 +1,7 @@
 
 package konkuk.thip.feed.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.domain.Feed;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -48,5 +50,10 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.reportCount = feed.getReportCount();
         this.likeCount = feed.getLikeCount();
         this.commentCount = feed.getCommentCount();
+    }
+
+    @VisibleForTesting
+    public void setCreatedAt(LocalDateTime newCreatedAt) {
+        super.setCreatedAt(newCreatedAt);
     }
 }

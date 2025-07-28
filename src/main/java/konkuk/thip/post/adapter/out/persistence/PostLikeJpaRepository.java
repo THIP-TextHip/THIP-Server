@@ -10,11 +10,8 @@ import java.util.Set;
 
 @Repository
 public interface PostLikeJpaRepository extends JpaRepository<PostLikeJpaEntity, Long> {
-    int countByPostJpaEntity_PostId(Long postId);
 
-    boolean existsByPostJpaEntity_PostIdAndUserJpaEntity_UserId(Long postId, Long userId);
-
-    @Query(value = "SELECT pl.post_id FROM post_likes pl WHERE pl.user_id = :userId AND pl.post_id IN (:postIds)", nativeQuery = true)
+    @Query("SELECT p.postJpaEntity.postId FROM PostLikeJpaEntity p WHERE p.userJpaEntity.userId = :userId AND p.postJpaEntity.postId IN :postIds")
     Set<Long> findPostIdsLikedByUser(@Param("postIds") Set<Long> postIds,
                                      @Param("userId") Long userId);
 }

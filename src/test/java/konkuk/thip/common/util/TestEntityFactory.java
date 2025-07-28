@@ -74,6 +74,16 @@ public class TestEntityFactory {
                 .build();
     }
 
+    public static UserJpaEntity createUser(AliasJpaEntity alias, String nickname) {
+        return UserJpaEntity.builder()
+                .nickname(nickname)
+                .imageUrl("https://test.img")
+                .oauth2Id("kakao_12345678")
+                .aliasForUserJpaEntity(alias)
+                .role(UserRole.USER)
+                .build();
+    }
+
     public static BookJpaEntity createBook() {
         return BookJpaEntity.builder()
                 .title("책제목")
@@ -192,6 +202,9 @@ public class TestEntityFactory {
                 .build();
     }
 
+    /**
+     * 공개/비공개 여부만을 설정하는 기본 피드 생성을 위한 팩토리 메서드
+     */
     public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic) {
 
         return FeedJpaEntity.builder()
@@ -238,6 +251,38 @@ public class TestEntityFactory {
         return feed;
     }
 
+    /**
+     * 커스텀 feed 생성을 위한 팩토리 메서드
+     */
+    public static FeedJpaEntity createFeed(UserJpaEntity user,
+                                           BookJpaEntity book,
+                                           boolean isPublic,
+                                           int likeCount,
+                                           int commentCount,
+                                           List<String> imageUrls) {
+        // 1) 기본 Feed 엔티티 빌드 (content, reportCount 등은 테스트용 기본값)
+        FeedJpaEntity feed = FeedJpaEntity.builder()
+                .content("기본 피드 본문입니다.")
+                .isPublic(isPublic)
+                .likeCount(likeCount)
+                .commentCount(commentCount)
+                .reportCount(0)
+                .userJpaEntity(user)
+                .bookJpaEntity(book)
+                .contentList(new ArrayList<>())
+                .build();
+
+        // 2) 이미지 URL 리스트 → ContentJpaEntity 매핑
+        List<ContentJpaEntity> contents = imageUrls.stream()
+                .map(url -> ContentJpaEntity.builder()
+                        .contentUrl(url)
+                        .postJpaEntity(feed)
+                        .build())
+                .toList();
+        feed.getContentList().addAll(contents);
+
+        return feed;
+    }
 
     public static SavedFeedJpaEntity createSavedFeed(UserJpaEntity user, FeedJpaEntity feed) {
         return SavedFeedJpaEntity.builder()
