@@ -111,6 +111,36 @@ public enum SwaggerResponseDescription {
             INVALID_VOTE_PAGE_RANGE
     ))),
 
+    // FEED
+    FEED_CREATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            TAG_NOT_FOUND,
+            TAG_NAME_NOT_MATCH,
+            INVALID_FEED_COMMAND,
+            BOOK_NAVER_API_PARSING_ERROR,
+            BOOK_NAVER_API_ISBN_NOT_FOUND,
+            EMPTY_FILE_EXCEPTION,
+            EXCEPTION_ON_IMAGE_UPLOAD,
+            INVALID_FILE_EXTENSION
+    ))),
+    FEED_UPDATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            FEED_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            TAG_NOT_FOUND,
+            TAG_NAME_NOT_MATCH,
+            INVALID_FEED_COMMAND,
+            FEED_ACCESS_FORBIDDEN
+    ))),
+    CHANGE_FEED_SAVED_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            FEED_NOT_FOUND,
+            FEED_ALREADY_SAVED,
+            FEED_NOT_SAVED_CANNOT_DELETE
+    ))),
+    FEED_SEARCH(new LinkedHashSet<>(Set.of())),
+
 
   ;
     private final Set<ErrorCode> errorCodeList;

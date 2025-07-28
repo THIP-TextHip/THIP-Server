@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
-@Tag(name = "Room Command API", description = "방의 상태변경 API")
+@Tag(name = "Room Command API", description = "방 상태변경 관련 API")
 @RestController
 @RequiredArgsConstructor
 public class RoomCommandController {
