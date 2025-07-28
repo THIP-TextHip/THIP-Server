@@ -107,9 +107,9 @@ class RoomGetMemberListApiTest {
         room1 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         // 유저1(호스트), 유저2(멤버), 유저3(멤버)로 참여
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, user1, RoomParticipantRole.HOST, 80.0));
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, user2, RoomParticipantRole.MEMBER, 60.0));
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, user3, RoomParticipantRole.MEMBER, 50.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room1, user1, RoomParticipantRole.HOST, 80.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room1, user2, RoomParticipantRole.MEMBER, 60.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room1, user3, RoomParticipantRole.MEMBER, 50.0));
 
 
         // 팔로잉 관계 설정
@@ -201,7 +201,7 @@ class RoomGetMemberListApiTest {
     void getRoomMemberList_noSubscriber() throws Exception {
         //given
         UserJpaEntity userNoFollower = userJpaRepository.save(TestEntityFactory.createUser(aliasJpaRepository.findAll().get(0)));
-        roomParticipantJpaRepository.save(TestEntityFactory.createUserRoom(room1, userNoFollower, RoomParticipantRole.MEMBER, 10.0));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room1, userNoFollower, RoomParticipantRole.MEMBER, 10.0));
         Long roomId = room1.getRoomId();
 
         //when

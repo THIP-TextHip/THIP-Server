@@ -1,11 +1,14 @@
 package konkuk.thip.record.adapter.out.persistence.repository;
 
-import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.record.adapter.out.persistence.constants.SortType;
+import konkuk.thip.record.application.port.out.dto.PostQueryDto;
+
+import java.util.List;
 
 public interface RecordQueryRepository {
 
-    Page<RecordSearchResponse.RecordSearchResult> findRecordsByRoom(Long roomId, String viewType, Integer pageStart, Integer pageEnd, Boolean isOverview, Long userId, Pageable pageable);
+    List<PostQueryDto> findMyRecords(Long roomId, Long userId, Cursor cursor);
 
+    List<PostQueryDto> findGroupRecordsOrderBySortType(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview, SortType sortType);
 }

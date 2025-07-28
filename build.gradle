@@ -68,6 +68,9 @@ dependencies {
 	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	//Google Guava
+	implementation 'com.google.guava:guava:33.2.0-jre'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
