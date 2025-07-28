@@ -4,6 +4,8 @@ import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 import java.util.List;
 
 @Repository
@@ -20,6 +22,11 @@ public class PostLikeQueryPersistenceAdapter implements PostLikeQueryPort {
     @Override
     public boolean existsByPostIdAndUserId(Long postId, Long userId) {
         return postLikeJpaRepository.existsByPostJpaEntity_PostIdAndUserJpaEntity_UserId(postId, userId);
+    }
+
+    @Override
+    public Set<Long> findPostIdsLikedByUser(Set<Long> postIds, Long userId) {
+        return postLikeJpaRepository.findPostIdsLikedByUser(postIds, userId);
     }
 
     @Override

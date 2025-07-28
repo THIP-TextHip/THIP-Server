@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 import java.util.List;
 
 @Repository
@@ -13,6 +15,10 @@ public interface PostLikeJpaRepository extends JpaRepository<PostLikeJpaEntity, 
     int countByPostJpaEntity_PostId(Long postId);
 
     boolean existsByPostJpaEntity_PostIdAndUserJpaEntity_UserId(Long postId, Long userId);
+
+    @Query(value = "SELECT pl.post_id FROM post_likes pl WHERE pl.user_id = :userId AND pl.post_id IN (:postIds)", nativeQuery = true)
+    Set<Long> findPostIdsLikedByUser(@Param("postIds") Set<Long> postIds,
+                                     @Param("userId") Long userId);
 
     @Query("SELECT p.postJpaEntity.postId FROM PostLikeJpaEntity p WHERE p.userJpaEntity.userId = :userId AND p.postJpaEntity.postId IN :postIds")
     List<Long> findPostIdsLikedByUserIdAndPostIds(@Param("userId") Long userId, @Param("postIds") List<Long> postIds);
