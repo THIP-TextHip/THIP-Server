@@ -11,6 +11,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
+import konkuk.thip.room.adapter.in.web.response.*;
 import konkuk.thip.room.application.port.in.*;
 import konkuk.thip.room.application.port.in.RoomGetHomeJoinedListUseCase;
 import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
@@ -37,6 +40,7 @@ public class RoomQueryController {
     private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
     private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
+    private final RoomShowMineUseCase roomShowMineUseCase;
 
     @Operation(
             summary = "방 검색",
@@ -112,10 +116,18 @@ public class RoomQueryController {
     @ExceptionDescription(ROOM_PLAYING_DETAIL)
     @GetMapping("/rooms/{roomId}/playing")
     public BaseResponse<RoomPlayingDetailViewResponse> getPlayingRoomDetailView(
-            @Parameter(hidden = true) @UserId final Long userId,
-            @Parameter(description = "상세보기 하려는 방의 ID", example = "1") @PathVariable("roomId") final Long roomId
+            @UserId final Long userId,
+            @PathVariable("roomId") final Long roomId
     ) {
         return BaseResponse.ok(roomShowPlayingDetailViewUseCase.getPlayingRoomDetailView(userId, roomId));
     }
 
+    // 내 모임방 리스트 조회
+    @GetMapping("/rooms/my")
+    public BaseResponse<RoomShowMineResponse> getMyRooms(
+            @UserId final Long userId,
+            @RequestParam(value = "type", required = false, defaultValue = "playingAndRecruiting") final String type,
+            @RequestParam(value = "cursor", required = false) final String cursor) {
+        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
+    }
 }

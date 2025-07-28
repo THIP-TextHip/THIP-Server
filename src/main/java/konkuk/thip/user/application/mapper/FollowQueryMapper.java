@@ -6,7 +6,7 @@ import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface FollowDtoMapper {
+public interface FollowQueryMapper {
 
     UserFollowersResponse.Follower toFollowerList(FollowQueryDto dto);
 
