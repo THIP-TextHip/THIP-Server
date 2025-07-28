@@ -3,7 +3,6 @@ package konkuk.thip.saved.application.port.out;
 import konkuk.thip.book.domain.SavedBooks;
 import konkuk.thip.feed.domain.SavedFeeds;
 
-import java.util.List;
 import java.util.Set;
 
 public interface SavedQueryPort {
@@ -11,5 +10,5 @@ public interface SavedQueryPort {
     SavedBooks findSavedBooksByUserId(Long userId);
     SavedFeeds findSavedFeedsByUserId(Long userId);
 
-    Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Long userId, List<Long> feedIds);
+    Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId);
 }

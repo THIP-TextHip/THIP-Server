@@ -92,8 +92,7 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
     }
 
     @Override
-    public Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Long userId, List<Long> feedIds) {
-        return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds).stream()
-                .collect(Collectors.toUnmodifiableSet());
+    public Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId) {
+        return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
     }
 }
