@@ -1,5 +1,7 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -51,14 +53,23 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     }
 
     @Override
-    public List<FeedQueryDto> findFeedsByFollowingPriority(Long userId, LocalDateTime cursorVal, int size) {
+    public List<FeedQueryDto> findFeedsByFollowingPriority(Long userId, Integer lastPriority, LocalDateTime lastCreatedAt, int size) {
         // 1) 게시글 ID만 우선순위 + 페이징으로 조회
-        List<Long> feedIds = fetchFeedIdsByFollowingPriority(userId, cursorVal, size);
-        if (feedIds.isEmpty()) {
+        List<Tuple> tuples = fetchFeedIdsAndPriorityByFollowingPriority(userId, lastPriority, lastCreatedAt, size);
+        if (tuples.isEmpty()) {
             return List.of();       // early return
         }
 
         // 2) 상세 엔티티를 ID 순으로 조회 후 정렬
+        List<Long> feedIds = tuples.stream()
+                .map(tuple -> tuple.get(0, Long.class))
+                .toList();
+        Map<Long, Integer> priorityMap = tuples.stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, Long.class),
+                        tuple -> tuple.get(1, Integer.class)
+                ));
+
         List<FeedJpaEntity> entities = fetchFeedEntitiesByIds(feedIds);
         Map<Long, FeedJpaEntity> entityMap = entities.stream()
                 .collect(Collectors.toMap(FeedJpaEntity::getPostId, e -> e));
@@ -67,13 +78,37 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .toList();
 
         // 3) DTO 변환
-        return mapToDtoList(ordered);
+        return ordered.stream()
+                .map(e -> {
+                    String[] urls = e.getContentList().stream()
+                            .map(ContentJpaEntity::getContentUrl)
+                            .toArray(String[]::new);
+                    boolean isPriority = priorityMap.get(e.getPostId()) == 1;
+
+                    return FeedQueryDto.builder()
+                            .feedId(e.getPostId())
+                            .creatorId(e.getUserJpaEntity().getUserId())
+                            .creatorNickname(e.getUserJpaEntity().getNickname())
+                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
+                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                            .createdAt(e.getCreatedAt())
+                            .isbn(e.getBookJpaEntity().getIsbn())
+                            .bookTitle(e.getBookJpaEntity().getTitle())
+                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
+                            .contentBody(e.getContent())
+                            .contentUrls(urls)
+                            .likeCount(e.getLikeCount())
+                            .commentCount(e.getCommentCount())
+                            .isPriorityFeed(isPriority)
+                            .build();
+                })
+                .toList();
     }
 
     @Override
-    public List<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime cursorVal, int size) {
+    public List<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         // 1) 게시글 ID만 최신순 페이징으로 조회
-        List<Long> feedIds = fetchFeedIdsLatest(userId, cursorVal, size);
+        List<Long> feedIds = fetchFeedIdsLatest(userId, lastCreatedAt, size);
         if (feedIds.isEmpty()) {
             return List.of();       // early return
         }
@@ -87,81 +122,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .toList();
 
         // 3) DTO 변환
-        return mapToDtoList(ordered);
-    }
-
-    /**
-     * ID 목록만 우선순위 & 커서 페이징으로 조회
-     */
-    private List<Long> fetchFeedIdsByFollowingPriority(Long userId, LocalDateTime cursorVal, int size) {
-        // 내가 작성한 모든 글 + 내가 팔로우하는 다른 유저가 작성한 공개글을 우선적으로 최신순 조회
-        // 이후 내가 팔로우하지 않는 다른 유저가 작성한 공개글을 최신순 조회
-        NumberExpression<Integer> priority = new CaseBuilder()
-                .when(feed.userJpaEntity.userId.eq(userId)).then(1)
-                .when(
-                        following.userJpaEntity.userId.eq(userId)
-                                .and(following.followingUserJpaEntity.userId.eq(feed.userJpaEntity.userId))
-                                .and(feed.isPublic.eq(true))
-                ).then(1)
-                .otherwise(0);
-
-        return jpaQueryFactory
-                .select(feed.postId)
-                .distinct()
-                .from(feed)
-                .leftJoin(following)
-                .on(following.userJpaEntity.userId.eq(userId)
-                        .and(following.followingUserJpaEntity.userId.eq(feed.userJpaEntity.userId)))
-                .where(
-                        // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글)
-                        feed.status.eq(StatusType.ACTIVE),
-                        feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
-                        cursorVal != null ? feed.createdAt.lt(cursorVal) : Expressions.TRUE
-                )
-                .orderBy(priority.desc(), feed.createdAt.desc())
-                .limit(size + 1)
-                .fetch();
-    }
-
-    /**
-     * ID 목록만 최신순 커서 페이징으로 조회
-     */
-    private List<Long> fetchFeedIdsLatest(Long userId, LocalDateTime cursorVal, int size) {
-        return jpaQueryFactory
-                .select(feed.postId)
-                .distinct()
-                .from(feed)
-                .where(
-                        // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글)
-                        feed.status.eq(StatusType.ACTIVE),
-                        feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
-                        cursorVal != null ? feed.createdAt.lt(cursorVal) : Expressions.TRUE
-                )
-                .orderBy(feed.createdAt.desc())
-                .limit(size + 1)
-                .fetch();
-    }
-
-    /**
-     * 주어진 ID 목록으로 엔티티를 페치조인 후 조회
-     */
-    private List<FeedJpaEntity> fetchFeedEntitiesByIds(List<Long> ids) {
-        return jpaQueryFactory
-                .select(feed).distinct()
-                .from(feed)
-                .leftJoin(feed.contentList, content).fetchJoin()
-                .leftJoin(feed.userJpaEntity, user).fetchJoin()
-                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
-                .leftJoin(feed.bookJpaEntity, book).fetchJoin()
-                .where(feed.postId.in(ids))
-                .fetch();
-    }
-
-    /**
-     * 엔티티 목록 -> FeedQueryDto 목록 변환
-     */
-    private List<FeedQueryDto> mapToDtoList(List<FeedJpaEntity> entities) {
-        return entities.stream()
+        return ordered.stream()
                 .map(e -> {
                     String[] urls = e.getContentList().stream()
                             .map(ContentJpaEntity::getContentUrl)
@@ -183,5 +144,79 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                             .build();
                 })
                 .toList();
+    }
+
+    /**
+     * ID 목록만 우선순위 & 커서 페이징으로 조회
+     */
+    private List<Tuple> fetchFeedIdsAndPriorityByFollowingPriority(Long userId, Integer lastPriority, LocalDateTime lastCreatedAt, int size) {
+        // 내가 작성한 모든 글 + 내가 팔로우하는 다른 유저가 작성한 공개글을 우선적으로 최신순 조회
+        // 이후 내가 팔로우하지 않는 다른 유저가 작성한 공개글을 최신순 조회
+        NumberExpression<Integer> priority = new CaseBuilder()
+                .when(feed.userJpaEntity.userId.eq(userId)).then(1)
+                .when(
+                        following.userJpaEntity.userId.eq(userId)
+                                .and(following.followingUserJpaEntity.userId.eq(feed.userJpaEntity.userId))
+                                .and(feed.isPublic.eq(true))
+                ).then(1)
+                .otherwise(0);
+
+        // 복합 커서 조건: 우선순위 및 생성일시 기준
+        BooleanExpression cursorCondition = (lastPriority != null && lastCreatedAt != null)
+                ? priority.lt(lastPriority)
+                .or(priority.eq(lastPriority)
+                        .and(feed.createdAt.lt(lastCreatedAt)))
+                : Expressions.TRUE;
+
+        return jpaQueryFactory
+                .select(feed.postId, priority)
+                .distinct()
+                .from(feed)
+                .leftJoin(following)
+                .on(following.userJpaEntity.userId.eq(userId)
+                        .and(following.followingUserJpaEntity.userId.eq(feed.userJpaEntity.userId)))
+                .where(
+                        // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
+                        feed.status.eq(StatusType.ACTIVE),
+                        feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
+                        cursorCondition
+                )
+                .orderBy(priority.desc(), feed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    /**
+     * ID 목록만 최신순 커서 페이징으로 조회
+     */
+    private List<Long> fetchFeedIdsLatest(Long userId, LocalDateTime lastCreatedAt, int size) {
+        return jpaQueryFactory
+                .select(feed.postId)
+                .distinct()
+                .from(feed)
+                .where(
+                        // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
+                        feed.status.eq(StatusType.ACTIVE),
+                        feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
+                        lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
+                )
+                .orderBy(feed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    /**
+     * 주어진 ID 목록으로 엔티티를 페치조인 후 조회
+     */
+    private List<FeedJpaEntity> fetchFeedEntitiesByIds(List<Long> ids) {
+        return jpaQueryFactory
+                .select(feed).distinct()
+                .from(feed)
+                .leftJoin(feed.contentList, content).fetchJoin()
+                .leftJoin(feed.userJpaEntity, user).fetchJoin()
+                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
+                .leftJoin(feed.bookJpaEntity, book).fetchJoin()
+                .where(feed.postId.in(ids))
+                .fetch();
     }
 }
