@@ -7,6 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public record PostBookIsSavedRequest(
         @Schema(description = "저장 여부 type (true -> 저장, false -> 저장 취소)", example = "true")
         @NotNull(message = "type은 필수입니다.")
-        boolean type
+        Boolean type
 ) {
 }
