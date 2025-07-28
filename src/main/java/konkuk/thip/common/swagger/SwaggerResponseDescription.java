@@ -95,6 +95,16 @@ public enum SwaggerResponseDescription {
             INVALID_RECORD_PAGE_RANGE
     ))),
 
+    // Vote
+    VOTE_CREATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ROOM_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            ROOM_IS_EXPIRED,
+            VOTE_CANNOT_BE_OVERVIEW,
+            INVALID_VOTE_PAGE_RANGE
+    ))),
+
 
   ;
     private final Set<ErrorCode> errorCodeList;
