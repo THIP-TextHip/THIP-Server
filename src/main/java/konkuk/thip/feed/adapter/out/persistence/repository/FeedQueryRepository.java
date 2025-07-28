@@ -9,7 +9,7 @@ import java.util.Set;
 public interface FeedQueryRepository {
     Set<Long> findUserIdsByBookId(Long bookId);
 
-    List<FeedQueryDto> findFeedsByFollowingPriority(Long userId, LocalDateTime cursorVal, int size);
+    List<FeedQueryDto> findFeedsByFollowingPriority(Long userId, Integer lastPriority, LocalDateTime lastCreatedAt, int size);
 
-    List<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime cursorVal, int size);
+    List<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
 }

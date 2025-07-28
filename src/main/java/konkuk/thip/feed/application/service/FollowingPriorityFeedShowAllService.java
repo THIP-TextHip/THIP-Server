@@ -1,7 +1,7 @@
 package konkuk.thip.feed.application.service;
 
+import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
-import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
 import konkuk.thip.feed.application.mapper.FeedQueryMapper;
 import konkuk.thip.feed.application.port.in.FeedShowAllUseCase;
@@ -14,8 +14,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @ConditionalOnProperty(
@@ -38,18 +39,18 @@ public class FollowingPriorityFeedShowAllService implements FeedShowAllUseCase {
     @Transactional(readOnly = true)
     @Override
     public FeedShowAllResponse showAllFeeds(Long userId, String cursor) {
-        // 1. 커서 파싱 : createdAt을 커서로 사용한다
-        LocalDateTime cursorVal = cursor != null && !cursor.isBlank() ? DateUtil.parseDateTime(cursor) : null;
+        // 1. 커서 생성
+        Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
         // 2. [팔로우 하는 유저의 피드를 우선적으로] 피드 조회 with 페이징 처리
-        CursorBasedList<FeedQueryDto> result = feedQueryPort.findFeedsByFollowingPriority(userId, cursorVal, PAGE_SIZE);
-        List<Long> feedIds = result.contents().stream()
+        CursorBasedList<FeedQueryDto> result = feedQueryPort.findFeedsByFollowingPriority(userId, nextCursor);
+        Set<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
-                .toList();
+                .collect(Collectors.toUnmodifiableSet());
 
         // 3. 유저가 저장한 피드들, 좋아한 피드들 조회
-        List<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
-        List<Long> likedFeedIdsByUser = postLikeQueryPort.findLikedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+        Set<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(feedIds, userId);
+        Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
 
         // 4. response 로의 매핑
         List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()

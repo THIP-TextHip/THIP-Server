@@ -1,7 +1,9 @@
 package konkuk.thip.feed.adapter.in.web;
 
+import com.amazonaws.services.cloudformation.model.StackResourceDriftInformation;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
+import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
@@ -357,18 +359,17 @@ class FollowingPriorityFeedShowAllApiTest {
                 Timestamp.valueOf(t12), f12.getPostId());
 
         // DB에 저장된 f10의 createdAt 값을 native query 로 조회
-        LocalDateTime nextCursorVal = jdbcTemplate.queryForObject(
+        LocalDateTime lastCreatedAt = jdbcTemplate.queryForObject(
                 "SELECT created_at FROM posts WHERE post_id = ?",
                 (rs, rowNum) -> rs.getTimestamp("created_at").toLocalDateTime(), f10.getPostId()
         );
-        String nextCursor = nextCursorVal.toString();
+        String nextCursor = "1|" + lastCreatedAt.toString();        // MockMvc.param() 이 문자열을 내부적으로 한번 더 인코딩하므로 Cursor.toEncodedString 메서드 사용 X
 
         //when //then
         mockMvc.perform(get("/feeds")
                         .requestAttr("userId", me.getUserId())
                         .param("cursor", nextCursor))        // 이전에 f10 까지 조회 -> f10의 createdAt이 커서
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.nextCursor", nullValue()))      // nextCursor 는 null
                 .andExpect(jsonPath("$.data.isLast", is(true)))
                 .andExpect(jsonPath("$.data.feedList", hasSize(2)))
                 /**

@@ -1,5 +1,6 @@
 package konkuk.thip.feed.application.port.out;
 
+import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 
@@ -10,7 +11,7 @@ public interface FeedQueryPort {
 
     Set<Long> findUserIdsByBookId(Long bookId);
 
-    CursorBasedList<FeedQueryDto> findFeedsByFollowingPriority(Long userId, LocalDateTime cursorVal, int size);
+    CursorBasedList<FeedQueryDto> findFeedsByFollowingPriority(Long userId, Cursor cursor);
 
-    CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime cursorVal, int size);
+    CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity, Long> {
     @Modifying
@@ -17,5 +18,5 @@ public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity
     List<SavedFeedJpaEntity> findAllByUserId(@Param("userId") Long userId);
 
     @Query("SELECT s.feedJpaEntity.postId FROM SavedFeedJpaEntity s WHERE s.userJpaEntity.userId = :userId AND s.feedJpaEntity.postId IN :feedIds")
-    List<Long> findSavedFeedIdsByUserIdAndFeedIds(@Param("userId") Long userId, @Param("feedIds") List<Long> feedIds);
+    Set<Long> findSavedFeedIdsByUserIdAndFeedIds(@Param("userId") Long userId, @Param("feedIds") Set<Long> feedIds);
 }

@@ -8,15 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import java.util.List;
-
 @Repository
 public interface PostLikeJpaRepository extends JpaRepository<PostLikeJpaEntity, Long> {
 
-    @Query(value = "SELECT pl.post_id FROM post_likes pl WHERE pl.user_id = :userId AND pl.post_id IN (:postIds)", nativeQuery = true)
+    @Query("SELECT p.postJpaEntity.postId FROM PostLikeJpaEntity p WHERE p.userJpaEntity.userId = :userId AND p.postJpaEntity.postId IN :postIds")
     Set<Long> findPostIdsLikedByUser(@Param("postIds") Set<Long> postIds,
                                      @Param("userId") Long userId);
-
-    @Query("SELECT p.postJpaEntity.postId FROM PostLikeJpaEntity p WHERE p.userJpaEntity.userId = :userId AND p.postJpaEntity.postId IN :postIds")
-    List<Long> findPostIdsLikedByUserIdAndPostIds(@Param("userId") Long userId, @Param("postIds") List<Long> postIds);
 }
