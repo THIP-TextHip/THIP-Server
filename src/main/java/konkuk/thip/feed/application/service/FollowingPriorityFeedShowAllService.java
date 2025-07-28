@@ -1,5 +1,6 @@
 package konkuk.thip.feed.application.service;
 
+import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
@@ -39,11 +40,11 @@ public class FollowingPriorityFeedShowAllService implements FeedShowAllUseCase {
     @Transactional(readOnly = true)
     @Override
     public FeedShowAllResponse showAllFeeds(Long userId, String cursor) {
-        // 1. 커서 파싱 : createdAt을 커서로 사용한다
-        LocalDateTime cursorVal = cursor != null && !cursor.isBlank() ? DateUtil.parseDateTime(cursor) : null;
+        // 1. 커서 생성
+        Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
         // 2. [팔로우 하는 유저의 피드를 우선적으로] 피드 조회 with 페이징 처리
-        CursorBasedList<FeedQueryDto> result = feedQueryPort.findFeedsByFollowingPriority(userId, cursorVal, PAGE_SIZE);
+        CursorBasedList<FeedQueryDto> result = feedQueryPort.findFeedsByFollowingPriority(userId, nextCursor);
         List<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
                 .toList();
