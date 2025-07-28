@@ -86,8 +86,7 @@ public class RoomQueryController {
     public BaseResponse<RoomShowMineResponse> getMyRooms(
             @UserId final Long userId,
             @RequestParam(value = "type", required = false, defaultValue = "playingAndRecruiting") final String type,
-            @RequestParam(value = "cursorDate", required = false) final LocalDate cursorDate,
-            @RequestParam(value = "cursorId", required = false) final Long cursorId) {
-        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursorDate, cursorId));
+            @RequestParam(value = "cursor", required = false) final String cursor) {
+        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
     }
 }
