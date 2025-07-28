@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +50,10 @@ public class Cursor {
 
     public LocalDateTime getLocalDateTime(int index) {
         return getAs(index, LocalDateTime::parse, "LocalDateTime");
+    }
+
+    public LocalDate getLocalDate(int index) {
+        return getAs(index, LocalDate::parse, "LocalDate");
     }
 
     public Long getLong(int index) {

@@ -117,7 +117,9 @@ public enum ErrorCode implements ResponseCode {
     USER_NOT_PARTICIPATED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140006, "사용자가 방에 참여하지 않은 상태에서 취소하기는 불가합니다."),
     HOST_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 140007, "방장은 참여 취소를 할 수 없습니다."),
     ROOM_RECRUIT_CANNOT_CLOSED(HttpStatus.BAD_REQUEST, 140008, "방 모집 마감을 할 수 없습니다."),
-    ROOM_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 140009, "방 접근 권한이 없습니다."),
+    INVALID_MY_ROOM_TYPE(HttpStatus.BAD_REQUEST, 140009, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 MY ROOM type 이 있습니다."),
+    INVALID_MY_ROOM_CURSOR(HttpStatus.BAD_REQUEST, 140010, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 cursor 가 있습니다"),
+    ROOM_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 140011, "방 접근 권한이 없습니다."),
 
     /**
      * 150000 : Category error
