@@ -1,18 +1,18 @@
 package konkuk.thip.room.application.service;
 
-import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomShowMineResponse;
+import konkuk.thip.room.application.mapper.RoomQueryMapper;
 import konkuk.thip.room.application.port.in.RoomShowMineUseCase;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
-import konkuk.thip.room.application.port.out.dto.CursorSliceOfMyRoomView;
+import konkuk.thip.room.application.port.out.dto.RoomShowMineQueryDto;
 import konkuk.thip.room.domain.MyRoomType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_MY_ROOM_CURSOR;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,34 +21,49 @@ public class RoomShowMineService implements RoomShowMineUseCase {
     private final static int PAGE_SIZE = 10;
 
     private final RoomQueryPort roomQueryPort;
+    private final RoomQueryMapper roomQueryMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public RoomShowMineResponse getMyRooms(Long userId, String type, LocalDate cursorDate, Long cursorId) {
-        // 1. cursor xor 연산 검증
-        if (cursorDate == null ^ cursorId == null) {
-            throw new BusinessException(INVALID_MY_ROOM_CURSOR, new IllegalArgumentException("cursorDate, cursorId는 하나만 null 일 수 없습니다."));
-        }
+    public RoomShowMineResponse getMyRooms(Long userId, String type, String cursor) {
+        // 1. cursor 생성
+        Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
         // 2. type 검증 및 커서 기반 조회
-        CursorSliceOfMyRoomView<RoomShowMineResponse.MyRoom> slice = switch (MyRoomType.from(type)) {
+        MyRoomType myRoomType = MyRoomType.from(type);
+        CursorBasedList<RoomShowMineQueryDto> result = switch (myRoomType) {
                 case RECRUITING -> roomQueryPort
-                        .findRecruitingRoomsUserParticipated(userId, cursorDate, cursorId, PAGE_SIZE);
+                        .findRecruitingRoomsUserParticipated(userId, nextCursor);
                 case PLAYING    -> roomQueryPort
-                        .findPlayingRoomsUserParticipated(userId, cursorDate, cursorId, PAGE_SIZE);
+                        .findPlayingRoomsUserParticipated(userId, nextCursor);
                 case PLAYING_AND_RECRUITING -> roomQueryPort
-                    .findPlayingAndRecruitingRoomsUserParticipated(userId, cursorDate, cursorId, PAGE_SIZE);
+                    .findPlayingAndRecruitingRoomsUserParticipated(userId, nextCursor);
                 case EXPIRED    -> roomQueryPort
-                        .findExpiredRoomsUserParticipated(userId, cursorDate, cursorId, PAGE_SIZE);
+                        .findExpiredRoomsUserParticipated(userId, nextCursor);
         };
 
-        // 3. return
+        // 3. dto -> response로 매핑 (EXPIRED 타입인 경우 endDate를 null로 처리)
+        boolean isExpiredType = myRoomType == MyRoomType.EXPIRED;
+        List<RoomShowMineResponse.MyRoom> myRooms = result.contents().stream()
+                .map(dto -> {
+                    RoomShowMineResponse.MyRoom r = roomQueryMapper.toShowMyRoomResponse(dto);
+                    if (isExpiredType) {
+                        return new RoomShowMineResponse.MyRoom(
+                                r.roomId(),
+                                r.bookImageUrl(),
+                                r.roomName(),
+                                r.memberCount(),
+                                null
+                        );
+                    }
+                    return r;
+                })
+                .toList();
+
         return new RoomShowMineResponse(
-                slice.getContent(),
-                slice.getContent().size(),
-                slice.isLast(),
-                slice.getNextCursorDate(),
-                slice.getNextCursorId()
+                myRooms,
+                result.nextCursor(),
+                !result.hasNext()
         );
     }
 }
