@@ -99,6 +99,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                             .contentUrls(urls)
                             .likeCount(e.getLikeCount())
                             .commentCount(e.getCommentCount())
+                            .isPublic(e.getIsPublic())
                             .isPriorityFeed(isPriority)
                             .build();
                 })
@@ -141,6 +142,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                             .contentUrls(urls)
                             .likeCount(e.getLikeCount())
                             .commentCount(e.getCommentCount())
+                            .isPublic(e.getIsPublic())
+                            // 전체피드 - 최신순 조회 ver 에서는 priority 값은 null
                             .build();
                 })
                 .toList();
@@ -217,6 +220,62 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
                 .leftJoin(feed.bookJpaEntity, book).fetchJoin()
                 .where(feed.postId.in(ids))
+                .fetch();
+    }
+
+    @Override
+    public List<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+        // 1. 내 피드 ID 목록만 최신순 페이징 조회
+        List<Long> feedIds = fetchMyFeedIdsByCreatedAt(userId, lastCreatedAt, size);
+
+        // 2. 엔티티 조회 및 순서 보존
+        List<FeedJpaEntity> entities = fetchFeedEntitiesByIds(feedIds);
+        Map<Long, FeedJpaEntity> entityMap = entities.stream()
+                .collect(Collectors.toMap(FeedJpaEntity::getPostId, e -> e));
+        List<FeedJpaEntity> ordered = feedIds.stream()
+                .map(entityMap::get)
+                .toList();
+
+        // 3. DTO 반환
+        return ordered.stream()
+                .map(e -> {
+                    String[] urls = e.getContentList().stream()
+                            .map(ContentJpaEntity::getContentUrl)
+                            .toArray(String[]::new);
+                    return FeedQueryDto.builder()
+                            .feedId(e.getPostId())
+                            .creatorId(e.getUserJpaEntity().getUserId())
+                            .creatorNickname(e.getUserJpaEntity().getNickname())
+                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
+                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                            .createdAt(e.getCreatedAt())
+                            .isbn(e.getBookJpaEntity().getIsbn())
+                            .bookTitle(e.getBookJpaEntity().getTitle())
+                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
+                            .contentBody(e.getContent())
+                            .contentUrls(urls)
+                            .likeCount(e.getLikeCount())
+                            .commentCount(e.getCommentCount())
+                            .isPublic(e.getIsPublic())
+                            // 내 피드 조회에서 priority 는 null
+                            .build();
+                })
+                .toList();
+    }
+
+    private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+        return jpaQueryFactory
+                .select(feed.postId)
+                .distinct()
+                .from(feed)
+                .where(
+                        // ACTIVE 인 feed & 내가 작성한 글 & cursorCondition
+                        feed.status.eq(StatusType.ACTIVE),
+                        feed.userJpaEntity.userId.eq(userId),
+                        lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
+                )
+                .orderBy(feed.createdAt.desc())
+                .limit(size + 1)
                 .fetch();
     }
 }
