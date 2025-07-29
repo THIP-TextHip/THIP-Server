@@ -5,15 +5,15 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 
-public record FollowQueryDto(Long userId,
-                             String nickname,
-                             String profileImageUrl,
-                             String aliasName,
-                             Integer followerCount,
-                             LocalDateTime createdAt) {
+public record UserQueryDto(Long userId,
+                           String nickname,
+                           String profileImageUrl,
+                           String aliasName,
+                           Integer followerCount,
+                           LocalDateTime createdAt) {
 
     @QueryProjection
-    public FollowQueryDto {
+    public UserQueryDto {
         Assert.notNull(userId, "userId must not be null");
         Assert.notNull(nickname, "nickname must not be null");
         Assert.notNull(profileImageUrl, "profileImageUrl must not be null");
