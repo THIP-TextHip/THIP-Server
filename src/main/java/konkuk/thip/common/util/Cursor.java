@@ -39,11 +39,12 @@ public class Cursor {
             return new Cursor(List.of(), pageSize);     // 빈 커서 생성
         }
 
-        if (!encoded.contains(JOIN_DELIMITER)) {
-            return new Cursor(List.of(encoded), pageSize);      // 단일 커서
+        String decoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+
+        if (!decoded.contains(JOIN_DELIMITER)) {
+            return new Cursor(List.of(decoded), pageSize);      // 단일 커서
         }
 
-        String decoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
         List<String> parts = Arrays.asList(decoded.split(SPLIT_DELIMITER));
         return new Cursor(parts, pageSize);     // 복합 커서
     }
