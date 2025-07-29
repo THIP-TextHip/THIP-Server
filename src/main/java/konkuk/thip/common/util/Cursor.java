@@ -35,15 +35,25 @@ public class Cursor {
 
     // 디코딩을 위한 정적 팩토리 메서드
     public static Cursor from(String encoded, int pageSize) {
-        if (encoded == null || !encoded.contains("|")) {
-            return new Cursor(List.of(), pageSize); // 빈 커서 생성
+        if (encoded == null) {
+            return new Cursor(List.of(), pageSize);     // 빈 커서 생성
         }
+
+        if (!encoded.contains(JOIN_DELIMITER)) {
+            return new Cursor(List.of(encoded), pageSize);      // 단일 커서
+        }
+
         String decoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
         List<String> parts = Arrays.asList(decoded.split(SPLIT_DELIMITER));
-        return new Cursor(parts, pageSize);
+        return new Cursor(parts, pageSize);     // 복합 커서
     }
 
     public String toEncodedString() {
+        if (rawCursorList.size() == 1) {        // 단일 커서
+            return URLEncoder.encode(rawCursorList.get(0), StandardCharsets.UTF_8);
+        }
+
+        // 복합 커서
         String raw = String.join(JOIN_DELIMITER, rawCursorList);
         return URLEncoder.encode(raw, StandardCharsets.UTF_8);
     }
