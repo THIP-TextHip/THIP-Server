@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface FollowQueryMapper {
 
-    UserFollowersResponse.Follower toFollowerList(UserQueryDto dto);
+    UserFollowersResponse.FollowerDto toFollowerDto(UserQueryDto dto);
 
-    UserFollowingResponse.Following toFollowingList(UserQueryDto dto);
+    UserFollowingResponse.FollowingDto toFollowingDto(UserQueryDto dto);
 }

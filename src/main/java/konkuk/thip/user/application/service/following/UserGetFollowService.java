@@ -34,7 +34,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
         );
 
         var followers = result.contents().stream()
-                .map(followQueryMapper::toFollowerList)
+                .map(followQueryMapper::toFollowerDto)
                 .toList();
 
         return UserFollowersResponse.builder()
@@ -54,7 +54,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
         );
 
         var following = result.contents().stream()
-                .map(followQueryMapper::toFollowingList)
+                .map(followQueryMapper::toFollowingDto)
                 .toList();
 
         return UserFollowingResponse.builder()

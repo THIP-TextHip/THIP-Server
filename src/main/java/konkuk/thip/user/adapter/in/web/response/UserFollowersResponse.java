@@ -6,12 +6,12 @@ import java.util.List;
 
 @Builder
 public record UserFollowersResponse(
-        List<Follower> followers,
+        List<FollowerDto> followers,
         String nextCursor,
         boolean isLast
 ) {
     @Builder
-    public record Follower(
+    public record FollowerDto(
             Long userId,
             String nickname,
             String profileImageUrl,

@@ -63,4 +63,6 @@ public class UserQueryController {
                                                                   @PathVariable final Long targetUserId) {
         return BaseResponse.ok(UserIsFollowingResponse.of(userIsFollowingUsecase.isFollowing(userId, targetUserId)));
     }
+
+
 }
