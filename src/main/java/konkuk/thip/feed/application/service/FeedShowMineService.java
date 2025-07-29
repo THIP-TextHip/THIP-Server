@@ -31,7 +31,7 @@ public class FeedShowMineService implements FeedShowMineUseCase {
         // 3. 유저가 작성한 전체 피드 개수 구하기
         int totalFeedCount = feedQueryPort.countFeedsByUserId(userId);
 
-        // 4.
+        // 4. dto -> response 변환
         var feedList = result.contents().stream()
                 .map(feedQueryMapper::toFeedShowMineResponse)
                 .toList();
