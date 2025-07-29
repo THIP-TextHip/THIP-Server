@@ -77,6 +77,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                         targetUser.nickname,
                         alias.imageUrl,
                         alias.value,
+                        alias.color,
                         targetUser.followerCount,
                         following.createdAt
                 ))

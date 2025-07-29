@@ -16,6 +16,7 @@ public record UserFollowersResponse(
             String nickname,
             String profileImageUrl,
             String aliasName,
+            String aliasColor,
             Integer followerCount
     ){
 

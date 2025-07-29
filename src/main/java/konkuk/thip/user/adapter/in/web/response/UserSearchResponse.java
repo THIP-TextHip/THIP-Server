@@ -10,6 +10,7 @@ public record UserSearchResponse(
             String nickname,
             String profileImageUrl,
             String aliasName,
+            String aliasColor,
             Integer followerCount
     ) {
     }

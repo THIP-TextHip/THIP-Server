@@ -56,6 +56,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                                 user.nickname,
                                 user.aliasForUserJpaEntity.imageUrl,
                                 user.aliasForUserJpaEntity.value,
+                                user.aliasForUserJpaEntity.color,
                                 user.followerCount,
                                 user.createdAt
                         )

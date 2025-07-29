@@ -15,7 +15,8 @@ public record UserFollowingResponse(
             Long userId,
             String nickname,
             String profileImageUrl,
-            String aliasName
+            String aliasName,
+            String aliasColor
     ){
     }
 
