@@ -2,6 +2,7 @@ package konkuk.thip.feed.application.mapper;
 
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedShowMineResponse;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,4 +29,9 @@ public interface FeedQueryMapper {
             Set<Long> likedFeedIds
     );
 
+    @Mapping(
+            target = "postDate",
+            expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
+    )
+    FeedShowMineResponse.FeedDto toFeedShowMineResponse(FeedQueryDto dto);
 }
