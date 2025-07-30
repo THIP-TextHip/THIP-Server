@@ -79,30 +79,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환
         return ordered.stream()
-                .map(e -> {
-                    String[] urls = e.getContentList().stream()
-                            .map(ContentJpaEntity::getContentUrl)
-                            .toArray(String[]::new);
-                    boolean isPriority = priorityMap.get(e.getPostId()) == 1;
-
-                    return FeedQueryDto.builder()
-                            .feedId(e.getPostId())
-                            .creatorId(e.getUserJpaEntity().getUserId())
-                            .creatorNickname(e.getUserJpaEntity().getNickname())
-                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
-                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
-                            .createdAt(e.getCreatedAt())
-                            .isbn(e.getBookJpaEntity().getIsbn())
-                            .bookTitle(e.getBookJpaEntity().getTitle())
-                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                            .contentBody(e.getContent())
-                            .contentUrls(urls)
-                            .likeCount(e.getLikeCount())
-                            .commentCount(e.getCommentCount())
-                            .isPublic(e.getIsPublic())
-                            .isPriorityFeed(isPriority)
-                            .build();
-                })
+                .map(e -> toDto(e, priorityMap.get(e.getPostId())))
                 .toList();
     }
 
@@ -122,30 +99,9 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .map(entityMap::get)
                 .toList();
 
-        // 3) DTO 변환
+        // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> {
-                    String[] urls = e.getContentList().stream()
-                            .map(ContentJpaEntity::getContentUrl)
-                            .toArray(String[]::new);
-                    return FeedQueryDto.builder()
-                            .feedId(e.getPostId())
-                            .creatorId(e.getUserJpaEntity().getUserId())
-                            .creatorNickname(e.getUserJpaEntity().getNickname())
-                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
-                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
-                            .createdAt(e.getCreatedAt())
-                            .isbn(e.getBookJpaEntity().getIsbn())
-                            .bookTitle(e.getBookJpaEntity().getTitle())
-                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                            .contentBody(e.getContent())
-                            .contentUrls(urls)
-                            .likeCount(e.getLikeCount())
-                            .commentCount(e.getCommentCount())
-                            .isPublic(e.getIsPublic())
-                            // 전체피드 - 최신순 조회 ver 에서는 priority 값은 null
-                            .build();
-                })
+                .map(e -> toDto(e, null))
                 .toList();
     }
 
@@ -234,30 +190,9 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .map(entityMap::get)
                 .toList();
 
-        // 3. DTO 반환
+        // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> {
-                    String[] urls = e.getContentList().stream()
-                            .map(ContentJpaEntity::getContentUrl)
-                            .toArray(String[]::new);
-                    return FeedQueryDto.builder()
-                            .feedId(e.getPostId())
-                            .creatorId(e.getUserJpaEntity().getUserId())
-                            .creatorNickname(e.getUserJpaEntity().getNickname())
-                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
-                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
-                            .createdAt(e.getCreatedAt())
-                            .isbn(e.getBookJpaEntity().getIsbn())
-                            .bookTitle(e.getBookJpaEntity().getTitle())
-                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                            .contentBody(e.getContent())
-                            .contentUrls(urls)
-                            .likeCount(e.getLikeCount())
-                            .commentCount(e.getCommentCount())
-                            .isPublic(e.getIsPublic())
-                            // 내 피드 조회에서 priority 는 null
-                            .build();
-                })
+                .map(e -> toDto(e, null))
                 .toList();
     }
 
@@ -274,5 +209,30 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .orderBy(feed.createdAt.desc())
                 .limit(size + 1)
                 .fetch();
+    }
+
+    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority) {
+        String[] urls = e.getContentList().stream()
+                .map(ContentJpaEntity::getContentUrl)
+                .toArray(String[]::new);
+        boolean isPriorityFeed = (priority != null && priority == 1);
+
+        return FeedQueryDto.builder()
+                .feedId(e.getPostId())
+                .creatorId(e.getUserJpaEntity().getUserId())
+                .creatorNickname(e.getUserJpaEntity().getNickname())
+                .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
+                .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                .createdAt(e.getCreatedAt())
+                .isbn(e.getBookJpaEntity().getIsbn())
+                .bookTitle(e.getBookJpaEntity().getTitle())
+                .bookAuthor(e.getBookJpaEntity().getAuthorName())
+                .contentBody(e.getContent())
+                .contentUrls(urls)
+                .likeCount(e.getLikeCount())
+                .commentCount(e.getCommentCount())
+                .isPublic(e.getIsPublic())
+                .isPriorityFeed(isPriorityFeed)
+                .build();
     }
 }

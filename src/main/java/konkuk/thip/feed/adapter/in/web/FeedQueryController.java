@@ -24,7 +24,7 @@ public class FeedQueryController {
 
     @Operation(
             summary = "피드 전체 조회",
-            description = "사용자가 작성한 피드를 전체 조회합니다."
+            description = "THIP을 사용하는 모든 유저가 작성한 피드를 전체 조회합니다."
     )
     @GetMapping("/feeds")
     public BaseResponse<FeedShowAllResponse> showAllFeeds(
@@ -34,9 +34,14 @@ public class FeedQueryController {
         return BaseResponse.ok(feedShowAllUseCase.showAllFeeds(userId, cursor));
     }
 
+    @Operation(
+            summary = "내 피드 조회",
+            description = "사용자가 작성한 피드를 전체 조회합니다."
+    )
     @GetMapping("/feeds/mine")
     public BaseResponse<FeedShowMineResponse> showMyFeeds(
-            @UserId final Long userId,
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(feedShowMineUseCase.showMyFeeds(userId, cursor));
     }
