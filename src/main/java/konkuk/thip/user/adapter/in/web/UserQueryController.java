@@ -89,7 +89,7 @@ public class UserQueryController {
             description = "특정 사용자가 다른 사용자를 팔로우하고 있는지 확인합니다."
     )
     @GetMapping("/users/{targetUserId}/is-following")
-    public BaseResponse<UserIsFollowingResponse> checkisFollowing(
+    public BaseResponse<UserIsFollowingResponse> checkIsFollowing(
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "팔로우 여부를 확인할 대상 사용자 ID") @PathVariable final Long targetUserId) {
         return BaseResponse.ok(UserIsFollowingResponse.of(userIsFollowingUsecase.isFollowing(userId, targetUserId)));

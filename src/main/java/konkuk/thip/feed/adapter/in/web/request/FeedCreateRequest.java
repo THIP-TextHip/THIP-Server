@@ -10,7 +10,7 @@ import java.util.List;
 @Schema(description = "피드 생성 요청 DTO")
 public record FeedCreateRequest(
 
-        @Schema(description = "생성할 피드의 책 ISBN", example = "9788936433862")
+        @Schema(description = "생성할 피드의 책 ISBN", example = "9780306406157")
         @NotBlank(message = "ISBN은 필수입니다.")
         String isbn,
 
