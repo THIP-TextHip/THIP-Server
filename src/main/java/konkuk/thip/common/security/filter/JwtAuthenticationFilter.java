@@ -76,4 +76,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        // 화이트리스트 경로에 대해서는 JWT 필터 제외
+        return path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/api-docs")
+                || path.startsWith("/oauth2/authorization")
+                || path.startsWith("/login/oauth2/code");
+    }
+
 }
