@@ -173,7 +173,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         return jpaQueryFactory
                 .select(feed.postId, priority)
-                .distinct()
                 .from(feed)
                 .leftJoin(following)
                 .on(following.userJpaEntity.userId.eq(userId)
@@ -195,7 +194,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private List<Long> fetchFeedIdsLatest(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
-                .distinct()
                 .from(feed)
                 .where(
                         // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
@@ -266,7 +264,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
-                .distinct()
                 .from(feed)
                 .where(
                         // ACTIVE 인 feed & 내가 작성한 글 & cursorCondition
