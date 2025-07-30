@@ -1,9 +1,9 @@
 package konkuk.thip.recentSearch.application.port.in;
 
-import java.util.List;
+import konkuk.thip.recentSearch.adapter.in.web.response.RecentSearchGetResponse;
 
 public interface RecentSearchGetUseCase {
 
-    List<String> getRecentSearches(String typeParam, Long userId);
+    RecentSearchGetResponse getRecentSearches(String typeParam, Long userId);
 
 }
