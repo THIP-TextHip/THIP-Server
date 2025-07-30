@@ -114,7 +114,6 @@ class FeedShowMineApiTest {
         mockMvc.perform(get("/feeds/mine")
                         .requestAttr("userId", me.getUserId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.totalFeedCount", is(2)))        // 내가 작성한 게시글은 총 2개
                 .andExpect(jsonPath("$.data.feedList", hasSize(2)))
                 /**
                  * 정렬 조건
@@ -185,7 +184,6 @@ class FeedShowMineApiTest {
         mockMvc.perform(get("/feeds/mine")
                         .requestAttr("userId", me.getUserId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.totalFeedCount", is(4)))        // 내가 작성한 게시글은 총 4개
                 .andExpect(jsonPath("$.data.feedList", hasSize(4)))
                 /**
                  * 정렬 조건

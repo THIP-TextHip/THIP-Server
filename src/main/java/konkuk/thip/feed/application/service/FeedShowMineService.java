@@ -28,17 +28,13 @@ public class FeedShowMineService implements FeedShowMineUseCase {
         // 2. [최신순으로] 피드 조회 with 페이징 처리
         CursorBasedList<FeedQueryDto> result = feedQueryPort.findMyFeedsByCreatedAt(userId, nextCursor);
 
-        // 3. 유저가 작성한 전체 피드 개수 구하기
-        int totalFeedCount = feedQueryPort.countFeedsByUserId(userId);
-
-        // 4. dto -> response 변환
+        // 3. dto -> response 변환
         var feedList = result.contents().stream()
                 .map(feedQueryMapper::toFeedShowMineResponse)
                 .toList();
 
         return new FeedShowMineResponse(
                 feedList,
-                totalFeedCount,
                 result.nextCursor(),
                 !result.hasNext()
         );

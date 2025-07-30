@@ -4,7 +4,6 @@ import java.util.List;
 
 public record FeedShowMineResponse(
         List<FeedDto> feedList,
-        int totalFeedCount,
         String nextCursor,
         boolean isLast
 ) {
