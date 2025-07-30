@@ -187,7 +187,7 @@ class FeedShowMineApiTest {
                 .andExpect(jsonPath("$.data.feedList", hasSize(4)))
                 /**
                  * 정렬 조건
-                 * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
+                 * 내 글 최신순 조회
                  */
                 .andExpect(jsonPath("$.data.feedList[0].feedId", is(f1.getPostId().intValue())))
                 .andExpect(jsonPath("$.data.feedList[1].feedId", is(f2.getPostId().intValue())))
@@ -268,7 +268,7 @@ class FeedShowMineApiTest {
                 .andExpect(jsonPath("$.data.feedList", hasSize(10)))
                 /**
                  * 정렬 조건
-                 * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
+                 * 내 글 최신순 조회
                  */
                 .andExpect(jsonPath("$.data.feedList[0].feedId", is(f1.getPostId().intValue())))
                 .andExpect(jsonPath("$.data.feedList[1].feedId", is(f2.getPostId().intValue())))
@@ -340,7 +340,7 @@ class FeedShowMineApiTest {
                 .andExpect(jsonPath("$.data.feedList", hasSize(2)))
                 /**
                  * 정렬 조건
-                 * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
+                 * 내 글 최신순 조회
                  */
                 .andExpect(jsonPath("$.data.feedList[0].feedId", is(f11.getPostId().intValue())))
                 .andExpect(jsonPath("$.data.feedList[1].feedId", is(f12.getPostId().intValue())));
