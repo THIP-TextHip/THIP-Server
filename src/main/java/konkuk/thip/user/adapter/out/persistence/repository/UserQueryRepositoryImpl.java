@@ -1,6 +1,6 @@
 package konkuk.thip.user.adapter.out.persistence.repository;
 
-import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
@@ -43,31 +43,32 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
-        NumberExpression<Double> relevance = Expressions.numberTemplate( // 정확도 계산
-                Double.class,
-                "MATCH({0}) AGAINST ({1} IN NATURAL LANGUAGE MODE)",
-                user.nickname, keyword
-        );
+        String pattern = "%" + keyword + "%";
+
+        NumberExpression<Integer> priority = new CaseBuilder()
+                .when(user.nickname.eq(keyword)).then(3)
+                .when(user.nickname.like(keyword + "%")).then(2)
+                .when(user.nickname.like(pattern)).then(1)
+                .otherwise(0);
 
         return queryFactory
-                .select(
-                        new QUserQueryDto(
-                                user.userId,
-                                user.nickname,
-                                user.aliasForUserJpaEntity.imageUrl,
-                                user.aliasForUserJpaEntity.value,
-                                user.aliasForUserJpaEntity.color,
-                                user.followerCount,
-                                user.createdAt
-                        )
-                )
+                .select(new QUserQueryDto(
+                        user.userId,
+                        user.nickname,
+                        alias.imageUrl,
+                        alias.value,
+                        alias.color,
+                        user.followerCount,
+                        user.createdAt
+                ))
                 .from(user)
                 .leftJoin(user.aliasForUserJpaEntity, alias)
-                .where(relevance.gt(0),
-                        user.userId.ne(userId) // 자기 자신 제외
-                )
-                .orderBy(relevance.desc())
+                .where(user.nickname.like(pattern)
+                        .and(user.userId.ne(userId)))
+                .orderBy(priority.desc(), user.nickname.asc())
                 .limit(size)
                 .fetch();
     }
+
+
 }

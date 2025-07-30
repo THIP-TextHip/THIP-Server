@@ -9,4 +9,5 @@ public interface UserQueryRepository {
     Set<Long> findUserIdsByBookId(Long bookId);
 
     List<UserQueryDto> findUsersByNicknameOrderByAccuracy(String keyword, Long userId, Integer size);
+
 }
