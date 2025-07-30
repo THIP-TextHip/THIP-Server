@@ -1,5 +1,6 @@
 package konkuk.thip.feed.adapter.out.persistence;
 
+import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
@@ -43,9 +44,33 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     }
 
     @Override
-    public CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+    public CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, Cursor cursor) {
+        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+        int size = cursor.getPageSize();
+
         List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findLatestFeedsByCreatedAt(userId, lastCreatedAt, size);
 
-        return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> feedQueryDto.createdAt().toString());
+        return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
+            return nextCursor.toEncodedString();
+        });    }
+
+    @Override
+    public CursorBasedList<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, Cursor cursor) {
+        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+        int size = cursor.getPageSize();
+
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findMyFeedsByCreatedAt(userId, lastCreatedAt, size);
+
+        return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
+            return nextCursor.toEncodedString();
+        });
+    }
+
+    @Override
+    public int countFeedsByUserId(Long userId) {
+        // int 로 강제 형변환 해도 괜찮죠??
+        return (int) feedJpaRepository.countFeedsByUserId(userId, StatusType.ACTIVE);
     }
 }

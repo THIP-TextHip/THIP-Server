@@ -79,29 +79,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환
         return ordered.stream()
-                .map(e -> {
-                    String[] urls = e.getContentList().stream()
-                            .map(ContentJpaEntity::getContentUrl)
-                            .toArray(String[]::new);
-                    boolean isPriority = priorityMap.get(e.getPostId()) == 1;
-
-                    return FeedQueryDto.builder()
-                            .feedId(e.getPostId())
-                            .creatorId(e.getUserJpaEntity().getUserId())
-                            .creatorNickname(e.getUserJpaEntity().getNickname())
-                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
-                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
-                            .createdAt(e.getCreatedAt())
-                            .isbn(e.getBookJpaEntity().getIsbn())
-                            .bookTitle(e.getBookJpaEntity().getTitle())
-                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                            .contentBody(e.getContent())
-                            .contentUrls(urls)
-                            .likeCount(e.getLikeCount())
-                            .commentCount(e.getCommentCount())
-                            .isPriorityFeed(isPriority)
-                            .build();
-                })
+                .map(e -> toDto(e, priorityMap.get(e.getPostId())))
                 .toList();
     }
 
@@ -121,28 +99,9 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .map(entityMap::get)
                 .toList();
 
-        // 3) DTO 변환
+        // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> {
-                    String[] urls = e.getContentList().stream()
-                            .map(ContentJpaEntity::getContentUrl)
-                            .toArray(String[]::new);
-                    return FeedQueryDto.builder()
-                            .feedId(e.getPostId())
-                            .creatorId(e.getUserJpaEntity().getUserId())
-                            .creatorNickname(e.getUserJpaEntity().getNickname())
-                            .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
-                            .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
-                            .createdAt(e.getCreatedAt())
-                            .isbn(e.getBookJpaEntity().getIsbn())
-                            .bookTitle(e.getBookJpaEntity().getTitle())
-                            .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                            .contentBody(e.getContent())
-                            .contentUrls(urls)
-                            .likeCount(e.getLikeCount())
-                            .commentCount(e.getCommentCount())
-                            .build();
-                })
+                .map(e -> toDto(e, null))
                 .toList();
     }
 
@@ -170,7 +129,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         return jpaQueryFactory
                 .select(feed.postId, priority)
-                .distinct()
                 .from(feed)
                 .leftJoin(following)
                 .on(following.userJpaEntity.userId.eq(userId)
@@ -192,7 +150,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private List<Long> fetchFeedIdsLatest(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
-                .distinct()
                 .from(feed)
                 .where(
                         // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
@@ -218,5 +175,64 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .leftJoin(feed.bookJpaEntity, book).fetchJoin()
                 .where(feed.postId.in(ids))
                 .fetch();
+    }
+
+    @Override
+    public List<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+        // 1. 내 피드 ID 목록만 최신순 페이징 조회
+        List<Long> feedIds = fetchMyFeedIdsByCreatedAt(userId, lastCreatedAt, size);
+
+        // 2. 엔티티 조회 및 순서 보존
+        List<FeedJpaEntity> entities = fetchFeedEntitiesByIds(feedIds);
+        Map<Long, FeedJpaEntity> entityMap = entities.stream()
+                .collect(Collectors.toMap(FeedJpaEntity::getPostId, e -> e));
+        List<FeedJpaEntity> ordered = feedIds.stream()
+                .map(entityMap::get)
+                .toList();
+
+        // 3) DTO 변환 (priority 없음)
+        return ordered.stream()
+                .map(e -> toDto(e, null))
+                .toList();
+    }
+
+    private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+        return jpaQueryFactory
+                .select(feed.postId)
+                .from(feed)
+                .where(
+                        // ACTIVE 인 feed & 내가 작성한 글 & cursorCondition
+                        feed.status.eq(StatusType.ACTIVE),
+                        feed.userJpaEntity.userId.eq(userId),
+                        lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
+                )
+                .orderBy(feed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority) {
+        String[] urls = e.getContentList().stream()
+                .map(ContentJpaEntity::getContentUrl)
+                .toArray(String[]::new);
+        boolean isPriorityFeed = (priority != null && priority == 1);
+
+        return FeedQueryDto.builder()
+                .feedId(e.getPostId())
+                .creatorId(e.getUserJpaEntity().getUserId())
+                .creatorNickname(e.getUserJpaEntity().getNickname())
+                .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
+                .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                .createdAt(e.getCreatedAt())
+                .isbn(e.getBookJpaEntity().getIsbn())
+                .bookTitle(e.getBookJpaEntity().getTitle())
+                .bookAuthor(e.getBookJpaEntity().getAuthorName())
+                .contentBody(e.getContent())
+                .contentUrls(urls)
+                .likeCount(e.getLikeCount())
+                .commentCount(e.getCommentCount())
+                .isPublic(e.getIsPublic())
+                .isPriorityFeed(isPriorityFeed)
+                .build();
     }
 }

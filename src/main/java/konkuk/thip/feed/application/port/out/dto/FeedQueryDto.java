@@ -20,5 +20,6 @@ public record FeedQueryDto(
         String[] contentUrls,
         int likeCount,
         int commentCount,
+        boolean isPublic,
         @Nullable Boolean isPriorityFeed
 ) { }
