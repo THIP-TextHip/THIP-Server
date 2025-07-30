@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.GET_USER_FOLLOW;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.USER_SEARCH;
 
 @Tag(name = "User Query API", description = "사용자가 주체가 되는 조회")
 @Validated
@@ -107,10 +108,16 @@ public class UserQueryController {
     }
 
 
+    @Operation(
+            summary = "사용자 검색",
+            description = "닉네임을 기준으로 사용자를 검색합니다. 정확도순 정렬을 지원합니다."
+    )
+    @ExceptionDescription(USER_SEARCH)
     @GetMapping("/users")
-    public BaseResponse<UserSearchResponse> showSearchUsers(@RequestParam @NotBlank(message = "검색어는 필수입니다.") final String keyword,
-                                                            @RequestParam(required = false, defaultValue = "30") @Min(1) @Max(30) final Integer size,
-                                                            @UserId final Long userId) {
+    public BaseResponse<UserSearchResponse> showSearchUsers(
+            @Parameter(description = "검색어", example = "thip") @RequestParam @NotBlank(message = "검색어는 필수입니다.") final String keyword,
+            @Parameter(description = "단일 검색 결과 페이지 크기 (1~30) / default : 30", example = "30") @RequestParam(required = false, defaultValue = "30") @Min(1) @Max(30) final Integer size,
+            @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size)));
     }
 }
