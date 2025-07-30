@@ -7,6 +7,7 @@ import konkuk.thip.recentSearch.domain.RecentSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static konkuk.thip.recentSearch.adapter.out.jpa.SearchType.USER_SEARCH;
@@ -22,5 +23,13 @@ public class RecentSearchQueryPersistenceAdapter implements RecentSearchQueryPor
     public Optional<RecentSearch> findRecentSearchByKeywordAndUserId(String keyword, Long userId) {
         return recentSearchJpaRepository.findBySearchTermAndTypeAndUserId(keyword, USER_SEARCH, userId)
                 .map(recentSearchMapper::toDomainEntity);
+    }
+
+    @Override
+    public List<RecentSearch> findRecentSearchesByTypeAndUserId(String type, Long userId) {
+        return recentSearchJpaRepository.findByTypeAndUserId(type, userId)
+                .stream()
+                .map(recentSearchMapper::toDomainEntity)
+                .toList();
     }
 }
