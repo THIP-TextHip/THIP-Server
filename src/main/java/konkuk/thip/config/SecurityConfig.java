@@ -90,7 +90,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://thip-git-develop-thips-projects.vercel.app/"
+                "https://thip-git-develop-thips-projects.vercel.app"
         )); // 배포 시 도메인 명시
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(Collections.singletonList("*"));
