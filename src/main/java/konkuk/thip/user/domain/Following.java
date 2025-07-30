@@ -27,21 +27,12 @@ public class Following extends BaseDomainEntity {
                 .build();
     }
 
-    public boolean changeFollowingState(boolean isFollowRequest) {
-        StatusType currentStatus = getStatus();
-        validateFollowingState(isFollowRequest, currentStatus);
-
-        super.changeStatus();
-        return isFollowRequest;
-    }
-
-    private void validateFollowingState(boolean isFollowRequest, StatusType currentStatus) {
-        if (isFollowRequest && currentStatus == StatusType.ACTIVE) { // 팔로우 요청일 때 이미 팔로우 중인 경우
+    public static boolean validateFollowingState(boolean isExistingFollowing, boolean isFollowRequest) {
+        if (isExistingFollowing && isFollowRequest) { // 이미 팔로우 관계가 존재하는 상태에서 팔로우 요청을 하는 경우
             throw new InvalidStateException(USER_ALREADY_FOLLOWED);
-        }
-
-        if (!isFollowRequest && currentStatus == StatusType.INACTIVE) { // 언팔로우 요청일 때 이미 언팔로우 중인 경우
+        } else if (!isExistingFollowing && !isFollowRequest) { // 언팔로우 요청을 하는데 팔로우 관계가 존재하지 않는 경우
             throw new InvalidStateException(USER_ALREADY_UNFOLLOWED);
         }
+        return isFollowRequest;
     }
 }

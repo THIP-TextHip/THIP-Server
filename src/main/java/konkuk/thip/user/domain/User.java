@@ -33,19 +33,11 @@ public class User extends BaseDomainEntity {
                 .build();
     }
 
-    public void updateFollowerCount(boolean isFollowing) {
-        if (isFollowing) {
-            increaseFollowerCount();
-        } else {
-            decreaseFollowerCount();
-        }
-    }
-
     public void increaseFollowerCount() {
         followerCount++;
     }
 
-    private void decreaseFollowerCount() {
+    public void decreaseFollowerCount() {
         if(followerCount == 0) {
             throw new InvalidStateException(ErrorCode.FOLLOW_COUNT_IS_ZERO);
         }
