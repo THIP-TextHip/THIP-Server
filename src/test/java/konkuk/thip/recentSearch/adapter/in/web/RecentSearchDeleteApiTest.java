@@ -3,7 +3,7 @@ package konkuk.thip.recentSearch.adapter.in.web;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -66,7 +66,7 @@ class RecentSearchDeleteApiTest {
         RecentSearchJpaEntity entity = recentSearchJpaRepository.save(
                 RecentSearchJpaEntity.builder()
                         .searchTerm("삭제테스트")
-                        .type(SearchType.USER_SEARCH)
+                        .type(RecentSearchType.USER_SEARCH)
                         .userJpaEntity(currentUser)
                         .build()
         );

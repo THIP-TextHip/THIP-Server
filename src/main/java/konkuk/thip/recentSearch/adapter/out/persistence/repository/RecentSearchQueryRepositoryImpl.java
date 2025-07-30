@@ -2,7 +2,7 @@ package konkuk.thip.recentSearch.adapter.out.persistence.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +19,7 @@ public class RecentSearchQueryRepositoryImpl implements RecentSearchQueryReposit
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Optional<RecentSearchJpaEntity> findBySearchTermAndTypeAndUserId(String searchTerm, SearchType type, Long userId) {
+    public Optional<RecentSearchJpaEntity> findBySearchTermAndTypeAndUserId(String searchTerm, RecentSearchType type, Long userId) {
         RecentSearchJpaEntity result = queryFactory
                 .selectFrom(recentSearchJpaEntity)
                 .where(
@@ -34,16 +34,16 @@ public class RecentSearchQueryRepositoryImpl implements RecentSearchQueryReposit
     }
 
     @Override
-    public List<RecentSearchJpaEntity> findByTypeAndUserId(String type, Long userId) {
+    public List<RecentSearchJpaEntity> findByTypeAndUserId(RecentSearchType type, Long userId, int limit) {
         return queryFactory
                 .selectFrom(recentSearchJpaEntity)
                 .where(
-                        recentSearchJpaEntity.type.eq(SearchType.from(type)),
+                        recentSearchJpaEntity.type.eq(type),
                         recentSearchJpaEntity.userJpaEntity.userId.eq(userId),
                         recentSearchJpaEntity.status.eq(ACTIVE)
                 )
                 .orderBy(recentSearchJpaEntity.modifiedAt.desc())
-                .limit(5)
+                .limit(limit)
                 .fetch();
     }
 }

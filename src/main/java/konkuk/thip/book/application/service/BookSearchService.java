@@ -28,7 +28,7 @@ import java.util.Set;
 
 import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.recentSearch.adapter.out.jpa.SearchType.BOOK_SEARCH;
+import static konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType.BOOK_SEARCH;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +69,7 @@ public class BookSearchService implements BookSearchUseCase {
         //최근검색어 추가
         RecentSearch  recentSearch =  RecentSearch.builder()
                         .searchTerm(keyword)
-                        .type(BOOK_SEARCH.getSearchType())
+                        .type(BOOK_SEARCH)
                         .userId(userId)
                         .build();
         recentSearchCommandPort.save(recentSearch);

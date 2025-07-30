@@ -3,7 +3,7 @@ package konkuk.thip.recentSearch.adapter.in.web;
 import jakarta.persistence.EntityManager;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -65,7 +65,7 @@ class RecentSearchGetApiTest {
             RecentSearchJpaEntity saved = recentSearchJpaRepository.save(
                     RecentSearchJpaEntity.builder()
                             .searchTerm("검색어" + i)
-                            .type(SearchType.USER_SEARCH)
+                            .type(RecentSearchType.USER_SEARCH)
                             .userJpaEntity(currentUser)
                             .build()
             );

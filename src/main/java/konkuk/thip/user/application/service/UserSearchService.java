@@ -1,5 +1,6 @@
 package konkuk.thip.user.application.service;
 
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.application.service.manager.RecentSearchCreateManager;
 import konkuk.thip.user.adapter.in.web.response.UserSearchResponse;
 import konkuk.thip.user.application.mapper.UserQueryMapper;
@@ -29,7 +30,7 @@ public class UserSearchService implements UserSearchUsecase {
                 ));
 
         // 최근 검색어 저장
-        recentSearchCreateManager.saveRecentSearchByUser(userSearchQuery.userId(), userSearchQuery.keyword());
+        recentSearchCreateManager.saveRecentSearchByUser(userSearchQuery.userId(), userSearchQuery.keyword(), RecentSearchType.USER_SEARCH);
 
         return UserSearchResponse.of(userDtoList);
     }
