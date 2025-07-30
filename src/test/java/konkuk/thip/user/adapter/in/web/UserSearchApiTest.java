@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @DisplayName("[통합] 사용자 검색 API + 최근 검색어 저장 테스트")
-class UserSearchApiIntegrationTest {
+class UserSearchApiTest {
 
     @Autowired
     private MockMvc mockMvc;
