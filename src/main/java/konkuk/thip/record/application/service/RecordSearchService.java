@@ -78,7 +78,7 @@ public class RecordSearchService implements RecordSearchUseCase {
                         pageEnd = book.getPageCount();
                     }
                 }
-                yield getGroupRecordBySortParams(recordSearchQuery.sort(), roomId, userId, cursor, pageStart, pageEnd, isPageFilter, isOverview);
+                yield getGroupRecordBySortParams(recordSearchQuery.sort(), roomId, userId, cursor, pageStart, pageEnd, isOverview);
             }
             case MINE -> {
                 validateMyRecordFilters(pageStart, pageEnd, isPageFilter, isOverview, recordSearchQuery.sort());
@@ -110,7 +110,7 @@ public class RecordSearchService implements RecordSearchUseCase {
                 .build();
     }
 
-    private CursorBasedList<PostQueryDto> getGroupRecordBySortParams(String sort, Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isPageFilter, Boolean isOverview) {
+    private CursorBasedList<PostQueryDto> getGroupRecordBySortParams(String sort, Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview) {
         return switch(RecordSearchSortParams.from(sort)) {
             case LATEST -> recordQueryPort.searchGroupRecordsByLatest(roomId, userId, cursor, pageStart, pageEnd, isOverview);
             case LIKE -> recordQueryPort.searchGroupRecordsByLike(roomId, userId, cursor, pageStart, pageEnd, isOverview);
