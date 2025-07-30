@@ -10,7 +10,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.INVALID_SEARCH_TYPE;
 public enum SearchType {
 
     USER_SEARCH("사용자 검색"),
-    BOOK_SEARCH("책_검색");
+    BOOK_SEARCH("책 검색");
 
     private final String searchType;
 
