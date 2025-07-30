@@ -1,7 +1,6 @@
 package konkuk.thip.common.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -12,16 +11,8 @@ public class BaseDomainEntity {
 
     private LocalDateTime createdAt;
 
-    @Setter
     private LocalDateTime modifiedAt;
 
     private StatusType status;
 
-    protected void changeStatus() {
-        if (this.status == StatusType.ACTIVE) {
-            this.status = StatusType.INACTIVE;
-        } else {
-            this.status = StatusType.ACTIVE;
-        }
-    }
 }

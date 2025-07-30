@@ -3,7 +3,6 @@ package konkuk.thip.recentSearch.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.recentSearch.domain.RecentSearch;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
@@ -30,10 +29,4 @@ public class RecentSearchJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
-
-    public void updateFrom(RecentSearch recentSearch) {
-        this.searchTerm = recentSearch.getSearchTerm();
-        this.type = recentSearch.getType();
-        this.setModifiedAt(recentSearch.getModifiedAt());
-    }
 }

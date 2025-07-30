@@ -52,11 +52,9 @@ public class RecentSearchCommandPersistenceAdapter implements RecentSearchComman
     }
 
     @Override
-    public void update(RecentSearch recentSearch) {
-        RecentSearchJpaEntity recentSearchJpaEntity = recentSearchJpaRepository.findById(recentSearch.getId())
-                .orElseThrow(() -> new EntityNotFoundException(RECENT_SEARCH_NOT_FOUND));
-
-        recentSearchJpaEntity.updateFrom(recentSearch);
-        recentSearchJpaRepository.save(recentSearchJpaEntity);
+    public void touch(RecentSearch recentSearch) {
+        recentSearchJpaRepository.updateModifiedAt(recentSearch.getId());
     }
+
+
 }

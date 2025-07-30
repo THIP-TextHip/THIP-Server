@@ -7,8 +7,6 @@ import konkuk.thip.recentSearch.domain.RecentSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class RecentSearchCreateManager {
@@ -21,16 +19,8 @@ public class RecentSearchCreateManager {
         // 동일 조건 (userId + keyword + type) 검색 기록이 이미 있는지 확인
         recentSearchQueryPort.findRecentSearchByKeywordAndUserId(keyword, userId, type)
                 .ifPresentOrElse(
-                        existingRecentSearch -> {
-                            // 이미 존재하면 createdAt만 갱신
-                            existingRecentSearch.updateModifiedAt(LocalDateTime.now());
-                            recentSearchCommandPort.update(existingRecentSearch);
-                        },
-                        () -> {
-                            // 없으면 새로 저장
-                            RecentSearch userRecentSearch = RecentSearch.withoutId(keyword, type, userId);
-                            recentSearchCommandPort.save(userRecentSearch);
-                        }
+                        recentSearchCommandPort::touch, // 있으면 modifiedAt 갱신
+                        () -> recentSearchCommandPort.save(RecentSearch.withoutId(keyword, type, userId)) // 없으면 새로 저장
                 );
     }
 }

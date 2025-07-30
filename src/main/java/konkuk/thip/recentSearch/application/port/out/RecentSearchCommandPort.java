@@ -20,5 +20,5 @@ public interface RecentSearchCommandPort {
     void save(RecentSearch recentSearch);
     void delete(Long id);
 
-    void update(RecentSearch recentSearch);
+    void touch(RecentSearch recentSearch); // modifiedAt 갱신용 메서드
 }

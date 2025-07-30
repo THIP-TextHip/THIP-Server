@@ -5,8 +5,6 @@ import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
-
 @Getter
 @SuperBuilder
 public class RecentSearch extends BaseDomainEntity {
@@ -25,9 +23,5 @@ public class RecentSearch extends BaseDomainEntity {
                 .type(type)
                 .userId(userId)
                 .build();
-    }
-
-    public void updateModifiedAt(LocalDateTime localDateTime) {
-        this.setModifiedAt(localDateTime);
     }
 }
