@@ -73,6 +73,7 @@ public enum ErrorCode implements ResponseCode {
      */
     INVALID_SEARCH_TYPE(HttpStatus.BAD_REQUEST, 90000,"알맞은 검색어 타입을 찾을 수 없습니다."),
     RECENT_SEARCH_NOT_FOUND(HttpStatus.NOT_FOUND, 90001, "존재하지 않는 RECENT SEARCH 입니다."),
+    RECENT_SEARCH_NOT_ADDED_BY_USER(HttpStatus.BAD_REQUEST, 90002, "사용자가 추가하지 않은 검색어는 삭제할 수 없습니다."),
 
     /**
      * 100000 : room error
