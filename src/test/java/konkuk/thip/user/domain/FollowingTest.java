@@ -1,93 +1,70 @@
 package konkuk.thip.user.domain;
 
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_FOLLOWED;
-import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_UNFOLLOWED;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("[단위] Following 단위 테스트")
 class FollowingTest {
 
     @Nested
-    @DisplayName("팔로우 요청")
-    class Follow {
+    @DisplayName("팔로우 요청인 경우")
+    class FollowRequest {
+
+        private final boolean isFollowRequest = true;
 
         @Test
-        @DisplayName("inactive 상태에서 follow 요청 → active로 변경")
-        void follow_from_inactive() {
-            Following following = Following.builder()
-                    .userId(1L)
-                    .followingUserId(2L)
-                    .status(StatusType.INACTIVE)
-                    .build();
+        @DisplayName("이미 팔로우 중이면 예외 발생")
+        void alreadyFollowed_shouldThrowException() {
+            boolean isExistingFollowing = true;
 
-            boolean result = following.changeFollowingState(true);
-
-            assertThat(result).isTrue();
-            assertThat(following.getStatus()).isEqualTo(StatusType.ACTIVE);
+            assertThatThrownBy(() ->
+                    Following.validateFollowingState(isExistingFollowing, isFollowRequest))
+                    .isInstanceOf(InvalidStateException.class)
+                    .hasMessageContaining(ErrorCode.USER_ALREADY_FOLLOWED.getMessage());
         }
 
         @Test
-        @DisplayName("이미 active 상태에서 follow 요청 → 예외 발생")
-        void follow_from_active_should_throw() {
-            Following following = Following.builder()
-                    .userId(1L)
-                    .followingUserId(2L)
-                    .status(StatusType.ACTIVE)
-                    .build();
+        @DisplayName("팔로우 관계가 없으면 true 반환")
+        void notFollowed_shouldReturnTrue() {
+            boolean isExistingFollowing = false;
 
-            assertThatThrownBy(() -> following.changeFollowingState(true))
-                    .isInstanceOf(InvalidStateException.class)
-                    .hasMessage(USER_ALREADY_FOLLOWED.getMessage());
+            boolean result = Following.validateFollowingState(isExistingFollowing, isFollowRequest);
+
+            assertThat(result).isTrue();
         }
     }
 
     @Nested
-    @DisplayName("언팔로우 요청")
-    class Unfollow {
+    @DisplayName("언팔로우 요청인 경우")
+    class UnfollowRequest {
+
+        private final boolean isFollowRequest = false;
 
         @Test
-        @DisplayName("active 상태에서 unfollow 요청 → inactive로 변경")
-        void unfollow_from_active() {
-            Following following = Following.builder()
-                    .userId(1L)
-                    .followingUserId(2L)
-                    .status(StatusType.ACTIVE)
-                    .build();
+        @DisplayName("팔로우 관계가 없으면 예외 발생")
+        void notFollowed_shouldThrowException() {
+            boolean isExistingFollowing = false;
 
-            boolean result = following.changeFollowingState(false);
+            assertThatThrownBy(() ->
+                    Following.validateFollowingState(isExistingFollowing, isFollowRequest))
+                    .isInstanceOf(InvalidStateException.class)
+                    .hasMessageContaining(ErrorCode.USER_ALREADY_UNFOLLOWED.getMessage());
+        }
+
+        @Test
+        @DisplayName("팔로우 중이면 false 반환")
+        void alreadyFollowed_shouldReturnFalse() {
+            boolean isExistingFollowing = true;
+
+            boolean result = Following.validateFollowingState(isExistingFollowing, isFollowRequest);
 
             assertThat(result).isFalse();
-            assertThat(following.getStatus()).isEqualTo(StatusType.INACTIVE);
         }
-
-        @Test
-        @DisplayName("이미 inactive 상태에서 unfollow 요청 → 예외 발생")
-        void unfollow_from_inactive_should_throw() {
-            Following following = Following.builder()
-                    .userId(1L)
-                    .followingUserId(2L)
-                    .status(StatusType.INACTIVE)
-                    .build();
-
-            assertThatThrownBy(() -> following.changeFollowingState(false))
-                    .isInstanceOf(InvalidStateException.class)
-                    .hasMessage(USER_ALREADY_UNFOLLOWED.getMessage());
-        }
-    }
-
-    @Test
-    @DisplayName("새로운 팔로우 생성 시 상태는 ACTIVE")
-    void create_following_should_be_active() {
-        Following following = Following.withoutId(1L, 2L);
-
-        assertThat(following.getUserId()).isEqualTo(1L);
-        assertThat(following.getFollowingUserId()).isEqualTo(2L);
-        assertThat(following.getStatus()).isEqualTo(StatusType.ACTIVE);
     }
 }

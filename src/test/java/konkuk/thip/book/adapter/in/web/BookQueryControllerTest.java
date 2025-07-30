@@ -4,7 +4,7 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -64,7 +64,7 @@ class BookQueryControllerTest {
 
         RecentSearchJpaEntity recentSearch = recentSearchJpaRepository.save(RecentSearchJpaEntity.builder()
                 .searchTerm("테스트검색어")
-                .type(SearchType.BOOK_SEARCH)
+                .type(RecentSearchType.BOOK_SEARCH)
                 .userJpaEntity(user)
                 .build());
 
@@ -186,7 +186,7 @@ class BookQueryControllerTest {
 
         assertThat(recentSearch).isNotNull();
         assertThat(recentSearch.getSearchTerm()).isEqualTo(keyword);
-        assertThat(recentSearch.getType()).isEqualTo(SearchType.BOOK_SEARCH);
+        assertThat(recentSearch.getType()).isEqualTo(RecentSearchType.BOOK_SEARCH);
         assertThat(recentSearch.getUserJpaEntity().getUserId()).isEqualTo(user.getUserId());
     }
 }

@@ -11,6 +11,8 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 import static konkuk.thip.common.exception.code.ErrorCode.RECENT_SEARCH_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
@@ -22,6 +24,12 @@ public class RecentSearchCommandPersistenceAdapter implements RecentSearchComman
     private final UserJpaRepository userJpaRepository;
 
     private final RecentSearchMapper recentSearchMapper;
+
+    @Override
+    public Optional<RecentSearch> findById(Long id) {
+        return recentSearchJpaRepository.findById(id)
+                .map(recentSearchMapper::toDomainEntity);
+    }
 
     @Override
     public void save(RecentSearch recentSearch) {
@@ -44,11 +52,9 @@ public class RecentSearchCommandPersistenceAdapter implements RecentSearchComman
     }
 
     @Override
-    public void update(RecentSearch recentSearch) {
-        RecentSearchJpaEntity recentSearchJpaEntity = recentSearchJpaRepository.findById(recentSearch.getId())
-                .orElseThrow(() -> new EntityNotFoundException(RECENT_SEARCH_NOT_FOUND));
-
-        recentSearchJpaEntity.updateFrom(recentSearch);
-        recentSearchJpaRepository.save(recentSearchJpaEntity);
+    public void touch(RecentSearch recentSearch) {
+        recentSearchJpaRepository.updateModifiedAt(recentSearch.getId());
     }
+
+
 }

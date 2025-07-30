@@ -2,7 +2,7 @@ package konkuk.thip.user.adapter.in.web;
 
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.SearchType;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -88,7 +88,7 @@ class UserSearchApiTest {
         assertEquals(1, recentSearches.size());
         RecentSearchJpaEntity saved = recentSearches.get(0);
         assertEquals(keyword, saved.getSearchTerm());
-        assertEquals(SearchType.USER_SEARCH, saved.getType());
+        assertEquals(RecentSearchType.USER_SEARCH, saved.getType());
         assertEquals(currentUserId, saved.getUserJpaEntity().getUserId());
     }
 }

@@ -194,6 +194,12 @@ public enum SwaggerResponseDescription {
             JSON_PROCESSING_ERROR
     ))),
 
+    // Recent Search
+    RECENT_SEARCH_DELETE(new LinkedHashSet<>(Set.of(
+            RECENT_SEARCH_NOT_FOUND,
+            RECENT_SEARCH_NOT_ADDED_BY_USER
+    ))),
+
   ;
     private final Set<ErrorCode> errorCodeList;
     SwaggerResponseDescription(Set<ErrorCode> errorCodeList) {
