@@ -1,7 +1,7 @@
 package konkuk.thip.recentSearch.adapter.out.jpa;
 
 
-import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Getter;
 
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_SEARCH_TYPE;
@@ -10,7 +10,9 @@ import static konkuk.thip.common.exception.code.ErrorCode.INVALID_SEARCH_TYPE;
 public enum SearchType {
 
     USER_SEARCH("사용자 검색"),
-    BOOK_SEARCH("책 검색");
+    BOOK_SEARCH("책 검색"),
+    ROOM_SEARCH("방 검색"),
+    ;
 
     private final String searchType;
 
@@ -24,6 +26,6 @@ public enum SearchType {
                 return type;
             }
         }
-        throw new BusinessException(INVALID_SEARCH_TYPE);
+        throw new InvalidStateException(INVALID_SEARCH_TYPE);
     }
 }
