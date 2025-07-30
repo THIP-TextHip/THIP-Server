@@ -3,6 +3,7 @@ package konkuk.thip.user.adapter.out.persistence.repository;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
@@ -64,7 +65,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 .from(user)
                 .leftJoin(user.aliasForUserJpaEntity, alias)
                 .where(user.nickname.like(pattern)
-                        .and(user.userId.ne(userId)))
+                        .and(user.userId.ne(userId))
+                        .and(user.status.eq(StatusType.ACTIVE)))
                 .orderBy(priority.desc(), user.nickname.asc())
                 .limit(size)
                 .fetch();
