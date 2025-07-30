@@ -24,7 +24,7 @@ public class RecentSearchCreateManager {
                 .ifPresentOrElse(
                         existingRecentSearch -> {
                             // 이미 존재하면 createdAt만 갱신
-                            existingRecentSearch.updateCreatedAt(LocalDateTime.now());
+                            existingRecentSearch.updateModifiedAt(LocalDateTime.now());
                             recentSearchCommandPort.update(existingRecentSearch);
                         },
                         () -> {

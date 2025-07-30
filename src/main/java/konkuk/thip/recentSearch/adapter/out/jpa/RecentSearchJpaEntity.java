@@ -34,6 +34,6 @@ public class RecentSearchJpaEntity extends BaseJpaEntity {
     public void updateFrom(RecentSearch recentSearch) {
         this.searchTerm = recentSearch.getSearchTerm();
         this.type = SearchType.from(recentSearch.getType());
-        this.setCreatedAt(recentSearch.getCreatedAt());
+        this.setModifiedAt(recentSearch.getModifiedAt());
     }
 }

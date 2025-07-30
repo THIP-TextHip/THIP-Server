@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class BaseDomainEntity {
 
-    @Setter
     private LocalDateTime createdAt;
 
+    @Setter
     private LocalDateTime modifiedAt;
 
     private StatusType status;

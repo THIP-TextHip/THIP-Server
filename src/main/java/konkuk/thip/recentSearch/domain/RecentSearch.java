@@ -26,7 +26,7 @@ public class RecentSearch extends BaseDomainEntity {
                 .build();
     }
 
-    public void updateCreatedAt(LocalDateTime localDateTime) {
-        this.setCreatedAt(localDateTime);
+    public void updateModifiedAt(LocalDateTime localDateTime) {
+        this.setModifiedAt(localDateTime);
     }
 }
