@@ -7,21 +7,21 @@ import lombok.Getter;
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_SEARCH_TYPE;
 
 @Getter
-public enum SearchType {
+public enum RecentSearchType {
 
-    USER_SEARCH("사용자 검색"),
-    BOOK_SEARCH("책 검색"),
-    ROOM_SEARCH("방 검색"),
+    USER_SEARCH("USER"),
+    BOOK_SEARCH("BOOK"),
+    ROOM_SEARCH("ROOM"),
     ;
 
     private final String searchType;
 
-    SearchType(String searchType) {
+    RecentSearchType(String searchType) {
         this.searchType = searchType;
     }
 
-    public static SearchType from(String searchType) {
-        for (SearchType type : SearchType.values()) {
+    public static RecentSearchType from(String searchType) {
+        for (RecentSearchType type : RecentSearchType.values()) {
             if (type.getSearchType().equals(searchType)) {
                 return type;
             }

@@ -25,7 +25,7 @@ public class RecentSearchJpaEntity extends BaseJpaEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SearchType type;
+    private RecentSearchType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -33,7 +33,7 @@ public class RecentSearchJpaEntity extends BaseJpaEntity {
 
     public void updateFrom(RecentSearch recentSearch) {
         this.searchTerm = recentSearch.getSearchTerm();
-        this.type = SearchType.from(recentSearch.getType());
+        this.type = recentSearch.getType();
         this.setModifiedAt(recentSearch.getModifiedAt());
     }
 }
