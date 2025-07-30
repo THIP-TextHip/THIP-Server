@@ -1,17 +1,27 @@
 package konkuk.thip.book.adapter.in.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import konkuk.thip.book.adapter.in.web.response.GetBookDetailSearchResponse;
 import konkuk.thip.book.adapter.in.web.response.GetBookMostSearchResponse;
 import konkuk.thip.book.adapter.in.web.response.GetBookSearchListResponse;
-import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.book.application.port.in.BookMostSearchUseCase;
+import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
+
+@Tag(name = "Book Query API", description = "책 조회 관련 API")
 @Validated
 @RestController
 @RequiredArgsConstructor
@@ -20,30 +30,43 @@ public class BookQueryController {
     private final BookSearchUseCase bookSearchUseCase;
     private final BookMostSearchUseCase bookMostSearchUseCase;
 
-
-    //책 검색결과 조회
+    @Operation(
+            summary = "책 검색결과 조회",
+            description = "사용자가 입력한 키워드로 책을 검색합니다."
+    )
+    @ExceptionDescription(BOOK_SEARCH)
     @GetMapping("/books")
-    public BaseResponse<GetBookSearchListResponse> getBookSearchList(@RequestParam final String keyword,
-                                                                     @RequestParam final int page,
-                                                                     @UserId final Long userId) {
+    public BaseResponse<GetBookSearchListResponse> getBookSearchList(
+            @Parameter(description = "검색 키워드", example = "해리포터") @RequestParam final String keyword,
+            @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") @RequestParam final int page,
+            @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(GetBookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page,userId), page));
     }
 
     //책 상세검색 결과 조회
+    @Operation(
+            summary = "책 상세검색 결과 조회",
+            description = "ISBN을 통해 책의 상세 정보를 조회합니다."
+    )
+    @ExceptionDescription(BOOK_DETAIL_SEARCH)
     @GetMapping("/books/{isbn}")
-    public BaseResponse<GetBookDetailSearchResponse> getBookDetailSearch(@PathVariable("isbn")
-                                                                             @Pattern(regexp = "\\d{13}") final String isbn,
-                                                                         @UserId final Long userId) {
-
-
-
+    public BaseResponse<GetBookDetailSearchResponse> getBookDetailSearch(
+            @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
+            @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
         return BaseResponse.ok(GetBookDetailSearchResponse.of(bookSearchUseCase.searchDetailBooks(isbn,userId)));
     }
 
     //가장 많이 검색된 책 조회
+    @Operation(
+            summary = "가장 많이 검색된 책 조회",
+            description = "사용자가 가장 많이 검색한 책들을 조회합니다."
+    )
+    @ExceptionDescription(POPULAR_BOOK_SEARCH)
     @GetMapping("/books/most-searched")
-    public BaseResponse<GetBookMostSearchResponse> getMostSearchedBooks(@UserId final Long userId) {
-
+    public BaseResponse<GetBookMostSearchResponse> getMostSearchedBooks(
+            @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(GetBookMostSearchResponse.of(bookMostSearchUseCase.getMostSearchedBooks(userId)));
     }
 
