@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.user.adapter.in.web.response.*;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
@@ -18,13 +20,22 @@ import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
 import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.in.UserVerifyNicknameUseCase;
 import konkuk.thip.user.application.port.in.UserIsFollowingUsecase;
+import konkuk.thip.user.application.port.in.UserSearchUsecase;
 import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
+import konkuk.thip.user.application.port.in.dto.UserSearchQuery;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.GET_USER_FOLLOW;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.USER_SEARCH;
 
 @Tag(name = "User Query API", description = "사용자가 주체가 되는 조회")
+@Validated
 @RestController
 @RequiredArgsConstructor
 public class UserQueryController {
@@ -33,6 +44,7 @@ public class UserQueryController {
     private final UserGetFollowUsecase userGetFollowUsecase;
     private final UserIsFollowingUsecase userIsFollowingUsecase;
     private final UserVerifyNicknameUseCase userVerifyNicknameUseCase;
+    private final UserSearchUsecase userSearchUsecase;
 
     @Operation(
             summary = "닉네임 중복 확인",
@@ -93,5 +105,19 @@ public class UserQueryController {
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "팔로우 여부를 확인할 대상 사용자 ID") @PathVariable final Long targetUserId) {
         return BaseResponse.ok(UserIsFollowingResponse.of(userIsFollowingUsecase.isFollowing(userId, targetUserId)));
+    }
+
+
+    @Operation(
+            summary = "사용자 검색",
+            description = "닉네임을 기준으로 사용자를 검색합니다. 정확도순 정렬을 지원합니다."
+    )
+    @ExceptionDescription(USER_SEARCH)
+    @GetMapping("/users")
+    public BaseResponse<UserSearchResponse> showSearchUsers(
+            @Parameter(description = "검색어", example = "thip") @RequestParam @NotBlank(message = "검색어는 필수입니다.") final String keyword,
+            @Parameter(description = "단일 검색 결과 페이지 크기 (1~30) / default : 30", example = "30") @RequestParam(required = false, defaultValue = "30") @Min(1) @Max(30) final Integer size,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size)));
     }
 }

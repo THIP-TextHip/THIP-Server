@@ -4,7 +4,7 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.in.web.response.UserFollowersResponse;
 import konkuk.thip.user.adapter.in.web.response.UserFollowingResponse;
 import konkuk.thip.user.application.mapper.FollowQueryMapper;
-import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
+import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -29,12 +29,12 @@ public class UserGetFollowService implements UserGetFollowUsecase {
     public UserFollowersResponse getUserFollowers(Long userId, String cursor, int size) {
         User user = userCommandPort.findById(userId);
 
-        CursorBasedList<FollowQueryDto> result = followingQueryPort.getFollowersByUserId(
+        CursorBasedList<UserQueryDto> result = followingQueryPort.getFollowersByUserId(
                 user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
         );
 
         var followers = result.contents().stream()
-                .map(followQueryMapper::toFollowerList)
+                .map(followQueryMapper::toFollowerDto)
                 .toList();
 
         return UserFollowersResponse.builder()
@@ -49,12 +49,12 @@ public class UserGetFollowService implements UserGetFollowUsecase {
     public UserFollowingResponse getMyFollowing(Long userId, String cursor, int size) {
         User user = userCommandPort.findById(userId);
 
-        CursorBasedList<FollowQueryDto> result = followingQueryPort.getFollowingByUserId(
+        CursorBasedList<UserQueryDto> result = followingQueryPort.getFollowingByUserId(
                 user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
         );
 
         var following = result.contents().stream()
-                .map(followQueryMapper::toFollowingList)
+                .map(followQueryMapper::toFollowingDto)
                 .toList();
 
         return UserFollowingResponse.builder()

@@ -23,6 +23,9 @@ public enum SwaggerResponseDescription {
     USER_SIGNUP(new LinkedHashSet<>(Set.of(
         ALIAS_NAME_NOT_MATCH
     ))),
+    USER_SEARCH(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND
+    ))),
 
     // Follow
     CHANGE_FOLLOW_STATE(new LinkedHashSet<>(Set.of(

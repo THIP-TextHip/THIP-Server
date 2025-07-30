@@ -1,25 +1,21 @@
 package konkuk.thip.user.adapter.in.web.response;
 
-import lombok.Builder;
-
 import java.util.List;
 
-@Builder
-public record UserFollowersResponse(
-        List<FollowerDto> followers,
-        String nextCursor,
-        boolean isLast
+public record UserSearchResponse(
+        List<UserDto> userList
 ) {
-    @Builder
-    public record FollowerDto(
+    public record UserDto(
             Long userId,
             String nickname,
             String profileImageUrl,
             String aliasName,
             String aliasColor,
             Integer followerCount
-    ){
-
+    ) {
     }
 
+    public static UserSearchResponse of(List<UserDto> userList) {
+        return new UserSearchResponse(userList);
+    }
 }

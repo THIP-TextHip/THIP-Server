@@ -7,8 +7,8 @@ import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
-import konkuk.thip.user.application.port.out.dto.FollowQueryDto;
-import konkuk.thip.user.application.port.out.dto.QFollowQueryDto;
+import konkuk.thip.user.application.port.out.dto.QUserQueryDto;
+import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -37,7 +37,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     }
 
     @Override
-    public List<FollowQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+    public List<UserQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
         return findFollowDtos(
                 userId,
                 cursor,
@@ -47,7 +47,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     }
 
     @Override
-    public List<FollowQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+    public List<UserQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
         return findFollowDtos(
                 userId,
                 cursor,
@@ -56,7 +56,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         );
     }
 
-    private List<FollowQueryDto> findFollowDtos(Long userId, LocalDateTime cursor, int size, boolean isFollowerQuery) {
+    private List<UserQueryDto> findFollowDtos(Long userId, LocalDateTime cursor, int size, boolean isFollowerQuery) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
@@ -72,11 +72,12 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         QUserJpaEntity targetUser = isFollowerQuery ? following.userJpaEntity : following.followingUserJpaEntity;
 
         return jpaQueryFactory
-                .select(new QFollowQueryDto(
+                .select(new QUserQueryDto(
                         targetUser.userId,
                         targetUser.nickname,
                         alias.imageUrl,
                         alias.value,
+                        alias.color,
                         targetUser.followerCount,
                         following.createdAt
                 ))

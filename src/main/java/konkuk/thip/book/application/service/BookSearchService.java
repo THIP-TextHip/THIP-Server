@@ -72,7 +72,7 @@ public class BookSearchService implements BookSearchUseCase {
                         .type(BOOK_SEARCH.getSearchType())
                         .userId(userId)
                         .build();
-        recentSearchCommandPort.save(userId,recentSearch);
+        recentSearchCommandPort.save(recentSearch);
 
         return result;
     }

@@ -6,16 +6,17 @@ import java.util.List;
 
 @Builder
 public record UserFollowingResponse(
-        List<Following> followings,
+        List<FollowingDto> followings,
         String nextCursor,
         boolean isLast
 ) {
     @Builder
-    public record Following(
+    public record FollowingDto(
             Long userId,
             String nickname,
             String profileImageUrl,
-            String aliasName
+            String aliasName,
+            String aliasColor
     ){
     }
 
