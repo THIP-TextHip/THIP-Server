@@ -14,15 +14,19 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
+import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
-import konkuk.thip.room.application.port.out.dto.QRoomShowMineQueryDto;
-import konkuk.thip.room.application.port.out.dto.RoomShowMineQueryDto;
+import konkuk.thip.room.application.port.out.dto.QRoomQueryDto;
+import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -37,6 +41,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     private final QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QRoomParticipantJpaEntity participant = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
+    private final QCategoryJpaEntity category = QCategoryJpaEntity.categoryJpaEntity;
 
     @Override
     public Page<RoomSearchResponse.RoomSearchResult> searchRoom(String keyword, String category, Pageable pageable) {
@@ -249,7 +254,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     // 1) 모집중인 방
     @Override
-    public List<RoomShowMineQueryDto> findRecruitingRoomsUserParticipated(
+    public List<RoomQueryDto> findRecruitingRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
@@ -266,7 +271,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     // 2) 진행중인 방
     @Override
-    public List<RoomShowMineQueryDto> findPlayingRoomsUserParticipated(
+    public List<RoomQueryDto> findPlayingRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
@@ -284,7 +289,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     // 3) 진행＋모집 통합
     @Override
-    public List<RoomShowMineQueryDto> findPlayingAndRecruitingRoomsUserParticipated(
+    public List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
@@ -315,7 +320,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     // 4) 만료된 방
     @Override
-    public List<RoomShowMineQueryDto> findExpiredRoomsUserParticipated(
+    public List<RoomQueryDto> findExpiredRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
@@ -331,10 +336,54 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         return fetchMyRooms(base, cursorExpr, orders, false, dateCursor, roomIdCursor, pageSize);
     }
 
+    @Override
+    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String categoryVal, int limit) {
+        return queryFactory
+                .select(new QRoomQueryDto(
+                        room.roomId,
+                        book.imageUrl,
+                        room.title,
+                        room.memberCount,
+                        room.startDate
+                ))
+                .from(room)
+                .leftJoin(room.bookJpaEntity, book)
+                .leftJoin(room.categoryJpaEntity, category)
+                .where(room.categoryJpaEntity.value.eq(categoryVal)
+                        .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
+                        .and(room.isPublic.isTrue()) // 공개 방만 조회
+                        .and(room.status.eq(StatusType.ACTIVE)))
+                .orderBy(room.startDate.asc(), room.memberCount.desc(), room.roomId.asc())
+                .limit(limit)
+                .fetch();
+    }
+
+    @Override
+    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String categoryVal, int limit) {
+        return queryFactory
+                .select(new QRoomQueryDto(
+                        room.roomId,
+                        book.imageUrl,
+                        room.title,
+                        room.memberCount,
+                        room.startDate
+                ))
+                .from(room)
+                .leftJoin(room.bookJpaEntity, book)
+                .leftJoin(room.categoryJpaEntity, category)
+                .where(room.categoryJpaEntity.value.eq(categoryVal)
+                        .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
+                        .and(room.isPublic.isTrue()) // 공개 방만 조회
+                        .and(room.status.eq(StatusType.ACTIVE)))
+                .orderBy(room.memberCount.desc(), room.startDate.asc(), room.roomId.asc())
+                .limit(limit)
+                .fetch();
+    }
+
     /**
      * 공통 커서 + 2단계 조회 (IDs → entities) 처리
      */
-    private List<RoomShowMineQueryDto> fetchMyRooms(
+    private List<RoomQueryDto> fetchMyRooms(
             BooleanExpression baseCondition,
             DateExpression<LocalDate> cursorExpr,
             OrderSpecifier<?>[] orders,
@@ -358,7 +407,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
         // 2) DTO 프로젝션: 필요한 필드만 바로 조회
         return queryFactory
-                .select(new QRoomShowMineQueryDto(
+                .select(new QRoomQueryDto(
                         room.roomId,
                         book.imageUrl,
                         room.title,
