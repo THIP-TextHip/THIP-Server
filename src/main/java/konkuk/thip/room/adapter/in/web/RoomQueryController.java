@@ -28,6 +28,7 @@ public class RoomQueryController {
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
     private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
     private final RoomShowMineUseCase roomShowMineUseCase;
+    private final RoomGetBookPageUseCase roomGetBookPageUseCase;
 
     @Operation(
             summary = "방 검색",
@@ -122,5 +123,13 @@ public class RoomQueryController {
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
+    }
+
+    @GetMapping("/rooms/{roomId}/book-page")
+    public BaseResponse<RoomGetBookPageResponse> getBookPage(
+            @Parameter(description = "방 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(roomGetBookPageUseCase.getBookPage(roomId, userId));
     }
 }
