@@ -1,6 +1,7 @@
 package konkuk.thip.feed.application.service;
 
 import konkuk.thip.feed.adapter.in.web.response.FeedShowUserInfoResponse;
+import konkuk.thip.feed.application.mapper.FeedQueryMapper;
 import konkuk.thip.feed.application.port.in.FeedShowUserInfoUseCase;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
@@ -20,6 +21,7 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
     private final UserCommandPort userCommandPort;
     private final FollowingQueryPort followingQueryPort;
     private final FeedQueryPort feedQueryPort;
+    private final FeedQueryMapper feedQueryMapper;
 
     @Transactional(readOnly = true)
     @Override
@@ -33,7 +35,7 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
         // 3. 내가 작성한 전체 피드 개수 구하기
         int allFeedCount = feedQueryPort.countAllFeedsByUserId(userId);
 
-        return buildResponse(feedOwner, allFeedCount, latestFollowerProfileImageUrls);
+        return feedQueryMapper.toFeedShowUserInfoResponse(feedOwner, allFeedCount, latestFollowerProfileImageUrls);
     }
 
     @Transactional(readOnly = true)
@@ -48,18 +50,6 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
         // 3. 유저가 작성한 공개 피드 개수 구하기
         int publicFeedCount = feedQueryPort.countPublicFeedsByUserId(anotherUserId);
 
-        return buildResponse(feedOwner, publicFeedCount, latestFollowerProfileImageUrls);
-    }
-
-    private FeedShowUserInfoResponse buildResponse(User feedOwner, int totalFeedCount, List<String> latestFollowerProfileImageUrls) {
-        return FeedShowUserInfoResponse.builder()
-                .profileImageUrl(feedOwner.getAlias().getImageUrl())
-                .nickname(feedOwner.getNickname())
-                .aliasName(feedOwner.getAlias().getValue())
-                .aliasColor(feedOwner.getAlias().getColor())
-                .followerCount(feedOwner.getFollowerCount())
-                .totalFeedCount(totalFeedCount)
-                .latestFollowerProfileImageUrls(latestFollowerProfileImageUrls)
-                .build();
+        return feedQueryMapper.toFeedShowUserInfoResponse(feedOwner, publicFeedCount, latestFollowerProfileImageUrls);
     }
 }
