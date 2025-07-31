@@ -92,6 +92,9 @@ public enum SwaggerResponseDescription {
             BOOK_NOT_FOUND,
             ROOM_ACCESS_FORBIDDEN
     ))),
+    ROOM_GET_DEADLINE_POPULAR(new LinkedHashSet<>(Set.of(
+            CATEGORY_NOT_MATCH
+    ))),
 
 
     // Record

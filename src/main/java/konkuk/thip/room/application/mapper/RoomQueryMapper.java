@@ -1,11 +1,14 @@
 package konkuk.thip.room.application.mapper;
 
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.room.adapter.in.web.response.RoomGetDeadlinePopularResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomShowMineResponse;
-import konkuk.thip.room.application.port.out.dto.RoomShowMineQueryDto;
+import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
 
 @Mapper(
         componentModel = "spring",
@@ -18,5 +21,13 @@ public interface RoomQueryMapper {
             target = "endDate",
             expression = "java(DateUtil.formatAfterTime(dto.endDate()))"
     )
-    RoomShowMineResponse.MyRoom toShowMyRoomResponse(RoomShowMineQueryDto dto);
+    RoomShowMineResponse.MyRoom toShowMyRoomResponse(RoomQueryDto dto);
+
+    @Mapping(
+            target = "deadlineDate",
+            expression = "java(DateUtil.formatAfterTime(dto.endDate()))"
+    )
+    RoomGetDeadlinePopularResponse.RoomDto toDeadlinePopularRoomDto(RoomQueryDto dto);
+
+    List<RoomGetDeadlinePopularResponse.RoomDto> toDeadlinePopularRoomDtoList(List<RoomQueryDto> roomQueryDtos);
 }

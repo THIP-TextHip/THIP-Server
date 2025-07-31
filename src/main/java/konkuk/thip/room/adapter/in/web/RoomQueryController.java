@@ -29,6 +29,7 @@ public class RoomQueryController {
     private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
     private final RoomShowMineUseCase roomShowMineUseCase;
     private final RoomGetBookPageUseCase roomGetBookPageUseCase;
+    private final RoomGetDeadlinePopularUseCase roomGetDeadlinePopularUsecase;
 
     @Operation(
             summary = "방 검색",
@@ -136,5 +137,18 @@ public class RoomQueryController {
             @Parameter(hidden = true) @UserId final Long userId
     ) {
         return BaseResponse.ok(roomGetBookPageUseCase.getBookPage(roomId, userId));
+    }
+
+    @Operation(
+            summary = "마감 임박 및 인기 방 조회",
+            description = "카테고리별로 마감 임박 방과 인기 방을 조회합니다."
+    )
+    @ExceptionDescription(ROOM_GET_DEADLINE_POPULAR)
+    @GetMapping("/rooms")
+    public BaseResponse<RoomGetDeadlinePopularResponse> getDeadlineAndPopularRoomList(
+            @Parameter(description = "카테고리 이름 (default : 문학)", example = "과학/IT")
+            @RequestParam(value = "category", defaultValue = "문학") final String category
+    ) {
+        return BaseResponse.ok(roomGetDeadlinePopularUsecase.getDeadlineAndPopularRoomList(category));
     }
 }
