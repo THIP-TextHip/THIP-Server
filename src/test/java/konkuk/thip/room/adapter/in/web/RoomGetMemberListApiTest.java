@@ -76,7 +76,6 @@ class RoomGetMemberListApiTest {
 
         user1 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터1")
-                .imageUrl("https://test1.img")
                 .oauth2Id("kakao_1")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -85,7 +84,6 @@ class RoomGetMemberListApiTest {
 
         user2 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터2")
-                .imageUrl("https://test2.img")
                 .oauth2Id("kakao_2")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -94,7 +92,6 @@ class RoomGetMemberListApiTest {
 
         user3 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터3")
-                .imageUrl("https://test3.img")
                 .oauth2Id("kakao_3")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)

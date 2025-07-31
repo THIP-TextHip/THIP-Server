@@ -89,4 +89,22 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                 .limit(size + 1)
                 .fetch();
     }
+
+    @Override
+    public List<String> findLatestFollowerImageUrls(Long userId, int size) {
+        QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
+        QUserJpaEntity follower = QUserJpaEntity.userJpaEntity;     // userId 를 팔로우하는 사람들(= follower)
+        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
+
+        return jpaQueryFactory
+                .select(alias.imageUrl)
+                .from(following)
+                .join(following.userJpaEntity, follower)
+                .join(follower.aliasForUserJpaEntity, alias)
+                .where(following.followingUserJpaEntity.userId.eq(userId)
+                        .and(following.status.eq(StatusType.ACTIVE)))
+                .orderBy(following.createdAt.desc())
+                .limit(size)
+                .fetch();
+    }
 }

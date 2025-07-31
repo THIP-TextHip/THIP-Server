@@ -72,7 +72,6 @@ class BookChangeSavedControllerTest {
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
-                .imageUrl("https://avatar1.jpg")
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());

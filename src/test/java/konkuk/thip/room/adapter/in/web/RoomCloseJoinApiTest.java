@@ -61,21 +61,18 @@ class RoomCloseJoinApiTest {
 
         host = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("호스트")
-                .imageUrl("https://test.img")
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
                 .build());
         member = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("방 참여자")
-                .imageUrl("https://test.img")
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
                 .build());
         outsider = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("방 미참여자")
-                .imageUrl("https://test.img")
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)

@@ -13,7 +13,6 @@ public class UserMapper {
     public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
         return UserJpaEntity.builder()
                 .nickname(user.getNickname())
-                .imageUrl(user.getAlias().getImageUrl())
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
                 .followerCount(user.getFollowerCount())

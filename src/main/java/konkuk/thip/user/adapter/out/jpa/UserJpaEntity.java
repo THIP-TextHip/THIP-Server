@@ -23,9 +23,6 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(length = 60, nullable = false)
     private String nickname;
 
-    @Column(name = "image_url", columnDefinition = "TEXT", nullable = false)
-    private String imageUrl;
-
     @Column(name = "oauth2_id", length = 50, nullable = false)
     private String oauth2Id;
 
@@ -43,7 +40,6 @@ public class UserJpaEntity extends BaseJpaEntity {
     public void updateFrom(User user) {
         this.nickname = user.getNickname();
         Assert.notNull(user.getAlias(), "Alias must not be null");
-        this.imageUrl = user.getAlias().getImageUrl();
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
     }

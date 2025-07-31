@@ -40,4 +40,9 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
 
         return CursorBasedList.of(followingDtos, size, followingDto -> followingDto.createdAt().toString());
     }
+
+    @Override
+    public List<String> getLatestFollowerImageUrls(Long userId, int size) {
+        return followingJpaRepository.findLatestFollowerImageUrls(userId, size);
+    }
 }

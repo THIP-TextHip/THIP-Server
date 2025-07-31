@@ -67,7 +67,6 @@ public class TestEntityFactory {
     public static UserJpaEntity createUser(AliasJpaEntity alias) {
         return UserJpaEntity.builder()
                 .nickname("테스터")
-                .imageUrl("https://test.img")
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -77,7 +76,6 @@ public class TestEntityFactory {
     public static UserJpaEntity createUser(AliasJpaEntity alias, String nickname) {
         return UserJpaEntity.builder()
                 .nickname(nickname)
-                .imageUrl("https://test.img")
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -188,7 +186,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static FollowingJpaEntity createFollowing(UserJpaEntity followerUser,UserJpaEntity followingUser) {
+    public static FollowingJpaEntity createFollowing(UserJpaEntity followerUser, UserJpaEntity followingUser) {
         return FollowingJpaEntity.builder()
                 .userJpaEntity(followerUser)
                 .followingUserJpaEntity(followingUser)

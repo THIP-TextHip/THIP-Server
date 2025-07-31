@@ -58,7 +58,6 @@ class UserFollowApiTest {
 
         UserJpaEntity followingUser = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("user100")
-                .imageUrl("http://image")
                 .oauth2Id("oauth2_user100")
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
@@ -66,7 +65,6 @@ class UserFollowApiTest {
 
         UserJpaEntity target = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("user200")
-                .imageUrl("http://image")
                 .oauth2Id("oauth2_user200")
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)

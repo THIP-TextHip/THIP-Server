@@ -81,7 +81,6 @@ class UserVerifyNicknameControllerTest {
 
         UserJpaEntity userJpaEntity = UserJpaEntity.builder()
                 .nickname("테스트유저")
-                .imageUrl("http://image.url")
                 .role(USER)
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(aliasJpaEntity)

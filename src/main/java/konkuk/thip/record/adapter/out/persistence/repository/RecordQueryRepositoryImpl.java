@@ -203,7 +203,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 pageExpr(),
                 user.userId,
                 user.nickname,
-                user.imageUrl,
+                user.aliasForUserJpaEntity.imageUrl,
                 post.content,
                 post.likeCount,
                 post.commentCount,

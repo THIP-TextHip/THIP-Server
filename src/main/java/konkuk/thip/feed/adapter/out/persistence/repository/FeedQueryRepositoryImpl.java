@@ -221,7 +221,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .feedId(e.getPostId())
                 .creatorId(e.getUserJpaEntity().getUserId())
                 .creatorNickname(e.getUserJpaEntity().getNickname())
-                .creatorProfileImageUrl(e.getUserJpaEntity().getImageUrl())
+                .creatorProfileImageUrl(e.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())
                 .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
                 .createdAt(e.getCreatedAt())
                 .isbn(e.getBookJpaEntity().getIsbn())
