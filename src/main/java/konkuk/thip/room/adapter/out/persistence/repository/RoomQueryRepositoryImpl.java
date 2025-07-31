@@ -349,11 +349,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .from(room)
                 .leftJoin(room.bookJpaEntity, book)
                 .leftJoin(room.categoryJpaEntity, category)
-                .where(room.categoryJpaEntity.value.eq(categoryVal)
-                        .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
-                        .and(room.isPublic.isTrue()) // 공개 방만 조회
-                        .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회
-                        .and(room.status.eq(StatusType.ACTIVE)))
+                .where(findDeadlinePopularRoomCondition(categoryVal, userId))
                 .orderBy(room.startDate.asc(), room.memberCount.desc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
@@ -372,14 +368,18 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .from(room)
                 .leftJoin(room.bookJpaEntity, book)
                 .leftJoin(room.categoryJpaEntity, category)
-                .where(room.categoryJpaEntity.value.eq(categoryVal)
-                        .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
-                        .and(room.isPublic.isTrue()) // 공개 방만 조회
-                        .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회
-                        .and(room.status.eq(StatusType.ACTIVE)))
+                .where(findDeadlinePopularRoomCondition(categoryVal, userId))
                 .orderBy(room.memberCount.desc(), room.startDate.asc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
+    }
+
+    private BooleanExpression findDeadlinePopularRoomCondition(String categoryVal, Long userId) {
+        return room.categoryJpaEntity.value.eq(categoryVal)
+                .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
+                .and(room.isPublic.isTrue()) // 공개 방만 조회
+                .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회
+                .and(room.status.eq(StatusType.ACTIVE));
     }
 
     /**
