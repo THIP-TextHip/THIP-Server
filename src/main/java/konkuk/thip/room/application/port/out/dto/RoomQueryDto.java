@@ -21,6 +21,5 @@ public record RoomQueryDto(
         Assert.notNull(roomName, "roomName must not be null");
         Assert.notNull(endDate, "endDate must not be null");
         Assert.isTrue(memberCount >= 0, "memberCount must be greater than or equal to 0");
-        Assert.notNull(endDate, "endDate must not be null");
     }
 }
