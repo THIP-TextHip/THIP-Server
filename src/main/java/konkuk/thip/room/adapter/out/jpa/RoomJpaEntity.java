@@ -1,5 +1,6 @@
 package konkuk.thip.room.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
@@ -8,7 +9,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-//TODO 방에 이방에 참여중인 인원수 추가
 @Entity
 @Table(name = "rooms")
 @Getter
@@ -70,8 +70,18 @@ public class RoomJpaEntity extends BaseJpaEntity {
         return this;
     }
 
-    // 테스트 메서드 편의용
+    @VisibleForTesting
     public void updateMemberCount(int memberCount) {
         this.memberCount = memberCount;
+    }
+
+    @VisibleForTesting
+    public void updateStartDate(LocalDate localDate) {
+        this.startDate = localDate;
+    }
+
+    @VisibleForTesting
+    public void updateIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

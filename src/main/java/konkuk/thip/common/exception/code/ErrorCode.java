@@ -111,7 +111,6 @@ public enum ErrorCode implements ResponseCode {
      * 140000 : roomParticipant error
      */
     ROOM_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, 140000, "존재하지 않는 RoomParticipant (방과 사용자 관계) 입니다."),
-    USER_NOT_BELONG_TO_ROOM(HttpStatus.BAD_REQUEST, 140001, "현재 모임방에 속하지 않는 유저입니다."),
     ROOM_PARTICIPANT_ROLE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140002, "일치하는 방에서의 사용자 역할이 없습니다."),
     ROOM_JOIN_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 140003, "일치하는 방 참여 상태가 없습니다."),
     USER_CANNOT_JOIN_OR_CANCEL(HttpStatus.BAD_REQUEST, 140004, "존재하지 않는 방은 참여하기 또는 취소하기가 불가능합니다."),

@@ -84,7 +84,16 @@ public enum SwaggerResponseDescription {
     ))),
     ROOM_PLAYING_DETAIL(new LinkedHashSet<>(Set.of(
             BOOK_NOT_FOUND,
-            ROOM_NOT_FOUND
+            ROOM_NOT_FOUND,
+            ROOM_ACCESS_FORBIDDEN
+    ))),
+    ROOM_GET_BOOK_PAGE(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            ROOM_ACCESS_FORBIDDEN
+    ))),
+    ROOM_GET_DEADLINE_POPULAR(new LinkedHashSet<>(Set.of(
+            CATEGORY_NOT_MATCH
     ))),
 
 
@@ -101,7 +110,7 @@ public enum SwaggerResponseDescription {
             USER_NOT_FOUND,
             ROOM_NOT_FOUND,
             BOOK_NOT_FOUND,
-            USER_NOT_BELONG_TO_ROOM
+            ROOM_ACCESS_FORBIDDEN
     ))),
 
     // Vote

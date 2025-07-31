@@ -27,10 +27,13 @@ public enum Category {
 
     public static Category from(String value) {
         return Arrays.stream(Category.values())
-                .filter(categoryName -> categoryName.getValue().equals(value))
+                .filter(categoryName -> categoryName.getValue().equals(value.trim()))
                 .findFirst()
                 .orElseThrow(
-                        () -> new InvalidStateException(CATEGORY_NOT_MATCH)
+                        () -> new InvalidStateException(CATEGORY_NOT_MATCH,
+                                new IllegalArgumentException(
+                                        String.format("존재하지 않는 카테고리입니다. value: %s", value)
+                                ))
                 );
     }
 }

@@ -28,6 +28,8 @@ public class RoomQueryController {
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
     private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
     private final RoomShowMineUseCase roomShowMineUseCase;
+    private final RoomGetBookPageUseCase roomGetBookPageUseCase;
+    private final RoomGetDeadlinePopularUseCase roomGetDeadlinePopularUsecase;
 
     @Operation(
             summary = "방 검색",
@@ -122,5 +124,32 @@ public class RoomQueryController {
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
+    }
+
+    @Operation(
+            summary = "책 전체 페이지수 및 총평 가능 여부 조회 (in 기록 작성 화면)",
+            description = "방 참여자가 책 기록을 남길 수 있는 최대 책 페이지 수와 총평 작성 가능 여부를 조회합니다."
+    )
+    @ExceptionDescription(ROOM_GET_BOOK_PAGE)
+    @GetMapping("/rooms/{roomId}/book-page")
+    public BaseResponse<RoomGetBookPageResponse> getBookPage(
+            @Parameter(description = "방 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(roomGetBookPageUseCase.getBookPage(roomId, userId));
+    }
+
+    @Operation(
+            summary = "마감 임박 및 인기 방 조회",
+            description = "카테고리별로 마감 임박 방과 인기 방을 조회합니다."
+    )
+    @ExceptionDescription(ROOM_GET_DEADLINE_POPULAR)
+    @GetMapping("/rooms")
+    public BaseResponse<RoomGetDeadlinePopularResponse> getDeadlineAndPopularRoomList(
+            @Parameter(description = "카테고리 이름 (default : 문학)", example = "과학/IT")
+            @RequestParam(value = "category", defaultValue = "문학") final String category,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(roomGetDeadlinePopularUsecase.getDeadlineAndPopularRoomList(category, userId));
     }
 }

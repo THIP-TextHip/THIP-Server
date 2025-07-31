@@ -6,7 +6,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomShowMineResponse;
 import konkuk.thip.room.application.mapper.RoomQueryMapper;
 import konkuk.thip.room.application.port.in.RoomShowMineUseCase;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
-import konkuk.thip.room.application.port.out.dto.RoomShowMineQueryDto;
+import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.MyRoomType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class RoomShowMineService implements RoomShowMineUseCase {
 
         // 2. type 검증 및 커서 기반 조회
         MyRoomType myRoomType = MyRoomType.from(type);
-        CursorBasedList<RoomShowMineQueryDto> result = switch (myRoomType) {
+        CursorBasedList<RoomQueryDto> result = switch (myRoomType) {
                 case RECRUITING -> roomQueryPort
                         .findRecruitingRoomsUserParticipated(userId, nextCursor);
                 case PLAYING    -> roomQueryPort

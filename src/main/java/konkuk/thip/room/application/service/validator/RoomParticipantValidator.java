@@ -1,13 +1,13 @@
 package konkuk.thip.room.application.service.validator;
 
+import konkuk.thip.common.annotation.HelperService;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.application.port.out.RoomParticipantQueryPort;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import static konkuk.thip.common.exception.code.ErrorCode.ROOM_ACCESS_FORBIDDEN;
 
-@Component
+@HelperService
 @RequiredArgsConstructor
 public class RoomParticipantValidator{
     private final RoomParticipantQueryPort participantPort;
