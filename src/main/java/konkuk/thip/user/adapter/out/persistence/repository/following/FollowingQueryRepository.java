@@ -12,4 +12,6 @@ public interface FollowingQueryRepository {
 
     List<UserQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size);
     List<UserQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size);
+
+    List<String> findTopFollowerProfileImageUrlsByUserIdOrderByCreatedAtDesc(Long userId, int size);
 }
