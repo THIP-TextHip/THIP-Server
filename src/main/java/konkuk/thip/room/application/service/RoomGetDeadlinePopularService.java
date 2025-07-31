@@ -18,13 +18,13 @@ public class RoomGetDeadlinePopularService implements RoomGetDeadlinePopularUseC
     private static final int DEFAULT_LIMIT = 4;
 
     @Override
-    public RoomGetDeadlinePopularResponse getDeadlineAndPopularRoomList(String categoryStr) {
+    public RoomGetDeadlinePopularResponse getDeadlineAndPopularRoomList(String categoryStr, Long userId) {
         Category category = Category.from(categoryStr);
 
         var deadlineRoomList = roomQueryMapper.toDeadlinePopularRoomDtoList(
-                roomQueryPort.findRoomsByCategoryOrderByDeadline(category, DEFAULT_LIMIT));
+                roomQueryPort.findRoomsByCategoryOrderByDeadline(category, DEFAULT_LIMIT, userId));
         var popularRoomList = roomQueryMapper.toDeadlinePopularRoomDtoList(
-                roomQueryPort.findRoomsByCategoryOrderByPopular(category, DEFAULT_LIMIT));
+                roomQueryPort.findRoomsByCategoryOrderByPopular(category, DEFAULT_LIMIT, userId));
 
         return RoomGetDeadlinePopularResponse.of(deadlineRoomList, popularRoomList);
     }

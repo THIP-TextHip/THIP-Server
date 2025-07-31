@@ -81,13 +81,13 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit) {
-        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category.getValue(), limit);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId) {
+        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category.getValue(), limit, userId);
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit) {
-        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category.getValue(), limit);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId) {
+        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category.getValue(), limit, userId);
     }
 
 

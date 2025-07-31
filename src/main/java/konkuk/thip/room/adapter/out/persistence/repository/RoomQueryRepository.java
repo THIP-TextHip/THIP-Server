@@ -27,7 +27,7 @@ public interface RoomQueryRepository {
 
     List<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String category, int limit, Long userId);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String category, int limit, Long userId);
 }

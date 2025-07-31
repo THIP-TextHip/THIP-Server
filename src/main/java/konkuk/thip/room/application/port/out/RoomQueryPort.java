@@ -32,7 +32,7 @@ public interface RoomQueryPort {
 
     CursorBasedList<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId);
 }

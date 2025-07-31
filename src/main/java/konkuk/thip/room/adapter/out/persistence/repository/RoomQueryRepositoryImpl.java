@@ -337,7 +337,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String categoryVal, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String categoryVal, int limit, Long userId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -352,6 +352,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .where(room.categoryJpaEntity.value.eq(categoryVal)
                         .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
                         .and(room.isPublic.isTrue()) // 공개 방만 조회
+                        .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회
                         .and(room.status.eq(StatusType.ACTIVE)))
                 .orderBy(room.startDate.asc(), room.memberCount.desc(), room.roomId.asc())
                 .limit(limit)
@@ -359,7 +360,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String categoryVal, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String categoryVal, int limit, Long userId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -374,10 +375,23 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .where(room.categoryJpaEntity.value.eq(categoryVal)
                         .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
                         .and(room.isPublic.isTrue()) // 공개 방만 조회
+                        .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회
                         .and(room.status.eq(StatusType.ACTIVE)))
                 .orderBy(room.memberCount.desc(), room.startDate.asc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
+    }
+
+    /**
+     * 유저가 참여한 방인지 여부를 확인하는 서브쿼리
+     */
+    private BooleanExpression userJoinedRoom(Long userId) {
+        return JPAExpressions
+                .selectOne()
+                .from(participant)
+                .where(participant.userJpaEntity.userId.eq(userId)
+                        .and(participant.roomJpaEntity.roomId.eq(room.roomId)))
+                .exists();
     }
 
     /**

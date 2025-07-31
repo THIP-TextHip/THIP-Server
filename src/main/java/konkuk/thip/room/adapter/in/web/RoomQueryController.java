@@ -147,8 +147,9 @@ public class RoomQueryController {
     @GetMapping("/rooms")
     public BaseResponse<RoomGetDeadlinePopularResponse> getDeadlineAndPopularRoomList(
             @Parameter(description = "카테고리 이름 (default : 문학)", example = "과학/IT")
-            @RequestParam(value = "category", defaultValue = "문학") final String category
+            @RequestParam(value = "category", defaultValue = "문학") final String category,
+            @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(roomGetDeadlinePopularUsecase.getDeadlineAndPopularRoomList(category));
+        return BaseResponse.ok(roomGetDeadlinePopularUsecase.getDeadlineAndPopularRoomList(category, userId));
     }
 }

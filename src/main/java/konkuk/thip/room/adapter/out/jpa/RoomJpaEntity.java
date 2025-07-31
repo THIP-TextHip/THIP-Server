@@ -74,4 +74,9 @@ public class RoomJpaEntity extends BaseJpaEntity {
     public void updateMemberCount(int memberCount) {
         this.memberCount = memberCount;
     }
+
+    @VisibleForTesting
+    public void updateStartDate(LocalDate localDate) {
+        this.startDate = localDate;
+    }
 }
