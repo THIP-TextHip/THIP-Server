@@ -34,7 +34,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_BELONG_TO_ROOM;
+import static konkuk.thip.common.exception.code.ErrorCode.ROOM_ACCESS_FORBIDDEN;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -286,8 +286,8 @@ class RoomPlayingDetailViewApiTest {
         mockMvc.perform(get("/rooms/{roomId}/playing", room.getRoomId())
                         .requestAttr("userId", 1000L))      // 방에 속하지 않는 유저
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(USER_NOT_BELONG_TO_ROOM.getCode()))
-                .andExpect(jsonPath("$.message", containsString(USER_NOT_BELONG_TO_ROOM.getMessage())));
+                .andExpect(jsonPath("$.code").value(ROOM_ACCESS_FORBIDDEN.getCode()))
+                .andExpect(jsonPath("$.message", containsString(ROOM_ACCESS_FORBIDDEN.getMessage())));
     }
 
     @Test

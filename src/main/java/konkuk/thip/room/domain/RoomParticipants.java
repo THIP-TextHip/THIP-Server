@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_BELONG_TO_ROOM;
+import static konkuk.thip.common.exception.code.ErrorCode.ROOM_ACCESS_FORBIDDEN;
 
 @Getter
 @RequiredArgsConstructor
@@ -42,7 +42,7 @@ public class RoomParticipants {
                 .filter(userRoom -> userRoom.getUserId().equals(userId))
                 .map(RoomParticipant::getCurrentPage)
                 .findFirst()
-                .orElseThrow(() -> new InvalidStateException(USER_NOT_BELONG_TO_ROOM));
+                .orElseThrow(() -> new InvalidStateException(ROOM_ACCESS_FORBIDDEN));
     }
 
     public double getUserPercentageOfUser(Long userId) {
@@ -50,6 +50,6 @@ public class RoomParticipants {
                 .filter(userRoom -> userRoom.getUserId().equals(userId))
                 .map(RoomParticipant::getUserPercentage)
                 .findFirst()
-                .orElseThrow(() -> new InvalidStateException(USER_NOT_BELONG_TO_ROOM));
+                .orElseThrow(() -> new InvalidStateException(ROOM_ACCESS_FORBIDDEN));
     }
 }

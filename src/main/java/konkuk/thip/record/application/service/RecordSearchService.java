@@ -60,7 +60,7 @@ public class RecordSearchService implements RecordSearchUseCase {
 
         Book book = bookCommandPort.findBookByRoomId(recordSearchQuery.roomId());
         RoomParticipant roomParticipant = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(recordSearchQuery.userId(), recordSearchQuery.roomId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_BELONG_TO_ROOM));
+                .orElseThrow(() -> new BusinessException(ErrorCode.ROOM_ACCESS_FORBIDDEN));
 
         // cursor 파싱
         Cursor cursor = Cursor.from(recordSearchQuery.nextCursor(), DEFAULT_PAGE_SIZE);
