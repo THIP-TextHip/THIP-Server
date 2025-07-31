@@ -28,7 +28,7 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
         User feedOwner = userCommandPort.findById(userId);
 
         // 2. 해당 유저를 팔로우 하는 유저들을 프로필 이미지 정보 구하기
-        List<String> latestFollowerProfileImageUrls = followingQueryPort.getLatestFollowerProfileImageUrlsByUserId(userId, FOLLOWER_DISPLAY_LIMIT);
+        List<String> latestFollowerProfileImageUrls = followingQueryPort.getLatestFollowerImageUrls(userId, FOLLOWER_DISPLAY_LIMIT);
 
         // 3. 내가 작성한 전체 피드 개수 구하기
         int allFeedCount = feedQueryPort.countAllFeedsByUserId(userId);
@@ -43,7 +43,7 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
         User feedOwner = userCommandPort.findById(anotherUserId);
 
         // 2. 해당 유저를 팔로우 하는 유저들을 프로필 이미지 정보 구하기
-        List<String> latestFollowerProfileImageUrls = followingQueryPort.getLatestFollowerProfileImageUrlsByUserId(anotherUserId, FOLLOWER_DISPLAY_LIMIT);
+        List<String> latestFollowerProfileImageUrls = followingQueryPort.getLatestFollowerImageUrls(anotherUserId, FOLLOWER_DISPLAY_LIMIT);
 
         // 3. 유저가 작성한 공개 피드 개수 구하기
         int publicFeedCount = feedQueryPort.countPublicFeedsByUserId(anotherUserId);

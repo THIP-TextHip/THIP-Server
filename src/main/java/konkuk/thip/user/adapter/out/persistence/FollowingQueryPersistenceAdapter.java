@@ -42,7 +42,7 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
     }
 
     @Override
-    public List<String> getLatestFollowerProfileImageUrlsByUserId(Long userId, int size) {
-        return followingJpaRepository.findTopFollowerProfileImageUrlsByUserIdOrderByCreatedAtDesc(userId, size);
+    public List<String> getLatestFollowerImageUrls(Long userId, int size) {
+        return followingJpaRepository.findLatestFollowerImageUrls(userId, size);
     }
 }

@@ -9,6 +9,6 @@ public interface FollowingQueryPort {
     CursorBasedList<UserQueryDto> getFollowersByUserId(Long userId, String cursor, int size);
     CursorBasedList<UserQueryDto> getFollowingByUserId(Long userId, String cursor, int size);
 
-    List<String> getLatestFollowerProfileImageUrlsByUserId(Long userId, int size);
+    List<String> getLatestFollowerImageUrls(Long userId, int size);
 }
 
