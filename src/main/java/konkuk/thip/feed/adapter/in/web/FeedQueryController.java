@@ -50,11 +50,19 @@ public class FeedQueryController {
         return BaseResponse.ok(feedShowMineUseCase.showMyFeeds(userId, cursor));
     }
 
+    @Operation(
+            summary = "내 피드 조회의 상단 화면 구성",
+            description = "사용자의 정보, 사용자의 팔로워 정보, 사용자가 작성한 전체 피드 개수를 조회합니다."
+    )
     @GetMapping("/feeds/mine/info")
     public BaseResponse<FeedShowUserInfoResponse> showMyInfoInFeeds(@Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(feedShowUserInfoUseCase.showMyInfoInFeeds(userId));
     }
 
+    @Operation(
+            summary = "특정 유저 피드 조회의 상단 화면 구성",
+            description = "사용자의 정보, 사용자의 팔로워 정보, 사용자가 작성한 공개 피드 개수를 조회합니다."
+    )
     @GetMapping("/feeds/users/{userId}/info")
     public BaseResponse<FeedShowUserInfoResponse> showAnotherUserInfoInFeeds(
             @Parameter(description = "피드 조회할 유저의 userId 값") @PathVariable final Long userId
