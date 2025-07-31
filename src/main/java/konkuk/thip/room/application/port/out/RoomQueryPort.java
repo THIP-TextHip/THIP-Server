@@ -5,7 +5,8 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.application.port.out.dto.RoomShowMineQueryDto;
+import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,11 +24,15 @@ public interface RoomQueryPort {
 
     Page<RoomGetHomeJoinedListResponse.RoomSearchResult> searchHomeJoinedRooms(Long userId, LocalDate today, Pageable pageable);
 
-    CursorBasedList<RoomShowMineQueryDto> findRecruitingRoomsUserParticipated(Long userId, Cursor cursor);
+    CursorBasedList<RoomQueryDto> findRecruitingRoomsUserParticipated(Long userId, Cursor cursor);
 
-    CursorBasedList<RoomShowMineQueryDto> findPlayingRoomsUserParticipated(Long userId, Cursor cursor);
+    CursorBasedList<RoomQueryDto> findPlayingRoomsUserParticipated(Long userId, Cursor cursor);
 
-    CursorBasedList<RoomShowMineQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Cursor cursor);
+    CursorBasedList<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Cursor cursor);
 
-    CursorBasedList<RoomShowMineQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor);
+    CursorBasedList<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor);
+
+    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit);
+
+    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
 }
