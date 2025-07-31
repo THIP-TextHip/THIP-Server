@@ -285,7 +285,7 @@ class RoomPlayingDetailViewApiTest {
         //when //then
         mockMvc.perform(get("/rooms/{roomId}/playing", room.getRoomId())
                         .requestAttr("userId", 1000L))      // 방에 속하지 않는 유저
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(ROOM_ACCESS_FORBIDDEN.getCode()))
                 .andExpect(jsonPath("$.message", containsString(ROOM_ACCESS_FORBIDDEN.getMessage())));
     }

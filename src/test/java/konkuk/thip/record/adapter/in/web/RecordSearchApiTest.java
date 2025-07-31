@@ -366,7 +366,7 @@ class RecordSearchApiTest {
                         .requestAttr("userId", nonParticipantUserId)
                         .param("type", "group")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
