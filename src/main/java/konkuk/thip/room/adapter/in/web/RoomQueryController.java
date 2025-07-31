@@ -125,6 +125,11 @@ public class RoomQueryController {
         return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
     }
 
+    @Operation(
+            summary = "책 전체 페이지수 및 총평 가능 여부 조회 (in 기록 작성 화면)",
+            description = "방 참여자가 책 기록을 남길 수 있는 최대 책 페이지 수와 총평 작성 가능 여부를 조회합니다."
+    )
+    @ExceptionDescription(ROOM_GET_BOOK_PAGE)
     @GetMapping("/rooms/{roomId}/book-page")
     public BaseResponse<RoomGetBookPageResponse> getBookPage(
             @Parameter(description = "방 ID", example = "1") @PathVariable("roomId") final Long roomId,
