@@ -72,15 +72,7 @@ class RoomVerifyPasswordAPITest {
     void setUp() {
 
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
-
-        UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
-                .oauth2Id("kakao_432708231")
-                .nickname("User1")
-                .imageUrl("https://avatar1.jpg")
-                .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
-                .build());
-
+        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias, "User1"));
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .isbn("1234567890123")
                 .title("테스트책")

@@ -135,7 +135,6 @@ class RoomSearchApiTest {
         List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
                 .mapToObj(i -> UserJpaEntity.builder()
                         .nickname("user" + i)
-                        .imageUrl("http://image")
                         .oauth2Id("oauth2Id")
                         .role(UserRole.USER)
                         .aliasForUserJpaEntity(alias)
