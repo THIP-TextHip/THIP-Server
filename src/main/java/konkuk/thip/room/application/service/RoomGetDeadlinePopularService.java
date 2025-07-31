@@ -7,6 +7,7 @@ import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.domain.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class RoomGetDeadlinePopularService implements RoomGetDeadlinePopularUseC
     private static final int DEFAULT_LIMIT = 4;
 
     @Override
+    @Transactional(readOnly = true)
     public RoomGetDeadlinePopularResponse getDeadlineAndPopularRoomList(String categoryStr, Long userId) {
         Category category = Category.from(categoryStr);
 
