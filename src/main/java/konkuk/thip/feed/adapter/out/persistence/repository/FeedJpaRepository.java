@@ -9,5 +9,8 @@ import org.springframework.data.repository.query.Param;
 public interface FeedJpaRepository extends JpaRepository<FeedJpaEntity, Long>, FeedQueryRepository {
 
     @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.status = :status")
-    long countFeedsByUserId(@Param("userId") Long userId, @Param("status") StatusType status);
+    long countAllFeedsByUserId(@Param("userId") Long userId, @Param("status") StatusType status);
+
+    @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.isPublic = TRUE AND f.status = :status")
+    long countPublicFeedsByUserId(@Param("userId") Long userId, @Param("status") StatusType status);
 }

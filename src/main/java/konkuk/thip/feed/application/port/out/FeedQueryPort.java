@@ -16,5 +16,7 @@ public interface FeedQueryPort {
 
     CursorBasedList<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, Cursor cursor);
 
-    int countFeedsByUserId(Long userId);
+    int countAllFeedsByUserId(Long userId);
+
+    int countPublicFeedsByUserId(Long userId);
 }

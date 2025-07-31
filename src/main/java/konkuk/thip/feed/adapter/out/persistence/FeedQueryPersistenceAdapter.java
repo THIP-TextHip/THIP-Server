@@ -69,8 +69,13 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     }
 
     @Override
-    public int countFeedsByUserId(Long userId) {
+    public int countAllFeedsByUserId(Long userId) {
         // int 로 강제 형변환 해도 괜찮죠??
-        return (int) feedJpaRepository.countFeedsByUserId(userId, StatusType.ACTIVE);
+        return (int) feedJpaRepository.countAllFeedsByUserId(userId, StatusType.ACTIVE);
+    }
+
+    @Override
+    public int countPublicFeedsByUserId(Long userId) {
+        return (int) feedJpaRepository.countPublicFeedsByUserId(userId, StatusType.ACTIVE);
     }
 }
