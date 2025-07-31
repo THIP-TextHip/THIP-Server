@@ -79,4 +79,9 @@ public class RoomJpaEntity extends BaseJpaEntity {
     public void updateStartDate(LocalDate localDate) {
         this.startDate = localDate;
     }
+
+    @VisibleForTesting
+    public void updateIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
 }
