@@ -1,8 +1,9 @@
 package konkuk.thip.vote.application.port.in;
 
 import konkuk.thip.vote.application.port.in.dto.VoteCreateCommand;
+import konkuk.thip.vote.application.port.in.dto.VoteCreateResult;
 
 public interface VoteCreateUseCase {
 
-    Long createVote(VoteCreateCommand command);
+    VoteCreateResult createVote(VoteCreateCommand command);
 }
