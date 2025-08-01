@@ -65,16 +65,16 @@ public class VoteService implements VoteUseCase {
     }
 
     private void createVote(Long userId, Long voteItemId) {
-        modifyVoteCount(voteItemId, true);
+        updateVoteCount(voteItemId, true);
         voteCommandPort.saveVoteParticipant(VoteParticipant.withoutId(userId, voteItemId));
     }
 
     private void removeVote(VoteParticipant participant, Long voteItemId) {
-        modifyVoteCount(voteItemId, false);
+        updateVoteCount(voteItemId, false);
         voteCommandPort.deleteVoteParticipant(participant);
     }
 
-    private void modifyVoteCount(Long voteItemId, boolean isIncrease) {
+    private void updateVoteCount(Long voteItemId, boolean isIncrease) {
         VoteItem voteItem = voteCommandPort.getVoteItemByIdOrThrow(voteItemId);
         if (isIncrease) {
             voteItem.increaseCount();
