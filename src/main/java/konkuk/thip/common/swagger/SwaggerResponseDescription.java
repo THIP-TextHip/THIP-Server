@@ -132,6 +132,13 @@ public enum SwaggerResponseDescription {
             VOTE_CANNOT_BE_OVERVIEW,
             INVALID_VOTE_PAGE_RANGE
     ))),
+    VOTE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            VOTE_ITEM_NOT_FOUND,
+            VOTE_ITEM_ALREADY_VOTED,
+            VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL
+    ))),
+
 
     // FEED
     FEED_CREATE(new LinkedHashSet<>(Set.of(

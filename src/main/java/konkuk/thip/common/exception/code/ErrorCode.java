@@ -104,6 +104,14 @@ public enum ErrorCode implements ResponseCode {
      * 120000 : voteItem error
      */
     VOTE_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, 120000, "투표는 존재하지만 투표항목이 비어있습니다."),
+    VOTE_ITEM_ALREADY_VOTED(HttpStatus.BAD_REQUEST, 120001, "이미 투표한 투표항목입니다."),
+    VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 120002, "투표하지 않은 투표항목은 취소할 수 없습니다."),
+
+
+    /**
+     * 125000 : voteParticipant error
+     */
+    VOTE_PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, 125000, "존재하지 않는 VOTE PARTICIPANT 입니다."),
 
     /**
      * 130000 : record error

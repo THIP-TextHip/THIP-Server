@@ -3,6 +3,7 @@ package konkuk.thip.vote.application.port.out;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.vote.domain.Vote;
 import konkuk.thip.vote.domain.VoteItem;
+import konkuk.thip.vote.domain.VoteParticipant;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +24,14 @@ public interface VoteCommandPort {
         return findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
     }
+
+    Optional<VoteParticipant> findVoteParticipantByUserIdAndVoteId(Long userId, Long voteId);
+
+    Optional<VoteParticipant> findVoteParticipantByUserIdAndVoteItemId(Long userId, Long voteItemId);
+
+    void updateVoteItemFromVoteParticipant(VoteParticipant voteParticipant);
+
+    void saveVoteParticipant(VoteParticipant voteParticipant);
+
+    void deleteVoteParticipant(VoteParticipant voteParticipant);
 }

@@ -26,4 +26,9 @@ public class VoteParticipantJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vote_item_id")
     private VoteItemJpaEntity voteItemJpaEntity;
+
+    public VoteParticipantJpaEntity updateVoteItem(VoteItemJpaEntity voteItemJpaEntity) {
+        this.voteItemJpaEntity = voteItemJpaEntity;
+        return this;
+    }
 }
