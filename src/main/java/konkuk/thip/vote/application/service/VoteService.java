@@ -9,10 +9,8 @@ import konkuk.thip.vote.application.service.dto.VoteCommand;
 import konkuk.thip.vote.application.service.dto.VoteResult;
 import konkuk.thip.vote.domain.VoteParticipant;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VoteService implements VoteUseCase {
@@ -23,16 +21,14 @@ public class VoteService implements VoteUseCase {
 
     @Override
     public VoteResult vote(VoteCommand command) {
-        log.info("VoteService.vote() - userId: {}, roomId: {}, voteId: {}, voteItemId: {}, type: {}",
-                command.userId(), command.roomId(), command.voteId(), command.voteItemId(), command.type());
         // 1. 방 참가자 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
 
         if (command.type()) {
-            // 2. 투표 아이템에 투표하기
+            // 투표하기
             handleVote(command.userId(), command.voteId(), command.voteItemId());
         } else {
-            // 2. 투표 아이템에 투표 취소하기
+            // 투표 취소하기
             handleVoteCancel(command);
         }
 
