@@ -36,7 +36,7 @@ public class VoteService implements VoteUseCase {
     }
 
     private void voteOrUpdate(Long userId, Long voteId, Long voteItemId) {
-        // 사용자가 해당 투표 항목에 참여했는지 확인
+        // 사용자가 해당 투표에 참여했는지 확인
         voteCommandPort.findVoteParticipantByUserIdAndVoteId(userId, voteId)
                 .ifPresentOrElse(
                         // 투표를 이미 한 경우
