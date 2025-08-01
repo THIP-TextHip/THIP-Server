@@ -8,6 +8,7 @@ import konkuk.thip.vote.domain.VoteParticipant;
 import java.util.List;
 import java.util.Optional;
 
+import static konkuk.thip.common.exception.code.ErrorCode.VOTE_ITEM_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.VOTE_NOT_FOUND;
 
 public interface VoteCommandPort {
@@ -29,7 +30,7 @@ public interface VoteCommandPort {
 
     default VoteItem getVoteItemByIdOrThrow(Long id) {
         return findVoteItemById(id)
-                .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(VOTE_ITEM_NOT_FOUND));
     }
 
     Optional<VoteParticipant> findVoteParticipantByUserIdAndVoteId(Long userId, Long voteId);

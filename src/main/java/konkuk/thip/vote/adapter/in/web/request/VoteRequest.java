@@ -2,7 +2,7 @@ package konkuk.thip.vote.adapter.in.web.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import konkuk.thip.vote.application.service.dto.VoteCommand;
+import konkuk.thip.vote.application.port.in.dto.VoteCommand;
 
 @Schema(
         description = "투표하기 요청 DTO 정보"

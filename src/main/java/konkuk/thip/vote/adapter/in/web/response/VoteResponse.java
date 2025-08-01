@@ -1,6 +1,6 @@
 package konkuk.thip.vote.adapter.in.web.response;
 
-import konkuk.thip.vote.application.service.dto.VoteResult;
+import konkuk.thip.vote.application.port.in.dto.VoteResult;
 
 public record VoteResponse(
         Long voteItemId,
