@@ -136,6 +136,7 @@ class RoomRecruitingDetailViewApiTest {
         List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
                 .mapToObj(i -> UserJpaEntity.builder()
                         .nickname("user" + i)
+                        .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                         .oauth2Id("oauth2Id")
                         .role(UserRole.USER)
                         .aliasForUserJpaEntity(alias)

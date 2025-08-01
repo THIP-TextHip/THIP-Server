@@ -8,6 +8,7 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -95,6 +96,7 @@ class VoteCreateControllerTest {
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());
@@ -112,8 +114,8 @@ class VoteCreateControllerTest {
 
 
         CategoryJpaEntity category = categoryJpaRepository.save(CategoryJpaEntity.builder()
-                .value("과학/IT")
-                .imageUrl("과학/IT_image")
+                .value(Category.SCIENCE_IT.getValue())
+                .imageUrl(Category.SCIENCE_IT.getImageUrl())
                 .aliasForCategoryJpaEntity(alias)
                 .build());
 

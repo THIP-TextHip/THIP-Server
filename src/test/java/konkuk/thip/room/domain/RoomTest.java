@@ -21,7 +21,7 @@ class RoomTest {
     private final LocalDate today = LocalDate.now();
     private final LocalDate START = today.plusDays(1);
     private final LocalDate END = today.plusDays(32);
-    private final Category validCategory = Category.from("과학/IT");
+    private final Category validCategory = Category.SCIENCE_IT;
 
     @Test
     @DisplayName("withoutId: 공개 방이면서 password가 not null 이면, InvalidStateException 발생한다.")

@@ -14,11 +14,13 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.Alias;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 
 import java.time.LocalDate;
@@ -34,32 +36,32 @@ public class TestEntityFactory {
 
     public static AliasJpaEntity createLiteratureAlias() {
         return AliasJpaEntity.builder()         // 실제 존재하는 값으로
-                .value("문학가")
-                .imageUrl("문학_image")
-                .color("문학_color")
+                .value(Alias.WRITER.getValue())
+                .imageUrl(Alias.WRITER.getImageUrl())
+                .color(Alias.WRITER.getColor())
                 .build();
     }
 
     public static CategoryJpaEntity createLiteratureCategory(AliasJpaEntity alias) {
         return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
-                .value("문학")
-                .imageUrl("문학_image")
+                .value(Category.LITERATURE.getValue())
+                .imageUrl(Category.LITERATURE.getImageUrl())
                 .aliasForCategoryJpaEntity(alias)
                 .build();
     }
 
     public static AliasJpaEntity createScienceAlias() {
         return AliasJpaEntity.builder()         // 실제 존재하는 값으로
-                .value("과학자")
-                .imageUrl("과학_image")
-                .color("과학_color")
+                .value(Alias.SCIENTIST.getValue())
+                .imageUrl(Alias.SCIENTIST.getImageUrl())
+                .color(Alias.SCIENTIST.getColor())
                 .build();
     }
 
     public static CategoryJpaEntity createScienceCategory(AliasJpaEntity alias) {
         return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
-                .value("과학/IT")
-                .imageUrl("과학/IT_image")
+                .value(Category.SCIENCE_IT.getValue())
+                .imageUrl(Category.SCIENCE_IT.getImageUrl())
                 .aliasForCategoryJpaEntity(alias)
                 .build();
     }
@@ -67,6 +69,7 @@ public class TestEntityFactory {
     public static UserJpaEntity createUser(AliasJpaEntity alias) {
         return UserJpaEntity.builder()
                 .nickname("테스터")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -76,6 +79,7 @@ public class TestEntityFactory {
     public static UserJpaEntity createUser(AliasJpaEntity alias, String nickname) {
         return UserJpaEntity.builder()
                 .nickname(nickname)
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)

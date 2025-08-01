@@ -26,6 +26,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDate;
+
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -76,6 +78,7 @@ class RoomGetMemberListApiTest {
 
         user1 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터1")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_1")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -84,6 +87,7 @@ class RoomGetMemberListApiTest {
 
         user2 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터2")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_2")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)
@@ -92,6 +96,7 @@ class RoomGetMemberListApiTest {
 
         user3 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터3")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_3")
                 .aliasForUserJpaEntity(alias)
                 .role(UserRole.USER)

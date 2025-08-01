@@ -408,6 +408,7 @@ class RecordSearchApiTest {
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_123")
                 .nickname("테스트사용자")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());
@@ -525,6 +526,7 @@ class RecordSearchApiTest {
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_123")
                 .nickname("테스트사용자")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());

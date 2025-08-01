@@ -66,6 +66,7 @@ class BookDetailSearchControllerTest {
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());
