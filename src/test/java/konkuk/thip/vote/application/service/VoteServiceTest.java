@@ -7,6 +7,7 @@ import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.application.service.dto.VoteCommand;
 import konkuk.thip.vote.application.service.dto.VoteResult;
+import konkuk.thip.vote.domain.VoteItem;
 import konkuk.thip.vote.domain.VoteParticipant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,16 +36,21 @@ class VoteServiceTest {
     @DisplayName("처음 투표하는 경우 - 새로운 VoteParticipant 저장")
     void vote_firstTimeVote_success() {
         // given
+        VoteItem voteItem = mock(VoteItem.class);
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 100L, true);
-        when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
-                .thenReturn(Optional.empty());
+
 
         // when
+        when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
+                .thenReturn(Optional.empty());
+        when(voteCommandPort.getVoteItemByIdOrThrow(100L)).thenReturn(voteItem);
         VoteResult result = voteService.vote(command);
 
         // then
         assertThat(result.voteItemId()).isEqualTo(100L);
         verify(roomParticipantValidator).validateUserIsRoomMember(1L, 1L);
+        verify(voteItem).increaseCount();
+        verify(voteCommandPort).updateVoteItem(voteItem);
         verify(voteCommandPort).saveVoteParticipant(any(VoteParticipant.class));
     }
 
@@ -54,15 +60,16 @@ class VoteServiceTest {
         // given
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 200L, true);
         VoteParticipant existing = VoteParticipant.withoutId(1L, 100L);
-        when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
-                .thenReturn(Optional.of(existing));
 
         // when
+        when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
+                .thenReturn(Optional.of(existing));
+        when(voteCommandPort.getVoteItemByIdOrThrow(200L)).thenReturn(mock(VoteItem.class));
         VoteResult result = voteService.vote(command);
 
         // then
         assertThat(result.voteItemId()).isEqualTo(200L);
-        verify(voteCommandPort).updateVoteItemFromVoteParticipant(existing);
+        verify(voteCommandPort).updateVoteParticipant(existing);
     }
 
     @Test
@@ -84,16 +91,21 @@ class VoteServiceTest {
     @DisplayName("투표 취소 - 해당 voteItem에 투표한 적이 있으면 삭제")
     void vote_cancelVote_success() {
         // given
+        VoteItem voteItem = mock(VoteItem.class);
+
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 300L, false);
         VoteParticipant existing = VoteParticipant.withoutId(1L, 300L);
-        when(voteCommandPort.findVoteParticipantByUserIdAndVoteItemId(1L, 300L))
-                .thenReturn(Optional.of(existing));
 
         // when
+        when(voteCommandPort.getVoteItemByIdOrThrow(300L)).thenReturn(voteItem);
+        when(voteCommandPort.findVoteParticipantByUserIdAndVoteItemId(1L, 300L))
+                .thenReturn(Optional.of(existing));
         VoteResult result = voteService.vote(command);
 
         // then
         assertThat(result.type()).isFalse();
+        verify(voteItem).decreaseCount();
+        verify(voteCommandPort).updateVoteItem(voteItem);
         verify(voteCommandPort).deleteVoteParticipant(existing);
     }
 

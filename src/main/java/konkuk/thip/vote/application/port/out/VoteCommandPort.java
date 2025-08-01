@@ -25,13 +25,22 @@ public interface VoteCommandPort {
                 .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
     }
 
+    Optional<VoteItem> findVoteItemById(Long id);
+
+    default VoteItem getVoteItemByIdOrThrow(Long id) {
+        return findVoteItemById(id)
+                .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
+    }
+
     Optional<VoteParticipant> findVoteParticipantByUserIdAndVoteId(Long userId, Long voteId);
 
     Optional<VoteParticipant> findVoteParticipantByUserIdAndVoteItemId(Long userId, Long voteItemId);
 
-    void updateVoteItemFromVoteParticipant(VoteParticipant voteParticipant);
+    void updateVoteParticipant(VoteParticipant voteParticipant);
 
     void saveVoteParticipant(VoteParticipant voteParticipant);
 
     void deleteVoteParticipant(VoteParticipant voteParticipant);
+
+    void updateVoteItem(VoteItem voteItem);
 }

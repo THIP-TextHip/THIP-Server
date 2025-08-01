@@ -44,7 +44,7 @@ public class User extends BaseDomainEntity {
 
     public void decreaseFollowerCount() {
         if(followerCount == 0) {
-            throw new InvalidStateException(ErrorCode.FOLLOW_COUNT_IS_ZERO);
+            throw new InvalidStateException(ErrorCode.FOLLOW_COUNT_CANNOT_BE_NEGATIVE);
         }
         followerCount--;
     }

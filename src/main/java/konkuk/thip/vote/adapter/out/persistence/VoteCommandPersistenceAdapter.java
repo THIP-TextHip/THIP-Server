@@ -76,6 +76,12 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     }
 
     @Override
+    public Optional<VoteItem> findVoteItemById(Long id) {
+        return voteItemJpaRepository.findById(id)
+                .map(voteItemMapper::toDomainEntity);
+    }
+
+    @Override
     public Optional<VoteParticipant> findVoteParticipantByUserIdAndVoteId(Long userId, Long voteId) {
         return voteParticipantJpaRepository.findVoteParticipantByUserIdAndVoteId(userId, voteId)
                 .map(voteParticipantMapper::toDomainEntity);
@@ -88,7 +94,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     }
 
     @Override
-    public void updateVoteItemFromVoteParticipant(VoteParticipant voteParticipant) {
+    public void updateVoteParticipant(VoteParticipant voteParticipant) {
         VoteParticipantJpaEntity voteParticipantJpaEntity = voteParticipantJpaRepository.findById(voteParticipant.getId()).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_PARTICIPANT_NOT_FOUND)
         );
@@ -118,6 +124,15 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     public void deleteVoteParticipant(VoteParticipant voteParticipant) {
         // 앞에서 이미 존재 여부를 확인했으므로, 여기서는 ID로 삭제
         voteParticipantJpaRepository.deleteById(voteParticipant.getId());
+    }
+
+    @Override
+    public void updateVoteItem(VoteItem voteItem) {
+        VoteItemJpaEntity voteItemJpaEntity = voteItemJpaRepository.findById(voteItem.getId()).orElseThrow(
+                () -> new EntityNotFoundException(VOTE_ITEM_NOT_FOUND)
+        );
+
+        voteItemJpaRepository.save(voteItemJpaEntity.updateFrom(voteItem));
     }
 
 

@@ -44,7 +44,6 @@ public class VoteCommandController {
         ));
     }
 
-    // 투표하기
     @Operation(
             summary = "투표하기",
             description = "특정 투표에 대해 사용자가 투표를 진행합니다. type이 true이면 투표하기, false이면 투표 취소입니다."

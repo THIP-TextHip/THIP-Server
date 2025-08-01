@@ -50,7 +50,7 @@ public enum ErrorCode implements ResponseCode {
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, 75000, "존재하지 않는 FOLLOW 입니다."),
     USER_ALREADY_UNFOLLOWED(HttpStatus.BAD_REQUEST, 75001, "이미 언팔로우한 사용자입니다."),
     USER_CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, 75002, "사용자는 자신을 팔로우할 수 없습니다."),
-    FOLLOW_COUNT_IS_ZERO(HttpStatus.BAD_REQUEST, 75003, "사용자의 팔로우 수가 0일때는 언팔로우는 불가능합니다."),
+    FOLLOW_COUNT_CANNOT_BE_NEGATIVE(HttpStatus.BAD_REQUEST, 75003, "사용자의 팔로우 수가 0일때는 언팔로우는 불가능합니다."),
 
     /**
      * 80000 : book error
@@ -106,6 +106,7 @@ public enum ErrorCode implements ResponseCode {
     VOTE_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, 120000, "투표는 존재하지만 투표항목이 비어있습니다."),
     VOTE_ITEM_ALREADY_VOTED(HttpStatus.BAD_REQUEST, 120001, "이미 투표한 투표항목입니다."),
     VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 120002, "투표하지 않은 투표항목은 취소할 수 없습니다."),
+    VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE(HttpStatus.BAD_REQUEST, 120003, "투표항목의 투표 수는 0 이하로 감소할 수 없습니다."),
 
 
     /**
