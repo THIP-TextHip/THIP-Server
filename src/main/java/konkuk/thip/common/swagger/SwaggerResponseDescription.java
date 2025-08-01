@@ -26,6 +26,16 @@ public enum SwaggerResponseDescription {
     USER_SEARCH(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
     ))),
+    USER_UPDATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ALIAS_NAME_NOT_MATCH,
+            USER_NICKNAME_TOO_LONG,
+            USER_NICKNAME_CANNOT_BE_BLANK,
+            USER_NICKNAME_CANNOT_BE_SAME,
+            USER_NICKNAME_UPDATE_TOO_FREQUENT,
+            USER_NICKNAME_ALREADY_EXISTS
+    ))),
+
 
     // Follow
     CHANGE_FOLLOW_STATE(new LinkedHashSet<>(Set.of(

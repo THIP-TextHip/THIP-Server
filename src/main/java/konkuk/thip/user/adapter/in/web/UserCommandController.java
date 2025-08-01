@@ -23,8 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
 import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.CHANGE_FOLLOW_STATE;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.USER_SIGNUP;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "User Command API", description = "사용자가 주체가 되는 정보 수정")
 @RestController
@@ -67,6 +66,11 @@ public class UserCommandController {
         )));
     }
 
+    @Operation(
+            summary = "사용자 정보 수정",
+            description = "사용자가 자신의 정보를 수정합니다. 닉네임과 칭호(Alias)를 수정할 수 있습니다."
+    )
+    @ExceptionDescription(USER_UPDATE)
     @PatchMapping("/users")
     public BaseResponse<Void> updateUser(
             @Parameter(hidden = true) @UserId final Long userId,
