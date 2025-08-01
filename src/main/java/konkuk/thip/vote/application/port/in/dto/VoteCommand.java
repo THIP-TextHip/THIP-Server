@@ -1,4 +1,4 @@
-package konkuk.thip.vote.application.service.dto;
+package konkuk.thip.vote.application.port.in.dto;
 
 public record VoteCommand(
         Long userId,
