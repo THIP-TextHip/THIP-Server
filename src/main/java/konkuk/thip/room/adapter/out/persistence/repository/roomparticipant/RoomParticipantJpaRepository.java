@@ -26,6 +26,6 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
             "WHERE rp.userJpaEntity.userId = :userId " +
             "AND rp.roomJpaEntity.roomId = :roomId " +
             "AND rp.status = 'ACTIVE'")
-    boolean existByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
+    boolean existsByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
 }
