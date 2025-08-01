@@ -13,6 +13,7 @@ public class UserMapper {
     public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
         return UserJpaEntity.builder()
                 .nickname(user.getNickname())
+                .nicknameUpdatedAt(user.getNicknameUpdatedAt())
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
                 .followerCount(user.getFollowerCount())
@@ -24,6 +25,7 @@ public class UserMapper {
         return User.builder()
                 .id(userJpaEntity.getUserId())
                 .nickname(userJpaEntity.getNickname())
+                .nicknameUpdatedAt(userJpaEntity.getNicknameUpdatedAt())
                 .userRole(userJpaEntity.getRole().getType())
                 .oauth2Id(userJpaEntity.getOauth2Id())
                 .followerCount(userJpaEntity.getFollowerCount())

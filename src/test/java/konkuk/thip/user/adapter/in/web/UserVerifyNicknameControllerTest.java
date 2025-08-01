@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDate;
+
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static konkuk.thip.user.adapter.out.jpa.UserRole.USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +83,7 @@ class UserVerifyNicknameControllerTest {
 
         UserJpaEntity userJpaEntity = UserJpaEntity.builder()
                 .nickname("테스트유저")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(USER)
                 .oauth2Id("kakao_12345678")
                 .aliasForUserJpaEntity(aliasJpaEntity)

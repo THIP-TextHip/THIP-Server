@@ -10,7 +10,7 @@ public record UserFollowRequest(
         @NotNull(message = "type은 필수 파라미터입니다.")
         Boolean type
 ) {
-        public static UserFollowCommand toCommand(Long userId, Long targetUserId, Boolean type) {
+        public UserFollowCommand toCommand(Long userId, Long targetUserId) {
                 return new UserFollowCommand(userId, targetUserId, type);
         }
 }

@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,6 +59,7 @@ class UserFollowApiTest {
 
         UserJpaEntity followingUser = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("user100")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("oauth2_user100")
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
@@ -65,6 +67,7 @@ class UserFollowApiTest {
 
         UserJpaEntity target = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("user200")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("oauth2_user200")
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)

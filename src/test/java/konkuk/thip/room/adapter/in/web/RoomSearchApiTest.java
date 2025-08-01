@@ -9,6 +9,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -135,6 +136,7 @@ class RoomSearchApiTest {
         List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
                 .mapToObj(i -> UserJpaEntity.builder()
                         .nickname("user" + i)
+                        .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                         .oauth2Id("oauth2Id")
                         .role(UserRole.USER)
                         .aliasForUserJpaEntity(alias)
@@ -362,7 +364,7 @@ class RoomSearchApiTest {
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
                 .param("keyword", "과학")
-                .param("category", "과학/IT")
+                .param("category", Category.SCIENCE_IT.getValue())
                 .param("sort", "deadline")
                 .param("page", "1"));
 

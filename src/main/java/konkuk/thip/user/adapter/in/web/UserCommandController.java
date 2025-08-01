@@ -12,20 +12,18 @@ import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.user.adapter.in.web.request.UserFollowRequest;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
+import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
 import konkuk.thip.user.adapter.in.web.response.UserFollowResponse;
 import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
+import konkuk.thip.user.application.port.in.UserUpdateUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
 import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.CHANGE_FOLLOW_STATE;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.USER_SIGNUP;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "User Command API", description = "사용자가 주체가 되는 정보 수정")
 @RestController
@@ -34,6 +32,8 @@ public class UserCommandController {
 
     private final UserSignupUseCase userSignupUseCase;
     private final UserFollowUsecase userFollowUsecase;
+    private final UserUpdateUseCase userUpdateUseCase;
+
     private final JwtUtil jwtUtil;
 
     @Operation(
@@ -60,9 +60,22 @@ public class UserCommandController {
     public BaseResponse<UserFollowResponse> followUser(
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "팔로우/언팔로우할 사용자 ID") @PathVariable final Long followingUserId,
-            @RequestBody @Valid final UserFollowRequest request) {
+            @RequestBody @Valid final UserFollowRequest userFollowRequest) {
         return BaseResponse.ok(UserFollowResponse.of(userFollowUsecase.changeFollowingState(
-                UserFollowRequest.toCommand(userId, followingUserId, request.type())
+                userFollowRequest.toCommand(userId, followingUserId)
         )));
+    }
+
+    @Operation(
+            summary = "사용자 정보 수정",
+            description = "사용자가 자신의 정보를 수정합니다. 닉네임과 칭호(Alias)를 수정할 수 있습니다."
+    )
+    @ExceptionDescription(USER_UPDATE)
+    @PatchMapping("/users")
+    public BaseResponse<Void> updateUser(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @RequestBody @Valid final UserUpdateRequest userUpdateRequest) {
+        userUpdateUseCase.updateUser(userUpdateRequest.toCommand(userId));
+        return BaseResponse.ok(null);
     }
 }

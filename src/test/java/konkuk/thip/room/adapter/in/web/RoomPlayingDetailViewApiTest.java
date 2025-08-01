@@ -11,6 +11,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -121,6 +122,7 @@ class RoomPlayingDetailViewApiTest {
         List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
                 .mapToObj(i -> UserJpaEntity.builder()
                         .nickname("user" + i)
+                        .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                         .oauth2Id("oauth2Id")
                         .role(UserRole.USER)
                         .aliasForUserJpaEntity(alias)
@@ -193,7 +195,7 @@ class RoomPlayingDetailViewApiTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.isHost", is(false)))
                 .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
-                .andExpect(jsonPath("$.data.roomImageUrl", is("과학/IT_image")))      // 방 대표 이미지 추가
+                .andExpect(jsonPath("$.data.roomImageUrl", is(Category.SCIENCE_IT.getImageUrl())))      // 방 대표 이미지 추가
                 .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))
@@ -241,7 +243,7 @@ class RoomPlayingDetailViewApiTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.isHost", is(true)))     // 방 HOST 이면 true
                 .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
-                .andExpect(jsonPath("$.data.roomImageUrl", is("과학/IT_image")))      // 방 대표 이미지 추가
+                .andExpect(jsonPath("$.data.roomImageUrl", is(Category.SCIENCE_IT.getImageUrl())))      // 방 대표 이미지 추가
                 .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))
@@ -315,7 +317,7 @@ class RoomPlayingDetailViewApiTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.isHost", is(false)))
                 .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
-                .andExpect(jsonPath("$.data.roomImageUrl", is("과학/IT_image")))      // 방 대표 이미지 추가
+                .andExpect(jsonPath("$.data.roomImageUrl", is(Category.SCIENCE_IT.getImageUrl())))      // 방 대표 이미지 추가
                 .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))
@@ -367,7 +369,7 @@ class RoomPlayingDetailViewApiTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.isHost", is(false)))
                 .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
-                .andExpect(jsonPath("$.data.roomImageUrl", is("과학/IT_image")))      // 방 대표 이미지 추가
+                .andExpect(jsonPath("$.data.roomImageUrl", is(Category.SCIENCE_IT.getImageUrl())))      // 방 대표 이미지 추가
                 .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))

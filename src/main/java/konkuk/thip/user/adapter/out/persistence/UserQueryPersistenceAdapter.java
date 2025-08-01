@@ -24,6 +24,11 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
     }
 
     @Override
+    public boolean existsByNicknameAndUserIdNot(String nickname, Long userId) {
+        return userJpaRepository.existsByNicknameAndUserIdNot(nickname, userId);
+    }
+
+    @Override
     public Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId) {
         return  userJpaRepository.findUserIdsByBookId(bookId);
     }

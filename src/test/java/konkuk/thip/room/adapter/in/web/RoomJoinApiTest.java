@@ -95,6 +95,7 @@ class RoomJoinApiTest {
         host = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("user")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());
@@ -102,6 +103,7 @@ class RoomJoinApiTest {
         participant = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_12345678")
                 .nickname("user123")
+                .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
                 .aliasForUserJpaEntity(alias)
                 .build());

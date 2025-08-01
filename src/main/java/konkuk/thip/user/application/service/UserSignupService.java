@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 import static konkuk.thip.user.adapter.out.jpa.UserRole.USER;
 
 
@@ -23,7 +25,7 @@ public class UserSignupService implements UserSignupUseCase {
     public Long signup(UserSignupCommand command) {
         Alias alias = Alias.from(command.aliasName());
         User user = User.withoutId(
-                command.nickname(), USER.getType(), command.oauth2Id(), alias
+                command.nickname(), LocalDate.now(), USER.getType(), command.oauth2Id(), alias
         );
 
         return userCommandPort.save(user);

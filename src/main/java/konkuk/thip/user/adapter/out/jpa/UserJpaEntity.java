@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.user.domain.User;
 import lombok.*;
-import org.springframework.util.Assert;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +24,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(length = 60, nullable = false)
     private String nickname;
 
+    @Column(name = "nickname_updated_at", nullable = false)
+    private LocalDate nicknameUpdatedAt; // 날짜 형식으로 저장 (예: "2023-10-01")
+
     @Column(name = "oauth2_id", length = 50, nullable = false)
     private String oauth2Id;
 
@@ -37,9 +41,17 @@ public class UserJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_alias_id", nullable = false)
     private AliasJpaEntity aliasForUserJpaEntity;
 
+    public void updateIncludeAliasFrom(User user, AliasJpaEntity aliasJpaEntity) {
+        this.nickname = user.getNickname();
+        this.nicknameUpdatedAt = user.getNicknameUpdatedAt();
+        this.role = UserRole.from(user.getUserRole());
+        this.followerCount = user.getFollowerCount();
+        this.aliasForUserJpaEntity = aliasJpaEntity;
+    }
+
     public void updateFrom(User user) {
         this.nickname = user.getNickname();
-        Assert.notNull(user.getAlias(), "Alias must not be null");
+        this.nicknameUpdatedAt = user.getNicknameUpdatedAt();
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
     }

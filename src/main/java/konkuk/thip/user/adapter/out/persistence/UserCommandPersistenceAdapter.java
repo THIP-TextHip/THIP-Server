@@ -52,4 +52,20 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
                 .map(userMapper::toDomainEntity)
                 .collect(Collectors.toMap(User::getId, Function.identity()));
     }
+
+    @Override
+    public void update(User user) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(user.getId()).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND)
+        );
+
+        aliasJpaRepository.findByValue(user.getAlias().getValue()).ifPresentOrElse(
+                aliasJpaEntity -> userJpaEntity.updateIncludeAliasFrom(user, aliasJpaEntity),
+                () -> {
+                    throw new EntityNotFoundException(ALIAS_NOT_FOUND);
+                }
+        );
+
+        userJpaRepository.save(userJpaEntity);
+    }
 }

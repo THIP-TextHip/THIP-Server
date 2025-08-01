@@ -8,6 +8,9 @@ import java.util.Set;
 
 public interface UserQueryPort {
     boolean existsByNickname(String nickname);
+
+    boolean existsByNicknameAndUserIdNot(String nickname, Long userId);
+
     Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId);
 
     UserViewAliasChoiceResult getAllAliasesAndCategories();
