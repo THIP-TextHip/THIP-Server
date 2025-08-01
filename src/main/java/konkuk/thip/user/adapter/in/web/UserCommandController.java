@@ -12,15 +12,14 @@ import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.user.adapter.in.web.request.UserFollowRequest;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
+import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
 import konkuk.thip.user.adapter.in.web.response.UserFollowResponse;
 import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
+import konkuk.thip.user.application.port.in.UserUpdateUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
 import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
@@ -34,6 +33,8 @@ public class UserCommandController {
 
     private final UserSignupUseCase userSignupUseCase;
     private final UserFollowUsecase userFollowUsecase;
+    private final UserUpdateUseCase userUpdateUseCase;
+
     private final JwtUtil jwtUtil;
 
     @Operation(
@@ -60,9 +61,17 @@ public class UserCommandController {
     public BaseResponse<UserFollowResponse> followUser(
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "팔로우/언팔로우할 사용자 ID") @PathVariable final Long followingUserId,
-            @RequestBody @Valid final UserFollowRequest request) {
+            @RequestBody @Valid final UserFollowRequest userFollowRequest) {
         return BaseResponse.ok(UserFollowResponse.of(userFollowUsecase.changeFollowingState(
-                UserFollowRequest.toCommand(userId, followingUserId, request.type())
+                userFollowRequest.toCommand(userId, followingUserId)
         )));
+    }
+
+    @PatchMapping("/users")
+    public BaseResponse<Void> updateUser(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @RequestBody @Valid final UserUpdateRequest userUpdateRequest) {
+        userUpdateUseCase.updateUser(userUpdateRequest.toCommand(userId));
+        return BaseResponse.ok(null);
     }
 }
