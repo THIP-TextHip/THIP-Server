@@ -65,12 +65,12 @@ public class User extends BaseDomainEntity {
         if(nickname.length() > 10) { // 10자 이상 불가
             throw new InvalidStateException(ErrorCode.USER_NICKNAME_TOO_LONG);
         }
-        if(nickname.equals(this.nickname)) { // 현재 닉네임과 같으면 업데이트 불가
-            throw new InvalidStateException(ErrorCode.USER_NICKNAME_CANNOT_BE_SAME);
-        }
         // 닉네임을 변경한지 6개월이 지나지 않았으면 닉네임 업데이트 불가
         if(nicknameUpdatedAt != null && nicknameUpdatedAt.isAfter(LocalDate.now().minusMonths(6))) {
             throw new InvalidStateException(ErrorCode.USER_NICKNAME_UPDATE_TOO_FREQUENT);
+        }
+        if(nickname.equals(this.nickname)) { // 현재 닉네임과 같으면 업데이트 불가
+            throw new InvalidStateException(ErrorCode.USER_NICKNAME_CANNOT_BE_SAME);
         }
     }
 
