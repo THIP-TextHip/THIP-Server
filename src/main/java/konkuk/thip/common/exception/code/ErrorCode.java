@@ -38,6 +38,11 @@ public enum ErrorCode implements ResponseCode {
      */
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 70000, "존재하지 않는 USER 입니다."),
     USER_ALREADY_FOLLOWED(HttpStatus.BAD_REQUEST, 70001, "이미 팔로우한 사용자입니다."),
+    USER_NICKNAME_TOO_LONG(HttpStatus.BAD_REQUEST, 70002, "사용자 닉네임은 10자 이하여야 합니다."),
+    USER_NICKNAME_CANNOT_BE_BLANK(HttpStatus.BAD_REQUEST, 70003, "사용자 닉네임은 비어있을 수 없습니다."),
+    USER_NICKNAME_CANNOT_BE_SAME(HttpStatus.BAD_REQUEST, 70004, "사용자 닉네임은 이전과 동일할 수 없습니다."),
+    USER_NICKNAME_UPDATE_TOO_FREQUENT(HttpStatus.BAD_REQUEST, 70005, "사용자 닉네임은 6개월에 한번 변경할 수 있습니다."),
+    USER_NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 70006, "다른 사용자가 이미 사용중인 닉네임입니다."),
 
     /**
      * 75000 : follow error
