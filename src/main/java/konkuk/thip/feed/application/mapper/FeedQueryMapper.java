@@ -1,8 +1,9 @@
 package konkuk.thip.feed.application.mapper;
 
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedShowByUserResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowMineResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowUserInfoResponse;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.user.domain.User;
@@ -32,11 +33,22 @@ public interface FeedQueryMapper {
             Set<Long> likedFeedIds
     );
 
+    @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))")
+    FeedShowMineResponse.FeedDto toFeedShowMineDto(FeedQueryDto dto);
+
+    List<FeedShowMineResponse.FeedDto> toFeedShowMineResponse(List<FeedQueryDto> dtos);
+
+    @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
+    @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
     @Mapping(
             target = "postDate",
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
-    FeedShowMineResponse.FeedDto toFeedShowMineResponse(FeedQueryDto dto);
+    FeedShowByUserResponse.FeedDto toFeedShowByUserResponse(
+            FeedQueryDto dto,
+            Set<Long> savedFeedIds,
+            Set<Long> likedFeedIds
+    );
 
     @Mapping(target = "profileImageUrl", source = "feedOwner.alias.imageUrl")
     @Mapping(target = "nickname", source = "feedOwner.nickname")
