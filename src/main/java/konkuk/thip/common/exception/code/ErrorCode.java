@@ -175,6 +175,10 @@ public enum ErrorCode implements ResponseCode {
     COMMENT_LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190002, "좋아요 수는 0 이하로 감소할 수 없습니다."),
     COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, 190003, "사용자가 이미 좋아요한 댓글입니다."),
     COMMENT_NOT_LIKED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 190004, "사용자가 좋아요하지 않은 댓글은 좋아요 취소 할 수 없습니다."),
+    COMMENT_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, 190005, "댓글 삭제 권한이 없습니다."),
+    COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 190006, "이미 삭제된 댓글 입니다."),
+    COMMENT_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190007, "댓글 수는 0 이하로 감소할 수 없습니다."),
+
     ;
 
     private final HttpStatus httpStatus;
