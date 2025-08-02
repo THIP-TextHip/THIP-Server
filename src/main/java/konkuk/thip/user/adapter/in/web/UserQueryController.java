@@ -90,7 +90,7 @@ public class UserQueryController {
             description = "내가 팔로우하는 사용자 목록을 조회합니다."
     )
     @ExceptionDescription(GET_USER_FOLLOW)
-    @GetMapping("/users/my/following")
+    @GetMapping("/users/my-followings")
     public BaseResponse<UserFollowingResponse> showMyFollowing(
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "커서") @RequestParam(required = false) final String cursor,
@@ -138,5 +138,15 @@ public class UserQueryController {
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(required = false) final String cursor) {
         return BaseResponse.ok(userMyPageUseCase.getUserReaction(userId, UserReactionType.from(type), size, cursor));
+    }
+
+    @Operation(
+            summary = "사용자 유저 정보 조회 (마이페이지)",
+            description = "사용자의 마이페이지 정보를 조회합니다."
+    )
+    @GetMapping("/users/my-page")
+    public BaseResponse<UserProfileResponse> showUserMyPage(
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(userMyPageUseCase.getUserProfile(userId));
     }
 }

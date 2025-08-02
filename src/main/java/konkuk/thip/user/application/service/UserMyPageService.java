@@ -7,8 +7,10 @@ import konkuk.thip.user.adapter.in.web.response.UserReactionResponse;
 import konkuk.thip.user.application.mapper.ReactionQueryMapper;
 import konkuk.thip.user.application.port.in.UserMyPageUseCase;
 import konkuk.thip.user.application.port.in.dto.UserReactionType;
+import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class UserMyPageService implements UserMyPageUseCase {
 
     private final UserQueryPort userQueryPort;
+    private final UserCommandPort userCommandPort;
 
     private final ReactionQueryMapper reactionQueryMapper;
 
@@ -43,6 +46,8 @@ public class UserMyPageService implements UserMyPageUseCase {
 
     @Override
     public UserProfileResponse getUserProfile(Long userId) {
-        return null;
+        User user = userCommandPort.findById(userId);
+
+        return UserProfileResponse.of(user.getAlias().getImageUrl(), user.getNickname(), user.getAlias().getValue());
     }
 }
