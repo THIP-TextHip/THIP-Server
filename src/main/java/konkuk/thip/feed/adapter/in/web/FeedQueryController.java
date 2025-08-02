@@ -52,8 +52,8 @@ public class FeedQueryController {
     }
 
     @Operation(
-            summary = "특정 유저 피드 조회",
-            description = "내가 아닌 다른 유저가 작성한 피드를 전체 조회합니다."
+            summary = "특정 유저의 공개 피드 조회",
+            description = "내가 아닌 다른 유저가 작성한 공개 피드를 전체 조회합니다."
     )
     @GetMapping("/feeds/users/{userId}")
     public BaseResponse<FeedShowByUserResponse> showSpecificUserFeeds(
@@ -74,7 +74,7 @@ public class FeedQueryController {
     }
 
     @Operation(
-            summary = "특정 유저 피드 조회의 상단 화면 구성",
+            summary = "특정 유저의 공개 피드 조회의 상단 화면 구성",
             description = "사용자의 정보, 사용자의 팔로워 정보, 사용자가 작성한 공개 피드 개수를 조회합니다."
     )
     @GetMapping("/feeds/users/{userId}/info")
