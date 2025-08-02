@@ -8,13 +8,7 @@ import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
 import konkuk.thip.common.post.service.PostQueryService;
-import konkuk.thip.feed.application.port.out.FeedCommandPort;
-import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.common.post.PostType;
-import konkuk.thip.record.application.port.out.RecordCommandPort;
-import konkuk.thip.record.domain.Record;
-import konkuk.thip.vote.application.port.out.VoteCommandPort;
-import konkuk.thip.vote.domain.Vote;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +21,6 @@ import static konkuk.thip.common.exception.code.ErrorCode.INVALID_COMMENT_CREATE
 public class CommentCreateService implements CommentCreateUseCase {
 
     private final CommentCommandPort commentCommandPort;
-    private final FeedCommandPort feedCommandPort;
-    private final RecordCommandPort recordCommandPort;
-    private final VoteCommandPort voteCommandPort;
 
     private final PostQueryService postQueryService;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
