@@ -27,6 +27,10 @@ public abstract class PostJpaEntity extends BaseJpaEntity {
 
     protected Integer commentCount = 0;
 
+    // type 구분을 위한 조회용 컬럼
+    @Column(name = "dtype", insertable = false, updatable = false)
+    private String dtype;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
