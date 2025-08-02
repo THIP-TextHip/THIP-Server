@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.user.application.port.in.dto.UserReactionType;
 import konkuk.thip.user.adapter.in.web.response.*;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
@@ -23,6 +24,7 @@ import konkuk.thip.user.application.port.in.UserIsFollowingUsecase;
 import konkuk.thip.user.application.port.in.UserSearchUsecase;
 import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
 import konkuk.thip.user.application.port.in.dto.UserSearchQuery;
+import konkuk.thip.user.application.port.in.UserMyPageUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +47,7 @@ public class UserQueryController {
     private final UserIsFollowingUsecase userIsFollowingUsecase;
     private final UserVerifyNicknameUseCase userVerifyNicknameUseCase;
     private final UserSearchUsecase userSearchUsecase;
+    private final UserMyPageUseCase userMyPageUseCase;
 
     @Operation(
             summary = "닉네임 중복 확인",
@@ -119,5 +122,17 @@ public class UserQueryController {
             @Parameter(description = "단일 검색 결과 페이지 크기 (1~30) / default : 30", example = "30") @RequestParam(required = false, defaultValue = "30") @Min(1) @Max(30) final Integer size,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size)));
+    }
+
+    @GetMapping("/users/reactions")
+    public BaseResponse<UserReactionResponse> showUserReaction(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "반응 타입 (LIKE, COMMENT) / default : 둘다", example = "LIKE")
+            @RequestParam(required = false, defaultValue = "BOTH") final String type,
+            @Parameter(description = "단일 요청 페이지 크기 (1~10) / default : 10", example = "10")
+            @RequestParam(defaultValue = "10") @Max(value = 10) @Min(value = 1) final int size,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(required = false) final String cursor) {
+        return BaseResponse.ok(userMyPageUseCase.getUserReaction(userId, UserReactionType.from(type), size, cursor));
     }
 }

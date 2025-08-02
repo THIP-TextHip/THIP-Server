@@ -1,5 +1,8 @@
 package konkuk.thip.user.application.port.out;
 
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
 import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 
@@ -16,4 +19,10 @@ public interface UserQueryPort {
     UserViewAliasChoiceResult getAllAliasesAndCategories();
 
     List<UserQueryDto> findUsersByNicknameOrderByAccuracy(String keyword, Long userId, Integer size);
+
+    CursorBasedList<ReactionQueryDto> findLikeReactionsByUserId(Long userId, Cursor cursor);
+
+    CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor);
+
+    CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor);
 }
