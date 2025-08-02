@@ -13,6 +13,6 @@ public class BaseDomainEntity {
 
     private LocalDateTime modifiedAt;
 
-    private StatusType status;
+    protected StatusType status;
 
 }
