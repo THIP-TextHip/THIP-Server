@@ -124,6 +124,10 @@ public class UserQueryController {
         return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size)));
     }
 
+    @Operation(
+            summary = "사용자 반응 조회",
+            description = "사용자가 남긴 반응(좋아요, 댓글)을 조회합니다."
+    )
     @GetMapping("/users/reactions")
     public BaseResponse<UserReactionResponse> showUserReaction(
             @Parameter(hidden = true) @UserId final Long userId,
