@@ -72,7 +72,7 @@ class UserGetFollowingApiTest {
     void getFollowingsWithCursorPaging() throws Exception {
         // 1. 첫 번째 요청 (cursor 없음)
         ResultActions firstPageResult = mockMvc.perform(
-                get("/users/my/following")
+                get("/users/my-followings")
                         .requestAttr("userId", loginUser.getUserId())
         );
 
@@ -90,7 +90,7 @@ class UserGetFollowingApiTest {
 
         // 2. 두 번째 요청 (cursor 사용)
         ResultActions secondPageResult = mockMvc.perform(
-                get("/users/my/following")
+                get("/users/my-followings")
                         .param("cursor", nextCursor)
                         .requestAttr("userId", loginUser.getUserId())
         );
