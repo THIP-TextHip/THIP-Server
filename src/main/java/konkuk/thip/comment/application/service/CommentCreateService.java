@@ -53,11 +53,13 @@ public class CommentCreateService implements CommentCreateUseCase {
         // 3. 댓글 생성
         Long commentId = createCommentDomain(command);
 
+        //TODO 게시물의 댓글 수 증가/감소 동시성 제어 로직 추가해야됨
+
         // 4. 게시글 댓글 수 증가
         // 4-1. 도메인 게시물 댓글 수 증가
         post.increaseCommentCount();
         // 4-2 Jpa엔티티 게시물 댓글 수 증가
-        updatePost(type, post);
+        postQueryService.updatePost(type, post);
 
         return commentId;
     }
@@ -83,14 +85,6 @@ public class CommentCreateService implements CommentCreateUseCase {
         );
 
         return commentCommandPort.save(comment);
-    }
-
-    private void updatePost(PostType type, CommentCountUpdatable post) {
-        switch (type) {
-            case FEED -> feedCommandPort.update((Feed) post);
-            case RECORD -> recordCommandPort.update((Record) post);
-            case VOTE -> voteCommandPort.updateVote((Vote) post);
-        }
     }
 
 }
