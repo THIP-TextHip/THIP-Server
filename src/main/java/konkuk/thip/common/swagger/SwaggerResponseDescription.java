@@ -43,7 +43,7 @@ public enum SwaggerResponseDescription {
             USER_ALREADY_FOLLOWED,
             USER_ALREADY_UNFOLLOWED,
             USER_CANNOT_FOLLOW_SELF,
-            FOLLOW_COUNT_IS_ZERO
+            FOLLOW_COUNT_CANNOT_BE_NEGATIVE
     ))),
     GET_USER_FOLLOW(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
@@ -132,6 +132,14 @@ public enum SwaggerResponseDescription {
             VOTE_CANNOT_BE_OVERVIEW,
             INVALID_VOTE_PAGE_RANGE
     ))),
+    VOTE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            VOTE_ITEM_NOT_FOUND,
+            VOTE_ITEM_ALREADY_VOTED,
+            VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL,
+            VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE
+    ))),
+
 
     // FEED
     FEED_CREATE(new LinkedHashSet<>(Set.of(

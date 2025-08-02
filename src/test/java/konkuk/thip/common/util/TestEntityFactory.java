@@ -21,7 +21,9 @@ import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.domain.Alias;
+import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
+import konkuk.thip.vote.adapter.out.jpa.VoteParticipantJpaEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -290,6 +292,13 @@ public class TestEntityFactory {
         return SavedFeedJpaEntity.builder()
                 .feedJpaEntity(feed)
                 .userJpaEntity(user)
+                .build();
+    }
+
+    public static VoteParticipantJpaEntity createVoteParticipant(UserJpaEntity user, VoteItemJpaEntity item) {
+        return VoteParticipantJpaEntity.builder()
+                .userJpaEntity(user)
+                .voteItemJpaEntity(item)
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package konkuk.thip.vote.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.vote.domain.VoteItem;
 import lombok.*;
 
 @Entity
@@ -28,4 +29,9 @@ public class VoteItemJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "post_id")
     private VoteJpaEntity voteJpaEntity;
 
+    public VoteItemJpaEntity updateFrom(VoteItem voteItem) {
+        this.itemName = voteItem.getItemName();
+        this.count = voteItem.getCount();
+        return this;
+    }
 }

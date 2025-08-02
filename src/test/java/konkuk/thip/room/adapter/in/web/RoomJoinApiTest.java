@@ -178,7 +178,7 @@ class RoomJoinApiTest {
 
         // 참여자 삭제 확인
         boolean exists = roomParticipantJpaRepository
-                .existByUserIdAndRoomId(participant.getUserId(), room.getRoomId());
+                .existsByUserIdAndRoomId(participant.getUserId(), room.getRoomId());
         assertThat(exists).isFalse();
 
         // 인원수 감소 확인

@@ -10,16 +10,22 @@ import java.util.Optional;
 
 public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticipantJpaEntity, Long>, RoomParticipantQueryRepository{
 
-    @Query(value = "SELECT * FROM room_participants WHERE user_id = :userId AND room_id = :roomId AND status = 'ACTIVE'", nativeQuery = true)
+    @Query("SELECT rp FROM RoomParticipantJpaEntity rp " +
+            "WHERE rp.userJpaEntity.userId = :userId " +
+            "AND rp.roomJpaEntity.roomId = :roomId " +
+            "AND rp.status = 'ACTIVE'")
     Optional<RoomParticipantJpaEntity> findByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
-    @Query(value = "SELECT * FROM room_participants WHERE room_id = :roomId AND status = 'ACTIVE'", nativeQuery = true)
+    @Query("SELECT rp FROM RoomParticipantJpaEntity rp " +
+            "WHERE rp.roomJpaEntity.roomId = :roomId " +
+            "AND rp.status = 'ACTIVE'")
     List<RoomParticipantJpaEntity> findAllByRoomId(@Param("roomId") Long roomId);
 
-    @Query(
-            value = "SELECT EXISTS (SELECT 1 FROM room_participants rp WHERE rp.user_id = :userId AND rp.room_id = :roomId AND rp.status = 'ACTIVE')",
-            nativeQuery = true
-    )
-    boolean existByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
+    @Query("SELECT CASE WHEN COUNT(rp) > 0 THEN true ELSE false END " +
+            "FROM RoomParticipantJpaEntity rp " +
+            "WHERE rp.userJpaEntity.userId = :userId " +
+            "AND rp.roomJpaEntity.roomId = :roomId " +
+            "AND rp.status = 'ACTIVE'")
+    boolean existsByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
 }

@@ -14,7 +14,7 @@ public class RoomParticipantValidator{
 
     // 사용자가 방에 속해있는지 검증
     public void validateUserIsRoomMember(Long roomId, Long userId) {
-        if (!participantPort.existByUserIdAndRoomId(roomId, userId)) {
+        if (!participantPort.existByUserIdAndRoomId(userId, roomId)) {
             throw new InvalidStateException(ROOM_ACCESS_FORBIDDEN,
                 new IllegalArgumentException("사용자가 이 방의 참가자가 아닙니다. roomId=" + roomId + ", userId=" + userId));
         }

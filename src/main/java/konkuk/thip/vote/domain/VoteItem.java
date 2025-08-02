@@ -1,6 +1,8 @@
 package konkuk.thip.vote.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -73,5 +75,16 @@ public class VoteItem extends BaseDomainEntity {
         }
 
         return result;
+    }
+
+    public void increaseCount() {
+        this.count++;
+    }
+
+    public void decreaseCount() {
+        if(this.count == 0) {
+            throw new InvalidStateException(ErrorCode.VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE);
+        }
+        this.count--;
     }
 }
