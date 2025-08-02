@@ -196,6 +196,25 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .toList();
     }
 
+    @Override
+    public List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+        // 1. 특정 유저 피드 ID 목록만 최신순 페이징 조회
+        List<Long> feedIds = fetchSpecificUserFeedIdsByCreatedAt(userId, lastCreatedAt, size);
+
+        // 2. 엔티티 조회 및 순서 보존
+        List<FeedJpaEntity> entities = fetchFeedEntitiesByIds(feedIds);
+        Map<Long, FeedJpaEntity> entityMap = entities.stream()
+                .collect(Collectors.toMap(FeedJpaEntity::getPostId, e -> e));
+        List<FeedJpaEntity> ordered = feedIds.stream()
+                .map(entityMap::get)
+                .toList();
+
+        // 3) DTO 변환 (priority 없음)
+        return ordered.stream()
+                .map(e -> toDto(e, null))
+                .toList();
+    }
+
     private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
@@ -204,6 +223,22 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                         // ACTIVE 인 feed & 내가 작성한 글 & cursorCondition
                         feed.status.eq(StatusType.ACTIVE),
                         feed.userJpaEntity.userId.eq(userId),
+                        lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
+                )
+                .orderBy(feed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    private List<Long> fetchSpecificUserFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+        return jpaQueryFactory
+                .select(feed.postId)
+                .from(feed)
+                .where(
+                        // ACTIVE 인 feed & 특정 유저가 작성한 공개 글 & cursorCondition
+                        feed.status.eq(StatusType.ACTIVE),
+                        feed.userJpaEntity.userId.eq(userId),
+                        feed.isPublic.eq(Boolean.TRUE),
                         lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
                 )
                 .orderBy(feed.createdAt.desc())

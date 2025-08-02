@@ -5,11 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.feed.adapter.in.web.response.FeedShowUserInfoResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedShowByUserResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowMineResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedShowUserInfoResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
 import konkuk.thip.feed.application.port.in.FeedShowAllUseCase;
-import konkuk.thip.feed.application.port.in.FeedShowMineUseCase;
+import konkuk.thip.feed.application.port.in.FeedShowAllOfUserUseCase;
 import konkuk.thip.feed.application.port.in.FeedShowUserInfoUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeedQueryController {
 
     private final FeedShowAllUseCase feedShowAllUseCase;
-    private final FeedShowMineUseCase feedShowMineUseCase;
+    private final FeedShowAllOfUserUseCase feedShowMineUseCase;
     private final FeedShowUserInfoUseCase feedShowUserInfoUseCase;
 
     @Operation(
@@ -40,7 +41,7 @@ public class FeedQueryController {
 
     @Operation(
             summary = "내 피드 조회",
-            description = "사용자가 작성한 피드를 전체 조회합니다."
+            description = "내가 작성한 피드를 전체 조회합니다."
     )
     @GetMapping("/feeds/mine")
     public BaseResponse<FeedShowMineResponse> showMyFeeds(
@@ -48,6 +49,19 @@ public class FeedQueryController {
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(feedShowMineUseCase.showMyFeeds(userId, cursor));
+    }
+
+    @Operation(
+            summary = "특정 유저의 공개 피드 조회",
+            description = "내가 아닌 다른 유저가 작성한 공개 피드를 전체 조회합니다."
+    )
+    @GetMapping("/feeds/users/{userId}")
+    public BaseResponse<FeedShowByUserResponse> showSpecificUserFeeds(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "해당 유저(= 피드 주인)의 userId 값") @PathVariable("userId") final Long feedOwnerId,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(value = "cursor", required = false) final String cursor) {
+        return BaseResponse.ok(feedShowMineUseCase.showPublicFeedsOfFeedOwner(userId, feedOwnerId, cursor));
     }
 
     @Operation(
@@ -60,7 +74,7 @@ public class FeedQueryController {
     }
 
     @Operation(
-            summary = "특정 유저 피드 조회의 상단 화면 구성",
+            summary = "특정 유저의 공개 피드 조회의 상단 화면 구성",
             description = "사용자의 정보, 사용자의 팔로워 정보, 사용자가 작성한 공개 피드 개수를 조회합니다."
     )
     @GetMapping("/feeds/users/{userId}/info")
