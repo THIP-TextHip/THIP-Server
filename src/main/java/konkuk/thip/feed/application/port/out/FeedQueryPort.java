@@ -10,11 +10,21 @@ public interface FeedQueryPort {
 
     Set<Long> findUserIdsByBookId(Long bookId);
 
+    /**
+     * 전체 피드 조회
+     */
     CursorBasedList<FeedQueryDto> findFeedsByFollowingPriority(Long userId, Cursor cursor);
-
     CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, Cursor cursor);
 
+    /**
+     * 내 피드 조회
+     */
     CursorBasedList<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, Cursor cursor);
+
+    /**
+     * 특정 유저 피드 조회
+     */
+    CursorBasedList<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, Cursor cursor);
 
     int countAllFeedsByUserId(Long userId);
 

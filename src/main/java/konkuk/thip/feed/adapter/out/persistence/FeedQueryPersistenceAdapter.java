@@ -53,7 +53,8 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
         return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
             return nextCursor.toEncodedString();
-        });    }
+        });
+    }
 
     @Override
     public CursorBasedList<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, Cursor cursor) {
@@ -61,6 +62,19 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
         int size = cursor.getPageSize();
 
         List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findMyFeedsByCreatedAt(userId, lastCreatedAt, size);
+
+        return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
+            return nextCursor.toEncodedString();
+        });
+    }
+
+    @Override
+    public CursorBasedList<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, Cursor cursor) {
+        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+        int size = cursor.getPageSize();
+
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findSpecificUserFeedsByCreatedAt(userId, lastCreatedAt, size);
 
         return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
