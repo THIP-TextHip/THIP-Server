@@ -46,8 +46,9 @@ public class FeedCommandController {
     }
 
     @Operation(
-            summary = "피드 수정 (책 빼고 변경가능)",
-            description = "사용자가 피드를 수정합니다."
+            summary = "피드 수정",
+            description = "사용자가 피드를 수정합니다. 책을 제외하고 모든 피드의 정보를 수정가능합니다.\n" +
+                    "이미지는 삭제만 가능하며, 태그,이미지의 경우 수정 시 변경된 값 즉, DB에 존재해야하는 값들을 보내주시면 됩니다."
     )
     @ExceptionDescription(FEED_UPDATE)
     @PatchMapping("/feeds/{feedId}")
