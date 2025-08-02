@@ -61,7 +61,7 @@ public class FeedQueryController {
             @Parameter(description = "해당 유저(= 피드 주인)의 userId 값") @PathVariable("userId") final Long feedOwnerId,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
-        return BaseResponse.ok(feedShowMineUseCase.showSpecificUserFeeds(userId, feedOwnerId, cursor));
+        return BaseResponse.ok(feedShowMineUseCase.showPublicFeedsOfFeedOwner(userId, feedOwnerId, cursor));
     }
 
     @Operation(

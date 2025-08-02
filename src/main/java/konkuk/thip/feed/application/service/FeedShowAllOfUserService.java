@@ -46,7 +46,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
 
     @Transactional(readOnly = true)
     @Override
-    public FeedShowByUserResponse showSpecificUserFeeds(Long userId, Long feedOwnerId, String cursor) {
+    public FeedShowByUserResponse showPublicFeedsOfFeedOwner(Long userId, Long feedOwnerId, String cursor) {
         // 1. 커서 생성
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 

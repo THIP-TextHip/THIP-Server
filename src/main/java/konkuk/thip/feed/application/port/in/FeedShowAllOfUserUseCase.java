@@ -7,5 +7,5 @@ public interface FeedShowAllOfUserUseCase {
 
     FeedShowMineResponse showMyFeeds(Long userId, String cursor);
 
-    FeedShowByUserResponse showSpecificUserFeeds(Long userId, Long feedOwnerId, String cursor);
+    FeedShowByUserResponse showPublicFeedsOfFeedOwner(Long userId, Long feedOwnerId, String cursor);
 }
