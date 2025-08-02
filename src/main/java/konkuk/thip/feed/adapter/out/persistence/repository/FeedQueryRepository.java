@@ -14,4 +14,6 @@ public interface FeedQueryRepository {
     List<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
 
     List<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
+
+    List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
 }
