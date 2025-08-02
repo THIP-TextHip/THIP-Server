@@ -40,7 +40,7 @@ public class VoteService implements VoteUseCase {
         voteCommandPort.findVoteParticipantByUserIdAndVoteId(userId, voteId)
                 .ifPresentOrElse(
                         // 투표를 이미 한 경우
-                        participant -> updateVote(participant, voteItemId),
+                        participant -> updateVote(participant, voteItemId, participant.getVoteItemId()),
                         // 투표를 처음 하는 경우
                         () -> createVote(userId, voteItemId)
                 );
@@ -59,8 +59,12 @@ public class VoteService implements VoteUseCase {
                 );
     }
 
-    private void updateVote(VoteParticipant participant, Long newVoteItemId) {
+    private void updateVote(VoteParticipant participant, Long newVoteItemId, Long oldVoteItemId) {
         participant.changeVoteItem(newVoteItemId);
+        // 투표 항목 변경 시, 기존 투표 항목의 카운트 감소 및 새로운 투표 항목의 카운트 증가
+        updateVoteCount(oldVoteItemId, false);
+        updateVoteCount(newVoteItemId, true);
+
         voteCommandPort.updateVoteParticipant(participant);
     }
 

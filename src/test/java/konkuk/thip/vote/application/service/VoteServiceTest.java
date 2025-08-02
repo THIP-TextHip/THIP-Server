@@ -58,18 +58,25 @@ class VoteServiceTest {
     @DisplayName("이미 투표한 경우 - 다른 voteItemId로 변경 성공")
     void vote_alreadyVoted_changeVoteItem_success() {
         // given
+        VoteItem voteItem = mock(VoteItem.class);
+        VoteItem exsitingVoteItem = mock(VoteItem.class);
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 200L, true);
         VoteParticipant existing = VoteParticipant.withoutId(1L, 100L);
 
         // when
         when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
                 .thenReturn(Optional.of(existing));
-        when(voteCommandPort.getVoteItemByIdOrThrow(200L)).thenReturn(mock(VoteItem.class));
+        when(voteCommandPort.getVoteItemByIdOrThrow(200L)).thenReturn(voteItem);
+        when(voteCommandPort.getVoteItemByIdOrThrow(existing.getVoteItemId())).thenReturn(exsitingVoteItem);
         VoteResult result = voteService.vote(command);
 
         // then
         assertThat(result.voteItemId()).isEqualTo(200L);
         verify(voteCommandPort).updateVoteParticipant(existing);
+        verify(voteItem).increaseCount();
+        verify(voteCommandPort).updateVoteItem(voteItem);
+        verify(exsitingVoteItem).decreaseCount();
+        verify(voteCommandPort).updateVoteItem(exsitingVoteItem);
     }
 
     @Test

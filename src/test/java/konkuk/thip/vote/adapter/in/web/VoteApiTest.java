@@ -105,7 +105,7 @@ class VoteApiTest {
     @DisplayName("이미 투표한 경우 다른 항목으로 변경 성공")
     void vote_alreadyVoted_change_success() throws Exception {
         VoteItemJpaEntity item1 = voteItemJpaRepository.save(
-                VoteItemJpaEntity.builder().itemName("항목1").count(0).voteJpaEntity(vote).build()
+                VoteItemJpaEntity.builder().itemName("항목1").count(1).voteJpaEntity(vote).build()
         );
         VoteItemJpaEntity item2 = voteItemJpaRepository.save(
                 VoteItemJpaEntity.builder().itemName("항목2").count(0).voteJpaEntity(vote).build()
@@ -129,6 +129,8 @@ class VoteApiTest {
 
         voteItemJpaRepository.findById(item1.getVoteItemId())
                 .ifPresent(voteItem -> assertThat(voteItem.getCount()).isEqualTo(0));
+        voteItemJpaRepository.findById(item2.getVoteItemId())
+                .ifPresent(voteItem -> assertThat(voteItem.getCount()).isEqualTo(1));
     }
 
     @Test
