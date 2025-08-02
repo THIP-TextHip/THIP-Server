@@ -4,7 +4,9 @@ import konkuk.thip.common.exception.InvalidStateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_LIKE_COUNT_UNDERFLOW;
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
+import static konkuk.thip.common.entity.StatusType.INACTIVE;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.common.post.PostType.FEED;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +16,7 @@ class CommentTest {
     private final String CONTENT = "댓글 본문";
     private final Long CREATOR_ID = 1L;
     private final Long POST_ID = 100L;
+    private final Long OTHER_USER_ID = 2L;
 
     private Comment createParentComment(Long postId) {
         return Comment.builder()
@@ -25,6 +28,22 @@ class CommentTest {
                 .parentCommentId(null)
                 .reportCount(0)
                 .likeCount(0)
+                .status(ACTIVE)
+                .build();
+    }
+
+
+    private Comment createInactiveComment(Long postId) {
+        return Comment.builder()
+                .id(124L) //ID 임의 주입
+                .content(CONTENT)
+                .targetPostId(postId)
+                .creatorId(CREATOR_ID)
+                .postType(FEED)
+                .parentCommentId(null)
+                .reportCount(0)
+                .likeCount(0)
+                .status(INACTIVE)
                 .build();
     }
 
@@ -173,6 +192,41 @@ class CommentTest {
         });
 
         assertEquals(COMMENT_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("softDelete: 정상적인 작성자가 호출하면 상태가 INACTIVE로 변경된다")
+    void softDelete_byCreator_changesStatusToInactive() {
+        Comment comment = createParentComment(POST_ID);
+
+        comment.softDelete(CREATOR_ID);
+
+        assertEquals(INACTIVE, comment.getStatus());
+    }
+
+    @Test
+    @DisplayName("softDelete: 작성자가 아니면 InvalidStateException 예외가 발생한다")
+    void softDelete_byNonCreator_throwsInvalidStateException() {
+        Comment comment = createParentComment(POST_ID);
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
+            comment.softDelete(OTHER_USER_ID);
+        });
+
+        assertEquals(COMMENT_DELETE_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("softDelete: 이미 삭제된 댓글에 다시 호출하면 InvalidStateException 예외가 발생한다")
+    void softDelete_alreadyInactive_throwsInvalidStateException() {
+
+        Comment comment = createInactiveComment(POST_ID);
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
+            comment.softDelete(CREATOR_ID);
+        });
+
+        assertEquals(COMMENT_ALREADY_DELETED, ex.getErrorCode());
     }
 
 }
