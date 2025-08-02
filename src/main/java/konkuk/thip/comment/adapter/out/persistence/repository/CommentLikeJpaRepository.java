@@ -17,7 +17,7 @@ public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEn
     void deleteByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
     @Query(value = "SELECT EXISTS(SELECT 1 FROM comment_likes WHERE user_id = :userId AND comment_id = :commentId)", nativeQuery = true)
-    Long existsByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
+    Object existsByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
     @Modifying
     @Query(value = "DELETE FROM comment_likes WHERE comment_id = :commentId", nativeQuery = true)
