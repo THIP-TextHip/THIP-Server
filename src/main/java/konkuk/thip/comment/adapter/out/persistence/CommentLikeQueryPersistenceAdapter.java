@@ -19,6 +19,7 @@ public class CommentLikeQueryPersistenceAdapter implements CommentLikeQueryPort 
 
     @Override
     public boolean isLikedCommentByUser(Long userId, Long commentId) {
-        return commentLikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
+        Long exists = commentLikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
+        return exists != null && exists > 0;
     }
 }
