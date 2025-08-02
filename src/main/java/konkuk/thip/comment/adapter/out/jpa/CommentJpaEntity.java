@@ -53,6 +53,7 @@ public class CommentJpaEntity extends BaseJpaEntity {
     public CommentJpaEntity updateFrom(Comment comment) {
         this.reportCount = comment.getReportCount();
         this.likeCount = comment.getLikeCount();
+        this.status = comment.getStatus();
         return this;
     }
 
