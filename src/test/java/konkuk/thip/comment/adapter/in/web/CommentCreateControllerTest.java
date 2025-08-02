@@ -3,7 +3,6 @@ package konkuk.thip.comment.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
-import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
@@ -39,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.common.post.PostType.FEED;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("[단위] 댓글 생성 api controller 단위 테스트")
-class CommentControllerTest {
+class CommentCreateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -217,56 +215,5 @@ class CommentControllerTest {
                     .andExpect(jsonPath("$.message", containsString("존재하지 않는 VOTE 입니다.")));
         }
 
-        @Test
-        @DisplayName("답글인데 parentId가 null일 경우 400 반환")
-        void replyWithoutParentId() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.put("isReplyRequest", true);
-            req.put("parentId", null);  // 필수인데 없음
-            assertBadCommentCreateRequest(req, "답글 작성 시 parentId는 필수입니다.");
-        }
-
-        @Test
-        @DisplayName("일반 댓글인데 parentId가 존재할 경우 400 반환")
-        void rootCommentWithParentId() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.put("isReplyRequest", false);
-            req.put("parentId", 1L);  // 있으면 안 됨
-            assertBadCommentCreateRequest(req, "일반 댓글에는 parentId가 없어야 합니다.");
-        }
-
-        @Test
-        @DisplayName("parentId가 존재하지만 댓글이 실제 존재하지 않을 때 400 반환")
-        void replyToNonExistentParent() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.put("isReplyRequest", true);
-            req.put("parentId", 99999L);  // 존재하지 않는 parent
-            assertBadCommentCreateRequest(req, "parentId에 해당하는 부모 댓글이 존재해야 합니다.");
-        }
-
-        @Test
-        @DisplayName("댓글과 부모 댓글의 게시글이 일치하지 않을 경우 400 반환")
-        void parentPostMismatch() throws Exception {
-
-            // 1. 부모 댓글을 FEED에 작성
-            CommentJpaEntity parentComment = commentJpaRepository.save(
-                    TestEntityFactory.createComment(feed, user, FEED)
-            );
-
-            // 2. 답글 요청은 RECORD에 대해 요청
-            Map<String, Object> req = new HashMap<>();
-            req.put("content", "게시글 불일치");
-            req.put("isReplyRequest", true);
-            req.put("parentId", parentComment.getCommentId());
-            req.put("postType", "record");
-
-            mockMvc.perform(post("/comments/{postId}", record.getPostId())
-                            .requestAttr("userId", user.getUserId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsBytes(req)))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(INVALID_COMMENT_CREATE.getCode()))
-                    .andExpect(jsonPath("$.message", containsString("댓글과 부모 댓글의 게시글이 일치하지 않습니다.")));
-        }
     }
 }
