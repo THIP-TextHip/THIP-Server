@@ -116,7 +116,7 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
 
     private void validateCreator(Long userId) {
         if (!this.creatorId.equals(userId)) {
-            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN);
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("피드 작성자만 피드를 수정할 수 있습니다."));
         }
     }
 
@@ -159,6 +159,18 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
     @Override
     public void increaseCommentCount() {
         commentCount++;
+    }
+
+    @Override
+    public void decreaseCommentCount() {
+        checkCommentCountNotUnderflow();
+        commentCount--;
+    }
+
+    private void checkCommentCountNotUnderflow() {
+        if (commentCount <= 0) {
+            throw new InvalidStateException(COMMENT_COUNT_UNDERFLOW);
+        }
     }
 
 }
