@@ -5,18 +5,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.feed.adapter.in.web.response.FeedShowByUserResponse;
-import konkuk.thip.feed.adapter.in.web.response.FeedShowMineResponse;
-import konkuk.thip.feed.adapter.in.web.response.FeedShowUserInfoResponse;
-import konkuk.thip.feed.adapter.in.web.response.FeedShowAllResponse;
+import konkuk.thip.common.swagger.annotation.ExceptionDescription;
+import konkuk.thip.feed.adapter.in.web.response.*;
 import konkuk.thip.feed.application.port.in.FeedShowAllUseCase;
 import konkuk.thip.feed.application.port.in.FeedShowAllOfUserUseCase;
+import konkuk.thip.feed.application.port.in.FeedShowSingleUseCase;
 import konkuk.thip.feed.application.port.in.FeedShowUserInfoUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.SHOW_SINGLE_FEED;
 
 @Tag(name = "Feed Query API", description = "피드 조회 관련 API")
 @RestController
@@ -26,6 +27,7 @@ public class FeedQueryController {
     private final FeedShowAllUseCase feedShowAllUseCase;
     private final FeedShowAllOfUserUseCase feedShowMineUseCase;
     private final FeedShowUserInfoUseCase feedShowUserInfoUseCase;
+    private final FeedShowSingleUseCase feedShowSingleUseCase;
 
     @Operation(
             summary = "피드 전체 조회",
@@ -82,5 +84,18 @@ public class FeedQueryController {
             @Parameter(description = "피드 조회할 유저의 userId 값") @PathVariable final Long userId
     ) {
         return BaseResponse.ok(feedShowUserInfoUseCase.showAnotherUserInfoInFeeds(userId));
+    }
+
+    @Operation(
+            summary = "피드 상세보기",
+            description = "피드 하나의 본문 내용, 태그 목록 등을 조회합니다."
+    )
+    @ExceptionDescription(SHOW_SINGLE_FEED)
+    @GetMapping("/feeds/{feedId}")
+    public BaseResponse<FeedShowSingleResponse> showSingleFeed(
+            @Parameter(description = "조회할 피드의 id값") @PathVariable final Long feedId,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(feedShowSingleUseCase.showSingleFeed(feedId, userId));
     }
 }
