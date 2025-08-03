@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 특정 유저 피드 조회 api 통합 테스트")
-class FeedShowSpecificUserTest {
+class FeedShowSpecificUserApiTest {
 
     @Autowired
     private MockMvc mockMvc;
