@@ -36,7 +36,7 @@ public class RecordCreateService implements RecordCreateUseCase {
     @Override
     //todo updateRoomPercentage 스케줄러로 책임을 분리할지 논의
     public RecordCreateResult createRecord(RecordCreateCommand command) {
-        roomParticipantValidator.validateUserIsRoomMember(command.userId(), command.roomId());
+        roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
 
         // 1. Record 생성
         Record record = Record.withoutId(

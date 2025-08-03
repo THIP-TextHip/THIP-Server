@@ -76,17 +76,6 @@ class RecordCreateControllerTest {
     private UserJpaEntity user;
     private RoomJpaEntity room;
 
-//    @AfterEach
-//    void tearDown() {
-//        recordJpaRepository.deleteAll();
-//        roomParticipantJpaRepository.deleteAllInBatch();
-//        roomJpaRepository.deleteAll();
-//        bookJpaRepository.deleteAll();
-//        categoryJpaRepository.deleteAll();
-//        userJpaRepository.deleteAll();
-//        aliasJpaRepository.deleteAll();
-//    }
-
     private void saveUserAndRoom() {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
