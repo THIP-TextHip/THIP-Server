@@ -9,10 +9,12 @@ import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.room.adapter.in.web.request.RoomCreateRequest;
 import konkuk.thip.room.adapter.in.web.request.RoomJoinRequest;
+import konkuk.thip.room.adapter.in.web.response.RoomRecruitCloseResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomJoinResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomCreateResponse;
 import konkuk.thip.room.application.port.in.RoomCreateUseCase;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
-import konkuk.thip.room.application.port.in.RoomRecruitCloseUsecase;
+import konkuk.thip.room.application.port.in.RoomRecruitCloseUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +30,7 @@ public class RoomCommandController {
 
     private final RoomCreateUseCase roomCreateUseCase;
     private final RoomJoinUseCase roomJoinUsecase;
-    private final RoomRecruitCloseUsecase roomRecruitCloseUsecase;
+    private final RoomRecruitCloseUseCase roomRecruitCloseUsecase;
 
     /**
      * 방 생성 요청
@@ -57,13 +59,14 @@ public class RoomCommandController {
     )
     @ExceptionDescription(ROOM_JOIN_CANCEL)
     @PostMapping("/rooms/{roomId}/join")
-    public BaseResponse<Void> joinRoom(
+    public BaseResponse<RoomJoinResponse> joinRoom(
             @Valid @RequestBody final RoomJoinRequest request,
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "참여/취소하려는 방의 ID", example = "1") @PathVariable final Long roomId
     ) {
-        roomJoinUsecase.changeJoinState(request.toCommand(userId, roomId));
-        return BaseResponse.ok(null);
+        return BaseResponse.ok(
+                RoomJoinResponse.of(roomJoinUsecase.changeJoinState(request.toCommand(userId, roomId)))
+        );
     }
 
     /**
@@ -75,10 +78,11 @@ public class RoomCommandController {
     )
     @ExceptionDescription(ROOM_RECRUIT_CLOSE)
     @PostMapping("/rooms/{roomId}/close")
-    public BaseResponse<Void> closeRoomRecruit(
+    public BaseResponse<RoomRecruitCloseResponse> closeRoomRecruit(
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "모집을 마감할 방의 ID", example = "1") @PathVariable final Long roomId) {
-        roomRecruitCloseUsecase.closeRoomRecruit(userId, roomId);
-        return BaseResponse.ok(null);
+        return BaseResponse.ok(
+                RoomRecruitCloseResponse.of(roomRecruitCloseUsecase.closeRoomRecruit(userId, roomId))
+        );
     }
 }

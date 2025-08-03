@@ -7,6 +7,7 @@ import java.util.List;
 @Builder
 public record RecordSearchResponse(
     List<PostDto> postList,
+    Long roomId,
     String nextCursor,
     Boolean isLast
 ){

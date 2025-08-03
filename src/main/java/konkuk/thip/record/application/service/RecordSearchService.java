@@ -104,6 +104,7 @@ public class RecordSearchService implements RecordSearchUseCase {
 
         // RecordSearchResponse 생성
         return RecordSearchResponse.builder()
+                .roomId(roomId)
                 .postList(postDtos)
                 .nextCursor(cursorBasedList.nextCursor())
                 .isLast(!cursorBasedList.hasNext())
