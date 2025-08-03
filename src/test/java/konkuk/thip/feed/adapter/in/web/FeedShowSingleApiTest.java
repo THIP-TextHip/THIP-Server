@@ -112,7 +112,7 @@ class FeedShowSingleApiTest {
     }
 
     @Test
-    @DisplayName("비공개 피드 단일 조회 요청이 올 경우, 400 error을 반환한다.")
+    @DisplayName("피드 작성자가 아닌 다른 유저가 비공개 피드 단일 조회 요청을 할 경우, 400 error을 반환한다.")
     void feed_can_not_show_private_one() throws Exception {
         //given
         AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
@@ -134,5 +134,29 @@ class FeedShowSingleApiTest {
                         .requestAttr("userId", me.getUserId()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", containsString(FEED_CAN_NOT_SHOW_PRIVATE_ONE.getMessage())));
+    }
+
+    @Test
+    @DisplayName("피드 작성자는 비공개 피드를 단일 조회할 수 있다.")
+    void feed_can_show_private_one_by_feed_owner() throws Exception {
+        //given
+        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
+
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
+
+        // 피드 및 피드 태그 생성
+        CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_REPORT.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_RECOMMEND.getValue()));
+        FeedJpaEntity privateFeed = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, false, 50, 10, List.of("content1", "content2")));      // me가 작성한 비공개 피드
+        feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t1));
+        feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t2));
+
+        //when //then
+        mockMvc.perform(get("/feeds/{feedId}", privateFeed.getPostId())
+                        .requestAttr("userId", me.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.feedId", is(privateFeed.getPostId().intValue())));
     }
 }
