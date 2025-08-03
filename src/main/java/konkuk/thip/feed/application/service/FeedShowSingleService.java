@@ -32,11 +32,9 @@ public class FeedShowSingleService implements FeedShowSingleUseCase {
 
     @Override
     public FeedShowSingleResponse showSingleFeed(Long feedId, Long userId) {
-        // 1. 단일 피드 조회
+        // 1. 단일 피드 조회 및 피드 조회 유효성 검증
         Feed feed = feedCommandPort.getByIdOrThrow(feedId);
-        if (!feed.getIsPublic()) {
-            throw new BusinessException(FEED_CAN_NOT_SHOW_PRIVATE_ONE);
-        }
+        feed.validateViewPermission(userId);
 
         // 2. 피드 작성자 도메인 조회
         User feedCreator = userCommandPort.findById(feed.getCreatorId());
