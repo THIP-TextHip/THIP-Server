@@ -12,13 +12,13 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import org.junit.jupiter.api.AfterEach;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] RecordCommandController 테스트")
 class RecordCreateControllerTest {
@@ -74,16 +76,16 @@ class RecordCreateControllerTest {
     private UserJpaEntity user;
     private RoomJpaEntity room;
 
-    @AfterEach
-    void tearDown() {
-        recordJpaRepository.deleteAll();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
-    }
+//    @AfterEach
+//    void tearDown() {
+//        recordJpaRepository.deleteAll();
+//        roomParticipantJpaRepository.deleteAllInBatch();
+//        roomJpaRepository.deleteAll();
+//        bookJpaRepository.deleteAll();
+//        categoryJpaRepository.deleteAll();
+//        userJpaRepository.deleteAll();
+//        aliasJpaRepository.deleteAll();
+//    }
 
     private void saveUserAndRoom() {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
