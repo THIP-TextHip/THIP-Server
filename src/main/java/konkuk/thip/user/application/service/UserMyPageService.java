@@ -31,9 +31,9 @@ public class UserMyPageService implements UserMyPageUseCase {
         Cursor cursor = Cursor.from(cursorStr, size);
 
         CursorBasedList<ReactionQueryDto> reactionQueryDtoList = switch (userReactionType) {
-            case LIKE -> userQueryPort.findLikeReactionsByUserId(userId, cursor);
-            case COMMENT -> userQueryPort.findCommentReactionsByUserId(userId, cursor);
-            case BOTH -> userQueryPort.findBothReactionsByUserId(userId, cursor);
+            case LIKE -> userQueryPort.findLikeReactionsByUserId(userId, cursor, UserReactionType.LIKE.getLabel());
+            case COMMENT -> userQueryPort.findCommentReactionsByUserId(userId, cursor, UserReactionType.COMMENT.getLabel());
+            case BOTH -> userQueryPort.findBothReactionsByUserId(userId, cursor, UserReactionType.LIKE.getLabel(), UserReactionType.COMMENT.getLabel());
         };
 
         List<UserReactionResponse.ReactionDto> reactionDtoList = reactionQueryMapper.toReactionDtoList(reactionQueryDtoList.contents());

@@ -83,7 +83,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     @Override
-    public List<ReactionQueryDto> findLikeByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size) {
+    public List<ReactionQueryDto> findLikeByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String likeLabel) {
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QPostLikeJpaEntity postLike = QPostLikeJpaEntity.postLikeJpaEntity;
         QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
@@ -98,7 +98,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
         return queryFactory
                 .select(new QReactionQueryDto(
-                        Expressions.constant("좋아요"),
+                        Expressions.constant(likeLabel),
                         post.postId,
                         post.userJpaEntity.nickname,
                         post.userJpaEntity.userId,
@@ -116,7 +116,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     @Override
-    public List<ReactionQueryDto> findCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size) {
+    public List<ReactionQueryDto> findCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String commentLabel) {
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
         QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
         QCommentJpaEntity comment = QCommentJpaEntity.commentJpaEntity;
@@ -131,12 +131,12 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
         return queryFactory
                 .select(new QReactionQueryDto(
-                        Expressions.constant("댓글"),
+                        Expressions.constant(commentLabel),
                         post.postId,
                         post.userJpaEntity.nickname,
                         post.userJpaEntity.userId,
                         post.dtype,
-                        post.content, // 일단은 post의 content를 사용 (추후에 댓글 content로 수정 가능)
+                        comment.content,
                         comment.createdAt
                 ))
                 .from(comment)
@@ -149,9 +149,9 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     @Override
-    public List<ReactionQueryDto> findLikeAndCommentByUserId(Long userId, LocalDateTime cursor, Integer size) {
-        List<ReactionQueryDto> likes = findLikeByUserId(userId, cursor, size);
-        List<ReactionQueryDto> comments = findCommentByUserId(userId, cursor, size);
+    public List<ReactionQueryDto> findLikeAndCommentByUserId(Long userId, LocalDateTime cursor, Integer size, String likeLabel, String commentLabel) {
+        List<ReactionQueryDto> likes = findLikeByUserId(userId, cursor, size, likeLabel);
+        List<ReactionQueryDto> comments = findCommentByUserId(userId, cursor, size, commentLabel);
 
         return Stream.concat(likes.stream(), comments.stream())
                 .sorted(Comparator.comparing(ReactionQueryDto::createdAt).reversed())

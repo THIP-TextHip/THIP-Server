@@ -12,10 +12,10 @@ public interface UserQueryRepository {
 
     List<UserQueryDto> findUsersByNicknameOrderByAccuracy(String keyword, Long userId, Integer size);
 
-    List<ReactionQueryDto> findLikeByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size);
+    List<ReactionQueryDto> findLikeByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String likeLabel);
 
-    List<ReactionQueryDto> findCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size);
+    List<ReactionQueryDto> findCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String commentLabel);
 
-    List<ReactionQueryDto> findLikeAndCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size);
+    List<ReactionQueryDto> findLikeAndCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String likeLabel, String commentLabel);
 
 }

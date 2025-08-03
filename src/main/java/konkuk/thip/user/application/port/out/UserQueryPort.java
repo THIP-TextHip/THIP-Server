@@ -20,9 +20,9 @@ public interface UserQueryPort {
 
     List<UserQueryDto> findUsersByNicknameOrderByAccuracy(String keyword, Long userId, Integer size);
 
-    CursorBasedList<ReactionQueryDto> findLikeReactionsByUserId(Long userId, Cursor cursor);
+    CursorBasedList<ReactionQueryDto> findLikeReactionsByUserId(Long userId, Cursor cursor, String label);
 
-    CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor);
+    CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor, String label);
 
-    CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor);
+    CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor, String likeLabel, String commentLabel);
 }

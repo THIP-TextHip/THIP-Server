@@ -49,18 +49,24 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
     }
 
     @Override
-    public CursorBasedList<ReactionQueryDto> findLikeReactionsByUserId(Long userId, Cursor cursor) {
-        return getReactions(userId, cursor, userJpaRepository::findLikeByUserId);
+    public CursorBasedList<ReactionQueryDto> findLikeReactionsByUserId(Long userId, Cursor cursor, String likeLabel) {
+        return getReactions(userId, cursor,
+                (id, cursorDateTime, size) -> userJpaRepository.findLikeByUserId(id, cursorDateTime, size, likeLabel)
+        );
     }
 
     @Override
-    public CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor) {
-        return getReactions(userId, cursor, userJpaRepository::findCommentByUserId);
+    public CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor, String commentLabel) {
+        return getReactions(userId, cursor,
+                (id, cursorDateTime, size) -> userJpaRepository.findCommentByUserId(id, cursorDateTime, size, commentLabel)
+        );
     }
 
     @Override
-    public CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor) {
-        return getReactions(userId, cursor, userJpaRepository::findLikeAndCommentByUserId);
+    public CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor, String likeLabel, String commentLabel) {
+        return getReactions(userId, cursor,
+                (id, cursorDateTime, size) -> userJpaRepository.findLikeAndCommentByUserId(id, cursorDateTime, size, likeLabel, commentLabel)
+        );
     }
 
     private CursorBasedList<ReactionQueryDto> getReactions(Long userId, Cursor cursor, ReactionQueryFunction reactionQueryFunction) {

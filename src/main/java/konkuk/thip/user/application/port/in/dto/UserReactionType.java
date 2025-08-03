@@ -6,14 +6,16 @@ import lombok.Getter;
 
 @Getter
 public enum UserReactionType {
-    LIKE("LIKE"),
-    COMMENT("COMMENT"),
-    BOTH("BOTH");
+    LIKE("LIKE", "좋아요"),
+    COMMENT("COMMENT", "댓글"),
+    BOTH("BOTH", "좋아요와 댓글");
 
     private final String type;
+    private final String label;
 
-    UserReactionType(String type) {
+    UserReactionType(String type, String label) {
         this.type = type;
+        this.label = label;
     }
 
     public static UserReactionType from(String type) {
