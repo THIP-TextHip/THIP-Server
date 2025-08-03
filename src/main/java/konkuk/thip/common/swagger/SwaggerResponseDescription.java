@@ -169,6 +169,12 @@ public enum SwaggerResponseDescription {
             FEED_ALREADY_SAVED,
             FEED_NOT_SAVED_CANNOT_DELETE
     ))),
+    SHOW_SINGLE_FEED(new LinkedHashSet<>(Set.of(
+            FEED_NOT_FOUND,
+            USER_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            FEED_CAN_NOT_SHOW_PRIVATE_ONE
+    ))),
 
     // Comment
     COMMENT_CREATE(new LinkedHashSet<>(Set.of(
