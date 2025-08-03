@@ -71,6 +71,9 @@ class RecordCreateControllerTest {
     @Autowired
     private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
+    private UserJpaEntity user;
+    private RoomJpaEntity room;
+
     @AfterEach
     void tearDown() {
         recordJpaRepository.deleteAll();
@@ -85,13 +88,13 @@ class RecordCreateControllerTest {
     private void saveUserAndRoom() {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
-        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        user = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
 
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
-        RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+        room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         //UserRoomJpaEntity 생성 및 저장
         RoomParticipantJpaEntity userRoom = RoomParticipantJpaEntity.builder()
@@ -121,12 +124,9 @@ class RecordCreateControllerTest {
                 content
         );
 
-        Long userId = userJpaRepository.findAll().get(0).getUserId();
-        Long roomId = roomJpaRepository.findAll().get(0).getRoomId();
-
         //when
-        ResultActions result = mockMvc.perform(post("/rooms/{roomId}/record", roomId)
-                .requestAttr("userId", userId)
+        ResultActions result = mockMvc.perform(post("/rooms/{roomId}/record", room.getRoomId())
+                .requestAttr("userId", user.getUserId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)
                 ));
@@ -142,8 +142,8 @@ class RecordCreateControllerTest {
         RecordJpaEntity recordJpaEntity = recordJpaRepository.findById(recordId).orElse(null);
 
         assertThat(recordJpaEntity).isNotNull();
-        assertThat(recordJpaEntity.getUserJpaEntity().getUserId()).isEqualTo(userId);
-        assertThat(recordJpaEntity.getRoomJpaEntity().getRoomId()).isEqualTo(roomId);
+        assertThat(recordJpaEntity.getUserJpaEntity().getUserId()).isEqualTo(user.getUserId());
+        assertThat(recordJpaEntity.getRoomJpaEntity().getRoomId()).isEqualTo(room.getRoomId());
         assertThat(recordJpaEntity.getPage()).isEqualTo(page);
         assertThat(recordJpaEntity.getContent()).isEqualTo(content);
     }
