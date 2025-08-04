@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import konkuk.thip.comment.adapter.in.web.request.CommentCreateRequest;
 import konkuk.thip.comment.adapter.in.web.request.CommentIsLikeRequest;
+import konkuk.thip.comment.adapter.in.web.response.CommentDeleteResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIdResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIsLikeResponse;
 import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
@@ -67,11 +68,10 @@ public class CommentCommandController {
     )
     @ExceptionDescription(COMMENT_DELETE)
     @DeleteMapping("/comments/{commentId}")
-    public BaseResponse<Void> deleteComment(
+    public BaseResponse<CommentDeleteResponse> deleteComment(
             @Parameter(description = "삭제하려는 댓글 ID", example = "1") @PathVariable("commentId") final Long commentId,
             @Parameter(hidden = true) @UserId final Long userId) {
-        commentDeleteUseCase.deleteComment(commentId,userId);
-        return BaseResponse.ok(null);
+        return BaseResponse.ok(CommentDeleteResponse.of(commentDeleteUseCase.deleteComment(commentId,userId)));
     }
 
 }
