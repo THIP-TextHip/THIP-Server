@@ -7,7 +7,7 @@ import konkuk.thip.comment.application.service.validator.CommentAuthorizationVal
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
-import konkuk.thip.common.post.service.PostQueryService;
+import konkuk.thip.common.post.service.PostHandler;
 import konkuk.thip.common.post.PostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class CommentCreateService implements CommentCreateUseCase {
 
     private final CommentCommandPort commentCommandPort;
 
-    private final PostQueryService postQueryService;
+    private final PostHandler postHandler;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
 
     @Override
@@ -34,7 +34,7 @@ public class CommentCreateService implements CommentCreateUseCase {
         PostType type = PostType.from(command.postType());
 
         // 2. 게시물 타입에 맞게 조회
-        CommentCountUpdatable post = postQueryService.findPost(type, command.postId());
+        CommentCountUpdatable post = postHandler.findPost(type, command.postId());
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
         commentAuthorizationValidator.validateUserCanAccessPostForComment(type, post, command.userId());
 
@@ -50,7 +50,7 @@ public class CommentCreateService implements CommentCreateUseCase {
         // 4-1. 도메인 게시물 댓글 수 증가
         post.increaseCommentCount();
         // 4-2 Jpa엔티티 게시물 댓글 수 증가
-        postQueryService.updatePost(type, post);
+        postHandler.updatePost(type, post);
 
         return commentId;
     }

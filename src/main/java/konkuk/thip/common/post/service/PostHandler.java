@@ -1,5 +1,6 @@
 package konkuk.thip.common.post.service;
 
+import konkuk.thip.common.annotation.HelperService;
 import konkuk.thip.common.post.CommentCountUpdatable;
 import konkuk.thip.common.post.PostType;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
@@ -9,11 +10,10 @@ import konkuk.thip.record.domain.Record;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.domain.Vote;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
+@HelperService
 @RequiredArgsConstructor
-public class PostQueryService {
+public class PostHandler {
 
     private final FeedCommandPort feedCommandPort;
     private final RecordCommandPort recordCommandPort;
