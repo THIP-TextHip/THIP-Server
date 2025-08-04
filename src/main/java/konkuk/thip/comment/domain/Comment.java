@@ -1,7 +1,6 @@
 package konkuk.thip.comment.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.PostType;
 import lombok.Builder;
@@ -147,18 +146,10 @@ public class Comment extends BaseDomainEntity {
         return this.creatorId.equals(userId);
     }
 
-    private void validateDeletable(Long userId) {
+    public void validateDeletable(Long userId) {
         if (!validateCreator(userId)) {
             throw new InvalidStateException(COMMENT_DELETE_FORBIDDEN);
         }
-    }
-
-    public void softDelete(Long userId) {
-        validateDeletable(userId);
-        if (this.status == StatusType.INACTIVE) {
-            throw new InvalidStateException(COMMENT_ALREADY_DELETED);
-        }
-        this.status = StatusType.INACTIVE;
     }
 
 }
