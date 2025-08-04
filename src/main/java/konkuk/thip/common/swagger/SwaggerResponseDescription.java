@@ -201,7 +201,6 @@ public enum SwaggerResponseDescription {
             RECORD_NOT_FOUND,
             VOTE_NOT_FOUND,
             COMMENT_DELETE_FORBIDDEN,
-            COMMENT_ALREADY_DELETED,
             COMMENT_COUNT_UNDERFLOW,
             FEED_ACCESS_FORBIDDEN,
             ROOM_ACCESS_FORBIDDEN
