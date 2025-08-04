@@ -32,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.post.PostType.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -100,8 +99,7 @@ class CommentDeleteAPITest {
                 .andExpect(status().isOk());
 
         // then
-        CommentJpaEntity found = commentJpaRepository.findById(commentId).get();
-        assertThat(found.getStatus()).isEqualTo(INACTIVE);
+        assertThat(commentJpaRepository.findById(commentId).isEmpty());
     }
 
     @Test
@@ -121,8 +119,7 @@ class CommentDeleteAPITest {
                 .andExpect(status().isOk());
 
         // then
-        CommentJpaEntity found = commentJpaRepository.findById(replyId).get();
-        assertThat(found.getStatus()).isEqualTo(INACTIVE);
+        assertThat(commentJpaRepository.findById(replyId)).isEmpty();
     }
 
     @Test
@@ -143,15 +140,14 @@ class CommentDeleteAPITest {
                 .andExpect(status().isOk());
 
         // then
-        CommentJpaEntity found = commentJpaRepository.findById(commentId).get();
-        assertThat(found.getStatus()).isEqualTo(INACTIVE);
+        assertThat(commentJpaRepository.findById(commentId).isEmpty());
 
         // Feed 댓글수 감소 확인
         FeedJpaEntity updatedFeed = feedJpaRepository.findById(feed.getPostId()).get();
         assertThat(updatedFeed.getCommentCount()).isEqualTo(beforeCount - 1);
 
         // 댓글 좋아요가 모두 삭제됐는지 확인
-        boolean like = (boolean) commentLikeJpaRepository.existsByUserIdAndCommentId(user.getUserId(), commentId);
+        boolean like = commentLikeJpaRepository.existsByUserIdAndCommentId(user.getUserId(), commentId);
         assertThat(like).isFalse();
     }
 

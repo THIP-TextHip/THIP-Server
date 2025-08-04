@@ -193,40 +193,4 @@ class CommentTest {
 
         assertEquals(COMMENT_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
     }
-
-    @Test
-    @DisplayName("softDelete: 정상적인 작성자가 호출하면 상태가 INACTIVE로 변경된다")
-    void softDelete_byCreator_changesStatusToInactive() {
-        Comment comment = createParentComment(POST_ID);
-
-        comment.softDelete(CREATOR_ID);
-
-        assertEquals(INACTIVE, comment.getStatus());
-    }
-
-    @Test
-    @DisplayName("softDelete: 작성자가 아니면 InvalidStateException 예외가 발생한다")
-    void softDelete_byNonCreator_throwsInvalidStateException() {
-        Comment comment = createParentComment(POST_ID);
-
-        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            comment.softDelete(OTHER_USER_ID);
-        });
-
-        assertEquals(COMMENT_DELETE_FORBIDDEN, ex.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("softDelete: 이미 삭제된 댓글에 다시 호출하면 InvalidStateException 예외가 발생한다")
-    void softDelete_alreadyInactive_throwsInvalidStateException() {
-
-        Comment comment = createInactiveComment(POST_ID);
-
-        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            comment.softDelete(CREATOR_ID);
-        });
-
-        assertEquals(COMMENT_ALREADY_DELETED, ex.getErrorCode());
-    }
-
 }
