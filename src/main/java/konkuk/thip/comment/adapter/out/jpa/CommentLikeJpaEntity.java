@@ -22,7 +22,7 @@ public class CommentLikeJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_id")
     private UserJpaEntity userJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "comment_id")
     private CommentJpaEntity commentJpaEntity;
 }
