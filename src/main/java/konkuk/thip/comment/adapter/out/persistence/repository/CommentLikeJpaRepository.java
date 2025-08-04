@@ -9,18 +9,22 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEntity, Long> {
-    @Query(value = "SELECT * FROM comment_likes WHERE user_id = :userId", nativeQuery = true)
-    List<CommentLikeJpaEntity> findAllByUserId(Long userId);
+
+    @Query("SELECT cl FROM CommentLikeJpaEntity cl WHERE cl.userJpaEntity.userId = :userId")
+    List<CommentLikeJpaEntity> findAllByUserId(@Param("userId") Long userId);
+
 
     @Modifying
-    @Query(value = "DELETE FROM comment_likes WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
+    @Query("DELETE FROM CommentLikeJpaEntity cl WHERE cl.userJpaEntity.userId = :userId AND cl.commentJpaEntity.commentId = :commentId")
     void deleteByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
-    @Query(value = "SELECT EXISTS(SELECT 1 FROM comment_likes WHERE user_id = :userId AND comment_id = :commentId)", nativeQuery = true)
-    Object existsByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
+    @Query("SELECT CASE WHEN COUNT(cl) > 0 THEN true ELSE false END " +
+            "FROM CommentLikeJpaEntity cl " +
+            "WHERE cl.userJpaEntity.userId = :userId AND cl.commentJpaEntity.commentId = :commentId")
+    boolean existsByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
     @Modifying
-    @Query(value = "DELETE FROM comment_likes WHERE comment_id = :commentId", nativeQuery = true)
-    int deleteAllByCommentId(@Param("commentId") Long commentId);
+    @Query("DELETE FROM CommentLikeJpaEntity cl WHERE cl.commentJpaEntity.commentId = :commentId")
+    void deleteAllByCommentId(@Param("commentId") Long commentId);
 
 }
