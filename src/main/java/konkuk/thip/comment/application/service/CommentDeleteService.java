@@ -33,19 +33,20 @@ public class CommentDeleteService implements CommentDeleteUseCase {
 
         // 2. 댓글 삭제 권한 검증 및 소프트 딜리트
         comment.validateDeletable(userId);
-        commentCommandPort.delete(comment);
+        // 2-1. 댓글 좋아요 삭제
+        commentLikeCommandPort.deleteAllByCommentId(commentId);
 
+        // 3. 댓글 삭제
+        commentCommandPort.delete(comment);
 
         //TODO 게시물의 댓글 수 증가/감소 동시성 제어 로직 추가해야됨
 
-        // 3. 게시글 댓글 수 감소
-        // 3-1. 도메인 게시물 댓글 수 감소
+        // 4. 게시글 댓글 수 감소
+        // 4-1. 도메인 게시물 댓글 수 감소
         post.decreaseCommentCount();
-        // 3-2 Jpa엔티티 게시물 댓글 수 감소
+        // 4-2 Jpa엔티티 게시물 댓글 수 감소
         postHandler.updatePost(comment.getPostType(), post);
 
-        // 4. 댓글 좋아요 삭제
-        commentLikeCommandPort.deleteAllByCommentId(commentId);
         return post.getId();
     }
 
