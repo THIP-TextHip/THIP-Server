@@ -22,6 +22,7 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.vote.adapter.out.persistence.repository.VoteJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
+import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.post.PostType.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -40,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@Transactional
 @DisplayName("[통합] 댓글 삭제 api 통합 테스트")
 class CommentDeleteAPITest {
 
@@ -58,8 +58,6 @@ class CommentDeleteAPITest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private CommentLikeJpaRepository commentLikeJpaRepository;
-
-
 
     private AliasJpaEntity alias;
     private UserJpaEntity user;
@@ -83,6 +81,20 @@ class CommentDeleteAPITest {
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
     }
 
+    @AfterEach
+    void tearDown() {
+        recordJpaRepository.deleteAllInBatch();
+        voteJpaRepository.deleteAllInBatch();
+        commentLikeJpaRepository.deleteAll();
+        commentJpaRepository.deleteAllInBatch();
+        feedJpaRepository.deleteAllInBatch();
+        roomParticipantJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAll();
+        userJpaRepository.deleteAllInBatch();
+        categoryJpaRepository.deleteAll();
+        aliasJpaRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("루트댓글을 삭제하면 [soft delete 처리]된다")
@@ -91,6 +103,7 @@ class CommentDeleteAPITest {
         // given
         CommentJpaEntity comment = commentJpaRepository.save(TestEntityFactory.createComment(feed, user, FEED));
         feed.updateCommentCount(1);
+        feedJpaRepository.save(feed);
         Long commentId = comment.getCommentId();
 
         // when
@@ -99,7 +112,8 @@ class CommentDeleteAPITest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findById(commentId).isEmpty());
+        assertThat(commentJpaRepository.findById(commentId)).isPresent();
+        assertThat(commentJpaRepository.findById(commentId).get().getStatus()).isEqualTo(INACTIVE);
     }
 
     @Test
@@ -110,8 +124,8 @@ class CommentDeleteAPITest {
         CommentJpaEntity parent = commentJpaRepository.save(TestEntityFactory.createComment(feed, user, FEED));
         CommentJpaEntity reply = commentJpaRepository.save(TestEntityFactory.createReplyComment(feed, user, FEED, parent));
         feed.updateCommentCount(2);
+        feedJpaRepository.save(feed);
         Long replyId = reply.getCommentId();
-
 
         // when
         mockMvc.perform(delete("/comments/{commentId}", replyId)
@@ -119,7 +133,9 @@ class CommentDeleteAPITest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findById(replyId)).isEmpty();
+        assertThat(commentJpaRepository.findById(replyId)).isPresent();
+        assertThat(commentJpaRepository.findById(replyId).get().getStatus()).isEqualTo(INACTIVE);
+
     }
 
     @Test
@@ -131,6 +147,7 @@ class CommentDeleteAPITest {
         CommentJpaEntity comment = commentJpaRepository.save(TestEntityFactory.createComment(feed, user, FEED));
         commentLikeJpaRepository.save(TestEntityFactory.createCommentLike(comment, user));
         feed.updateCommentCount(1);
+        feedJpaRepository.save(feed);
         Long commentId = comment.getCommentId();
         int beforeCount = feed.getCommentCount();
 
@@ -140,7 +157,8 @@ class CommentDeleteAPITest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findById(commentId).isEmpty());
+        assertThat(commentJpaRepository.findById(commentId)).isPresent();
+        assertThat(commentJpaRepository.findById(commentId).get().getStatus()).isEqualTo(INACTIVE);
 
         // Feed 댓글수 감소 확인
         FeedJpaEntity updatedFeed = feedJpaRepository.findById(feed.getPostId()).get();
@@ -150,6 +168,5 @@ class CommentDeleteAPITest {
         boolean like = commentLikeJpaRepository.existsByUserIdAndCommentId(user.getUserId(), commentId);
         assertThat(like).isFalse();
     }
-
 
 }
