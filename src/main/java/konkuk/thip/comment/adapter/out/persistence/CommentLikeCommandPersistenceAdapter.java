@@ -41,4 +41,10 @@ public class CommentLikeCommandPersistenceAdapter implements CommentLikeCommandP
     public void delete(Long userId, Long commentId) {
         commentLikeJpaRepository.deleteByUserIdAndCommentId(userId, commentId);
     }
+
+    @Override
+    public void deleteAllByCommentId(Long commentId) {
+        commentLikeJpaRepository.deleteAllByCommentId(commentId);
+    }
+
 }

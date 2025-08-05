@@ -8,8 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_VOTE_PAGE_RANGE;
-import static konkuk.thip.common.exception.code.ErrorCode.VOTE_CANNOT_BE_OVERVIEW;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
@@ -72,5 +71,17 @@ public class Vote extends BaseDomainEntity implements CommentCountUpdatable, Roo
     @Override
     public void increaseCommentCount() {
         commentCount++;
+    }
+
+    @Override
+    public void decreaseCommentCount() {
+        checkCommentCountNotUnderflow();
+        commentCount--;
+    }
+
+    private void checkCommentCountNotUnderflow() {
+        if (commentCount <= 0) {
+            throw new InvalidStateException(COMMENT_COUNT_UNDERFLOW);
+        }
     }
 }

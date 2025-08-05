@@ -10,6 +10,7 @@ import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
@@ -70,31 +71,23 @@ public interface FeedQueryMapper {
     @Mapping(target = "isbn", source = "book.isbn")
     @Mapping(target = "bookAuthor", source = "book.authorName")
     @Mapping(target = "contentBody", source = "feed.content")
-    @Mapping(target = "contentUrls", source = "feed.contentList")
+    @Mapping(target = "contentUrls", source = "feed.contentList", qualifiedByName = "mapContentList")
     @Mapping(target = "likeCount", source = "feed.likeCount")
     @Mapping(target = "commentCount", source = "feed.commentCount")
     @Mapping(target = "isSaved", source = "isSaved")
     @Mapping(target = "isLiked", source = "isLiked")
-    @Mapping(target = "tagList", source = "feed.tagList")
+    @Mapping(target = "tagList", source = "feed.tagList", qualifiedByName = "mapTagList")
     FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked);
 
-    // List<Content> → String[] 변환
+    @Named("mapContentList")
     default String[] mapContentList(List<Content> contentList) {
-        if (contentList == null) {
-            return new String[0];
-        }
-        return contentList.stream()
-                .map(Content::getContentUrl)
-                .toArray(String[]::new);
+        if (contentList == null) return new String[0];
+        return contentList.stream().map(Content::getContentUrl).toArray(String[]::new);
     }
 
-    // List<Tag> → String[] 변환
+    @Named("mapTagList")
     default String[] mapTagList(List<Tag> tagList) {
-        if (tagList == null) {
-            return new String[0];
-        }
-        return tagList.stream()
-                .map(Tag::getValue)
-                .toArray(String[]::new);
+        if (tagList == null) return new String[0];
+        return tagList.stream().map(Tag::getValue).toArray(String[]::new);
     }
 }
