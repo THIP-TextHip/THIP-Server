@@ -2,10 +2,19 @@ package konkuk.thip.book.application.port.out;
 
 
 import konkuk.thip.book.domain.Book;
+import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.common.exception.code.ErrorCode;
+
+import java.util.Optional;
 
 public interface BookCommandPort {
 
-    Book findByIsbn(String isbn);
+    Optional<Book> findByIsbn(String isbn);
+
+    default Book getByIdOrThrow(String isbn){
+        return findByIsbn(isbn)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.BOOK_NOT_FOUND));
+    }
 
     Long save(Book book);
 

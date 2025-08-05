@@ -56,7 +56,7 @@ public class BookMostSearchRankService {
             int rank = 1;
             for (String isbn : isbns) {
                 try {
-                    Book book = bookCommandPort.findByIsbn(isbn);
+                    Book book = bookCommandPort.getByIdOrThrow(isbn);
                     bookRankDetails.add(BookMostSearchResult.BookRankInfo.builder()
                             .rank(rank++)
                             .title(book.getTitle())

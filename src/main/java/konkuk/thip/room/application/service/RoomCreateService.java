@@ -51,7 +51,7 @@ public class RoomCreateService implements RoomCreateUseCase {
 
     private Long resolveBookAndEnsurePage(String isbn) {
         try {
-            Book existing = bookCommandPort.findByIsbn(isbn);
+            Book existing = bookCommandPort.getByIdOrThrow(isbn);
             if (!existing.hasPageCount()) {
                 updateBookPageCount(existing);
             }

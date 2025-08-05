@@ -93,7 +93,7 @@ public class BookSearchService implements BookSearchUseCase {
         Book book;
         try {
             // DB에서 책 정보 조회 (없으면 예외 발생)
-            book = bookCommandPort.findByIsbn(isbn);
+            book = bookCommandPort.getByIdOrThrow(isbn);
         } catch (EntityNotFoundException e) {
             // 책이 DB에 없으면 기본값으로 반환
             return BookDetailSearchResult.of(

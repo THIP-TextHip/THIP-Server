@@ -34,7 +34,7 @@ public class BookSavedService implements BookSavedUseCase {
 
         try {
             // Book 조회 시도
-            book = bookCommandPort.findByIsbn(isbn);
+            book = bookCommandPort.getByIdOrThrow(isbn);
         } catch (EntityNotFoundException e) {
             // 책이 DB에 없을 때 처리
 
