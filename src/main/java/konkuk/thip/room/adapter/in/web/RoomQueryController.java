@@ -52,7 +52,7 @@ public class RoomQueryController {
     )
     @ExceptionDescription(ROOM_PASSWORD_CHECK)
     @PostMapping("/rooms/{roomId}/password")
-    public BaseResponse<Void> verifyRoomPassword(
+    public BaseResponse<RoomVerifyPasswordResponse> verifyRoomPassword(
             @Parameter(description = "비밀번호 검증하려는 비공개 방 ID", example = "1") @PathVariable("roomId") final Long roomId,
             @Valid @RequestBody final RoomVerifyPasswordRequest roomVerifyPasswordRequest
     ) {
