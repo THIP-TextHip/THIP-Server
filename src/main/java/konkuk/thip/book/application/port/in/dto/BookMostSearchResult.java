@@ -1,6 +1,5 @@
 package konkuk.thip.book.application.port.in.dto;
 
-import konkuk.thip.book.adapter.in.web.response.GetBookMostSearchResponse;
 import lombok.Builder;
 
 import java.util.List;

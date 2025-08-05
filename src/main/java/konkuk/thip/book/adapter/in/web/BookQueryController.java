@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
-import konkuk.thip.book.adapter.in.web.response.GetBookDetailSearchResponse;
-import konkuk.thip.book.adapter.in.web.response.GetBookMostSearchResponse;
-import konkuk.thip.book.adapter.in.web.response.GetBookSearchListResponse;
+import konkuk.thip.book.adapter.in.web.response.BookDetailSearchResponse;
+import konkuk.thip.book.adapter.in.web.response.BookMostSearchResponse;
+import konkuk.thip.book.adapter.in.web.response.BookSearchListResponse;
 import konkuk.thip.book.application.port.in.BookMostSearchUseCase;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
@@ -36,11 +36,11 @@ public class BookQueryController {
     )
     @ExceptionDescription(BOOK_SEARCH)
     @GetMapping("/books")
-    public BaseResponse<GetBookSearchListResponse> getBookSearchList(
+    public BaseResponse<BookSearchListResponse> getBookSearchList(
             @Parameter(description = "검색 키워드", example = "해리포터") @RequestParam final String keyword,
             @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") @RequestParam final int page,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(GetBookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page,userId), page));
+        return BaseResponse.ok(BookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page,userId), page));
     }
 
     //책 상세검색 결과 조회
@@ -50,12 +50,12 @@ public class BookQueryController {
     )
     @ExceptionDescription(BOOK_DETAIL_SEARCH)
     @GetMapping("/books/{isbn}")
-    public BaseResponse<GetBookDetailSearchResponse> getBookDetailSearch(
+    public BaseResponse<BookDetailSearchResponse> getBookDetailSearch(
             @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
             @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
             @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(GetBookDetailSearchResponse.of(bookSearchUseCase.searchDetailBooks(isbn,userId)));
+        return BaseResponse.ok(BookDetailSearchResponse.of(bookSearchUseCase.searchDetailBooks(isbn,userId)));
     }
 
     //가장 많이 검색된 책 조회
@@ -65,9 +65,12 @@ public class BookQueryController {
     )
     @ExceptionDescription(POPULAR_BOOK_SEARCH)
     @GetMapping("/books/most-searched")
-    public BaseResponse<GetBookMostSearchResponse> getMostSearchedBooks(
+    public BaseResponse<BookMostSearchResponse> getMostSearchedBooks(
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(GetBookMostSearchResponse.of(bookMostSearchUseCase.getMostSearchedBooks(userId)));
+        return BaseResponse.ok(BookMostSearchResponse.of(bookMostSearchUseCase.getMostSearchedBooks(userId)));
     }
+
+    @GetMapping("/books/{isbn}/recuriting-rooms")
+    public BaseResponse
 
 }
