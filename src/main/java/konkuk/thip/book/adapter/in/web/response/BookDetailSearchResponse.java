@@ -12,7 +12,7 @@ public record BookDetailSearchResponse(
         String isbn,
         String description,
         int recruitingRoomCount,
-        int recruitingReadCount,
+        int readCount,
         boolean isSaved
 ) {
     public static BookDetailSearchResponse of(BookDetailSearchResult result) {
@@ -25,7 +25,7 @@ public record BookDetailSearchResponse(
                 result.naverDetailBook().isbn(),
                 result.naverDetailBook().description(),
                 result.recruitingRoomCount(),
-                result.recruitingReadCount(),
+                result.readCount(),
                 result.isSaved());
     }
 

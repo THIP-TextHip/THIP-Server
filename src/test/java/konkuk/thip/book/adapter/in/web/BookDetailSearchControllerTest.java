@@ -140,7 +140,7 @@ class BookDetailSearchControllerTest {
 
         assertThat(result).isNotNull();
         assertThat(result.recruitingRoomCount()).isEqualTo(1);
-        assertThat(result.recruitingReadCount()).isEqualTo(1);
+        assertThat(result.readCount()).isEqualTo(1);
         assertThat(result.isSaved()).isTrue();
         assertThat(result.naverDetailBook()).isNotNull();
     }
@@ -185,7 +185,7 @@ class BookDetailSearchControllerTest {
         roomParticipantJpaRepository.deleteAllInBatch();
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());
-        assertThat(result.recruitingReadCount()).isEqualTo(0);
+        assertThat(result.readCount()).isEqualTo(0);
     }
 
     @Test
