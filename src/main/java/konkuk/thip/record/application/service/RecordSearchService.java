@@ -105,6 +105,7 @@ public class RecordSearchService implements RecordSearchUseCase {
         // RecordSearchResponse 생성
         return RecordSearchResponse.builder()
                 .roomId(roomId)
+                .isbn(book.getIsbn())
                 .postList(postDtos)
                 .nextCursor(cursorBasedList.nextCursor())
                 .isLast(!cursorBasedList.hasNext())
