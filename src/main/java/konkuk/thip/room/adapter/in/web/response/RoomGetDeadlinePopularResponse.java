@@ -10,6 +10,7 @@ public record RoomGetDeadlinePopularResponse(
             Long roomId,
             String bookImageUrl,
             String roomName,
+            int recruitCount, // 방 최대 인원 수
             int memberCount,
             String deadlineDate
     ) {

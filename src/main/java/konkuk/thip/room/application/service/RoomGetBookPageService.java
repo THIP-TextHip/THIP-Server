@@ -28,6 +28,6 @@ public class RoomGetBookPageService implements RoomGetBookPageUseCase {
         Book book = bookCommandPort.findBookByRoomId(roomId);
         RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(userId, roomId);
 
-        return RoomGetBookPageResponse.of(book.getPageCount(), roomParticipant.canWriteOverview());
+        return RoomGetBookPageResponse.of(book.getPageCount(), roomParticipant.canWriteOverview(), roomId);
     }
 }

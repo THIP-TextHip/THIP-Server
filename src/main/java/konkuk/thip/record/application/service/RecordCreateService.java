@@ -6,10 +6,12 @@ import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.record.application.port.in.RecordCreateUseCase;
 import konkuk.thip.record.application.port.in.dto.RecordCreateCommand;
+import konkuk.thip.record.application.port.in.dto.RecordCreateResult;
 import konkuk.thip.record.application.port.out.RecordCommandPort;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +30,14 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final BookCommandPort bookCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
 
+    private final RoomParticipantValidator roomParticipantValidator;
+
     @Transactional
     @Override
     //todo updateRoomPercentage 스케줄러로 책임을 분리할지 논의
-    public Long createRecord(RecordCreateCommand command) {
+    public RecordCreateResult createRecord(RecordCreateCommand command) {
+        roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
+
         // 1. Record 생성
         Record record = Record.withoutId(
                 command.content(),
@@ -48,14 +54,16 @@ public class RecordCreateService implements RecordCreateUseCase {
 
         // 3. 유효성 검증
         validateRoom(room);
-        validateUserRoom(roomParticipant);
+        validateRoomParticipant(roomParticipant);
         validateRecord(record, book);
 
         // 4. UserRoom의 currentPage, userPercentage 업데이트
         updateRoomProgress(roomParticipant, record, book, room);
 
         // 5. Record 저장
-        return recordCommandPort.saveRecord(record);
+        Long newRecordId = recordCommandPort.saveRecord(record);
+
+        return RecordCreateResult.of(newRecordId, command.roomId());
     }
 
     private void updateRoomProgress(RoomParticipant roomParticipant, Record record, Book book, Room room) {
@@ -69,7 +77,7 @@ public class RecordCreateService implements RecordCreateUseCase {
         }
     }
 
-    private void validateUserRoom(RoomParticipant roomParticipant) {
+    private void validateRoomParticipant(RoomParticipant roomParticipant) {
         // UserRoom의 총평 작성 가능 여부 검증
         if (!roomParticipant.canWriteOverview()) {
             String message = String.format(

@@ -11,6 +11,7 @@ public record RoomQueryDto(
         Long roomId,
         String bookImageUrl,
         String roomName,
+        int recruitCount, // 방 최대 인원 수
         int memberCount,
         LocalDate endDate       // 방 진행 마감일 or 방 모집 마감일
 ) {
@@ -20,6 +21,7 @@ public record RoomQueryDto(
         Assert.notNull(bookImageUrl, "bookImageUrl must not be null");
         Assert.notNull(roomName, "roomName must not be null");
         Assert.notNull(endDate, "endDate must not be null");
+        Assert.isTrue(recruitCount > 0, "recruitCount must be greater than 0");
         Assert.isTrue(memberCount >= 0, "memberCount must be greater than or equal to 0");
     }
 }

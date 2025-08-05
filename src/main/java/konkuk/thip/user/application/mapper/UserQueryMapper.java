@@ -12,4 +12,6 @@ public interface UserQueryMapper {
     // List<QueryDto> -> List<DTO>
     List<UserSearchResponse.UserDto> toUserDtoList(List<UserQueryDto> userQueryDtos);
 
+
+
 }

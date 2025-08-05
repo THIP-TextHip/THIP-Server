@@ -12,13 +12,13 @@ import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import org.junit.jupiter.api.AfterEach;
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] RecordCommandController 테스트")
 class RecordCreateControllerTest {
@@ -71,27 +73,19 @@ class RecordCreateControllerTest {
     @Autowired
     private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
-    @AfterEach
-    void tearDown() {
-        recordJpaRepository.deleteAll();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
-    }
+    private UserJpaEntity user;
+    private RoomJpaEntity room;
 
     private void saveUserAndRoom() {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
 
-        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        user = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
 
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
-        RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+        room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         //UserRoomJpaEntity 생성 및 저장
         RoomParticipantJpaEntity userRoom = RoomParticipantJpaEntity.builder()
@@ -121,12 +115,9 @@ class RecordCreateControllerTest {
                 content
         );
 
-        Long userId = userJpaRepository.findAll().get(0).getUserId();
-        Long roomId = roomJpaRepository.findAll().get(0).getRoomId();
-
         //when
-        ResultActions result = mockMvc.perform(post("/rooms/{roomId}/record", roomId)
-                .requestAttr("userId", userId)
+        ResultActions result = mockMvc.perform(post("/rooms/{roomId}/record", room.getRoomId())
+                .requestAttr("userId", user.getUserId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)
                 ));
@@ -142,8 +133,8 @@ class RecordCreateControllerTest {
         RecordJpaEntity recordJpaEntity = recordJpaRepository.findById(recordId).orElse(null);
 
         assertThat(recordJpaEntity).isNotNull();
-        assertThat(recordJpaEntity.getUserJpaEntity().getUserId()).isEqualTo(userId);
-        assertThat(recordJpaEntity.getRoomJpaEntity().getRoomId()).isEqualTo(roomId);
+        assertThat(recordJpaEntity.getUserJpaEntity().getUserId()).isEqualTo(user.getUserId());
+        assertThat(recordJpaEntity.getRoomJpaEntity().getRoomId()).isEqualTo(room.getRoomId());
         assertThat(recordJpaEntity.getPage()).isEqualTo(page);
         assertThat(recordJpaEntity.getContent()).isEqualTo(content);
     }
