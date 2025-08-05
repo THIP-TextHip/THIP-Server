@@ -74,6 +74,8 @@ dependencies {
 
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
