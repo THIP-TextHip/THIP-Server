@@ -12,5 +12,7 @@ public interface FollowingQueryPort {
     List<String> getLatestFollowerImageUrls(Long userId, int size);
 
     boolean isFollowingUser(Long userId, Long targetUserId);
+
+    int getFollowingCountByUser(Long userId);
 }
 

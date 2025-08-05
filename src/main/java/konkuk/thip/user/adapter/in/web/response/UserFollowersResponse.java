@@ -7,6 +7,7 @@ import java.util.List;
 @Builder
 public record UserFollowersResponse(
         List<FollowerDto> followers,
+        Integer totalFollowerCount,
         String nextCursor,
         boolean isLast
 ) {
