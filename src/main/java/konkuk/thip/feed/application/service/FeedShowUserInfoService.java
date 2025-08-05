@@ -35,21 +35,24 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
         // 3. 내가 작성한 전체 피드 개수 구하기
         int allFeedCount = feedQueryPort.countAllFeedsByUserId(userId);
 
-        return feedQueryMapper.toFeedShowUserInfoResponse(feedOwner, allFeedCount, latestFollowerProfileImageUrls);
+        return feedQueryMapper.toFeedShowUserInfoResponse(feedOwner, allFeedCount, false, latestFollowerProfileImageUrls);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public FeedShowUserInfoResponse showAnotherUserInfoInFeeds(Long anotherUserId) {
-        // 1. User 찾기
-        User feedOwner = userCommandPort.findById(anotherUserId);
+    public FeedShowUserInfoResponse showAnotherUserInfoInFeeds(Long userId, Long feedOwnerId) {
+        // 1. feedOwner 찾기
+        User feedOwner = userCommandPort.findById(feedOwnerId);
 
-        // 2. 해당 유저를 팔로우 하는 유저들을 프로필 이미지 정보 구하기
-        List<String> latestFollowerProfileImageUrls = followingQueryPort.getLatestFollowerImageUrls(anotherUserId, FOLLOWER_DISPLAY_LIMIT);
+        // 2. feedOwner를 팔로우 하는 유저들을 프로필 이미지 정보 구하기
+        List<String> latestFollowerProfileImageUrls = followingQueryPort.getLatestFollowerImageUrls(feedOwnerId, FOLLOWER_DISPLAY_LIMIT);
 
-        // 3. 유저가 작성한 공개 피드 개수 구하기
-        int publicFeedCount = feedQueryPort.countPublicFeedsByUserId(anotherUserId);
+        // 3. feedOwner가 작성한 공개 피드 개수 구하기
+        int publicFeedCount = feedQueryPort.countPublicFeedsByUserId(feedOwnerId);
 
-        return feedQueryMapper.toFeedShowUserInfoResponse(feedOwner, publicFeedCount, latestFollowerProfileImageUrls);
+        // 4. user가 feedOwner 를 팔로잉하는지 조회
+        boolean isFollowing = followingQueryPort.isFollowingUser(userId, feedOwnerId);
+
+        return feedQueryMapper.toFeedShowUserInfoResponse(feedOwner, publicFeedCount, isFollowing, latestFollowerProfileImageUrls);
     }
 }

@@ -167,6 +167,7 @@ class FeedShowUserInfoApiTest {
         //given
         AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
         AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity anotherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "anotherUser"));
         UserJpaEntity follower1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower1"));
         UserJpaEntity follower2 = userJpaRepository.save(TestEntityFactory.createUser(a1, "follower2"));
@@ -194,16 +195,45 @@ class FeedShowUserInfoApiTest {
         feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, false));       // 비공개글
 
         //when //then
-        mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId()))
+        mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId())
+                        .requestAttr("userId", me.getUserId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.creatorId", is(anotherUser.getUserId().intValue())))
                 .andExpect(jsonPath("$.data.profileImageUrl", is(a0.getImageUrl())))
                 .andExpect(jsonPath("$.data.nickname", is(anotherUser.getNickname())))
                 .andExpect(jsonPath("$.data.aliasName", is(a0.getValue())))
                 .andExpect(jsonPath("$.data.aliasColor", is(a0.getColor())))
                 .andExpect(jsonPath("$.data.followerCount", is(2)))
                 .andExpect(jsonPath("$.data.totalFeedCount", is(2)))        // 공개 글만
+                .andExpect(jsonPath("$.data.isFollowing", is(false)))       // me는 anotherUser를 팔로잉하지 않음
                 // 팔로워 유저의 프로필 이미지 정렬 순서 : 팔로잉을 최신에 맺은 순 (follower2 -> follower1 순)
                 .andExpect(jsonPath("$.data.latestFollowerProfileImageUrls", is(List.of(a1.getImageUrl(), a0.getImageUrl()))));
+    }
+
+    @Test
+    @DisplayName("accessToken의 유저가 특정 유저를 팔로잉하는 경우, isFollowing은 true이다.")
+    void feed_show_user_info_isFollowing_test() throws Exception {
+        //given
+        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        UserJpaEntity anotherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "anotherUser"));
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a1, "me"));
+        followingJpaRepository.save(TestEntityFactory.createFollowing(me, anotherUser));// me 가 anotherUser를 follow 하는 상황
+
+        // 피드 생성 및 생성일 직접 설정
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
+        feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, true));        // 공개글
+        feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, true));        // 공개글
+        feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, false));       // 비공개글
+        feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, false));       // 비공개글
+
+        //when //then
+        mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId())
+                        .requestAttr("userId", me.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isFollowing", is(true)))       // me는 anotherUser를 팔로잉함
+                // 팔로워 유저의 프로필 이미지 정렬 순서 : 팔로잉을 최신에 맺은 순
+                .andExpect(jsonPath("$.data.latestFollowerProfileImageUrls", is(List.of(a1.getImageUrl()))));
     }
 
     @Test
@@ -212,6 +242,7 @@ class FeedShowUserInfoApiTest {
         //given
         AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
         AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity anotherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "anotherUser"));
         UserJpaEntity follower1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower1"));
         UserJpaEntity follower2 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower2"));
@@ -257,7 +288,8 @@ class FeedShowUserInfoApiTest {
                 7, anotherUser.getUserId());      // anotherUser 의 followerCount 값을 7로 update
 
         //when //then
-        mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId()))
+        mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId())
+                        .requestAttr("userId", me.getUserId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.followerCount", is(7)))
                 // 팔로워 유저의 프로필 이미지 정렬 순서 : 팔로잉을 최신에 맺은 순 (follower7 -> follower6 -> ,,, -> follower3 순)
