@@ -107,14 +107,14 @@ public class BookSearchService implements BookSearchUseCase {
         //이책에 모집중인 모임방 개수
         int recruitingRoomCount = getRecruitingRoomCount(book);
         // 이책에 읽기 참여중인 사용자 수
-        int recruitingReadCount = getRecruitingReadCount(book);
+        int readCount = getReadCount(book);
         // 사용자의 해당 책 저장 여부
         boolean isSaved = savedQueryPort.existsByUserIdAndBookId(user.getId(), book.getId());
 
         return BookDetailSearchResult.of(
                 naverDetailBookParseResult,
                 recruitingRoomCount,
-                recruitingReadCount,
+                readCount,
                 isSaved);
     }
 
@@ -124,7 +124,7 @@ public class BookSearchService implements BookSearchUseCase {
         return roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(book.getId(), today);
     }
 
-    private int getRecruitingReadCount(Book book) {
+    private int getReadCount(Book book) {
         // 해당책으로 피드에 글 작성
         // 해당책에 대해 모임방 참여
         // 둘 중 하나라도 부합될 경우 카운트, 중복 카운트 불가
