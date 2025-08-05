@@ -3,7 +3,6 @@ package konkuk.thip.room.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -117,7 +116,7 @@ public class Room extends BaseDomainEntity {
         return PASSWORD_ENCODER.matches(rawPassword, this.hashedPassword);
     }
 
-    public void verifyPassword(String rawPassword) {
+    public boolean verifyPassword(String rawPassword) {
 
         validateRoomRecruitExpired();
 
@@ -127,9 +126,7 @@ public class Room extends BaseDomainEntity {
         }
 
         //비밀번호 검증
-        if (!matchesPassword(rawPassword)) {
-            throw new BusinessException(ROOM_PASSWORD_MISMATCH);
-        }
+        return matchesPassword(rawPassword);
     }
 
     public void validateRoomRecruitExpired() {
