@@ -79,7 +79,6 @@ public enum SwaggerResponseDescription {
     ))),
     ROOM_PASSWORD_CHECK(new LinkedHashSet<>(Set.of(
             ROOM_NOT_FOUND,
-            ROOM_PASSWORD_MISMATCH,
             ROOM_RECRUITMENT_PERIOD_EXPIRED,
             ROOM_PASSWORD_NOT_REQUIRED
     ))),

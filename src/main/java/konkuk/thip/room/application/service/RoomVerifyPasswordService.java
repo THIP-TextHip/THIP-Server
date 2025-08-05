@@ -1,5 +1,6 @@
 package konkuk.thip.room.application.service;
 
+import konkuk.thip.room.adapter.in.web.response.RoomVerifyPasswordResponse;
 import konkuk.thip.room.application.port.in.RoomVerifyPasswordUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomVerifyPasswordQuery;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
@@ -17,13 +18,13 @@ public class RoomVerifyPasswordService implements RoomVerifyPasswordUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public Void verifyRoomPassword(RoomVerifyPasswordQuery query) {
+    public RoomVerifyPasswordResponse verifyRoomPassword(RoomVerifyPasswordQuery query) {
 
         //방 검증
         Room room = roomCommandPort.getByIdOrThrow(query.roomId());
 
         //도메인에서 비밀번호 검증 로직 수행
-        room.verifyPassword(query.password());
-        return null;
+        boolean matched = room.verifyPassword(query.password());
+        return RoomVerifyPasswordResponse.of(matched, room.getId());
     }
 }
