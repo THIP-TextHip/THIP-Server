@@ -99,6 +99,7 @@ public class UserQueryController {
         return BaseResponse.ok(userGetFollowUsecase.getMyFollowing(userId, cursor, size));
     }
 
+    @Deprecated
     @Operation(
             summary = "팔로잉 여부 조회",
             description = "특정 사용자가 다른 사용자를 팔로우하고 있는지 확인합니다."

@@ -1,6 +1,7 @@
 
 package konkuk.thip.feed.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.domain.Feed;
@@ -49,4 +50,10 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.likeCount = feed.getLikeCount();
         this.commentCount = feed.getCommentCount();
     }
+
+    @VisibleForTesting
+    public void updateCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
 }

@@ -32,6 +32,9 @@ public class SecurityConfig {
     @Value("${server.web-url}")
     private String webUrl;
 
+    @Value("${server.web-domain-url}")
+    private String webDomainUrl;
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -40,16 +43,8 @@ public class SecurityConfig {
     private static final String[] WHITELIST = {
             "/swagger-ui/**", "/api-docs/**", "/swagger-ui.html",
             "/v3/api-docs/**","/oauth2/authorization/**",
-            "/login/oauth2/code/**",
+            "/login/oauth2/code/**", "/actuator/health",
 
-//            //테스트를 위한 url
-            "/api/test/public",
-            "/api/test/auth-status",
-            "/api/test/protected",
-            "/auth/kakao/**",
-            "/kakao-login-test.html",
-            "/google-login-test.html",
-            "/index.html",
     };
 
     @Bean
@@ -94,7 +89,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                webUrl
+                webUrl,
+                webDomainUrl
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(Collections.singletonList("*"));

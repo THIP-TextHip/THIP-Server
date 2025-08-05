@@ -7,6 +7,7 @@ import java.util.List;
 @Builder
 public record UserFollowingResponse(
         List<FollowingDto> followings,
+        Integer totalFollowingCount,
         String nextCursor,
         boolean isLast
 ) {
@@ -16,7 +17,8 @@ public record UserFollowingResponse(
             String nickname,
             String profileImageUrl,
             String aliasName,
-            String aliasColor
+            String aliasColor,
+            boolean isFollowing
     ){
     }
 

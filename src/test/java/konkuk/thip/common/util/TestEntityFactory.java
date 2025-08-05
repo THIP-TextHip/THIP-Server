@@ -185,6 +185,18 @@ public class TestEntityFactory {
                 .build();
     }
 
+    public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user,PostType postType,CommentJpaEntity parentComment) {
+        return CommentJpaEntity.builder()
+                .content("댓글 내용")
+                .postJpaEntity(post)
+                .userJpaEntity(user)
+                .likeCount(0)
+                .reportCount(0)
+                .postType(postType)
+                .parent(parentComment)
+                .build();
+    }
+
     public static CommentLikeJpaEntity createCommentLike(CommentJpaEntity comment, UserJpaEntity user) {
         return CommentLikeJpaEntity.builder()
                 .userJpaEntity(user)

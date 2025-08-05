@@ -4,10 +4,40 @@ import konkuk.thip.common.exception.InvalidStateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_COUNT_UNDERFLOW;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Record 도메인 테스트")
 class RecordTest {
+
+    private final Long CREATOR_ID = 1L;
+
+    private Record createWithCommentRecord() {
+        return Record.builder()
+                .id(100L)
+                .content("댓글이 존재하는 기록입니다.")
+                .creatorId(CREATOR_ID)
+                .page(10)
+                .isOverview(false)
+                .likeCount(0)
+                .commentCount(1)
+                .roomId(100L)
+                .build();
+    }
+
+    private Record createNotCommentRecord() {
+        return Record.builder()
+                .id(100L)
+                .content("댓글이 존재하지 않는 기록입니다.")
+                .creatorId(CREATOR_ID)
+                .page(10)
+                .isOverview(false)
+                .likeCount(0)
+                .commentCount(0)
+                .roomId(100L)
+                .build();
+    }
+
 
     @Test
     @DisplayName("validatePage: 유효한 페이지 범위일 때, 예외가 발생하지 않는다.")
@@ -60,4 +90,39 @@ class RecordTest {
         assertInstanceOf(IllegalArgumentException.class, ex.getCause());
         assertTrue(ex.getCause().getMessage().contains("현재 페이지 = 15"));
     }
+
+    @Test
+    @DisplayName("increaseCommentCount: 기록의 댓글 수가 정상적으로 1 증가한다.")
+    void increaseCommentCount_increments() {
+        Record record = createWithCommentRecord();
+        int before = record.getCommentCount();
+
+        record.increaseCommentCount();
+
+        assertEquals(before + 1, record.getCommentCount());
+    }
+
+    @Test
+    @DisplayName("decreaseCommentCount: 기록의 댓글 수가 정상적으로 1 감소한다.")
+    void decreaseCommentCount_decrements() {
+        Record record = createWithCommentRecord();
+        int before = record.getCommentCount();
+
+        record.decreaseCommentCount();
+
+        assertEquals(before - 1, record.getCommentCount());
+    }
+
+    @Test
+    @DisplayName("decreaseCommentCount: 기록의 댓글 수가 0 이하로 내려가면 InvalidStateException이 발생한다.")
+    void decreaseCommentCount_belowZero_throws() {
+        Record record = createNotCommentRecord();
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.decreaseCommentCount());
+
+        assertEquals(COMMENT_COUNT_UNDERFLOW, ex.getErrorCode());
+    }
+
+
 }

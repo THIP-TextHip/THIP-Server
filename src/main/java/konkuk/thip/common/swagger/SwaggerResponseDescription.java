@@ -79,7 +79,6 @@ public enum SwaggerResponseDescription {
     ))),
     ROOM_PASSWORD_CHECK(new LinkedHashSet<>(Set.of(
             ROOM_NOT_FOUND,
-            ROOM_PASSWORD_MISMATCH,
             ROOM_RECRUITMENT_PERIOD_EXPIRED,
             ROOM_PASSWORD_NOT_REQUIRED
     ))),
@@ -169,6 +168,12 @@ public enum SwaggerResponseDescription {
             FEED_ALREADY_SAVED,
             FEED_NOT_SAVED_CANNOT_DELETE
     ))),
+    SHOW_SINGLE_FEED(new LinkedHashSet<>(Set.of(
+            FEED_NOT_FOUND,
+            USER_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            FEED_CAN_NOT_SHOW_PRIVATE_ONE
+    ))),
 
     // Comment
     COMMENT_CREATE(new LinkedHashSet<>(Set.of(
@@ -190,7 +195,20 @@ public enum SwaggerResponseDescription {
             VOTE_NOT_FOUND,
             COMMENT_ALREADY_LIKED,
             COMMENT_NOT_LIKED_CANNOT_CANCEL,
-            COMMENT_LIKE_COUNT_UNDERFLOW
+            COMMENT_LIKE_COUNT_UNDERFLOW,
+            FEED_ACCESS_FORBIDDEN,
+            ROOM_ACCESS_FORBIDDEN
+    ))),
+    COMMENT_DELETE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            COMMENT_NOT_FOUND,
+            FEED_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            VOTE_NOT_FOUND,
+            COMMENT_DELETE_FORBIDDEN,
+            COMMENT_COUNT_UNDERFLOW,
+            FEED_ACCESS_FORBIDDEN,
+            ROOM_ACCESS_FORBIDDEN
     ))),
 
     // Book

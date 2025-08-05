@@ -85,7 +85,6 @@ public enum ErrorCode implements ResponseCode {
      */
     ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, 100000, "존재하지 않는 ROOM 입니다."),
     INVALID_ROOM_CREATE(HttpStatus.BAD_REQUEST, 100001, "유효하지 않은 ROOM 생성 요청 입니다."),
-    ROOM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, 100002, "비밀번호가 일치하지 않습니다."),
     ROOM_PASSWORD_NOT_REQUIRED(HttpStatus.BAD_REQUEST, 100003, "공개방은 비밀번호가 필요하지 않습니다."),
     ROOM_RECRUITMENT_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, 100004, "모집기간이 만료된 방입니다."),
     INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
@@ -153,6 +152,7 @@ public enum ErrorCode implements ResponseCode {
     DUPLICATED_FEEDS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 160005, "중복된 피드가 존재합니다."),
     FEED_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 160006, "사용자가 이미 저장한 피드입니다."),
     FEED_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 160007, "사용자가 저장하지 않은 피드는 저장삭제 할 수 없습니다."),
+    FEED_CAN_NOT_SHOW_PRIVATE_ONE(HttpStatus.BAD_REQUEST, 160008, "비공개 피드는 피드 작성자 이외에는 조회할 수 없습니다."),
 
     /**
      * 170000 : Image File error
@@ -175,6 +175,9 @@ public enum ErrorCode implements ResponseCode {
     COMMENT_LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190002, "좋아요 수는 0 이하로 감소할 수 없습니다."),
     COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, 190003, "사용자가 이미 좋아요한 댓글입니다."),
     COMMENT_NOT_LIKED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 190004, "사용자가 좋아요하지 않은 댓글은 좋아요 취소 할 수 없습니다."),
+    COMMENT_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, 190005, "댓글 삭제 권한이 없습니다."),
+    COMMENT_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190007, "댓글 수는 0 이하로 감소할 수 없습니다."),
+
     ;
 
     private final HttpStatus httpStatus;

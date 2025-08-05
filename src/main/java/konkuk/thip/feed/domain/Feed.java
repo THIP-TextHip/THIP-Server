@@ -1,6 +1,7 @@
 package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
 import lombok.Builder;
@@ -116,7 +117,7 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
 
     private void validateCreator(Long userId) {
         if (!this.creatorId.equals(userId)) {
-            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN);
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("피드 작성자만 피드를 수정할 수 있습니다."));
         }
     }
 
@@ -161,4 +162,24 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
         commentCount++;
     }
 
+    @Override
+    public void decreaseCommentCount() {
+        checkCommentCountNotUnderflow();
+        commentCount--;
+    }
+
+    private void checkCommentCountNotUnderflow() {
+        if (commentCount <= 0) {
+            throw new InvalidStateException(COMMENT_COUNT_UNDERFLOW);
+        }
+    }
+
+    /**
+     * 유저가 현재 피드를 조회할 수 있는지를 검증하는 메서드
+     */
+    public void validateViewPermission(Long userId) {
+        if (!isPublic && !creatorId.equals(userId)) {
+            throw new BusinessException(FEED_CAN_NOT_SHOW_PRIVATE_ONE);
+        }
+    }
 }

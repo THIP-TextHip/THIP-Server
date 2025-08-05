@@ -6,5 +6,5 @@ public interface FeedShowUserInfoUseCase {
 
     FeedShowUserInfoResponse showMyInfoInFeeds(Long userId);
 
-    FeedShowUserInfoResponse showAnotherUserInfoInFeeds(Long anotherUserId);
+    FeedShowUserInfoResponse showAnotherUserInfoInFeeds(Long userId, Long feedOwnerId);
 }
