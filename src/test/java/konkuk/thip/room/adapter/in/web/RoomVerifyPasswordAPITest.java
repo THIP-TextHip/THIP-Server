@@ -142,11 +142,13 @@ class RoomVerifyPasswordAPITest {
                         .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isSuccess").value(true));
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.data.matched").value(true))
+                .andExpect(jsonPath("$.data.roomId").value(privateRoomId));
     }
 
     @Test
-    @DisplayName("모집기간이 만료되지 않은 비공개 방의 비밀번호 입력 검증 [실패]시 400 Bad Request 반환")
+    @DisplayName("모집기간이 만료되지 않은 비공개 방의 비밀번호 입력 검증 [실패]시 matched=false로 200 OK")
     void verifyRoomPassword_mismatch() throws Exception {
 
         // given
@@ -158,10 +160,10 @@ class RoomVerifyPasswordAPITest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                 )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.isSuccess").value(false))
-                .andExpect(jsonPath("$.code").value(ROOM_PASSWORD_MISMATCH.getCode()))
-                .andExpect(jsonPath("$.message" , containsString("비밀번호가 일치하지 않습니다.")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isSuccess").value(true))
+                .andExpect(jsonPath("$.data.matched").value(false))
+                .andExpect(jsonPath("$.data.roomId").value(privateRoomId));
     }
 
     @Test

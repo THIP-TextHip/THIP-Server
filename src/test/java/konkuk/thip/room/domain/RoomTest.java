@@ -219,25 +219,23 @@ class RoomTest {
     }
 
     @Test
-    @DisplayName("verifyPassword: 비밀번호 불일치 시 BusinessException(ROOM_PASSWORD_MISMATCH) 발생")
+    @DisplayName("verifyPassword: 비밀번호 불일치 시 false 반환")
     void verifyPassword_passwordMismatch() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
                 START, END, 5, 123L, validCategory
         );
-        BusinessException ex = assertThrows(BusinessException.class,
-                () -> room.verifyPassword("0000"));
-        assertEquals(ErrorCode.ROOM_PASSWORD_MISMATCH, ex.getErrorCode());
+        assertFalse(room.verifyPassword("0000"));
     }
 
     @Test
-    @DisplayName("verifyPassword: 모집기간 내, 비공개방, 비밀번호 일치 시 예외 발생하지 않음")
+    @DisplayName("verifyPassword: 모집기간 내, 비공개방, 비밀번호 일치 시 true 반환")
     void verifyPassword_success() {
         Room room = Room.withoutId(
                 "제목", "설명", false, "1234",
                 START, END, 5, 123L, validCategory
         );
-        assertDoesNotThrow(() -> room.verifyPassword("1234"));
+        assertTrue(room.verifyPassword("1234"));
     }
 
     @Test
