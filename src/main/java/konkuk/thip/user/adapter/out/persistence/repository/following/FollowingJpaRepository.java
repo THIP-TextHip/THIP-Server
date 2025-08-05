@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FollowingJpaRepository extends JpaRepository<FollowingJpaEntity, Long>, FollowingQueryRepository {
 
-
+    boolean existsByUserJpaEntity_UserIdAndFollowingUserJpaEntity_UserId(Long userId, Long followingUserId);
 }

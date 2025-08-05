@@ -45,4 +45,9 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
     public List<String> getLatestFollowerImageUrls(Long userId, int size) {
         return followingJpaRepository.findLatestFollowerImageUrls(userId, size);
     }
+
+    @Override
+    public boolean isFollowingUser(Long userId, Long targetUserId) {
+        return followingJpaRepository.existsByUserJpaEntity_UserIdAndFollowingUserJpaEntity_UserId(userId, targetUserId);
+    }
 }

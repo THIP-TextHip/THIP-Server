@@ -77,13 +77,14 @@ public class FeedQueryController {
 
     @Operation(
             summary = "특정 유저의 공개 피드 조회의 상단 화면 구성",
-            description = "사용자의 정보, 사용자의 팔로워 정보, 사용자가 작성한 공개 피드 개수를 조회합니다."
+            description = "피드 작성자의 정보, 피드 작성자의 팔로워 정보, 피드 작성자 작성한 공개 피드 개수, 내가 피드 작성자를 팔로잉하는지 를 조회합니다."
     )
     @GetMapping("/feeds/users/{userId}/info")
     public BaseResponse<FeedShowUserInfoResponse> showAnotherUserInfoInFeeds(
-            @Parameter(description = "피드 조회할 유저의 userId 값") @PathVariable final Long userId
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "피드 조회할 유저의 userId 값") @PathVariable("userId") final Long feedOwnerId
     ) {
-        return BaseResponse.ok(feedShowUserInfoUseCase.showAnotherUserInfoInFeeds(userId));
+        return BaseResponse.ok(feedShowUserInfoUseCase.showAnotherUserInfoInFeeds(userId, feedOwnerId));
     }
 
     @Operation(
