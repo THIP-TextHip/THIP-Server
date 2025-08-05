@@ -52,14 +52,16 @@ public interface FeedQueryMapper {
             Set<Long> likedFeedIds
     );
 
+    @Mapping(target = "creatorId", source = "feedOwner.id")
     @Mapping(target = "profileImageUrl", source = "feedOwner.alias.imageUrl")
     @Mapping(target = "nickname", source = "feedOwner.nickname")
     @Mapping(target = "aliasName", source = "feedOwner.alias.value")
     @Mapping(target = "aliasColor", source = "feedOwner.alias.color")
     @Mapping(target = "followerCount", source = "feedOwner.followerCount")
     @Mapping(target = "totalFeedCount", source = "totalFeedCount")
+    @Mapping(target = "isFollowing", source = "isFollowing")
     @Mapping(target = "latestFollowerProfileImageUrls", source = "latestFollowerProfileImageUrls")
-    FeedShowUserInfoResponse toFeedShowUserInfoResponse(User feedOwner, int totalFeedCount, List<String> latestFollowerProfileImageUrls);
+    FeedShowUserInfoResponse toFeedShowUserInfoResponse(User feedOwner, int totalFeedCount, boolean isFollowing, List<String> latestFollowerProfileImageUrls);
 
     @Mapping(target = "feedId", source = "feed.id")
     @Mapping(target = "creatorId", source = "feedCreator.id")
