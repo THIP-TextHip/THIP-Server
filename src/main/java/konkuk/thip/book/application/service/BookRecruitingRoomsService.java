@@ -9,6 +9,7 @@ import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class BookRecruitingRoomsService implements BookRecruitingRoomsUseCase {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Override
+    @Transactional(readOnly = true)
     public BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursorStr) {
 
         Cursor cursor = Cursor.from(cursorStr, DEFAULT_PAGE_SIZE);
