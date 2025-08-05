@@ -82,7 +82,7 @@ public class BookQueryController {
             @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
             @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
-            final String cursor
+            @RequestParam(required = false) final String cursor
     ) {
         return BaseResponse.ok(bookRecruitingRoomsUseCase.getRecruitingRoomsWithBook(isbn, cursor));
     }
