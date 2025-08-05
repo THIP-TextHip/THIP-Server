@@ -43,16 +43,8 @@ public class SecurityConfig {
     private static final String[] WHITELIST = {
             "/swagger-ui/**", "/api-docs/**", "/swagger-ui.html",
             "/v3/api-docs/**","/oauth2/authorization/**",
-            "/login/oauth2/code/**",
+            "/login/oauth2/code/**", "/actuator/health",
 
-//            //테스트를 위한 url
-            "/api/test/public",
-            "/api/test/auth-status",
-            "/api/test/protected",
-            "/auth/kakao/**",
-            "/kakao-login-test.html",
-            "/google-login-test.html",
-            "/index.html",
     };
 
     @Bean
