@@ -6,6 +6,7 @@ import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.vote.application.port.in.VoteCreateUseCase;
 import konkuk.thip.vote.application.port.in.dto.VoteCreateCommand;
+import konkuk.thip.vote.application.port.in.dto.VoteCreateResult;
 import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.domain.Vote;
 import konkuk.thip.vote.domain.VoteItem;
@@ -28,7 +29,7 @@ public class VoteCreateService implements VoteCreateUseCase {
     @Transactional
     @Override
     //todo UserRoom 업데이트 로직 추가 필요!!
-    public Long createVote(VoteCreateCommand command) {
+    public VoteCreateResult createVote(VoteCreateCommand command) {
         // 1. validate
         Vote vote = Vote.withoutId(
                 command.content(),
@@ -53,7 +54,7 @@ public class VoteCreateService implements VoteCreateUseCase {
                 .toList();
         voteCommandPort.saveAllVoteItems(voteItems);
 
-        return savedVoteId;
+        return VoteCreateResult.of(savedVoteId, command.roomId());
     }
 
     private void validateVote(Vote vote) {

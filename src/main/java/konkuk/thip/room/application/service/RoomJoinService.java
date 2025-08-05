@@ -4,6 +4,7 @@ import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
+import konkuk.thip.room.application.port.in.dto.RoomJoinResult;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
@@ -26,7 +27,7 @@ public class RoomJoinService implements RoomJoinUseCase {
 
     @Override
     @Transactional
-    public void changeJoinState(RoomJoinCommand roomJoinCommand) {
+    public RoomJoinResult changeJoinState(RoomJoinCommand roomJoinCommand) {
         RoomJoinType type = RoomJoinType.from(roomJoinCommand.type());
 
         // 방이 존재하지 않거나 만료된 경우
@@ -49,6 +50,8 @@ public class RoomJoinService implements RoomJoinUseCase {
 
         // 방의 상태 업데이트
         roomCommandPort.update(room);
+
+        return RoomJoinResult.of(room.getId(), roomJoinCommand.type());
     }
 
     private void handleCancel(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Optional<RoomParticipant> roomParticipantOptional, Room room) {

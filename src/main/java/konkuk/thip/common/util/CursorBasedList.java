@@ -13,4 +13,8 @@ public record CursorBasedList<T>(
         String nextCursor = hasNext ? extractor.extractCursor(contents.get(size - 1)) : null;
         return new CursorBasedList<>(contents, nextCursor, hasNext);
     }
+
+    public boolean isLast() {
+        return !hasNext;
+    }
 }
