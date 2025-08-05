@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import konkuk.thip.book.adapter.in.web.response.BookDetailSearchResponse;
 import konkuk.thip.book.adapter.in.web.response.BookMostSearchResponse;
+import konkuk.thip.book.adapter.in.web.response.BookRecruitingRoomsResponse;
 import konkuk.thip.book.adapter.in.web.response.BookSearchListResponse;
 import konkuk.thip.book.application.port.in.BookMostSearchUseCase;
+import konkuk.thip.book.application.port.in.BookRecruitingRoomsUseCase;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
@@ -29,6 +31,7 @@ public class BookQueryController {
 
     private final BookSearchUseCase bookSearchUseCase;
     private final BookMostSearchUseCase bookMostSearchUseCase;
+    private final BookRecruitingRoomsUseCase bookRecruitingRoomsUseCase;
 
     @Operation(
             summary = "책 검색결과 조회",
@@ -71,6 +74,13 @@ public class BookQueryController {
     }
 
     @GetMapping("/books/{isbn}/recuriting-rooms")
-    public BaseResponse
+    public BaseResponse<BookRecruitingRoomsResponse> getRecruitingRoomsWithBook(
+            @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
+            @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            final String cursor
+    ) {
+        return BaseResponse.ok(bookRecruitingRoomsUseCase.getRecruitingRoomsWithBook(isbn, cursor));
+    }
 
 }
