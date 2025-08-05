@@ -141,4 +141,15 @@ public class Comment extends BaseDomainEntity {
             throw new InvalidStateException(COMMENT_NOT_LIKED_CANNOT_CANCEL);
         }
     }
+
+    private boolean validateCreator(Long userId) {
+        return this.creatorId.equals(userId);
+    }
+
+    public void validateDeletable(Long userId) {
+        if (!validateCreator(userId)) {
+            throw new InvalidStateException(COMMENT_DELETE_FORBIDDEN);
+        }
+    }
+
 }

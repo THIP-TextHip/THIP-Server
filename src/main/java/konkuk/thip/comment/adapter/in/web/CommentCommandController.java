@@ -6,21 +6,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import konkuk.thip.comment.adapter.in.web.request.CommentCreateRequest;
 import konkuk.thip.comment.adapter.in.web.request.CommentIsLikeRequest;
+import konkuk.thip.comment.adapter.in.web.response.CommentDeleteResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIdResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIsLikeResponse;
 import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
+import konkuk.thip.comment.application.port.in.CommentDeleteUseCase;
 import konkuk.thip.comment.application.port.in.CommentLikeUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.CHANGE_COMMENT_LIKE_STATE;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.COMMENT_CREATE;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "Comment Command API", description = "댓글 상태변경 관련 API")
 @RestController
@@ -29,6 +27,7 @@ public class CommentCommandController {
 
     private final CommentCreateUseCase commentCreateUseCase;
     private final CommentLikeUseCase commentLikeUseCase;
+    private final CommentDeleteUseCase commentDeleteUseCase;
 
     /**
      * 댓글/답글 작성
@@ -61,6 +60,18 @@ public class CommentCommandController {
             @Parameter(description = "좋아요 상태를 변경하려는 댓글 ID", example = "1") @PathVariable("commentId") final Long commentId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(CommentIsLikeResponse.of(commentLikeUseCase.changeLikeStatusComment(request.toCommand(userId, commentId))));
+    }
+
+    @Operation(
+            summary = "댓글 삭제",
+            description = "사용자가 댓글을 삭제합니다."
+    )
+    @ExceptionDescription(COMMENT_DELETE)
+    @DeleteMapping("/comments/{commentId}")
+    public BaseResponse<CommentDeleteResponse> deleteComment(
+            @Parameter(description = "삭제하려는 댓글 ID", example = "1") @PathVariable("commentId") final Long commentId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(CommentDeleteResponse.of(commentDeleteUseCase.deleteComment(commentId,userId)));
     }
 
 }

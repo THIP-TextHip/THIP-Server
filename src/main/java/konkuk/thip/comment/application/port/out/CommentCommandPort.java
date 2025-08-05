@@ -21,4 +21,6 @@ public interface CommentCommandPort {
 
     void update(Comment comment);
 
+    void delete(Comment comment);
+
 }

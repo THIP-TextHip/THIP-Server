@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -67,18 +68,25 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
 
     @Override
     public Optional<Comment> findById(Long id) {
-        return commentJpaRepository.findById(id)
+        return commentJpaRepository.findByCommentIdAndStatus(id, ACTIVE)
                 .map(commentMapper::toDomainEntity);
     }
 
     @Override
     public void update(Comment comment) {
-
         CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getId()).orElseThrow(
                 () -> new EntityNotFoundException(COMMENT_NOT_FOUND)
         );
 
         commentJpaRepository.save(commentJpaEntity.updateFrom(comment));
+    }
+
+    @Override
+    public void delete(Comment comment) {
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getId()).orElseThrow(
+                () -> new EntityNotFoundException(COMMENT_NOT_FOUND)
+        );
+        commentJpaRepository.delete(commentJpaEntity);
     }
 
 }
