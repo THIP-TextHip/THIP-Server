@@ -67,9 +67,6 @@ jobs:
             echo "🗂️ Change Directory to Compose Path"
             cd ${{ env.COMPOSE_PATH }}
             
-#            echo "✋🏻Stopping existing container and Cleaning up old images"
-#            sudo docker-compose down --rmi all
-            
             sudo docker ps -a
             
             echo "🥳 Pulling new image"
@@ -77,7 +74,3 @@ jobs:
   
             echo "🚀 Run Blue-Green Deploy Script"
             sudo bash deploy.sh
-            
-#            echo "🌱 Starting new container"
-#            sudo docker-compose up -d
-#            sudo docker image prune -f
