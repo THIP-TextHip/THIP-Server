@@ -11,7 +11,7 @@ public interface BookCommandPort {
 
     Optional<Book> findByIsbn(String isbn);
 
-    default Book getByIdOrThrow(String isbn){
+    default Book getByIsbnOrThrow(String isbn){
         return findByIsbn(isbn)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.BOOK_NOT_FOUND));
     }

@@ -17,7 +17,7 @@ public class BookRecruitingRoomsService implements BookRecruitingRoomsUseCase {
 
     @Override
     public BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursor) {
-        Book book = bookCommandPort.getByIdOrThrow(isbn);
+        Book book = bookCommandPort.getByIsbnOrThrow(isbn);
 
 
         var recruitingRoomList = cursorBasedList.getContent().stream()
