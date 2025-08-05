@@ -8,6 +8,7 @@ import java.util.List;
 public record RecordSearchResponse(
     List<PostDto> postList,
     Long roomId,
+    String isbn,
     String nextCursor,
     Boolean isLast
 ){
