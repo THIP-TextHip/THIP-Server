@@ -39,7 +39,7 @@ public class BookQueryController {
     )
     @ExceptionDescription(BOOK_SEARCH)
     @GetMapping("/books")
-    public BaseResponse<BookSearchListResponse> getBookSearchList(
+    public BaseResponse<BookSearchListResponse> showBookSearchList(
             @Parameter(description = "검색 키워드", example = "해리포터") @RequestParam final String keyword,
             @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") @RequestParam final int page,
             @Parameter(hidden = true) @UserId final Long userId) {
@@ -53,7 +53,7 @@ public class BookQueryController {
     )
     @ExceptionDescription(BOOK_DETAIL_SEARCH)
     @GetMapping("/books/{isbn}")
-    public BaseResponse<BookDetailSearchResponse> getBookDetailSearch(
+    public BaseResponse<BookDetailSearchResponse> showBookDetailSearch(
             @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
             @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
             @Parameter(hidden = true) @UserId final Long userId
@@ -68,13 +68,17 @@ public class BookQueryController {
     )
     @ExceptionDescription(POPULAR_BOOK_SEARCH)
     @GetMapping("/books/most-searched")
-    public BaseResponse<BookMostSearchResponse> getMostSearchedBooks(
+    public BaseResponse<BookMostSearchResponse> showMostSearchedBooks(
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(BookMostSearchResponse.of(bookMostSearchUseCase.getMostSearchedBooks(userId)));
     }
 
-    @GetMapping("/books/{isbn}/recuriting-rooms")
-    public BaseResponse<BookRecruitingRoomsResponse> getRecruitingRoomsWithBook(
+    @Operation(
+            summary = "특정 책으로 모집중인 방 조회",
+            description = "책의 ISBN을 통해 해당 책과 관련된 모집중인 방들을 조회합니다."
+    )
+    @GetMapping("/books/{isbn}/recruiting-rooms")
+    public BaseResponse<BookRecruitingRoomsResponse> showRecruitingRoomsWithBook(
             @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
             @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")

@@ -12,14 +12,15 @@ public record BookRecruitingRoomsResponse(
     }
 
     public record RecruitingRoomDto(
+            Long roomId,
             String bookImageUrl,
-            String title,
+            String roomName,
             int memberCount,
             int recruitCount,
-            String recruitEndDate
+            String deadlineEndDate
     ) {
-        public static RecruitingRoomDto of(String bookImageUrl, String title, int memberCount, int recruitCount, String recruitEndDate) {
-            return new RecruitingRoomDto(bookImageUrl, title, memberCount, recruitCount, recruitEndDate);
+        public static RecruitingRoomDto of(Long roomId, String bookImageUrl, String roomName, int memberCount, int recruitCount, String deadlineEndDate) {
+            return new RecruitingRoomDto(roomId, bookImageUrl, roomName, memberCount, recruitCount, deadlineEndDate);
         }
     }
 }

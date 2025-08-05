@@ -1,6 +1,5 @@
 package konkuk.thip.room.adapter.out.persistence;
 
-import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
@@ -72,9 +71,9 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public CursorBasedList<RoomQueryDto> findRoomsByBookOrderByDeadline(Book book, Cursor cursor) {
+    public CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor) {
         return findRooms(cursor, (lastLocalDate, lastId, pageSize) ->
-                roomJpaRepository.findRoomsByIsbnOrderByStartDateAsc(book.getIsbn(), lastLocalDate, lastId, pageSize));
+                roomJpaRepository.findRoomsByIsbnOrderByStartDateAsc(isbn, lastLocalDate, lastId, pageSize));
     }
 
     private CursorBasedList<RoomQueryDto> findRooms(Cursor cursor, RoomQueryFunction queryFunction) {

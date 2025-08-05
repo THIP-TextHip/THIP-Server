@@ -1,6 +1,5 @@
 package konkuk.thip.room.application.port.out;
 
-import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
@@ -33,7 +32,7 @@ public interface RoomQueryPort {
 
     CursorBasedList<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor);
 
-    CursorBasedList<RoomQueryDto> findRoomsByBookOrderByDeadline(Book book, Cursor cursor);
+    CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor);
 
     List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId);
 
