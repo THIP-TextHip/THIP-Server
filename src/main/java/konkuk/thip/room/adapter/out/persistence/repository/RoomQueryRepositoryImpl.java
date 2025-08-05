@@ -343,6 +343,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.roomId,
                         book.imageUrl,
                         room.title,
+                        room.recruitCount,
                         room.memberCount,
                         room.startDate
                 ))
@@ -362,6 +363,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.roomId,
                         book.imageUrl,
                         room.title,
+                        room.recruitCount,
                         room.memberCount,
                         room.startDate
                 ))
@@ -425,6 +427,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.roomId,
                         book.imageUrl,
                         room.title,
+                        room.recruitCount,
                         room.memberCount,
                         cursorExpr
                 ))
