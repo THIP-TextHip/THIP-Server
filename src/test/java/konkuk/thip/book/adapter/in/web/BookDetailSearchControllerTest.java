@@ -176,7 +176,7 @@ class BookDetailSearchControllerTest {
 
 
     @Test
-    @DisplayName("피드와 방 참여자가 모두 없으면 recruitingReadCount가 0")
+    @DisplayName("피드와 방 참여자가 모두 없으면 readCount가 0")
     void searchDetailBooks_NoFeedOrRoomParticipants_ReturnsZero() {
         String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
