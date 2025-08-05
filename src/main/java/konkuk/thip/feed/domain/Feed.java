@@ -1,6 +1,7 @@
 package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.post.CommentCountUpdatable;
 import lombok.Builder;
@@ -173,4 +174,12 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
         }
     }
 
+    /**
+     * 유저가 현재 피드를 조회할 수 있는지를 검증하는 메서드
+     */
+    public void validateViewPermission(Long userId) {
+        if (!isPublic && !creatorId.equals(userId)) {
+            throw new BusinessException(FEED_CAN_NOT_SHOW_PRIVATE_ONE);
+        }
+    }
 }
