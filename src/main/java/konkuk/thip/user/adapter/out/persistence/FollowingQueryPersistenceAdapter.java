@@ -48,6 +48,11 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
 
     @Override
     public boolean isFollowingUser(Long userId, Long targetUserId) {
-        return followingJpaRepository.existsByUserJpaEntity_UserIdAndFollowingUserJpaEntity_UserId(userId, targetUserId);
+        return followingJpaRepository.existsByUserIdAndFollowingUserId(userId, targetUserId);
+    }
+
+    @Override
+    public int getFollowingCountByUser(Long userId) {
+        return followingJpaRepository.countFollowingByUserId(userId);
     }
 }

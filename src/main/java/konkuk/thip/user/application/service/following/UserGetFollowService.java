@@ -39,6 +39,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
 
         return UserFollowersResponse.builder()
                 .followers(followers)
+                .totalFollowerCount(user.getFollowerCount())
                 .nextCursor(result.nextCursor())
                 .isLast(!result.hasNext())
                 .build();
@@ -48,6 +49,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
     @Transactional(readOnly = true)
     public UserFollowingResponse getMyFollowing(Long userId, String cursor, int size) {
         User user = userCommandPort.findById(userId);
+        int totalFollowingCount = followingQueryPort.getFollowingCountByUser(user.getId());
 
         CursorBasedList<UserQueryDto> result = followingQueryPort.getFollowingByUserId(
                 user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
@@ -59,6 +61,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
 
         return UserFollowingResponse.builder()
                 .followings(following)
+                .totalFollowingCount(totalFollowingCount)
                 .nextCursor(result.nextCursor())
                 .isLast(!result.hasNext())
                 .build();
