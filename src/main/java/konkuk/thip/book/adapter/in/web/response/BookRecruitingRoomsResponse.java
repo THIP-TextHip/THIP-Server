@@ -20,8 +20,5 @@ public record BookRecruitingRoomsResponse(
             int recruitCount,
             String deadlineEndDate
     ) {
-        public static RecruitingRoomDto of(Long roomId, String bookImageUrl, String roomName, int memberCount, int recruitCount, String deadlineEndDate) {
-            return new RecruitingRoomDto(roomId, bookImageUrl, roomName, memberCount, recruitCount, deadlineEndDate);
-        }
     }
 }
