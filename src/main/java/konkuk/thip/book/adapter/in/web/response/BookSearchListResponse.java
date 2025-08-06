@@ -6,7 +6,7 @@ import java.util.List;
 
 import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
 
-public record GetBookSearchListResponse(
+public record BookSearchListResponse(
         List<BookDto> searchResult, // 책 목록
         int page,                   // 현재 페이지 (1부터 시작)
         int size,                   // 한 페이지에 포함되는 데이터 수 (페이지 크기)
@@ -15,7 +15,7 @@ public record GetBookSearchListResponse(
         boolean last,               // 마지막 페이지 여부
         boolean first               // 첫 페이지 여부
 ) {
-    public static GetBookSearchListResponse of(NaverBookParseResult result, int page) {
+    public static BookSearchListResponse of(NaverBookParseResult result, int page) {
         int totalElements = result.total();
         int totalPages = (int) Math.ceil((double) totalElements / PAGE_SIZE);
         boolean last = (page >= totalPages);
@@ -25,7 +25,7 @@ public record GetBookSearchListResponse(
                 .map(BookDto::of)
                 .toList();
 
-        return new GetBookSearchListResponse(
+        return new BookSearchListResponse(
                 bookDtos,
                 page,
                 PAGE_SIZE,

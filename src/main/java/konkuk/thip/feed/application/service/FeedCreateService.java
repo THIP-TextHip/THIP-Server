@@ -69,7 +69,7 @@ public class FeedCreateService implements FeedCreateUseCase {
      */
     private Long findOrCreateBookByIsbn(String isbn) {
         try {
-            Book existing = bookCommandPort.findByIsbn(isbn);
+            Book existing = bookCommandPort.getByIsbnOrThrow(isbn);
             return existing.getId();
         } catch (EntityNotFoundException e) {
             return saveNewBookWithFromExternalApi(isbn);

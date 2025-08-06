@@ -30,4 +30,6 @@ public interface RoomQueryRepository {
     List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String category, int limit, Long userId);
 
     List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String category, int limit, Long userId);
+
+    List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 }
