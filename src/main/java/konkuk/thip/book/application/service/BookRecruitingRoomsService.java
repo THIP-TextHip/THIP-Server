@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class BookRecruitingRoomsService implements BookRecruitingRoomsUseCase {
@@ -23,11 +25,13 @@ public class BookRecruitingRoomsService implements BookRecruitingRoomsUseCase {
     @Override
     @Transactional(readOnly = true)
     public BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursorStr) {
+        Integer totalRoomCount = (cursorStr == null || cursorStr.isBlank()) ? // 첫 요청 여부 판단
+                roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(isbn, LocalDate.now()) : null;
 
         Cursor cursor = Cursor.from(cursorStr, DEFAULT_PAGE_SIZE);
         CursorBasedList<RoomQueryDto> roomDtos = roomQueryPort.findRoomsByIsbnOrderByDeadline(isbn, cursor);
 
-        return BookRecruitingRoomsResponse.of(bookQueryMapper.toRecruitingRoomDtoList(roomDtos.contents()),
+        return BookRecruitingRoomsResponse.of(bookQueryMapper.toRecruitingRoomDtoList(roomDtos.contents()), totalRoomCount,
                 roomDtos.nextCursor(), roomDtos.isLast());
     }
 }
