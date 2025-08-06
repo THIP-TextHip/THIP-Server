@@ -16,4 +16,9 @@ public class PostLikeQueryPersistenceAdapter implements PostLikeQueryPort {
     public Set<Long> findPostIdsLikedByUser(Set<Long> postIds, Long userId) {
         return postLikeJpaRepository.findPostIdsLikedByUser(postIds, userId);
     }
+
+    @Override
+    public boolean isLikedPostByUser(Long userId, Long postId) {
+        return postLikeJpaRepository.existsByUserIdAndPostId(userId, postId);
+    }
 }
