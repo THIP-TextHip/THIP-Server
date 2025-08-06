@@ -7,5 +7,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface RoomQueryFunction {
-    List<RoomQueryDto> apply(Long userId, LocalDate lastLocalDate, Long lastId, int pageSize);
+    List<RoomQueryDto> apply(LocalDate lastLocalDate, Long lastId, int pageSize);
 }

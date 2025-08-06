@@ -140,7 +140,7 @@ class BookDetailSearchControllerTest {
 
         assertThat(result).isNotNull();
         assertThat(result.recruitingRoomCount()).isEqualTo(1);
-        assertThat(result.recruitingReadCount()).isEqualTo(1);
+        assertThat(result.readCount()).isEqualTo(1);
         assertThat(result.isSaved()).isTrue();
         assertThat(result.naverDetailBook()).isNotNull();
     }
@@ -176,7 +176,7 @@ class BookDetailSearchControllerTest {
 
 
     @Test
-    @DisplayName("피드와 방 참여자가 모두 없으면 recruitingReadCount가 0")
+    @DisplayName("피드와 방 참여자가 모두 없으면 readCount가 0")
     void searchDetailBooks_NoFeedOrRoomParticipants_ReturnsZero() {
         String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
@@ -185,7 +185,7 @@ class BookDetailSearchControllerTest {
         roomParticipantJpaRepository.deleteAllInBatch();
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());
-        assertThat(result.recruitingReadCount()).isEqualTo(0);
+        assertThat(result.readCount()).isEqualTo(0);
     }
 
     @Test

@@ -93,7 +93,7 @@ public class BookSearchService implements BookSearchUseCase {
         Book book;
         try {
             // DB에서 책 정보 조회 (없으면 예외 발생)
-            book = bookCommandPort.findByIsbn(isbn);
+            book = bookCommandPort.getByIsbnOrThrow(isbn);
         } catch (EntityNotFoundException e) {
             // 책이 DB에 없으면 기본값으로 반환
             return BookDetailSearchResult.of(
@@ -107,24 +107,24 @@ public class BookSearchService implements BookSearchUseCase {
         //이책에 모집중인 모임방 개수
         int recruitingRoomCount = getRecruitingRoomCount(book);
         // 이책에 읽기 참여중인 사용자 수
-        int recruitingReadCount = getRecruitingReadCount(book);
+        int readCount = getReadCount(book);
         // 사용자의 해당 책 저장 여부
         boolean isSaved = savedQueryPort.existsByUserIdAndBookId(user.getId(), book.getId());
 
         return BookDetailSearchResult.of(
                 naverDetailBookParseResult,
                 recruitingRoomCount,
-                recruitingReadCount,
+                readCount,
                 isSaved);
     }
 
     private int getRecruitingRoomCount(Book book) {
         //오늘 날짜 기준으로 방 활동 시작 기간이 이후인 방 찾기(모집중인 방)
         LocalDate today = LocalDate.now();
-        return roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(book.getId(), today);
+        return roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(book.getIsbn(), today);
     }
 
-    private int getRecruitingReadCount(Book book) {
+    private int getReadCount(Book book) {
         // 해당책으로 피드에 글 작성
         // 해당책에 대해 모임방 참여
         // 둘 중 하나라도 부합될 경우 카운트, 중복 카운트 불가

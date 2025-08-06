@@ -6,19 +6,19 @@ import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 public record BookDetailSearchResult(
         NaverDetailBookParseResult naverDetailBook,
         int recruitingRoomCount,
-        int recruitingReadCount,
+        int readCount,
         boolean isSaved
 
 )
 {
     public static BookDetailSearchResult of(NaverDetailBookParseResult naverDetailBook ,
                                                  int recruitingRoomCount,
-                                                 int recruitingReadCount,
+                                                 int readCount,
                                                  boolean isSaved) {
         return new BookDetailSearchResult(
                 naverDetailBook,
                 recruitingRoomCount,
-                recruitingReadCount,
+                readCount,
                 isSaved);
     }
 }

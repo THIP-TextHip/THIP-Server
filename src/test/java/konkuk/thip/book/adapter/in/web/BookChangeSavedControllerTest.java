@@ -1,7 +1,7 @@
 package konkuk.thip.book.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.book.adapter.in.web.request.PostBookIsSavedRequest;
+import konkuk.thip.book.adapter.in.web.request.BookIsSavedRequest;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.code.ErrorCode;
@@ -107,7 +107,7 @@ class BookChangeSavedControllerTest {
     void saveBook_success() throws Exception {
 
         // given
-        PostBookIsSavedRequest request = new PostBookIsSavedRequest(true);
+        BookIsSavedRequest request = new BookIsSavedRequest(true);
 
         //when
         ResultActions result = mockMvc.perform(post("/books/{isbn}/saved", testIsbn)
@@ -132,7 +132,7 @@ class BookChangeSavedControllerTest {
 
         // given
         String newIsbn = "9791195710447"; // DB에 없고 실제 존재하는 책 ISBN
-        PostBookIsSavedRequest request = new PostBookIsSavedRequest(true);
+        BookIsSavedRequest request = new BookIsSavedRequest(true);
 
         // when
         ResultActions result = mockMvc.perform(post("/books/{isbn}/saved", newIsbn)
@@ -164,7 +164,7 @@ class BookChangeSavedControllerTest {
                 .bookJpaEntity(book)
                 .build());
 
-        PostBookIsSavedRequest request = new PostBookIsSavedRequest(true);
+        BookIsSavedRequest request = new BookIsSavedRequest(true);
 
         //when
         ResultActions result = mockMvc.perform(post("/books/{isbn}/saved", testIsbn)
@@ -190,7 +190,7 @@ class BookChangeSavedControllerTest {
                 .bookJpaEntity(book)
                 .build());
 
-        PostBookIsSavedRequest request = new PostBookIsSavedRequest(false);
+        BookIsSavedRequest request = new BookIsSavedRequest(false);
 
         //when
         ResultActions result = mockMvc.perform(post("/books/{isbn}/saved", testIsbn)
@@ -213,7 +213,7 @@ class BookChangeSavedControllerTest {
     void deleteBook_notSaved_fail() throws Exception {
 
         // given
-        PostBookIsSavedRequest request = new PostBookIsSavedRequest(false);
+        BookIsSavedRequest request = new BookIsSavedRequest(false);
 
         //when
         ResultActions result = mockMvc.perform(post("/books/{isbn}/saved", testIsbn)
@@ -231,7 +231,7 @@ class BookChangeSavedControllerTest {
     void deleteBook_whenBookNotExist_thenFail() throws Exception {
         // given
         String newIsbn = "9791195710447"; // DB에 없고 실제 존재하는 책 ISBN
-        PostBookIsSavedRequest request = new PostBookIsSavedRequest(false);
+        BookIsSavedRequest request = new BookIsSavedRequest(false);
 
         // when
         ResultActions result = mockMvc.perform(post("/books/{isbn}/saved", newIsbn)

@@ -169,6 +169,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
         return tuples.stream()
                 .map(t -> RoomRecruitingDetailViewResponse.RecommendRoom.builder()
+                        .roomId(t.get(room.roomId))
                         .roomImageUrl(null)     // roomImageUrl은 추후 구현
                         .roomName(t.get(room.title))
                         .memberCount(t.get(memberCountExpr).intValue())
@@ -376,6 +377,35 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .fetch();
     }
 
+    @Override
+    public List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
+        DateExpression<LocalDate> cursorExpr = room.startDate; // 커서 비교는 startDate(= 모집 마감일 - 1일)
+        BooleanExpression baseCondition = room.bookJpaEntity.isbn.eq(isbn)
+                .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
+                .and(room.status.eq(StatusType.ACTIVE));
+
+        if (dateCursor != null && roomIdCursor != null) { // 첫 페이지가 아닌 경우
+            baseCondition = baseCondition.and(cursorExpr.gt(dateCursor)
+                    .or(cursorExpr.eq(dateCursor).and(room.roomId.gt(roomIdCursor))));
+        }
+
+        return queryFactory
+                .select(new QRoomQueryDto(
+                        room.roomId,
+                        book.imageUrl,
+                        room.title,
+                        room.recruitCount,
+                        room.memberCount,
+                        cursorExpr
+                ))
+                .from(room)
+                .leftJoin(room.bookJpaEntity, book)
+                .where(baseCondition)
+                .orderBy(cursorExpr.asc(), room.roomId.asc())
+                .limit(pageSize + 1)
+                .fetch();
+    }
+
     private BooleanExpression findDeadlinePopularRoomCondition(String categoryVal, Long userId) {
         return room.categoryJpaEntity.value.eq(categoryVal)
                 .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
@@ -429,6 +459,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
+                        room.startDate,     // 방의 진행 시작일 정보 채우기
                         cursorExpr
                 ))
                 .from(participant)

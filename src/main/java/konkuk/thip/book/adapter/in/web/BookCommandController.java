@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import konkuk.thip.book.adapter.in.web.request.PostBookIsSavedRequest;
-import konkuk.thip.book.adapter.in.web.response.PostBookIsSavedResponse;
+import konkuk.thip.book.adapter.in.web.request.BookIsSavedRequest;
+import konkuk.thip.book.adapter.in.web.response.BookIsSavedResponse;
 import konkuk.thip.book.application.port.in.BookSavedUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
@@ -34,13 +34,13 @@ public class BookCommandController {
     )
     @ExceptionDescription(CHANGE_BOOK_SAVED_STATE)
     @PostMapping("/books/{isbn}/saved")
-    public BaseResponse<PostBookIsSavedResponse> changeSavedBook(
+    public BaseResponse<BookIsSavedResponse> changeSavedBook(
             @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
             @PathVariable("isbn") @Pattern(regexp = "\\d{13}") final String isbn,
-            @RequestBody @Valid final PostBookIsSavedRequest postBookIsSavedRequest,
+            @RequestBody @Valid final BookIsSavedRequest bookIsSavedRequest,
             @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(PostBookIsSavedResponse.of(bookSavedUseCase.changeSavedBook(isbn,postBookIsSavedRequest.type(),userId)));
+        return BaseResponse.ok(BookIsSavedResponse.of(bookSavedUseCase.changeSavedBook(isbn, bookIsSavedRequest.type(),userId)));
     }
 
 }

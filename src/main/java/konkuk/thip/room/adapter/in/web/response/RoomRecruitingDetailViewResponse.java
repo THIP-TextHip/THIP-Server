@@ -23,10 +23,12 @@ public record RoomRecruitingDetailViewResponse(
         String bookTitle,
         String authorName,
         String bookDescription,
+        String publisher,
         List<RecommendRoom> recommendRooms
 ) {
     @Builder
     public record RecommendRoom(
+            Long roomId,
             String roomImageUrl,
             String roomName,
             int memberCount,

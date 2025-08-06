@@ -1,6 +1,7 @@
 package konkuk.thip.room.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import jakarta.annotation.Nullable;
 import lombok.Builder;
 import org.springframework.util.Assert;
 
@@ -13,6 +14,7 @@ public record RoomQueryDto(
         String roomName,
         int recruitCount, // 방 최대 인원 수
         int memberCount,
+        @Nullable LocalDate startDate,    // 방 진행 시작일
         LocalDate endDate       // 방 진행 마감일 or 방 모집 마감일
 ) {
     @QueryProjection
@@ -23,5 +25,17 @@ public record RoomQueryDto(
         Assert.notNull(endDate, "endDate must not be null");
         Assert.isTrue(recruitCount > 0, "recruitCount must be greater than 0");
         Assert.isTrue(memberCount >= 0, "memberCount must be greater than or equal to 0");
+    }
+
+    @QueryProjection
+    public RoomQueryDto(
+            Long roomId,
+            String bookImageUrl,
+            String roomName,
+            int recruitCount,
+            int memberCount,
+            LocalDate endDate
+    ) {
+        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate);
     }
 }

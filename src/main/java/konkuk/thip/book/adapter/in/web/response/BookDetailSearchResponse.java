@@ -4,7 +4,7 @@ import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 import lombok.Builder;
 
 @Builder
-public record GetBookDetailSearchResponse(
+public record BookDetailSearchResponse(
         String title,
         String imageUrl,
         String authorName,
@@ -12,12 +12,12 @@ public record GetBookDetailSearchResponse(
         String isbn,
         String description,
         int recruitingRoomCount,
-        int recruitingReadCount,
+        int readCount,
         boolean isSaved
 ) {
-    public static GetBookDetailSearchResponse of(BookDetailSearchResult result) {
+    public static BookDetailSearchResponse of(BookDetailSearchResult result) {
 
-        return new GetBookDetailSearchResponse(
+        return new BookDetailSearchResponse(
                 result.naverDetailBook().title(),
                 result.naverDetailBook().imageUrl(),
                 result.naverDetailBook().author(),
@@ -25,7 +25,7 @@ public record GetBookDetailSearchResponse(
                 result.naverDetailBook().isbn(),
                 result.naverDetailBook().description(),
                 result.recruitingRoomCount(),
-                result.recruitingReadCount(),
+                result.readCount(),
                 result.isSaved());
     }
 
