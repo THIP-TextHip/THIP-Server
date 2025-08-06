@@ -8,13 +8,16 @@ import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.feed.adapter.in.web.request.FeedCreateRequest;
+import konkuk.thip.feed.adapter.in.web.request.FeedIsLikeRequest;
 import konkuk.thip.feed.adapter.in.web.request.FeedIsSavedRequest;
 import konkuk.thip.feed.adapter.in.web.request.FeedUpdateRequest;
 import konkuk.thip.feed.adapter.in.web.response.FeedIdResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedIsLikeResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsSavedResponse;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
 import konkuk.thip.feed.application.port.in.FeedSavedUseCase;
 import konkuk.thip.feed.application.port.in.FeedUpdateUseCase;
+import konkuk.thip.post.application.port.in.PostLikeUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +34,7 @@ public class FeedCommandController {
     private final FeedCreateUseCase feedCreateUseCase;
     private final FeedUpdateUseCase feedUpdateUseCase;
     private final FeedSavedUseCase feedSavedUseCase;
+    private final PostLikeUseCase postLikeUseCase;
 
     @Operation(
             summary = "피드 작성",
@@ -72,6 +76,19 @@ public class FeedCommandController {
             @Parameter(description = "저장 상태 변경하려는 피드 ID") @PathVariable("feedId") final Long feedId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(FeedIsSavedResponse.of(feedSavedUseCase.changeSavedFeed(FeedIsSavedRequest.toCommand(userId,feedId,request.type()))));
+    }
+
+    @Operation(
+            summary = "피드 좋아요 상태 변경",
+            description = "사용자가 피드의 좋아요 상태를 변경합니다. (true -> 좋아요, false -> 좋아요 취소)"
+    )
+    @ExceptionDescription(CHANGE_FEED_LIKE_STATE)
+    @PostMapping("/feeds/{feedId}/likes")
+    public BaseResponse<FeedIsLikeResponse> likeFeed(
+            @RequestBody @Valid final FeedIsLikeRequest request,
+            @Parameter(description = "좋아요 상태를 변경하려는 피드 ID", example = "1")@PathVariable("feedId") final Long feedId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(FeedIsLikeResponse.of(postLikeUseCase.changeLikeStatusPost(request.toCommand(userId, feedId))));
     }
 
 }
