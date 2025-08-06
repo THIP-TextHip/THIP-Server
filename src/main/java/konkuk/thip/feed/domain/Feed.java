@@ -108,16 +108,22 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
         }
     }
 
-    public void validateCreateComment(Long userId){
+    // 공통된 비공개 접근 권한 검증 로직
+    private void validatePrivateAccessPermission(Long userId, String action) {
         if (!this.isPublic && !this.creatorId.equals(userId)) {
-            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 댓글을 쓸 수 있습니다."));
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN,
+                    new IllegalArgumentException(String.format("비공개 글은 작성자만 %s 있습니다.", action)));
         }
     }
 
+    // 댓글 작성 권한 검증
+    public void validateCreateComment(Long userId){
+        validatePrivateAccessPermission(userId, "댓글을 쓸 수");
+    }
+
+    // 좋아요 권한 검증
     public void validateLike(Long userId){
-        if (!this.isPublic && !this.creatorId.equals(userId)) {
-            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 좋아요 할 수 있습니다."));
-        }
+        validatePrivateAccessPermission(userId, "좋아요 할 수");
     }
 
     private void validateCreator(Long userId) {
