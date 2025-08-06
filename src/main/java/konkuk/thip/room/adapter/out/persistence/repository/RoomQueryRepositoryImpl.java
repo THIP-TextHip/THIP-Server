@@ -458,6 +458,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
+                        room.startDate,     // 방의 진행 시작일 정보 채우기
                         cursorExpr
                 ))
                 .from(participant)

@@ -7,12 +7,12 @@ import konkuk.thip.room.application.mapper.RoomQueryMapper;
 import konkuk.thip.room.application.port.in.RoomShowMineUseCase;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.MyRoomType;
+import konkuk.thip.room.application.port.in.dto.MyRoomType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -43,20 +43,20 @@ public class RoomShowMineService implements RoomShowMineUseCase {
         };
 
         // 3. dto -> response로 매핑 (EXPIRED 타입인 경우 endDate를 null로 처리)
-        boolean isExpiredType = myRoomType == MyRoomType.EXPIRED;
-        List<RoomShowMineResponse.MyRoom> myRooms = result.contents().stream()
+        var myRooms = result.contents().stream()
                 .map(dto -> {
-                    var myRoomResponse = roomQueryMapper.toShowMyRoomResponse(dto);
-                    if (isExpiredType) {
-                        return new RoomShowMineResponse.MyRoom(
-                                myRoomResponse.roomId(),
-                                myRoomResponse.bookImageUrl(),
-                                myRoomResponse.roomName(),
-                                myRoomResponse.memberCount(),
-                                null
-                        );
+                    if (myRoomType != MyRoomType.PLAYING_AND_RECRUITING) {
+                        // PLAYING, RECRUITING, EXPIRED 경우 타입 그대로 전달
+                        return roomQueryMapper.toShowMyRoomResponse(dto, myRoomType);
                     }
-                    return myRoomResponse;
+
+                    // PLAYING_AND_RECRUITING: startDate 기준으로 진행중/모집중 구분
+                    LocalDate now = LocalDate.now();
+                    if (dto.startDate() != null && dto.startDate().isBefore(now)) {
+                        return roomQueryMapper.toShowMyRoomResponse(dto, MyRoomType.PLAYING);   // 진행중인 방
+                    } else {
+                        return roomQueryMapper.toShowMyRoomResponse(dto, MyRoomType.RECRUITING);    // 모집중인 방
+                    }
                 })
                 .toList();
 
