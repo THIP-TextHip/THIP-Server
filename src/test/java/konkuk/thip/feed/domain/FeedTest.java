@@ -110,7 +110,7 @@ class FeedTest {
                 () -> feed.validateCreateComment(OTHER_USER_ID));
 
         assertEquals(FEED_ACCESS_FORBIDDEN, ex.getErrorCode());
-        assertFalse(ex.getCause().getMessage().contains("비공개 글은 작성자만"));
+        assertTrue(ex.getCause().getMessage().contains("비공개 글은 작성자만"));
     }
 
     @Test
@@ -267,4 +267,75 @@ class FeedTest {
                 .contentList(Collections.emptyList())
                 .build();
     }
+
+    @Test
+    @DisplayName("updateLikeCount: like == true 면 likeCount 가 1씩 증가한다.")
+    void updateLikeCount_likeTrue_increments() {
+        Feed feed = createPublicFeed();
+
+        feed.updateLikeCount(true);
+        assertEquals(1, feed.getLikeCount());
+
+        feed.updateLikeCount(true);
+        assertEquals(2, feed.getLikeCount());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == false 면 likeCount 가 1씩 감소한다.")
+    void updateLikeCount_likeFalse_decrements() {
+        Feed feed = createPublicFeed();
+        // 먼저 likeCount 증가 셋업
+        feed.updateLikeCount(true);
+        feed.updateLikeCount(true);
+        assertEquals(2, feed.getLikeCount());
+
+        feed.updateLikeCount(false);
+        assertEquals(1, feed.getLikeCount());
+
+        feed.updateLikeCount(false);
+        assertEquals(0, feed.getLikeCount());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == false 면 likeCount 가 0 이하로 내려가면 InvalidStateException이 발생한다.")
+    void updateLikeCount_likeFalse_underflow_throws() {
+        Feed feed = createPublicFeed();
+        assertEquals(0, feed.getLikeCount());
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
+            feed.updateLikeCount(false);
+        });
+
+        assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateLike: 공개 피드는 누구나 좋아요 할 수 있다")
+    void validateLike_publicFeed_anyUser_passes() {
+        Feed feed = createPublicFeed();
+
+        assertDoesNotThrow(() -> feed.validateLike(OTHER_USER_ID));
+        assertDoesNotThrow(() -> feed.validateLike(CREATOR_ID));
+    }
+
+    @Test
+    @DisplayName("validateLike: 비공개 피드이고 작성자가 아닌 경우 좋아요 시도하면  InvalidStateException이 발생한다.")
+    void validateLike_privateFeed_nonCreator_throws() {
+        Feed feed = createPrivateFeed();
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> feed.validateLike(OTHER_USER_ID));
+
+        assertEquals(FEED_ACCESS_FORBIDDEN, ex.getErrorCode());
+        assertTrue(ex.getCause().getMessage().contains("비공개 글은 작성자만 좋아요 할 수 있습니다."));
+    }
+
+    @Test
+    @DisplayName("validateLike: 비공개 피드이고 작성자인 경우 좋아요 할 수 있다")
+    void validateLike_privateFeed_creator_passes() {
+        Feed feed = createPrivateFeed();
+
+        assertDoesNotThrow(() -> feed.validateLike(CREATOR_ID));
+    }
+
 }
