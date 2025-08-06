@@ -45,7 +45,7 @@ public class BookSearchService implements BookSearchUseCase {
     private final BookRedisCommandPort bookRedisCommandPort;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public NaverBookParseResult searchBooks(String keyword, int page, Long userId) {
 
         if (keyword == null || keyword.isBlank()) {
