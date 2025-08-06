@@ -1,4 +1,4 @@
-package konkuk.thip.room.domain;
+package konkuk.thip.room.application.port.in.dto;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
