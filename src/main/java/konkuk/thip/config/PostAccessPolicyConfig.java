@@ -21,7 +21,7 @@ public class PostAccessPolicyConfig {
     private final RoomPostCommentAccessPolicy roomCommentPolicy;
 
     private final FeedLikeAccessPolicy feedLikePolicy;
-    private final RoomPostLikeAccessPolicy roomLikePolicy;
+    private final RoomPostLikeAccessPolicy roomPostLikePolicy;
 
     @Bean
     public Map<PostType, CommentAccessPolicy> commentAccessPolicyMap() {
@@ -36,8 +36,8 @@ public class PostAccessPolicyConfig {
     public Map<PostType, PostLikeAccessPolicy> roomPostAccessPolicyMap() {
         return Map.of(
                 PostType.FEED, feedLikePolicy,
-                PostType.RECORD, roomLikePolicy,
-                PostType.VOTE, roomLikePolicy
+                PostType.RECORD, roomPostLikePolicy,
+                PostType.VOTE, roomPostLikePolicy
         );
     }
 }
