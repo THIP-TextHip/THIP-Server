@@ -16,7 +16,7 @@ public record RoomPostIsLikeRequest(
         @NotBlank(message = "게시물 타입은 필수입니다.")
         String roomPostType
 ) {
-    public PostIsLikeCommand toCommand(Long userId, Long feedId) {
-        return new PostIsLikeCommand(userId, feedId, RoomPostType.from(roomPostType).toPostType(), type);
+    public PostIsLikeCommand toCommand(Long userId, Long postId) {
+        return new PostIsLikeCommand(userId, postId, RoomPostType.from(roomPostType).toPostType(), type);
     }
 }
