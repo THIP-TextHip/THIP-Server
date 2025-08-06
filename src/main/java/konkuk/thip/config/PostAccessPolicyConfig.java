@@ -33,7 +33,7 @@ public class PostAccessPolicyConfig {
     }
 
     @Bean
-    public Map<PostType, PostLikeAccessPolicy> roomPostAccessPolicyMap() {
+    public Map<PostType, PostLikeAccessPolicy> postLikeAccessPolicyMap() {
         return Map.of(
                 PostType.FEED, feedLikePolicy,
                 PostType.RECORD, roomPostLikePolicy,
