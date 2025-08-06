@@ -6,7 +6,7 @@ import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
 import konkuk.thip.common.post.service.PostHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class CommentDeleteService implements CommentDeleteUseCase {
         // 1. 댓글 조회 및 권한 검증
         Comment comment = commentCommandPort.getByIdOrThrow(commentId);
         // 1-1. 게시글 타입에 따른 댓글 삭제 권한 검증
-        CommentCountUpdatable post = postHandler.findPost(comment.getPostType(), comment.getTargetPostId());
+        CountUpdatable post = postHandler.findPost(comment.getPostType(), comment.getTargetPostId());
         commentAuthorizationValidator.validateUserCanAccessPostForComment(comment.getPostType(), post, userId);
 
         // 2. 댓글 삭제 권한 검증 및 소프트 딜리트

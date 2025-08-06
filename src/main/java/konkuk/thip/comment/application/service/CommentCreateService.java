@@ -6,7 +6,7 @@ import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
 import konkuk.thip.common.post.service.PostHandler;
 import konkuk.thip.common.post.PostType;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class CommentCreateService implements CommentCreateUseCase {
         PostType type = PostType.from(command.postType());
 
         // 2. 게시물 타입에 맞게 조회
-        CommentCountUpdatable post = postHandler.findPost(type, command.postId());
+        CountUpdatable post = postHandler.findPost(type, command.postId());
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
         commentAuthorizationValidator.validateUserCanAccessPostForComment(type, post, command.userId());
 
