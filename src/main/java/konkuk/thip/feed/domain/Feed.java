@@ -3,7 +3,7 @@ package konkuk.thip.feed.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -18,7 +18,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
-public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
+public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     private Long id;
 
@@ -110,8 +110,13 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
 
     public void validateCreateComment(Long userId){
         if (!this.isPublic && !this.creatorId.equals(userId)) {
-            validateCreator(userId);
             throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 댓글을 쓸 수 있습니다."));
+        }
+    }
+
+    public void validateLike(Long userId){
+        if (!this.isPublic && !this.creatorId.equals(userId)) {
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 좋아요 할 수 있습니다."));
         }
     }
 
@@ -168,9 +173,25 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
         commentCount--;
     }
 
+    @Override
+    public void updateLikeCount(boolean like) {
+        if (like) {
+            likeCount++;
+        } else {
+            checkLikeCountNotUnderflow();
+            likeCount--;
+        }
+    }
+
     private void checkCommentCountNotUnderflow() {
         if (commentCount <= 0) {
             throw new InvalidStateException(COMMENT_COUNT_UNDERFLOW);
+        }
+    }
+
+    private void checkLikeCountNotUnderflow() {
+        if (likeCount <= 0) {
+            throw new InvalidStateException(POST_LIKE_COUNT_UNDERFLOW);
         }
     }
 
