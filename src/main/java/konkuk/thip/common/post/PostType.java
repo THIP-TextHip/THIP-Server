@@ -26,16 +26,4 @@ public enum PostType {
                         new InvalidStateException(POST_TYPE_NOT_MATCH)
                 );
     }
-
-    public boolean isFeed() {
-        return this == FEED;
-    }
-
-    public boolean isRecord() {
-        return this == RECORD;
-    }
-
-    public boolean isVote() {
-        return this == VOTE;
-    }
 }
