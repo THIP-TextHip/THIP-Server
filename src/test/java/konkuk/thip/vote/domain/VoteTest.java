@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_COUNT_UNDERFLOW;
+import static konkuk.thip.common.exception.code.ErrorCode.POST_LIKE_COUNT_UNDERFLOW;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Vote 도메인 테스트")
@@ -122,6 +123,48 @@ class VoteTest {
                 () -> vote.decreaseCommentCount());
 
         assertEquals(COMMENT_COUNT_UNDERFLOW, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == true 면 likeCount 가 1씩 증가한다.")
+    void updateLikeCount_likeTrue_increments() {
+        Vote vote = createWithCommentVote();
+
+        vote.updateLikeCount(true);
+        assertEquals(1, vote.getLikeCount());
+
+        vote.updateLikeCount(true);
+        assertEquals(2, vote.getLikeCount());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == false 면 likeCount 가 1씩 감소한다.")
+    void updateLikeCount_likeFalse_decrements() {
+        Vote vote = createWithCommentVote();
+
+        // 먼저 likeCount 증가 셋업
+        vote.updateLikeCount(true);
+        vote.updateLikeCount(true);
+        assertEquals(2, vote.getLikeCount());
+
+        vote.updateLikeCount(false);
+        assertEquals(1, vote.getLikeCount());
+
+        vote.updateLikeCount(false);
+        assertEquals(0, vote.getLikeCount());
+    }
+
+    @Test
+    @DisplayName("updateLikeCount: like == false 면 likeCount 가 0 이하로 내려가면 InvalidStateException이 발생한다.")
+    void updateLikeCount_likeFalse_underflow_throws() {
+        Vote vote = createWithCommentVote();
+        assertEquals(0, vote.getLikeCount());
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
+            vote.updateLikeCount(false);
+        });
+
+        assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
     }
 
 }
