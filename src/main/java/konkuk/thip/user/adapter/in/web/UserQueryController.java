@@ -150,4 +150,14 @@ public class UserQueryController {
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(userMyPageUseCase.getUserProfile(userId));
     }
+
+    @Operation(
+            summary = "사용자 유저 아이디 조회",
+            description = "접속한 사용자의 유저 아이디를 조회합니다."
+    )
+    @GetMapping("/users/my-id")
+    public BaseResponse<Long> showUserMyId(
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(userId);
+    }
 }
