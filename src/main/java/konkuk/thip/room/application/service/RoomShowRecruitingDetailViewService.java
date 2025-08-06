@@ -72,6 +72,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
                 book.getTitle(),
                 book.getAuthorName(),
                 book.getDescription(),
+                book.getPublisher(),
                 recommendRooms
         );
     }
