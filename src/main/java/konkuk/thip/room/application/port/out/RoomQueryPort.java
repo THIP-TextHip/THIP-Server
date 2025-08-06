@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface RoomQueryPort {
 
-    int countRecruitingRoomsByBookAndStartDateAfter(Long bookId, LocalDate currentDate);
+    int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate);
 
     Page<RoomSearchResponse.RoomSearchResult> searchRoom(String keyword, String category, Pageable pageable);
 

@@ -10,9 +10,9 @@ import java.time.LocalDate;
 public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, RoomQueryRepository {
 
     @Query("SELECT COUNT(r) FROM RoomJpaEntity r " +
-            "WHERE r.bookJpaEntity.bookId = :bookId " +
+            "WHERE r.bookJpaEntity.isbn = :isbn " +
             "AND r.startDate > :currentDate " +
             "AND r.status = 'ACTIVE'")
-    int countActiveRoomsByBookIdAndStartDateAfter(@Param("bookId") Long bookId, @Param("currentDate") LocalDate currentDate);
+    int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
 
 }
