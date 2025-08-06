@@ -14,6 +14,11 @@ public record RoomShowMineResponse(
             Long roomId,
             String bookImageUrl,
             String roomName,
+
+            @Schema(description = "방의 최대 모집인원 수")
+            int recruitCount,
+
+            @Schema(description = "방의 멤버 수")
             int memberCount,
 
             @Schema(description = "방 진행 마감일 or 방 모집 마감일까지 남은 시간 (ex. \"3일 뒤\"), 완료된 방은 쓰레기값이 넘어갑니다. 무시해주세요.")
