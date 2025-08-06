@@ -169,6 +169,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
         return tuples.stream()
                 .map(t -> RoomRecruitingDetailViewResponse.RecommendRoom.builder()
+                        .roomId(t.get(room.roomId))
                         .roomImageUrl(null)     // roomImageUrl은 추후 구현
                         .roomName(t.get(room.title))
                         .memberCount(t.get(memberCountExpr).intValue())
