@@ -14,7 +14,6 @@ import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
-import konkuk.thip.book.domain.SavedBooks;
 import konkuk.thip.saved.application.port.out.dto.FeedIdAndTagProjection;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -45,18 +44,15 @@ public class SavedQueryPersistenceAdapter implements SavedQueryPort {
     }
 
     @Override
-    public SavedBooks findSavedBooksByUserId(Long userId) {
-
+    public List<Book> findSavedBooksByUserId(Long userId) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-        List<SavedBookJpaEntity> savedBookEntities = savedBookJpaRepository.findByUserJpaEntity_UserId(user.getUserId());
 
-        // SavedBookJpaEntity에서 BookJpaEntity를 꺼내 도메인 Book으로 변환
-        List<Book> books = savedBookEntities.stream()
+        List<SavedBookJpaEntity> savedBookEntities = savedBookJpaRepository.findByUserId(user.getUserId());
+
+        return savedBookEntities.stream()
                 .map(entity -> bookMapper.toDomainEntity(entity.getBookJpaEntity()))
                 .collect(Collectors.toList());
-
-        return new SavedBooks(books);
     }
 
     @Override

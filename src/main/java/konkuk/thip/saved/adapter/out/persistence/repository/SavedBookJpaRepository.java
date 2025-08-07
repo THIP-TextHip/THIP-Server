@@ -2,11 +2,14 @@ package konkuk.thip.saved.adapter.out.persistence.repository;
 
 import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface SavedBookJpaRepository extends JpaRepository<SavedBookJpaEntity, Long> {
     boolean existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(Long userId, Long bookId);
     void deleteByUserJpaEntity_UserIdAndBookJpaEntity_BookId(Long userId, Long bookId);
-    List<SavedBookJpaEntity> findByUserJpaEntity_UserId(Long userId);
+
+    @Query("SELECT s FROM SavedBookJpaEntity s WHERE s.userJpaEntity.userId = :userId")
+    List<SavedBookJpaEntity> findByUserId(Long userId);
 }
