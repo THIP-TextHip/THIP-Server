@@ -84,6 +84,6 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     // 사용자가 저장한 책을 삭제
     @Override
     public void deleteSavedBook(Long userId, Long bookId) {
-        savedBookJpaRepository.deleteByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
+        savedBookJpaRepository.deleteByUserIdAndBookId(userId, bookId);
     }
 }

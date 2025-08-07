@@ -122,7 +122,7 @@ class BookChangeSavedControllerTest {
 
         // 실제 저장됐는지 검증
         Optional<BookJpaEntity> bookJpaEntity = bookJpaRepository.findByIsbn(testIsbn);
-        boolean exists = savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookJpaEntity.get().getBookId());
+        boolean exists = savedBookJpaRepository.existsByUserIdAndBookId(userId, bookJpaEntity.get().getBookId());
         assertThat(exists).isTrue();
     }
 
@@ -148,7 +148,7 @@ class BookChangeSavedControllerTest {
         // 실제 저장됐는지 검증
         Optional<BookJpaEntity> bookJpaEntity = bookJpaRepository.findByIsbn(newIsbn);
         assertThat(bookJpaEntity).isPresent();
-        boolean exists = savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookJpaEntity.get().getBookId());
+        boolean exists = savedBookJpaRepository.existsByUserIdAndBookId(userId, bookJpaEntity.get().getBookId());
         assertThat(exists).isTrue();
     }
 
@@ -203,7 +203,7 @@ class BookChangeSavedControllerTest {
                 .andExpect(jsonPath("$.data.isSaved").value(false));
 
         // 실제 삭제됐는지 검증
-        boolean exists = savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(user.getUserId(), book.getBookId());
+        boolean exists = savedBookJpaRepository.existsByUserIdAndBookId(user.getUserId(), book.getBookId());
         assertThat(exists).isFalse();
 
     }
