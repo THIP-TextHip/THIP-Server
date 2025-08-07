@@ -54,7 +54,7 @@ public class RecordCreateService implements RecordCreateUseCase {
 
         // 3. 유효성 검증
         validateRoom(room);
-        validateRoomParticipant(roomParticipant);
+        validateRoomParticipant(roomParticipant, command.isOverview());
         validateRecord(record, book);
 
         // 4. UserRoom의 currentPage, userPercentage 업데이트
@@ -77,9 +77,9 @@ public class RecordCreateService implements RecordCreateUseCase {
         }
     }
 
-    private void validateRoomParticipant(RoomParticipant roomParticipant) {
+    private void validateRoomParticipant(RoomParticipant roomParticipant, boolean isOverview) {
         // UserRoom의 총평 작성 가능 여부 검증
-        if (!roomParticipant.canWriteOverview()) {
+        if (!roomParticipant.canWriteOverview() && isOverview) {
             String message = String.format(
                     "총평(isOverview)은 사용자 진행률이 80%% 이상일 때만 가능합니다. 현재 사용자 진행률 = %.2f%%",
                     roomParticipant.getUserPercentage()
