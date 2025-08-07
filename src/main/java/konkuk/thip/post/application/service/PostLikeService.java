@@ -9,6 +9,7 @@ import konkuk.thip.post.application.port.in.PostLikeUseCase;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.post.application.service.validator.PostLikeAuthorizationValidator;
+import konkuk.thip.post.domain.service.PostCountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class PostLikeService implements PostLikeUseCase {
     private final PostLikeCommandPort postLikeCommandPort;
 
     private final PostHandler postHandler;
+    private final PostCountService postCountService;
     private final PostLikeAuthorizationValidator postLikeAuthorizationValidator;
 
     @Override
@@ -45,7 +47,7 @@ public class PostLikeService implements PostLikeUseCase {
         }
 
         // 4. 게시물 좋아요 수 업데이트
-        post.updateLikeCount(command.isLike());
+        post.updateLikeCount(postCountService,command.isLike());
         postHandler.updatePost(command.postType(), post);
 
         return PostIsLikeResult.of(post.getId(), command.isLike());
