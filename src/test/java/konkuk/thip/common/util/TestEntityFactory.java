@@ -16,7 +16,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.domain.Category;
-import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
