@@ -9,7 +9,6 @@ import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.InvalidStateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -68,10 +67,10 @@ public class BookSavedService implements BookSavedUseCase {
     private void validateSaveBookAction(boolean isSaveRequest, boolean alreadySaved) {
         if (isSaveRequest && alreadySaved) {
             // 이미 저장되어 있는 책을 다시 저장하려는 경우 예외 처리
-            throw new InvalidStateException(BOOK_ALREADY_SAVED);
+            throw new BusinessException(BOOK_ALREADY_SAVED);
         } else if (!isSaveRequest && !alreadySaved) {
             // 저장되지 않은 책을 삭제하려는 경우 예외 처리
-            throw new InvalidStateException(BOOK_NOT_SAVED_CANNOT_DELETE);
+            throw new BusinessException(BOOK_NOT_SAVED_CANNOT_DELETE);
         }
     }
 
