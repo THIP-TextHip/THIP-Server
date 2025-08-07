@@ -1,6 +1,5 @@
 package konkuk.thip.book.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
@@ -37,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookGetSelectableListApiTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
 
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private AliasJpaRepository aliasJpaRepository;
