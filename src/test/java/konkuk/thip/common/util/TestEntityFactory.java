@@ -1,6 +1,7 @@
 package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
 import konkuk.thip.common.post.PostType;
@@ -311,6 +312,13 @@ public class TestEntityFactory {
         return VoteParticipantJpaEntity.builder()
                 .userJpaEntity(user)
                 .voteItemJpaEntity(item)
+                .build();
+    }
+
+    public static SavedBookJpaEntity createSavedBook(UserJpaEntity user, BookJpaEntity book) {
+        return SavedBookJpaEntity.builder()
+                .userJpaEntity(user)
+                .bookJpaEntity(book)
                 .build();
     }
 }
