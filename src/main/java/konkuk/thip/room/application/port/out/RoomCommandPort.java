@@ -1,7 +1,6 @@
 package konkuk.thip.room.application.port.out;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
 
 import java.util.Optional;

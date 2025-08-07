@@ -22,6 +22,5 @@ public interface RoomParticipantCommandPort {
 
     void deleteByUserIdAndRoomId(Long userId, Long roomId);
 
-
-
+    void update(RoomParticipant roomParticipant);
 }
