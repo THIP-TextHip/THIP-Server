@@ -91,6 +91,7 @@ public enum ErrorCode implements ResponseCode {
     ROOM_MEMBER_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, 100006, "방의 최대 인원 수를 초과했습니다."),
     ROOM_MEMBER_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 100007, "방의 인원 수가 1 이하(방장 포함)입니다."),
     ROOM_IS_EXPIRED(HttpStatus.BAD_REQUEST, 100008, "방이 만료되었습니다."),
+    ROOM_POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 100009, "일치하는 방 게시물 타입 이름이 없습니다. [RECORD, VOTE] 중 하나여야 합니다."),
 
     /**
      * 110000 : vote error
@@ -166,6 +167,14 @@ public enum ErrorCode implements ResponseCode {
      * 180000 : Post error
      */
     POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [FEED, RECORD, VOTE] 중 하나여야 합니다."),
+
+    /**
+     * 185000 : PostLike error
+     *
+     */
+    POST_LIKE_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 185000, "좋아요 수는 0 이하로 감소할 수 없습니다."),
+    POST_ALREADY_LIKED(HttpStatus.BAD_REQUEST, 185001, "사용자가 이미 좋아요한 게시물입니다."),
+    POST_NOT_LIKED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 185002, "사용자가 좋아요하지 않은 게시물은 좋아요 취소 할 수 없습니다."),
 
     /**
      * 190000 : Comment error

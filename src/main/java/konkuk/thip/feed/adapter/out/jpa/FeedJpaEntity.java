@@ -56,4 +56,9 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.commentCount = commentCount;
     }
 
+    @VisibleForTesting
+    public void updateLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
 }

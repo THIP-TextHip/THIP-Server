@@ -1,7 +1,7 @@
 package konkuk.thip.comment.application.service.policy;
 
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
 
 public interface CommentAccessPolicy {
-    void validateCommentAccess(CommentCountUpdatable post, Long userId);
+    void validateCommentAccess(CountUpdatable post, Long userId);
 }

@@ -1,5 +1,6 @@
 package konkuk.thip.vote.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
@@ -41,5 +42,10 @@ public class VoteJpaEntity extends PostJpaEntity {
         this.page = vote.getPage();
         this.isOverview = vote.isOverview();
         return this;
+    }
+
+    @VisibleForTesting
+    public void updateLikeCount(int likeCount) {
+        this.likeCount = likeCount;
     }
 }
