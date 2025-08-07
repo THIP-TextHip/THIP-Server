@@ -2,6 +2,8 @@ package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.post.domain.service.PostCountService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Feed 도메인 테스트")
 class FeedTest {
+
+    private PostCountService postCountService;
+
+    @BeforeEach
+     void setUp() {
+        postCountService = new PostCountService();
+    }
 
     private final Long CREATOR_ID = 1L;
     private final Long OTHER_USER_ID = 2L;
@@ -273,10 +282,10 @@ class FeedTest {
     void updateLikeCount_likeTrue_increments() {
         Feed feed = createPublicFeed();
 
-        feed.updateLikeCount(true);
+        feed.updateLikeCount(postCountService, true);
         assertEquals(1, feed.getLikeCount());
 
-        feed.updateLikeCount(true);
+        feed.updateLikeCount(postCountService, true);
         assertEquals(2, feed.getLikeCount());
     }
 
@@ -285,14 +294,14 @@ class FeedTest {
     void updateLikeCount_likeFalse_decrements() {
         Feed feed = createPublicFeed();
         // 먼저 likeCount 증가 셋업
-        feed.updateLikeCount(true);
-        feed.updateLikeCount(true);
+        feed.updateLikeCount(postCountService, true);
+        feed.updateLikeCount(postCountService, true);
         assertEquals(2, feed.getLikeCount());
 
-        feed.updateLikeCount(false);
+        feed.updateLikeCount(postCountService, false);
         assertEquals(1, feed.getLikeCount());
 
-        feed.updateLikeCount(false);
+        feed.updateLikeCount(postCountService, false);
         assertEquals(0, feed.getLikeCount());
     }
 
@@ -303,7 +312,7 @@ class FeedTest {
         assertEquals(0, feed.getLikeCount());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            feed.updateLikeCount(false);
+            feed.updateLikeCount(postCountService, false);
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());

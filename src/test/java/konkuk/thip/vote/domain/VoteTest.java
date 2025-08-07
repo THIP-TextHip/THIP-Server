@@ -1,6 +1,8 @@
 package konkuk.thip.vote.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.post.domain.service.PostCountService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Vote 도메인 테스트")
 class VoteTest {
+
+    private PostCountService postCountService;
+
+    @BeforeEach
+    void setUp() {
+        postCountService = new PostCountService();
+    }
 
     private final Long CREATOR_ID = 1L;
 
@@ -130,10 +139,10 @@ class VoteTest {
     void updateLikeCount_likeTrue_increments() {
         Vote vote = createWithCommentVote();
 
-        vote.updateLikeCount(true);
+        vote.updateLikeCount(postCountService,true);
         assertEquals(1, vote.getLikeCount());
 
-        vote.updateLikeCount(true);
+        vote.updateLikeCount(postCountService,true);
         assertEquals(2, vote.getLikeCount());
     }
 
@@ -143,14 +152,14 @@ class VoteTest {
         Vote vote = createWithCommentVote();
 
         // 먼저 likeCount 증가 셋업
-        vote.updateLikeCount(true);
-        vote.updateLikeCount(true);
+        vote.updateLikeCount(postCountService,true);
+        vote.updateLikeCount(postCountService,true);
         assertEquals(2, vote.getLikeCount());
 
-        vote.updateLikeCount(false);
+        vote.updateLikeCount(postCountService,false);
         assertEquals(1, vote.getLikeCount());
 
-        vote.updateLikeCount(false);
+        vote.updateLikeCount(postCountService,false);
         assertEquals(0, vote.getLikeCount());
     }
 
@@ -161,7 +170,7 @@ class VoteTest {
         assertEquals(0, vote.getLikeCount());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            vote.updateLikeCount(false);
+            vote.updateLikeCount(postCountService,false);
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());

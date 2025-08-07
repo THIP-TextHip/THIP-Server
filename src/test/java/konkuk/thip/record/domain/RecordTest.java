@@ -1,6 +1,8 @@
 package konkuk.thip.record.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.post.domain.service.PostCountService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Record 도메인 테스트")
 class RecordTest {
+
+    private PostCountService postCountService;
+
+    @BeforeEach
+    void setUp() {
+        postCountService = new PostCountService();
+    }
 
     private final Long CREATOR_ID = 1L;
 
@@ -130,10 +139,10 @@ class RecordTest {
     void updateLikeCount_likeTrue_increments() {
         Record record = createWithCommentRecord();
 
-        record.updateLikeCount(true);
+        record.updateLikeCount(postCountService,true);
         assertEquals(1, record.getLikeCount());
 
-        record.updateLikeCount(true);
+        record.updateLikeCount(postCountService,true);
         assertEquals(2, record.getLikeCount());
     }
 
@@ -143,14 +152,14 @@ class RecordTest {
         Record record = createWithCommentRecord();
 
         // 먼저 likeCount 증가 셋업
-        record.updateLikeCount(true);
-        record.updateLikeCount(true);
+        record.updateLikeCount(postCountService,true);
+        record.updateLikeCount(postCountService,true);
         assertEquals(2, record.getLikeCount());
 
-        record.updateLikeCount(false);
+        record.updateLikeCount(postCountService,false);
         assertEquals(1, record.getLikeCount());
 
-        record.updateLikeCount(false);
+        record.updateLikeCount(postCountService,false);
         assertEquals(0, record.getLikeCount());
     }
 
@@ -161,7 +170,7 @@ class RecordTest {
         assertEquals(0, record.getLikeCount());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            record.updateLikeCount(false);
+            record.updateLikeCount(postCountService,false);
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
