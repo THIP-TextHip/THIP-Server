@@ -1,6 +1,5 @@
 package konkuk.thip.book.adapter.out.persistence;
 
-import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.book.adapter.out.mapper.BookMapper;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
@@ -12,7 +11,7 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -28,23 +27,27 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
 
     @Override
     public boolean existsSavedBookByUserIdAndBookId(Long userId, Long bookId) {
-        return savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
+        return savedBookJpaRepository.existsByUserIdAndBookId(userId, bookId);
     }
 
     @Override
-    public List<Book> findSavedBooksByUserId(Long userId) {
+    public Set<Book> findSavedBooksByUserId(Long userId) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        List<SavedBookJpaEntity> savedBookEntities = savedBookJpaRepository.findByUserId(user.getUserId());
-
-        return savedBookEntities.stream()
-                .map(entity -> bookMapper.toDomainEntity(entity.getBookJpaEntity()))
-                .collect(Collectors.toList());
+        return bookJpaRepository.findSavedBooksByUserId(user.getUserId()).stream()
+                .map(bookMapper::toDomainEntity)
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public List<Book> findJoiningRoomsBooksByUserId(Long userId) {
-        return bookJpaRepository.;
+    public Set<Book> findJoiningRoomsBooksByUserId(Long userId) {
+        UserJpaEntity user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+
+        return bookJpaRepository.findJoiningRoomsBooksByUserId(user.getUserId())
+                .stream()
+                .map(bookMapper::toDomainEntity)
+                .collect(Collectors.toSet());
     }
 }

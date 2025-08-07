@@ -96,7 +96,9 @@ public class BookQueryController {
             @Parameter(description = "저장한 책 또는 참여 중인 모임의 책을 구분하는 필드 (SAVED : 저장한 책 / JOINING : 모임 방의 책)", example = "SAVED") @RequestParam final String type,
             @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(bookSelectableListUseCase.getSelectableBookList(BookSelectableType.from(type), userId));
+        return BaseResponse.ok(
+                BookSelectableListResponse.of(bookSelectableListUseCase.getSelectableBookList(BookSelectableType.from(type), userId))
+        );
     }
 
 }
