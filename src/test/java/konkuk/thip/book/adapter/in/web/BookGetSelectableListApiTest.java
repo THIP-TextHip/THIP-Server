@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Transactional
 @DisplayName("[통합] 저장한 책 및 참여 중 책 리스트 조회 API 통합 테스트")
-class BookSelectableApiTest {
+class BookGetSelectableListApiTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
