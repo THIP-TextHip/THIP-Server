@@ -10,7 +10,6 @@ import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.application.port.out.BookRedisCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
 import konkuk.thip.recentSearch.domain.RecentSearch;
@@ -90,32 +89,30 @@ public class BookSearchService implements BookSearchUseCase {
         //책 검색순위 정보 업데이트
         bookRedisCommandPort.incrementBookSearchCount(isbn,LocalDate.now());
 
-        Book book;
-        try {
-            // DB에서 책 정보 조회 (없으면 예외 발생)
-            book = bookCommandPort.getByIsbnOrThrow(isbn);
-        } catch (EntityNotFoundException e) {
-            // 책이 DB에 없으면 기본값으로 반환
-            return BookDetailSearchResult.of(
-                    naverDetailBookParseResult,
-                    0,    // 모집 중인 방 개수
-                    0,    // 읽기 참여자 수
-                    false // 저장 여부
-            );
-        }
+        return bookCommandPort.findByIsbn(isbn)
+                .map(book -> {
+                    //이책에 모집중인 모임방 개수
+                    int recruitingRoomCount = getRecruitingRoomCount(book);
+                    // 이책에 읽기 참여중인 사용자 수
+                    int readCount = getReadCount(book);
+                    // 사용자의 해당 책 저장 여부
+                    boolean isSaved = bookQueryPort.existsSavedBookByUserIdAndBookId(user.getId(), book.getId());
 
-        //이책에 모집중인 모임방 개수
-        int recruitingRoomCount = getRecruitingRoomCount(book);
-        // 이책에 읽기 참여중인 사용자 수
-        int readCount = getReadCount(book);
-        // 사용자의 해당 책 저장 여부
-        boolean isSaved = bookQueryPort.existsSavedBookByUserIdAndBookId(user.getId(), book.getId());
-
-        return BookDetailSearchResult.of(
-                naverDetailBookParseResult,
-                recruitingRoomCount,
-                readCount,
-                isSaved);
+                    return BookDetailSearchResult.of(
+                            naverDetailBookParseResult,
+                            recruitingRoomCount,
+                            readCount,
+                            isSaved
+                    );
+                })
+                .orElseGet(() ->
+                        BookDetailSearchResult.of(
+                                naverDetailBookParseResult,
+                                0,    // 모집 중인 방 개수
+                                0,    // 읽기 참여자 수
+                                false // 저장 여부
+                        )
+                );
     }
 
     private int getRecruitingRoomCount(Book book) {
