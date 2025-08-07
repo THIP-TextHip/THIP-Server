@@ -1,7 +1,5 @@
 package konkuk.thip.saved.adapter.out.persistence;
 
-import konkuk.thip.book.adapter.out.mapper.BookMapper;
-import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
@@ -9,9 +7,7 @@ import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.SavedFeeds;
-import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
-import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.saved.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.saved.application.port.out.dto.FeedIdAndTagProjection;
@@ -31,29 +27,10 @@ import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 @RequiredArgsConstructor
 public class SavedQueryPersistenceAdapter implements SavedQueryPort {
 
-    private final SavedBookJpaRepository savedBookJpaRepository;
     private final SavedFeedJpaRepository savedFeedJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final BookMapper bookMapper;
     private final FeedMapper feedMapper;
     private final FeedTagJpaRepository feedTagJpaRepository;
-
-    @Override
-    public boolean existsByUserIdAndBookId(Long userId, Long bookId) {
-        return savedBookJpaRepository.existsByUserJpaEntity_UserIdAndBookJpaEntity_BookId(userId, bookId);
-    }
-
-    @Override
-    public List<Book> findSavedBooksByUserId(Long userId) {
-        UserJpaEntity user = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-
-        List<SavedBookJpaEntity> savedBookEntities = savedBookJpaRepository.findByUserId(user.getUserId());
-
-        return savedBookEntities.stream()
-                .map(entity -> bookMapper.toDomainEntity(entity.getBookJpaEntity()))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public SavedFeeds findSavedFeedsByUserId(Long userId) {

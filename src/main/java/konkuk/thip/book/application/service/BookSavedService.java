@@ -6,11 +6,10 @@ import konkuk.thip.book.application.port.in.BookSavedUseCase;
 import konkuk.thip.book.application.port.in.dto.BookIsSavedResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
+import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.saved.application.port.out.SavedCommandPort;
-import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +21,7 @@ public class BookSavedService implements BookSavedUseCase {
 
     private final BookApiQueryPort bookApiQueryPort;
     private final BookCommandPort bookCommandPort;
-    private final SavedCommandPort savedCommandPort;
-    private final SavedQueryPort savedQueryPort;
+    private final BookQueryPort bookQueryPort;
 
     @Override
     @Transactional
@@ -38,13 +36,13 @@ public class BookSavedService implements BookSavedUseCase {
                     return registerBookByIsbn(isbn);
                 });
 
-        boolean alreadySaved = savedQueryPort.existsByUserIdAndBookId(userId, book.getId());
+        boolean alreadySaved = bookQueryPort.existsSavedBookByUserIdAndBookId(userId, book.getId());
         validateSaveBookAction(isSaveRequest, alreadySaved);
 
         if (isSaveRequest) {
-            savedCommandPort.saveBook(userId, book.getId());
+            bookCommandPort.saveSavedBook(userId, book.getId());
         } else {
-            savedCommandPort.deleteBook(userId, book.getId());
+            bookCommandPort.deleteSavedBook(userId, book.getId());
         }
 
         return BookIsSavedResult.of(isbn, isSaveRequest);

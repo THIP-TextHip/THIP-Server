@@ -4,8 +4,9 @@ import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
-import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
+import konkuk.thip.book.application.port.out.BookCommandPort;
+import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.application.port.out.BookRedisCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
@@ -14,7 +15,6 @@ import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
 import konkuk.thip.recentSearch.domain.RecentSearch;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
-import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.domain.User;
@@ -38,7 +38,7 @@ public class BookSearchService implements BookSearchUseCase {
     private final RoomQueryPort roomQueryPort;
     private final UserQueryPort userQueryPort;
     private final FeedQueryPort feedQueryPort;
-    private final SavedQueryPort savedQueryPort;
+    private final BookQueryPort bookQueryPort;
     private final RecentSearchCommandPort recentSearchCommandPort;
     private final BookCommandPort bookCommandPort;
     private final UserCommandPort userCommandPort;
@@ -109,7 +109,7 @@ public class BookSearchService implements BookSearchUseCase {
         // 이책에 읽기 참여중인 사용자 수
         int readCount = getReadCount(book);
         // 사용자의 해당 책 저장 여부
-        boolean isSaved = savedQueryPort.existsByUserIdAndBookId(user.getId(), book.getId());
+        boolean isSaved = bookQueryPort.existsSavedBookByUserIdAndBookId(user.getId(), book.getId());
 
         return BookDetailSearchResult.of(
                 naverDetailBookParseResult,
