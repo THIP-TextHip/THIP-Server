@@ -1,5 +1,6 @@
 package konkuk.thip.record.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.record.domain.Record;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
@@ -41,6 +42,11 @@ public class RecordJpaEntity extends PostJpaEntity {
         this.page = record.getPage();
         this.isOverview = record.isOverview();
         return this;
+    }
+
+    @VisibleForTesting
+    public void updateLikeCount(int likeCount) {
+        this.likeCount = likeCount;
     }
 
 }

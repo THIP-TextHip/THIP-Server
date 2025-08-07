@@ -105,7 +105,7 @@ public class RoomQueryController {
     @ExceptionDescription(ROOM_PLAYING_DETAIL)
     @GetMapping("/rooms/{roomId}/playing")
     public BaseResponse<RoomPlayingDetailViewResponse> getPlayingRoomDetailView(
-            @UserId final Long userId,
+            @Parameter(hidden = true) @UserId final Long userId,
             @PathVariable("roomId") final Long roomId
     ) {
         return BaseResponse.ok(roomShowPlayingDetailViewUseCase.getPlayingRoomDetailView(userId, roomId));

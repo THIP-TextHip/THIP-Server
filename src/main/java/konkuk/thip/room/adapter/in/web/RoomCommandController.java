@@ -7,8 +7,11 @@ import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
+import konkuk.thip.post.application.port.in.PostLikeUseCase;
 import konkuk.thip.room.adapter.in.web.request.RoomCreateRequest;
 import konkuk.thip.room.adapter.in.web.request.RoomJoinRequest;
+import konkuk.thip.room.adapter.in.web.request.RoomPostIsLikeRequest;
+import konkuk.thip.room.adapter.in.web.response.RoomPostIsLikeResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitCloseResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomJoinResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomCreateResponse;
@@ -31,6 +34,7 @@ public class RoomCommandController {
     private final RoomCreateUseCase roomCreateUseCase;
     private final RoomJoinUseCase roomJoinUsecase;
     private final RoomRecruitCloseUseCase roomRecruitCloseUsecase;
+    private final PostLikeUseCase postLikeUseCase;
 
     /**
      * 방 생성 요청
@@ -84,5 +88,18 @@ public class RoomCommandController {
         return BaseResponse.ok(
                 RoomRecruitCloseResponse.of(roomRecruitCloseUsecase.closeRoomRecruit(userId, roomId))
         );
+    }
+
+    @Operation(
+            summary = "방 게시물(기록,투표) 좋아요 상태 변경",
+            description = "사용자가 방 게시물의 좋아요 상태를 변경합니다. (true -> 좋아요, false -> 좋아요 취소)"
+    )
+    @ExceptionDescription(CHANGE_ROOM_LIKE_STATE)
+    @PostMapping("/room-posts/{postId}/likes")
+    public BaseResponse<RoomPostIsLikeResponse> likeRoomPost(
+            @RequestBody @Valid final RoomPostIsLikeRequest request,
+            @Parameter(description = "좋아요 상태를 변경하려는 방 게시물 ID", example = "1")@PathVariable("postId") final Long postId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(RoomPostIsLikeResponse.of(postLikeUseCase.changeLikeStatusPost(request.toCommand(userId, postId))));
     }
 }

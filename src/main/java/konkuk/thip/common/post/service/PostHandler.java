@@ -1,7 +1,7 @@
 package konkuk.thip.common.post.service;
 
 import konkuk.thip.common.annotation.HelperService;
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
 import konkuk.thip.common.post.PostType;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
@@ -19,7 +19,7 @@ public class PostHandler {
     private final RecordCommandPort recordCommandPort;
     private final VoteCommandPort voteCommandPort;
 
-    public CommentCountUpdatable findPost(PostType type, Long postId) {
+    public CountUpdatable findPost(PostType type, Long postId) {
         return switch (type) {
             case FEED -> feedCommandPort.getByIdOrThrow(postId);
             case RECORD -> recordCommandPort.getByIdOrThrow(postId);
@@ -27,7 +27,7 @@ public class PostHandler {
         };
     }
 
-    public void updatePost(PostType type, CommentCountUpdatable post) {
+    public void updatePost(PostType type, CountUpdatable post) {
         switch (type) {
             case FEED -> feedCommandPort.update((Feed) post);
             case RECORD -> recordCommandPort.update((Record) post);

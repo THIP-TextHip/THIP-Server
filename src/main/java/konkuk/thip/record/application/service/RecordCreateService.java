@@ -47,21 +47,25 @@ public class RecordCreateService implements RecordCreateUseCase {
                 command.roomId()
         );
 
-        // 2. UserRoom, Room, Book 조회
+        // 2. RoomParticipant, Room, Book 조회
         RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(command.userId(), command.roomId());
         Room room = roomCommandPort.getByIdOrThrow(record.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 3. 유효성 검증
         validateRoom(room);
-        validateRoomParticipant(roomParticipant);
+        validateRoomParticipant(roomParticipant, command.isOverview());
         validateRecord(record, book);
 
-        // 4. UserRoom의 currentPage, userPercentage 업데이트
+        // 4. RoomParticipant의 currentPage, userPercentage 업데이트
         updateRoomProgress(roomParticipant, record, book, room);
 
         // 5. Record 저장
         Long newRecordId = recordCommandPort.saveRecord(record);
+
+        // 6. Room, RoomParticipant 업데이트
+        roomCommandPort.update(room);
+        roomParticipantCommandPort.update(roomParticipant);
 
         return RecordCreateResult.of(newRecordId, command.roomId());
     }
@@ -71,15 +75,17 @@ public class RecordCreateService implements RecordCreateUseCase {
             // userPercentage가 업데이트되었으면 Room의 roomPercentage 업데이트
             List<RoomParticipant> roomParticipantList = roomParticipantCommandPort.findAllByRoomId(record.getRoomId());
             Double totalUserPercentage = roomParticipantList.stream()
+                    .filter(participant -> !roomParticipant.getId().equals(participant.getId())) // 현재 업데이트 중인 사용자 제외
                     .map(RoomParticipant::getUserPercentage)
                     .reduce(0.0, Double::sum);
+            totalUserPercentage += roomParticipant.getUserPercentage();
             room.updateRoomPercentage(totalUserPercentage / roomParticipantList.size());
         }
     }
 
-    private void validateRoomParticipant(RoomParticipant roomParticipant) {
+    private void validateRoomParticipant(RoomParticipant roomParticipant, boolean isOverview) {
         // UserRoom의 총평 작성 가능 여부 검증
-        if (!roomParticipant.canWriteOverview()) {
+        if (!roomParticipant.canWriteOverview() && isOverview) {
             String message = String.format(
                     "총평(isOverview)은 사용자 진행률이 80%% 이상일 때만 가능합니다. 현재 사용자 진행률 = %.2f%%",
                     roomParticipant.getUserPercentage()

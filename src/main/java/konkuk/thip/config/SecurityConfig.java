@@ -35,6 +35,10 @@ public class SecurityConfig {
     @Value("${server.web-domain-url}")
     private String webDomainUrl;
 
+    @Value("${server.https-url}")
+    private String httpsUrl;
+
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -68,7 +72,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                ;
+        ;
 
         return http.build();
     }
@@ -90,7 +94,8 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 webUrl,
-                webDomainUrl
+                webDomainUrl,
+                httpsUrl
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(Collections.singletonList("*"));
@@ -104,5 +109,5 @@ public class SecurityConfig {
 
         return source;
     }
-    
+
 }

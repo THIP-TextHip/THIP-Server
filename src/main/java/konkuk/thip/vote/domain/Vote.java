@@ -2,7 +2,8 @@ package konkuk.thip.vote.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
+import konkuk.thip.post.domain.service.PostCountService;
 import konkuk.thip.room.domain.RoomPost;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
-public class Vote extends BaseDomainEntity implements CommentCountUpdatable, RoomPost {
+public class Vote extends BaseDomainEntity implements CountUpdatable, RoomPost {
 
     private Long id;
 
@@ -77,6 +78,11 @@ public class Vote extends BaseDomainEntity implements CommentCountUpdatable, Roo
     public void decreaseCommentCount() {
         checkCommentCountNotUnderflow();
         commentCount--;
+    }
+
+    @Override
+    public void updateLikeCount(PostCountService postCountService, boolean isLike) {
+        likeCount = postCountService.updatePostLikeCount(isLike, likeCount);
     }
 
     private void checkCommentCountNotUnderflow() {

@@ -104,6 +104,16 @@ public enum SwaggerResponseDescription {
     ROOM_GET_DEADLINE_POPULAR(new LinkedHashSet<>(Set.of(
             CATEGORY_NOT_MATCH
     ))),
+    CHANGE_ROOM_LIKE_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            VOTE_NOT_FOUND,
+            POST_ALREADY_LIKED,
+            POST_NOT_LIKED_CANNOT_CANCEL,
+            POST_LIKE_COUNT_UNDERFLOW,
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_POST_TYPE_NOT_MATCH
+    ))),
 
 
     // Record
@@ -173,6 +183,14 @@ public enum SwaggerResponseDescription {
             USER_NOT_FOUND,
             BOOK_NOT_FOUND,
             FEED_CAN_NOT_SHOW_PRIVATE_ONE
+    ))),
+    CHANGE_FEED_LIKE_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            FEED_NOT_FOUND,
+            POST_ALREADY_LIKED,
+            POST_NOT_LIKED_CANNOT_CANCEL,
+            POST_LIKE_COUNT_UNDERFLOW,
+            FEED_ACCESS_FORBIDDEN
     ))),
 
     // Comment

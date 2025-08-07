@@ -10,6 +10,7 @@ import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
+import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
@@ -312,6 +313,13 @@ public class TestEntityFactory {
         return VoteParticipantJpaEntity.builder()
                 .userJpaEntity(user)
                 .voteItemJpaEntity(item)
+                .build();
+    }
+
+    public static PostLikeJpaEntity createPostLike(UserJpaEntity user, PostJpaEntity post) {
+        return PostLikeJpaEntity.builder()
+                .userJpaEntity(user)
+                .postJpaEntity(post)
                 .build();
     }
 

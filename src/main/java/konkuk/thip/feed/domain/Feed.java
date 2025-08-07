@@ -3,7 +3,8 @@ package konkuk.thip.feed.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CommentCountUpdatable;
+import konkuk.thip.common.post.CountUpdatable;
+import konkuk.thip.post.domain.service.PostCountService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -18,7 +19,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Getter
 @SuperBuilder
-public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
+public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     private Long id;
 
@@ -108,11 +109,22 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
         }
     }
 
-    public void validateCreateComment(Long userId){
+    // 공통된 비공개 접근 권한 검증 로직
+    private void validatePrivateAccessPermission(Long userId, String action) {
         if (!this.isPublic && !this.creatorId.equals(userId)) {
-            validateCreator(userId);
-            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN, new IllegalArgumentException("비공개 글은 작성자만 댓글을 쓸 수 있습니다."));
+            throw new InvalidStateException(FEED_ACCESS_FORBIDDEN,
+                    new IllegalArgumentException(String.format("비공개 글은 작성자만 %s 있습니다.", action)));
         }
+    }
+
+    // 댓글 작성 권한 검증
+    public void validateCreateComment(Long userId){
+        validatePrivateAccessPermission(userId, "댓글을 쓸 수");
+    }
+
+    // 좋아요 권한 검증
+    public void validateLike(Long userId){
+        validatePrivateAccessPermission(userId, "좋아요 할 수");
     }
 
     private void validateCreator(Long userId) {
@@ -166,6 +178,11 @@ public class Feed extends BaseDomainEntity implements CommentCountUpdatable {
     public void decreaseCommentCount() {
         checkCommentCountNotUnderflow();
         commentCount--;
+    }
+
+    @Override
+    public void updateLikeCount(PostCountService postCountService, boolean isLike) {
+        likeCount = postCountService.updatePostLikeCount(isLike, likeCount);
     }
 
     private void checkCommentCountNotUnderflow() {
