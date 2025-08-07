@@ -45,7 +45,7 @@ jobs:
           redis-version: 7
 
       - name: 🐘 build with Gradle
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build --parallel --stacktrace
 
       - name: ✉️ Post test results as a comment on the PR
         uses: EnricoMi/publish-unit-test-result-action@v2
