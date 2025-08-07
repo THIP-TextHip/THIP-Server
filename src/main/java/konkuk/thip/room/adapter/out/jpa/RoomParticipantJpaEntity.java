@@ -3,6 +3,7 @@ package konkuk.thip.room.adapter.out.jpa;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -49,5 +50,11 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
     @VisibleForTesting
     public void updateUserPercentage(double userPercentage) {
         this.userPercentage = userPercentage;
+    }
+
+    public void updateFrom(RoomParticipant roomParticipant) {
+        this.currentPage = roomParticipant.getCurrentPage();
+        this.userPercentage = roomParticipant.getUserPercentage();
+        this.roomParticipantRole = RoomParticipantRole.from(roomParticipant.getRoomParticipantRole());
     }
 }
