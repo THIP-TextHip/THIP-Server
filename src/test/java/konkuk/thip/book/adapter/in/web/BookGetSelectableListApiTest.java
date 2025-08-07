@@ -85,7 +85,7 @@ class BookGetSelectableListApiTest {
                         .requestAttr("userId", user.getUserId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.bookList").isArray())
-                .andExpect(jsonPath("$.data.bookList.length()").value(1))
+                .andExpect(jsonPath("$.data.bookList.length()").value(2))
                 .andExpect(jsonPath("$.data.bookList[0].isbn").value(joiningBook.getIsbn()));
     }
 }
