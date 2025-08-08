@@ -29,7 +29,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
         Cursor cursor = Cursor.from(query.cursorStr(), PAGE_SIZE);
 
         // 1. size 크기만큼의 루트 댓글 최신순 조회 -> 삭제된 루트 댓글 포함해서 전부 조회
-        CursorBasedList<CommentQueryDto> commentQueryDtoCursorBasedList = commentQueryPort.findLatestRootCommentsWithDeleted(query.postId(), cursor);
+        CursorBasedList<CommentQueryDto> commentQueryDtoCursorBasedList = commentQueryPort.findLatestRootCommentsWithDeleted(query.postId(), query.postType().getType(), cursor);
         List<CommentQueryDto> rootsInOrder = commentQueryDtoCursorBasedList.contents();
 
         // 2. 조회한 루트 댓글들의 전체 자식 댓귿들을(깊이 무관) 작성 시간순으로 조회

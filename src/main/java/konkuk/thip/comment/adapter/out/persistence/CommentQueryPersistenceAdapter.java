@@ -22,11 +22,11 @@ public class CommentQueryPersistenceAdapter implements CommentQueryPort {
     private final CommentMapper commentMapper;
 
     @Override
-    public CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, Cursor cursor) {
+    public CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, String postTypeStr, Cursor cursor) {
         LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
         int size = cursor.getPageSize();
 
-        List<CommentQueryDto> commentQueryDtos = commentJpaRepository.findRootCommentsWithDeletedByCreatedAtDesc(postId, lastCreatedAt, size);
+        List<CommentQueryDto> commentQueryDtos = commentJpaRepository.findRootCommentsWithDeletedByCreatedAtDesc(postId, postTypeStr, lastCreatedAt, size);
 
         return CursorBasedList.of(commentQueryDtos, size, commentQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(commentQueryDto.createdAt().toString()));

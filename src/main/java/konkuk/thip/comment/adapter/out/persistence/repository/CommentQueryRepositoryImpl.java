@@ -29,7 +29,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     private final QUserJpaEntity parentCommentCreator = new QUserJpaEntity("parentCommentCreator");
 
     @Override
-    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, LocalDateTime lastCreatedAt, int size) {
+    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size) {
         // 최상위 댓글(size+1) 프로젝션 생성
         QCommentQueryDto proj = new QCommentQueryDto(
                 comment.commentId,
@@ -46,6 +46,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
         // WHERE 절 분리
         BooleanExpression whereClause = comment.postJpaEntity.postId.eq(postId)
+                .and(comment.postJpaEntity.dtype.eq(postTypeStr))       // dType 필터링 추가
                 .and(comment.parent.isNull())       // 게시글의 최상위 댓글 조회
                 .and(lastCreatedAt != null      // 최신순 정렬
                         ? comment.createdAt.lt(lastCreatedAt)
