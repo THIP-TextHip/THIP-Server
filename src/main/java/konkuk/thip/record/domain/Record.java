@@ -96,4 +96,21 @@ public class Record extends BaseDomainEntity implements CountUpdatable, RoomPost
             throw new InvalidStateException(COMMENT_COUNT_UNDERFLOW);
         }
     }
+
+    private void validateCreator(Long userId) {
+        if (!this.creatorId.equals(userId)) {
+            throw new InvalidStateException(RECORD_ACCESS_FORBIDDEN, new IllegalArgumentException("기록 작성자만 기록을 수정/삭제할 수 있습니다."));
+        }
+    }
+
+    public void validateDeletable(Long userId) {
+        validateCreator(userId);
+    }
+
+    public void validateRoomId(Long roomId) {
+        if (!this.roomId.equals(roomId)) {
+            throw new InvalidStateException(RECORD_ACCESS_FORBIDDEN, new IllegalArgumentException("기록이 해당 방에 속하지 않습니다."));
+        }
+    }
+
 }
