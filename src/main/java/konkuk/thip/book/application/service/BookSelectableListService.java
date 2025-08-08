@@ -2,7 +2,7 @@ package konkuk.thip.book.application.service;
 
 import konkuk.thip.book.application.mapper.BookQueryMapper;
 import konkuk.thip.book.application.port.in.BookSelectableListUseCase;
-import konkuk.thip.book.application.port.in.dto.BookSelectableListResult;
+import konkuk.thip.book.application.port.in.dto.BookSelectableResult;
 import konkuk.thip.book.application.port.in.dto.BookSelectableType;
 import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.domain.Book;
@@ -19,7 +19,7 @@ public class BookSelectableListService implements BookSelectableListUseCase {
     private final BookQueryMapper bookQueryMapper;
 
     @Override
-    public List<BookSelectableListResult> getSelectableBookList(BookSelectableType bookSelectableType, Long userId) {
+    public List<BookSelectableResult> getSelectableBookList(BookSelectableType bookSelectableType, Long userId) {
         List<Book> bookList = switch(bookSelectableType) {
             case SAVED -> bookQueryPort.findSavedBooksByUserId(userId);
             case JOINING -> bookQueryPort.findJoiningRoomsBooksByUserId(userId);

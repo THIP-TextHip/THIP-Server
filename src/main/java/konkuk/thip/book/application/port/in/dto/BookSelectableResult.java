@@ -1,6 +1,6 @@
 package konkuk.thip.book.application.port.in.dto;
 
-public record BookSelectableListResult(
+public record BookSelectableResult(
         Long bookId,
         String bookTitle,
         String authorName,
