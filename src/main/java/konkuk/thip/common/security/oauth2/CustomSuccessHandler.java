@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
+import static konkuk.thip.common.security.constant.AuthParameters.*;
 
 @Slf4j
 @Component
@@ -23,12 +23,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private static final int COOKIE_MAX_AGE = 60 * 60 * 24; // 1일
 
-    @Value("${server.web-domain-url}")
+    @Value("${server.web-redirect-url}")
     private String webRedirectUrl;
 
     private final JwtUtil jwtUtil;
-    private final String signupEndPoint = "/signup/genre";
-    private final String homeEndPoint = "/feed";
 
     @Override
     public void onAuthenticationSuccess(
@@ -44,12 +42,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 신규 유저 - 회원가입용 임시 토큰
             String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id());
             addTokenCookie(response, tempToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + signupEndPoint);
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL);
         } else {
             // 기존 유저 - 로그인용 액세스 토큰
             String accessToken = jwtUtil.createAccessToken(loginUser.userId());
             addTokenCookie(response, accessToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + homeEndPoint);
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL);
         }
     }
 
