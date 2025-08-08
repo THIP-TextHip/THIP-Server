@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
-import static konkuk.thip.common.post.PostType.FEED;
+import static konkuk.thip.common.post.PostType.RECORD;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,7 +74,7 @@ class RecordDeleteAPITest {
         record = recordJpaRepository.save(TestEntityFactory.createRecord(user,room));
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
         postLikeJpaRepository.save(TestEntityFactory.createPostLike(user,record));
-        comment = commentJpaRepository.save(TestEntityFactory.createComment(record, user, FEED));
+        comment = commentJpaRepository.save(TestEntityFactory.createComment(record, user, RECORD));
         commentLikeJpaRepository.save(TestEntityFactory.createCommentLike(comment,user));
         record.updateLikeCount(1);
         record.updateCommentCount(1);
