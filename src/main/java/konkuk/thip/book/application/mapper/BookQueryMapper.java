@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
-import java.util.Set;
 
 @Mapper(
         componentModel = "spring",
@@ -35,5 +34,5 @@ public interface BookQueryMapper {
     @Mapping(target = "isbn", source = "book.isbn")
     BookInfo toBookInfo(Book book);
 
-    List<BookInfo> toBookInfoList(Set<Book> books);
+    List<BookInfo> toBookInfoList(List<Book> books);
 }

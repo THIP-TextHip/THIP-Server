@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +20,11 @@ public class BookSelectableListService implements BookSelectableListUseCase {
 
     @Override
     public List<BookInfo> getSelectableBookList(BookSelectableType bookSelectableType, Long userId) {
-        List<Book> bookSet = switch(bookSelectableType) {
+        List<Book> bookList = switch(bookSelectableType) {
             case SAVED -> bookQueryPort.findSavedBooksByUserId(userId);
             case JOINING -> bookQueryPort.findJoiningRoomsBooksByUserId(userId);
         };
 
-        return bookQueryMapper.toBookInfoList(bookSet);
+        return bookQueryMapper.toBookInfoList(bookList);
     }
 }
