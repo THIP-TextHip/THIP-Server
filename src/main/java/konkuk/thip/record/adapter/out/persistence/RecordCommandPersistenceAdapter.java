@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -43,8 +44,17 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
     @Override
     public Optional<Record> findById(Long id) {
-        return recordJpaRepository.findById(id)
+        return recordJpaRepository.findByPostIdAndStatus(id, ACTIVE)
                 .map(recordMapper::toDomainEntity);
+    }
+
+    @Override
+    public void delete(Record record) {
+        RecordJpaEntity recordJpaEntity = recordJpaRepository.findById(record.getId()).orElseThrow(
+                () -> new EntityNotFoundException(RECORD_NOT_FOUND)
+        );
+
+        recordJpaRepository.delete(recordJpaEntity);
     }
 
     @Override
