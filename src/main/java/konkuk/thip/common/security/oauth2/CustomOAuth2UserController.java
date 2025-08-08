@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-import static konkuk.thip.common.security.constant.AuthParameters.*;
-
 @RestController
 @RequiredArgsConstructor
 public class CustomOAuth2UserController {
@@ -36,12 +34,12 @@ public class CustomOAuth2UserController {
                 .map(user -> {
                     // 기존 유저: AccessToken 발급
                     String accessToken = jwtUtil.createAccessToken(user.getUserId());
-                    return BaseResponse.ok(OAuth2TokenResponse.of(JWT_PREFIX.getValue() + accessToken,false));
+                    return BaseResponse.ok(OAuth2TokenResponse.of(accessToken,false));
                 })
                 .orElseGet(() -> {
                     // 신규 유저: SignupToken 발급
                     String tempToken = jwtUtil.createSignupToken(oauth2Id);
-                    return BaseResponse.ok(OAuth2TokenResponse.of(JWT_PREFIX.getValue() + tempToken, true));
+                    return BaseResponse.ok(OAuth2TokenResponse.of(tempToken, true));
                 });
     }
 }
