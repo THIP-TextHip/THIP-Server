@@ -49,6 +49,8 @@ class CommentShowAllApiTest {
     @Autowired private CommentLikeJpaRepository commentLikeJpaRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
 
+    private static final String FEED_POST_TYPE = PostType.FEED.getType();
+
     @AfterEach
     void tearDown() {
         commentLikeJpaRepository.deleteAllInBatch();
@@ -92,7 +94,8 @@ class CommentShowAllApiTest {
 
         //when //then
         mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
-                        .requestAttr("userId", me.getUserId()))
+                        .requestAttr("userId", me.getUserId())
+                        .param("postType", FEED_POST_TYPE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.commentList", hasSize(1)))
                 /**
@@ -160,7 +163,8 @@ class CommentShowAllApiTest {
 
         //when //then
         mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
-                        .requestAttr("userId", me.getUserId()))
+                        .requestAttr("userId", me.getUserId())
+                        .param("postType", FEED_POST_TYPE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.commentList", hasSize(2)))
                 /**
@@ -225,7 +229,8 @@ class CommentShowAllApiTest {
 
         //when //then
         mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
-                        .requestAttr("userId", me.getUserId()))
+                        .requestAttr("userId", me.getUserId())
+                        .param("postType", FEED_POST_TYPE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.commentList", hasSize(1)))      // comment1 만 조회된다
                 /**
@@ -317,7 +322,8 @@ class CommentShowAllApiTest {
 
         //when //then
         MvcResult firstResult = mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
-                        .requestAttr("userId", me.getUserId()))
+                        .requestAttr("userId", me.getUserId())
+                        .param("postType", FEED_POST_TYPE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nextCursor", notNullValue()))
                 .andExpect(jsonPath("$.data.isLast", is(false)))
@@ -344,6 +350,7 @@ class CommentShowAllApiTest {
 
         mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
                         .requestAttr("userId", me.getUserId())
+                        .param("postType", FEED_POST_TYPE)
                         .param("cursor", nextCursor))       // 2페이지 요청
 
                 .andExpect(status().isOk())
