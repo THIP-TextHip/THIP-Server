@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,7 +35,12 @@ public class CommentQueryPersistenceAdapter implements CommentQueryPort {
     }
 
     @Override
-    public List<CommentQueryDto> findAllActiveChildrenComments(Long rootCommentId) {
-        return commentJpaRepository.findAllActiveChildrenCommentsByCreatedAtAsc(rootCommentId);
+    public List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId) {
+        return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentId);
+    }
+
+    @Override
+    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds) {
+        return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentIds);
     }
 }
