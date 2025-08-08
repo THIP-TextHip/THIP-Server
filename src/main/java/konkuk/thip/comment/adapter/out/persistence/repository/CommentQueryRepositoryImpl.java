@@ -65,7 +65,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     }
 
     @Override
-    public List<CommentQueryDto> findAllActiveChildrenCommentsByCreatedAtAsc(Long rootCommentId) {
+    public List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId) {
         List<CommentQueryDto> allDescendants = new ArrayList<>();       // 결과 누적용 리스트
 
         // 1) 부모 ID 집합에 루트 댓글 ID 추가
@@ -115,5 +115,74 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         // 5) 전체 자손 댓글을 깊이와 상관없이 작성 순으로 재정렬
         allDescendants.sort(Comparator.comparing(CommentQueryDto::createdAt));
         return allDescendants;
+    }
+
+    @Override
+    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsByCreatedAtAsc(Set<Long> rootCommentIds) {
+        // 1) 루트 ID별로 최상위 매핑 초기화
+        Map<Long, Long> idToRoot = new HashMap<>();
+        for (Long rootId : rootCommentIds) {
+            idToRoot.put(rootId, rootId);       // 초기화
+        }
+
+        // 2) 결과 맵 초기화
+        Map<Long, List<CommentQueryDto>> resultMap = new HashMap<>();
+        for (Long rootId : rootCommentIds) {
+            resultMap.put(rootId, new ArrayList<>());
+        }
+
+        // 3) 단계별 조회용 parentIds 초기화
+        Set<Long> parentIds = new HashSet<>(rootCommentIds);
+
+        // 4) 자손 댓글용 프로젝션 정의
+        QCommentQueryDto childProj = new QCommentQueryDto(
+                comment.commentId,
+                comment.parent.commentId,
+                parentCommentCreator.nickname,
+                commentCreator.userId,
+                aliasOfCommentCreator.imageUrl,
+                commentCreator.nickname,
+                aliasOfCommentCreator.value,
+                aliasOfCommentCreator.color,
+                comment.createdAt,
+                comment.content,
+                comment.likeCount,
+                comment.status.eq(StatusType.INACTIVE)
+        );
+
+        // 5) 루프를 돌며 모든 깊이의 자식 댓글 조회 및 매핑
+        while (!parentIds.isEmpty()) {
+            List<CommentQueryDto> children = queryFactory
+                    .select(childProj)
+                    .from(comment)
+                    .leftJoin(comment.parent, parentComment)
+                    .leftJoin(parentComment.userJpaEntity, parentCommentCreator)
+                    .leftJoin(comment.userJpaEntity, commentCreator)
+                    .leftJoin(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
+                    .where(
+                            comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
+                            comment.status.eq(StatusType.ACTIVE)        // 자식 댓글은 ACTIVE인 것만 조회
+                    )
+                    .fetch();
+
+            if (children.isEmpty()) break;
+
+            Set<Long> nextParentIds = new HashSet<>();
+            for (CommentQueryDto child : children) {    // 조회한 자식 댓글들에 대하여
+                Long rootId = idToRoot.get(child.parentCommentId());    // 현재 자식댓글의 루트 댓글(부모 아님, 루트임)
+
+                resultMap.get(rootId).add(child);   // 해당 루트 ID의 리스트에 자식 댓글 추가
+
+                // 현재 자식 댓글도 다음 단계의 parentIds로 사용하기 위해 매핑 저장
+                idToRoot.put(child.commentId(), rootId);
+                nextParentIds.add(child.commentId());
+            }
+            parentIds = nextParentIds;  // 한단계 아래 계층에서 활용할 부모 댓글들
+        }
+
+        // 6) 각 루트별 value 리스트를 작성시간순으로 정렬
+        resultMap.values().forEach(list -> list.sort(Comparator.comparing(CommentQueryDto::createdAt)));
+
+        return resultMap;
     }
 }
