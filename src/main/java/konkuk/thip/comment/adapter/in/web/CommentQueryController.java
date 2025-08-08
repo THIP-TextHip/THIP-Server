@@ -31,7 +31,7 @@ public class CommentQueryController {
             @Parameter(description = "댓글을 조회할 게시글(= FEED, RECORD, VOTE)의 id값")
             @PathVariable("postId") final Long postId,
             @Parameter(description = "게시물 타입 (RECORD, VOTE, FEED)", example = "RECORD")
-            @RequestParam(value = "postType", required = false) final String postType,      // 이거 우짤지 ??
+            @RequestParam(value = "postType") final String postType,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(commentShowAllUseCase.showAllCommentsOfPost(
