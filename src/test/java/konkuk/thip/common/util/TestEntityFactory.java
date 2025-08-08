@@ -186,12 +186,41 @@ public class TestEntityFactory {
                 .build();
     }
 
+    /**
+     * 댓글 내용, likeCount 커스텀
+     */
+    public static CommentJpaEntity createComment(PostJpaEntity post, UserJpaEntity user,PostType postType, String content, int likeCount) {
+        return CommentJpaEntity.builder()
+                .content(content)
+                .postJpaEntity(post)
+                .userJpaEntity(user)
+                .likeCount(likeCount)
+                .reportCount(0)
+                .postType(postType)
+                .build();
+    }
+
     public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user,PostType postType,CommentJpaEntity parentComment) {
         return CommentJpaEntity.builder()
                 .content("댓글 내용")
                 .postJpaEntity(post)
                 .userJpaEntity(user)
                 .likeCount(0)
+                .reportCount(0)
+                .postType(postType)
+                .parent(parentComment)
+                .build();
+    }
+
+    /**
+     * 자식 댓글 내용, likeCount 커스텀
+     */
+    public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user, PostType postType, CommentJpaEntity parentComment, String content, int likeCount) {
+        return CommentJpaEntity.builder()
+                .content(content)
+                .postJpaEntity(post)
+                .userJpaEntity(user)
+                .likeCount(likeCount)
                 .reportCount(0)
                 .postType(postType)
                 .parent(parentComment)

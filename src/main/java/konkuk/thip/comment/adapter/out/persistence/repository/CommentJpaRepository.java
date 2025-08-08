@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface CommentJpaRepository extends JpaRepository<CommentJpaEntity, Long> {
+public interface CommentJpaRepository extends JpaRepository<CommentJpaEntity, Long>, CommentQueryRepository {
     Optional<CommentJpaEntity> findByCommentIdAndStatus(Long commentId, StatusType status);
 }
