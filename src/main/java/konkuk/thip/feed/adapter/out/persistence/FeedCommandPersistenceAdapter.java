@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -40,13 +41,12 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
     @Override
     public Optional<Feed> findById(Long id) {
-        return feedJpaRepository.findById(id)
+        return feedJpaRepository.findByPostIdAndStatus(id, ACTIVE)
                 .map(feedJpaEntity -> {
                     List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
                     return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
                 });
     }
-
 
     @Override
     public Long save(Feed feed) {
@@ -108,4 +108,11 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         }
     }
 
+    @Override
+    public void delete(Feed feed) {
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getId())
+                .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
+
+        feedJpaRepository.delete(feedJpaEntity);
+    }
 }
