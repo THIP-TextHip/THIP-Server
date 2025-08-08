@@ -131,6 +131,11 @@ public enum SwaggerResponseDescription {
             BOOK_NOT_FOUND,
             ROOM_ACCESS_FORBIDDEN
     ))),
+    RECORD_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            RECORD_NOT_FOUND,
+            RECORD_ACCESS_FORBIDDEN
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(
