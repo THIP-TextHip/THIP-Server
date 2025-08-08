@@ -347,4 +347,21 @@ class FeedTest {
         assertDoesNotThrow(() -> feed.validateLike(CREATOR_ID));
     }
 
+    @Test
+    @DisplayName("validateDeletable: 작성자가 아닌 경우 피드를 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byNonCreator_throws(){
+        Feed feed = createPublicFeed();
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> feed.validateDeletable(OTHER_USER_ID));
+
+        assertEquals(FEED_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 피드의 작성자인 경우 피드를 삭제 할 수 있다.")
+    void validateDeletable_byCreator_Success(){
+        Feed feed = createPublicFeed();
+        assertDoesNotThrow(() -> feed.validateCreateComment(CREATOR_ID));
+    }
+
 }
