@@ -1,13 +1,13 @@
 package konkuk.thip.book.adapter.in.web.response;
 
-import konkuk.thip.book.application.port.in.dto.BookInfo;
+import konkuk.thip.book.application.port.in.dto.BookSelectableListResult;
 
 import java.util.List;
 
 public record BookSelectableListResponse(
-        List<BookInfo> bookList
+        List<BookSelectableListResult> bookList
 ) {
-    public static BookSelectableListResponse of(List<BookInfo> bookInfos) {
-        return new BookSelectableListResponse(bookInfos);
+    public static BookSelectableListResponse of(List<BookSelectableListResult> bookSelectableListResults) {
+        return new BookSelectableListResponse(bookSelectableListResults);
     }
 }

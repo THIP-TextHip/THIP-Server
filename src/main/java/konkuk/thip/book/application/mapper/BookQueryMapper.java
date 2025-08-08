@@ -1,7 +1,7 @@
 package konkuk.thip.book.application.mapper;
 
 import konkuk.thip.book.adapter.in.web.response.BookRecruitingRoomsResponse;
-import konkuk.thip.book.application.port.in.dto.BookInfo;
+import konkuk.thip.book.application.port.in.dto.BookSelectableListResult;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
@@ -32,7 +32,7 @@ public interface BookQueryMapper {
     @Mapping(target = "publisher", source = "book.publisher")
     @Mapping(target = "bookImageUrl", source = "book.imageUrl")
     @Mapping(target = "isbn", source = "book.isbn")
-    BookInfo toBookInfo(Book book);
+    BookSelectableListResult toBookInfo(Book book);
 
-    List<BookInfo> toBookInfoList(List<Book> books);
+    List<BookSelectableListResult> toBookInfoList(List<Book> books);
 }
