@@ -24,6 +24,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Collections;
 import java.util.List;
 
+import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -103,7 +105,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
-        config.setExposedHeaders(Collections.singletonList("Authorization"));
+        config.setExposedHeaders(Collections.singletonList(JWT_HEADER_KEY.getValue()));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
