@@ -16,4 +16,5 @@ public interface FeedCommandPort {
         return findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
     }
+    void delete(Feed feed);
 }
