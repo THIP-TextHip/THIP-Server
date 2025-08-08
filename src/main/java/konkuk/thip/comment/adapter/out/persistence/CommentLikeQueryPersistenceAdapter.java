@@ -8,6 +8,8 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 @Repository
 @RequiredArgsConstructor
 public class CommentLikeQueryPersistenceAdapter implements CommentLikeQueryPort {
@@ -20,5 +22,10 @@ public class CommentLikeQueryPersistenceAdapter implements CommentLikeQueryPort 
     @Override
     public boolean isLikedCommentByUser(Long userId, Long commentId) {
         return commentLikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
+    }
+
+    @Override
+    public Set<Long> findCommentIdsLikedByUser(Set<Long> commentIds, Long userId) {
+        return commentLikeJpaRepository.findCommentIdsLikedByUser(commentIds, userId);
     }
 }
