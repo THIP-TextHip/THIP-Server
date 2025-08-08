@@ -10,13 +10,13 @@ import java.util.Optional;
 public interface BookJpaRepository extends JpaRepository<BookJpaEntity, Long> {
     Optional<BookJpaEntity> findByIsbn(String isbn);
 
-    @Query("SELECT b FROM BookJpaEntity b " +
+    @Query("SELECT DISTINCT b FROM BookJpaEntity b " +
             "JOIN SavedBookJpaEntity s ON s.bookJpaEntity.bookId = b.bookId " +
             "WHERE s.userJpaEntity.userId = :userId " +
             "ORDER BY s.createdAt DESC")
     List<BookJpaEntity> findSavedBooksByUserId(Long userId);
 
-    @Query("SELECT b FROM BookJpaEntity b " +
+    @Query("SELECT DISTINCT b FROM BookJpaEntity b " +
             "JOIN RoomJpaEntity r ON r.bookJpaEntity.bookId = b.bookId " +
             "JOIN RoomParticipantJpaEntity rp ON rp.roomJpaEntity.roomId = r.roomId " +
             "WHERE rp.userJpaEntity.userId = :userId " +

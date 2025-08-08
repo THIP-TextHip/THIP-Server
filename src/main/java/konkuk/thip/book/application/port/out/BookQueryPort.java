@@ -2,13 +2,13 @@ package konkuk.thip.book.application.port.out;
 
 import konkuk.thip.book.domain.Book;
 
-import java.util.Set;
+import java.util.List;
 
 public interface BookQueryPort {
 
     boolean existsSavedBookByUserIdAndBookId(Long userId, Long bookId);
 
-    Set<Book> findSavedBooksByUserId(Long userId);
+    List<Book> findSavedBooksByUserId(Long userId);
 
-    Set<Book> findJoiningRoomsBooksByUserId(Long userId);
+    List<Book> findJoiningRoomsBooksByUserId(Long userId);
 }

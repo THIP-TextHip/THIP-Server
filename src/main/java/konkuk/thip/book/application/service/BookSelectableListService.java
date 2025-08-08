@@ -21,7 +21,7 @@ public class BookSelectableListService implements BookSelectableListUseCase {
 
     @Override
     public List<BookInfo> getSelectableBookList(BookSelectableType bookSelectableType, Long userId) {
-        Set<Book> bookSet = switch(bookSelectableType) {
+        List<Book> bookSet = switch(bookSelectableType) {
             case SAVED -> bookQueryPort.findSavedBooksByUserId(userId);
             case JOINING -> bookQueryPort.findJoiningRoomsBooksByUserId(userId);
         };

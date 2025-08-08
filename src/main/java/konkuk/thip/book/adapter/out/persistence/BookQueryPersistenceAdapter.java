@@ -11,7 +11,7 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -31,23 +31,23 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
     }
 
     @Override
-    public Set<Book> findSavedBooksByUserId(Long userId) {
+    public List<Book> findSavedBooksByUserId(Long userId) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return bookJpaRepository.findSavedBooksByUserId(user.getUserId()).stream()
                 .map(bookMapper::toDomainEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Set<Book> findJoiningRoomsBooksByUserId(Long userId) {
+    public List<Book> findJoiningRoomsBooksByUserId(Long userId) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return bookJpaRepository.findJoiningRoomsBooksByUserId(user.getUserId())
                 .stream()
                 .map(bookMapper::toDomainEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 }
