@@ -8,6 +8,7 @@ import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.domain.Book;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class BookSelectableListService implements BookSelectableListUseCase {
     private final BookQueryMapper bookQueryMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookSelectableResult> getSelectableBookList(BookSelectableType bookSelectableType, Long userId) {
         List<Book> bookList = switch(bookSelectableType) {
             case SAVED -> bookQueryPort.findSavedBooksByUserId(userId);
