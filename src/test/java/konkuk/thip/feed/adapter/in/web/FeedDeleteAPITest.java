@@ -104,7 +104,7 @@ class FeedDeleteAPITest {
         feedJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        tagJpaRepository.deleteAllInBatch();;
+        tagJpaRepository.deleteAllInBatch();
         categoryJpaRepository.deleteAllInBatch();
         aliasJpaRepository.deleteAllInBatch();
     }

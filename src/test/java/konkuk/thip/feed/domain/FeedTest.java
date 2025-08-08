@@ -361,7 +361,7 @@ class FeedTest {
     @DisplayName("validateDeletable: 피드의 작성자인 경우 피드를 삭제 할 수 있다.")
     void validateDeletable_byCreator_Success(){
         Feed feed = createPublicFeed();
-        assertDoesNotThrow(() -> feed.validateCreateComment(CREATOR_ID));
+        assertDoesNotThrow(() -> feed.validateDeletable(CREATOR_ID));
     }
 
 }
