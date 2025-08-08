@@ -15,4 +15,12 @@ public class AttendanceCheck extends BaseDomainEntity {
     private Long roomId;
 
     private Long creatorId;
+
+    public static AttendanceCheck withoutId(Long roomId, Long creatorId, String todayComment) {
+        return AttendanceCheck.builder()
+                .roomId(roomId)
+                .creatorId(creatorId)
+                .todayComment(todayComment)
+                .build();
+    }
 }
