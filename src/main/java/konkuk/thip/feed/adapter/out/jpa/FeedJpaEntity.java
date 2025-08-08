@@ -43,7 +43,7 @@ public class FeedJpaEntity extends PostJpaEntity {
     @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SavedFeedJpaEntity> savedFeeds = new ArrayList<>();
 
-    // 삭제요 피드 태그 양방향 매핑 관계
+    // 삭제용 피드 태그 양방향 매핑 관계
     @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<FeedTagJpaEntity> feedTags = new ArrayList<>();
 
