@@ -1,4 +1,4 @@
-package konkuk.thip.common.security.oauth2;
+package konkuk.thip.common.security.oauth2.dto;
 
 public record OAuth2TokenResponse(
         String token,
