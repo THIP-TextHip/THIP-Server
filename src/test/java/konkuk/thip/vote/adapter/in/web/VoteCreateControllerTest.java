@@ -78,7 +78,7 @@ class VoteCreateControllerTest {
     @AfterEach
     void tearDown() {
         voteItemJpaRepository.deleteAll();
-        voteJpaRepository.deleteAll();
+        voteJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
