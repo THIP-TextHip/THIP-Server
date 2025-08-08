@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,21 +32,15 @@ public class CommentShowAllService implements CommentShowAllUseCase {
         CursorBasedList<CommentQueryDto> commentQueryDtoCursorBasedList = commentQueryPort.findLatestRootCommentsWithDeleted(query.postId(), cursor);
         List<CommentQueryDto> rootsInOrder = commentQueryDtoCursorBasedList.contents();
 
-        // 2. 조회한 루트 댓글의 전체 active 답글들 작성순 조회 -> map 구조로 저장
-        Set<Long> allCommentIds = new HashSet<>();      // 반환할 모든 댓글들의 id set
-        Map<Long, List<CommentQueryDto>> childrenMap = new HashMap<>();
-        for (CommentQueryDto root : rootsInOrder) {
-            List<CommentQueryDto> allActiveChildrenInOrder = commentQueryPort.findAllActiveChildrenComments(root.commentId());
+        // 2. 조회한 루트 댓글들의 전체 자식 댓귿들을(깊이 무관) 작성 시간순으로 조회
+        Set<Long> rootCommentIds = rootsInOrder.stream()
+                .map(CommentQueryDto::commentId)
+                .collect(Collectors.toUnmodifiableSet());
 
-            childrenMap.put(root.commentId(), allActiveChildrenInOrder);
-
-            allCommentIds.add(root.commentId());
-            allActiveChildrenInOrder.stream()
-                    .map(CommentQueryDto::commentId)
-                    .forEach(allCommentIds::add);
-        }
-
+        Map<Long, List<CommentQueryDto>> childrenMap = commentQueryPort.findAllActiveChildCommentsOldestFirst(rootCommentIds);
+        
         // 3. 반환할 모든 댓글(루트 + 자식 모두 포함) 중 유저가 좋아한 댓글 조회
+        Set<Long> allCommentIds = parseAllCommentIds(childrenMap);
         Set<Long> likedCommentIds = commentLikeQueryPort.findCommentIdsLikedByUser(allCommentIds, query.userId());
 
         // 4. response 매핑
@@ -56,6 +51,16 @@ public class CommentShowAllService implements CommentShowAllUseCase {
                 commentQueryDtoCursorBasedList.nextCursor(),
                 commentQueryDtoCursorBasedList.isLast()
         );
+    }
+
+    private Set<Long> parseAllCommentIds(Map<Long, List<CommentQueryDto>> childrenMap) {
+        Set<Long> allCommentIds = new HashSet<>(childrenMap.keySet());  // 루트 댓글들
+        for (Long rootCommentId : childrenMap.keySet()) {
+            childrenMap.get(rootCommentId).stream()
+                    .map(CommentQueryDto::commentId)
+                    .forEach(allCommentIds::add);
+        }
+        return allCommentIds;
     }
 
     private List<CommentForSinglePostResponse.RootCommentDto> buildRootCommentResponses(
