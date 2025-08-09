@@ -1,4 +1,4 @@
-package konkuk.thip.saved.application.port.out.dto;
+package konkuk.thip.feed.application.port.out.dto;
 
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 

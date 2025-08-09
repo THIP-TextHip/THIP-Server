@@ -4,13 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
-import konkuk.thip.book.adapter.in.web.response.BookDetailSearchResponse;
-import konkuk.thip.book.adapter.in.web.response.BookMostSearchResponse;
-import konkuk.thip.book.adapter.in.web.response.BookRecruitingRoomsResponse;
-import konkuk.thip.book.adapter.in.web.response.BookSearchListResponse;
+import konkuk.thip.book.adapter.in.web.response.*;
 import konkuk.thip.book.application.port.in.BookMostSearchUseCase;
 import konkuk.thip.book.application.port.in.BookRecruitingRoomsUseCase;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
+import konkuk.thip.book.application.port.in.BookSelectableListUseCase;
+import konkuk.thip.book.application.port.in.dto.BookSelectableType;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -32,6 +31,7 @@ public class BookQueryController {
     private final BookSearchUseCase bookSearchUseCase;
     private final BookMostSearchUseCase bookMostSearchUseCase;
     private final BookRecruitingRoomsUseCase bookRecruitingRoomsUseCase;
+    private final BookSelectableListUseCase bookSelectableListUseCase;
 
     @Operation(
             summary = "책 검색결과 조회",
@@ -85,6 +85,21 @@ public class BookQueryController {
             @RequestParam(required = false) final String cursor
     ) {
         return BaseResponse.ok(bookRecruitingRoomsUseCase.getRecruitingRoomsWithBook(isbn, cursor));
+    }
+
+    @Operation(
+            summary = "저장한 책 또는 참여 중 모임의 책 조회",
+            description = "저장한 책 또는 참여 중인 모임의 책을 조회합니다. (방 생성시 책 선택 화면 페이지)"
+    )
+    @ExceptionDescription(BOOK_SELECTABLE_LIST)
+    @GetMapping("/books/selectable-list")
+    public BaseResponse<BookSelectableListResponse> showSelectableBookList(
+            @Parameter(description = "저장한 책 또는 참여 중인 모임의 책을 구분하는 필드 (SAVED : 저장한 책 / JOINING : 모임 방의 책)", example = "SAVED") @RequestParam final String type,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(
+                BookSelectableListResponse.of(bookSelectableListUseCase.getSelectableBookList(BookSelectableType.from(type), userId))
+        );
     }
 
 }

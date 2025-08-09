@@ -1,18 +1,17 @@
-package konkuk.thip.saved.adapter.out.jpa;
+package konkuk.thip.book.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "saved_feeds")
+@Table(name = "saved_books")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class SavedFeedJpaEntity extends BaseJpaEntity {
+public class SavedBookJpaEntity extends BaseJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +22,6 @@ public class SavedFeedJpaEntity extends BaseJpaEntity {
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private FeedJpaEntity feedJpaEntity;
+    @JoinColumn(name = "book_id")
+    private BookJpaEntity bookJpaEntity;
 }

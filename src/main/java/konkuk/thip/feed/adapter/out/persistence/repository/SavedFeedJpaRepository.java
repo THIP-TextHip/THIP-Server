@@ -1,6 +1,6 @@
-package konkuk.thip.saved.adapter.out.persistence.repository;
+package konkuk.thip.feed.adapter.out.persistence.repository;
 
-import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

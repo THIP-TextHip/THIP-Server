@@ -2,7 +2,7 @@ package konkuk.thip.feed.adapter.out.persistence.repository.FeedTag;
 
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
-import konkuk.thip.saved.application.port.out.dto.FeedIdAndTagProjection;
+import konkuk.thip.feed.application.port.out.dto.FeedIdAndTagProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
