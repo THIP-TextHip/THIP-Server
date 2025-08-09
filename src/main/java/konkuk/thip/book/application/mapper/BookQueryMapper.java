@@ -32,7 +32,7 @@ public interface BookQueryMapper {
     @Mapping(target = "publisher", source = "book.publisher")
     @Mapping(target = "bookImageUrl", source = "book.imageUrl")
     @Mapping(target = "isbn", source = "book.isbn")
-    BookSelectableResult toBookInfo(Book book);
+    BookSelectableResult toBookSelectableResult(Book book);
 
-    List<BookSelectableResult> toBookInfoList(List<Book> books);
+    List<BookSelectableResult> toBookSelectableResultList(List<Book> books);
 }

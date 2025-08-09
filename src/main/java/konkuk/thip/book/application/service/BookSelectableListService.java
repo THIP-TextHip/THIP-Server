@@ -27,6 +27,6 @@ public class BookSelectableListService implements BookSelectableListUseCase {
             case JOINING -> bookQueryPort.findJoiningRoomsBooksByUserId(userId);
         };
 
-        return bookQueryMapper.toBookInfoList(bookList);
+        return bookQueryMapper.toBookSelectableResultList(bookList);
     }
 }
