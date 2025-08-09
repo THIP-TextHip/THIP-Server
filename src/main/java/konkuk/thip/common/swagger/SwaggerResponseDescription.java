@@ -265,7 +265,9 @@ public enum SwaggerResponseDescription {
 
     // Attendance Check
     ATTENDANCE_CHECK_CREATE(new LinkedHashSet<>(Set.of(
-            ROOM_ACCESS_FORBIDDEN
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_NOT_FOUND,
+            USER_NOT_FOUND
     ))),
 
   ;
