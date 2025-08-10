@@ -1,6 +1,7 @@
 package konkuk.thip.common.util;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
 import konkuk.thip.common.post.PostType;
@@ -16,7 +17,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.domain.Category;
-import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -186,12 +187,41 @@ public class TestEntityFactory {
                 .build();
     }
 
+    /**
+     * 댓글 내용, likeCount 커스텀
+     */
+    public static CommentJpaEntity createComment(PostJpaEntity post, UserJpaEntity user,PostType postType, String content, int likeCount) {
+        return CommentJpaEntity.builder()
+                .content(content)
+                .postJpaEntity(post)
+                .userJpaEntity(user)
+                .likeCount(likeCount)
+                .reportCount(0)
+                .postType(postType)
+                .build();
+    }
+
     public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user,PostType postType,CommentJpaEntity parentComment) {
         return CommentJpaEntity.builder()
                 .content("댓글 내용")
                 .postJpaEntity(post)
                 .userJpaEntity(user)
                 .likeCount(0)
+                .reportCount(0)
+                .postType(postType)
+                .parent(parentComment)
+                .build();
+    }
+
+    /**
+     * 자식 댓글 내용, likeCount 커스텀
+     */
+    public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user, PostType postType, CommentJpaEntity parentComment, String content, int likeCount) {
+        return CommentJpaEntity.builder()
+                .content(content)
+                .postJpaEntity(post)
+                .userJpaEntity(user)
+                .likeCount(likeCount)
                 .reportCount(0)
                 .postType(postType)
                 .parent(parentComment)
@@ -319,6 +349,13 @@ public class TestEntityFactory {
         return PostLikeJpaEntity.builder()
                 .userJpaEntity(user)
                 .postJpaEntity(post)
+                .build();
+    }
+
+    public static SavedBookJpaEntity createSavedBook(UserJpaEntity user, BookJpaEntity book) {
+        return SavedBookJpaEntity.builder()
+                .userJpaEntity(user)
+                .bookJpaEntity(book)
                 .build();
     }
 }

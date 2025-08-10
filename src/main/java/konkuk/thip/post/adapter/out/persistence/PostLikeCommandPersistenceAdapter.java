@@ -44,6 +44,11 @@ public class PostLikeCommandPersistenceAdapter implements PostLikeCommandPort {
         postLikeJpaRepository.deleteByUserIdAndPostId(userId, postId);
     }
 
+    @Override
+    public void deleteAllByPostId(Long postId) {
+        postLikeJpaRepository.deleteAllByPostId(postId);
+    }
+
 
     private PostJpaEntity findPostJpaEntity(PostType postType, Long postId) {
         return switch (postType) {

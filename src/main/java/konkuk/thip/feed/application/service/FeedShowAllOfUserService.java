@@ -9,7 +9,6 @@ import konkuk.thip.feed.application.port.in.FeedShowAllOfUserUseCase;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
-import konkuk.thip.saved.application.port.out.SavedQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +23,6 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
 
     private static final int PAGE_SIZE = 10;
     private final FeedQueryPort feedQueryPort;
-    private final SavedQueryPort savedQueryPort;
     private final PostLikeQueryPort postLikeQueryPort;
     private final FeedQueryMapper feedQueryMapper;
 
@@ -57,7 +55,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
                 .collect(Collectors.toUnmodifiableSet());
 
         // 3. 유저가 저장한 피드들, 좋아한 피드들 조회
-        Set<Long> savedFeedIdsByUser = savedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(feedIds, userId);
+        Set<Long> savedFeedIdsByUser = feedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(feedIds, userId);
         Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
 
         // 4. response 로의 매핑

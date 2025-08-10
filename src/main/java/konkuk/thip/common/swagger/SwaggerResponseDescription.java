@@ -265,6 +265,9 @@ public enum SwaggerResponseDescription {
             USER_NOT_FOUND,
             JSON_PROCESSING_ERROR
     ))),
+    BOOK_SELECTABLE_LIST(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND
+    ))),
 
     // Recent Search
     RECENT_SEARCH_DELETE(new LinkedHashSet<>(Set.of(

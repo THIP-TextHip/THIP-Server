@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
+  pull-requests: write
 
 env:
   RESOURCE_PATH: src/main/resources
@@ -18,13 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-#      - name: Cache Gradle packages
-#        uses: actions/cache@v3
-#        with:
-#          path: ~/.gradle/caches
-#          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#          restore-keys: gradle-${{ runner.os }}-
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -50,4 +45,17 @@ jobs:
           redis-version: 7
 
       - name: 🐘 build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --parallel --stacktrace
+
+      - name: ✉️ Post test results as a comment on the PR
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/build/test-results/test/TEST-*.xml'
+
+      - name: 🙁 Annotate failed test cases on changed lines
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          token: ${{ github.token }}

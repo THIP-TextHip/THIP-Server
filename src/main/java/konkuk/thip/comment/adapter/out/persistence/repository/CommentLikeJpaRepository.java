@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEntity, Long> {
 
@@ -27,4 +28,16 @@ public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEn
     @Query("DELETE FROM CommentLikeJpaEntity cl WHERE cl.commentJpaEntity.commentId = :commentId")
     void deleteAllByCommentId(@Param("commentId") Long commentId);
 
+    @Query("SELECT c.commentJpaEntity.commentId FROM CommentLikeJpaEntity c WHERE c.userJpaEntity.userId = :userId AND c.commentJpaEntity.commentId IN :commentIds")
+    Set<Long> findCommentIdsLikedByUser(@Param("commentIds") Set<Long> commentIds, @Param("userId") Long userId);
+
+    @Modifying
+    @Query("""
+           DELETE FROM CommentLikeJpaEntity cl
+           WHERE cl.commentJpaEntity.commentId IN (
+                SELECT c.commentId FROM CommentJpaEntity c
+                WHERE c.postJpaEntity.postId = :postId
+           )
+           """)
+    void deleteAllByPostId(@Param("postId") Long postId);
 }
