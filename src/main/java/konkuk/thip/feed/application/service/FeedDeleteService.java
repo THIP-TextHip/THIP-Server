@@ -1,9 +1,11 @@
 package konkuk.thip.feed.application.service;
 
 import jakarta.transaction.Transactional;
+import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.feed.application.port.in.FeedDeleteUseCase;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 public class FeedDeleteService implements FeedDeleteUseCase {
 
     private final FeedCommandPort feedCommandPort;
+    private final CommentCommandPort commentCommandPort;
+    private final PostLikeCommandPort postLikeCommandPort;
 
     @Override
     @Transactional
@@ -25,6 +29,8 @@ public class FeedDeleteService implements FeedDeleteUseCase {
 
         // TODO S3 이미지 삭제 이벤트 기반 처리 or 배치 삭제
         // 3. 피드 삭제
+        commentCommandPort.softDeleteAllByPostId(feedId);
+        postLikeCommandPort.deleteAllByPostId(feedId);
         feedCommandPort.delete(feed);
     }
 }
