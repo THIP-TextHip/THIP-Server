@@ -99,4 +99,16 @@ public class FeedQueryController {
     ) {
         return BaseResponse.ok(feedShowSingleUseCase.showSingleFeed(feedId, userId));
     }
+
+    @Operation(
+            summary = "피드 작성을 위한 화면 조회 및 기록을 피드에 핀하기",
+            description = "기록을 피드에 핀하거나, 피드 작성시 필요한 정보들을 조회합니다 (선택한 책, 카테고리 및 하위 태그)"
+    )
+    @GetMapping("/feeds/write-info")
+    public BaseResponse<FeedWriteInfoResponse> showAnotherUserInfoInFeeds(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "피드 조회할 유저의 userId 값") @PathVariable("userId") final Long feedOwnerId
+    ) {
+        return BaseResponse.ok(feedShowUserInfoUseCase.showAnotherUserInfoInFeeds(userId, feedOwnerId));
+    }
 }
