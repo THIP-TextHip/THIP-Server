@@ -93,7 +93,6 @@ class FeedDeleteAPITest {
     }
 
     @AfterEach
-    @Transactional
     void tearDown() {
         postLikeJpaRepository.deleteAllInBatch();
         savedFeedJpaRepository.deleteAllInBatch();
