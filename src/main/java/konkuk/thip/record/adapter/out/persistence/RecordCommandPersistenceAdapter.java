@@ -54,7 +54,8 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
         );
 
-        recordJpaRepository.delete(recordJpaEntity);
+        recordJpaEntity.softDelete();
+        recordJpaRepository.save(recordJpaEntity);
     }
 
     @Override
