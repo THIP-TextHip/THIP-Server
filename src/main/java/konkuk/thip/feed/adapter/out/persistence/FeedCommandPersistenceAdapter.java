@@ -6,6 +6,7 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.adapter.out.jpa.*;
 import konkuk.thip.feed.adapter.out.mapper.ContentMapper;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
+import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -32,13 +34,16 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     private final BookJpaRepository bookJpaRepository;
     private final TagJpaRepository tagJpaRepository;
     private final FeedTagJpaRepository feedTagJpaRepository;
+    private final ContentJpaRepository contentJpaRepository;
+    private final SavedFeedJpaRepository savedFeedJpaRepository;
+
     private final FeedMapper feedMapper;
     private final ContentMapper contentMapper;
 
 
     @Override
     public Optional<Feed> findById(Long id) {
-        return feedJpaRepository.findById(id)
+        return feedJpaRepository.findByPostIdAndStatus(id,ACTIVE)
                 .map(feedJpaEntity -> {
                     List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
                     return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
@@ -129,6 +134,11 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getId())
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
 
-        feedJpaRepository.delete(feedJpaEntity);
+        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
+        contentJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
+        savedFeedJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
+
+        feedJpaEntity.softDelete();
+        feedJpaRepository.save(feedJpaEntity);
     }
 }

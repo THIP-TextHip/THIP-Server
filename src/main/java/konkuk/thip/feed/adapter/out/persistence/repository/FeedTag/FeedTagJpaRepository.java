@@ -22,4 +22,8 @@ public interface FeedTagJpaRepository extends JpaRepository<FeedTagJpaEntity, Lo
     WHERE ft.feedJpaEntity.postId IN :feedIds
     """)
     List<FeedIdAndTagProjection> findFeedIdAndTagsByFeedIds(@Param("feedIds") List<Long> feedIds);
+
+    @Modifying
+    @Query("DELETE FROM FeedTagJpaEntity ft WHERE ft.feedJpaEntity.postId = :feedId")
+    void deleteAllByFeedId(@Param("feedId") Long feedId);
 }
