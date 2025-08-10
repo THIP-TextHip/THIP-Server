@@ -50,15 +50,14 @@ public class RoomCreateService implements RoomCreateUseCase {
     }
 
     private Long resolveBookAndEnsurePage(String isbn) {
-        try {
-            Book existing = bookCommandPort.getByIsbnOrThrow(isbn);
-            if (!existing.hasPageCount()) {
-                updateBookPageCount(existing);
-            }
-            return existing.getId();
-        } catch (EntityNotFoundException e) {
-            return saveNewBookWithPageCount(isbn);
-        }
+        return bookCommandPort.findByIsbn(isbn)
+                .map(book -> {
+                    if (!book.hasPageCount()) {
+                        updateBookPageCount(book);
+                    }
+                    return book.getId();
+                })
+                .orElseGet(() -> saveNewBookWithPageCount(isbn));
     }
 
     private void updateBookPageCount(Book book) {

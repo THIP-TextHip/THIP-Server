@@ -3,6 +3,7 @@ package konkuk.thip.feed.application.port.out;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
+import konkuk.thip.feed.domain.SavedFeeds;
 
 import java.util.Set;
 
@@ -29,4 +30,11 @@ public interface FeedQueryPort {
     int countAllFeedsByUserId(Long userId);
 
     int countPublicFeedsByUserId(Long userId);
+
+    /**
+     * 저장된 피드 조회
+     */
+    SavedFeeds findSavedFeedsByUserId(Long userId);
+
+    Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId);
 }

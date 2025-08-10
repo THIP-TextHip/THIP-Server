@@ -3,14 +3,12 @@ package konkuk.thip.feed.adapter.out.persistence;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.*;
 import konkuk.thip.feed.adapter.out.mapper.ContentMapper;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
+import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -41,12 +38,13 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
     @Override
     public Optional<Feed> findById(Long id) {
-        return feedJpaRepository.findByPostIdAndStatus(id, ACTIVE)
+        return feedJpaRepository.findById(id)
                 .map(feedJpaEntity -> {
                     List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
                     return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
                 });
     }
+
 
     @Override
     public Long save(Feed feed) {
@@ -106,6 +104,24 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
             feedTagJpaRepository.save(feedTagJpaEntity);
         }
+    }
+
+    @Override
+    public void saveSavedFeed(Long userId, Long feedId) {
+        UserJpaEntity user = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        FeedJpaEntity feed = feedJpaRepository.findById(feedId)
+                .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
+        SavedFeedJpaEntity entity = SavedFeedJpaEntity.builder()
+                .userJpaEntity(user)
+                .feedJpaEntity(feed)
+                .build();
+        savedFeedJpaRepository.save(entity);
+    }
+
+    @Override
+    public void deleteSavedFeed(Long userId, Long feedId) {
+        savedFeedJpaRepository.deleteByUserIdAndFeedId(userId, feedId);
     }
 
     @Override
