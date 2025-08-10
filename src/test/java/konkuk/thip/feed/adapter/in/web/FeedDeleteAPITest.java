@@ -20,7 +20,6 @@ import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 피드 삭제 api 통합 테스트")
 class FeedDeleteAPITest {
@@ -92,21 +92,6 @@ class FeedDeleteAPITest {
         commentJpaRepository.save(comment);
     }
 
-    @AfterEach
-    void tearDown() {
-        postLikeJpaRepository.deleteAllInBatch();
-        savedFeedJpaRepository.deleteAllInBatch();
-        commentLikeJpaRepository.deleteAllInBatch();
-        commentJpaRepository.deleteAllInBatch();
-        contentJpaRepository.deleteAllInBatch();
-        feedTagJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        tagJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("피드를 삭제하면 [soft delete]되고, 연관된 피드 태그 연관관계, 콘텐츠(사진), 댓글, 댓글 좋아요, 피드 저장관계도 모두 삭제된다")
