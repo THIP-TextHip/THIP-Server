@@ -103,11 +103,12 @@ public class Record extends BaseDomainEntity implements CountUpdatable, RoomPost
         }
     }
 
-    public void validateDeletable(Long userId) {
+    public void validateDeletable(Long userId,Long roomId) {
+        validateRoomId(roomId);
         validateCreator(userId);
     }
 
-    public void validateRoomId(Long roomId) {
+    private void validateRoomId(Long roomId) {
         if (!this.roomId.equals(roomId)) {
             throw new InvalidStateException(RECORD_ACCESS_FORBIDDEN, new IllegalArgumentException("기록이 해당 방에 속하지 않습니다."));
         }
