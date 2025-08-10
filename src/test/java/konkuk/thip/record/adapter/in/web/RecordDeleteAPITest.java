@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 기록 삭제 api 통합 테스트")
 class RecordDeleteAPITest {
@@ -81,21 +82,6 @@ class RecordDeleteAPITest {
         recordJpaRepository.save(record);
         comment.updateLikeCount(1);
         commentJpaRepository.save(comment);
-    }
-
-    @AfterEach
-    @Transactional
-    void tearDown() {
-        postLikeJpaRepository.deleteAllInBatch();
-        commentLikeJpaRepository.deleteAllInBatch();
-        commentJpaRepository.deleteAllInBatch();
-        recordJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
     }
 
     @Test
