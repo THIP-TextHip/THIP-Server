@@ -6,14 +6,11 @@ import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
-import konkuk.thip.saved.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +20,6 @@ import java.util.List;
 @DiscriminatorValue("FEED")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@OnDelete(action = OnDeleteAction.CASCADE)
 public class FeedJpaEntity extends PostJpaEntity {
 
     @Column(name = "is_public", nullable = false)
