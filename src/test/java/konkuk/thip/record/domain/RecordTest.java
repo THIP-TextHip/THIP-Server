@@ -184,36 +184,26 @@ class RecordTest {
     void validateDeletable_byNonCreator_throws(){
         Record record = createWithCommentRecord();
         InvalidStateException ex = assertThrows(InvalidStateException.class,
-                () -> record.validateDeletable(OTHER_USER_ID));
+                () -> record.validateDeletable(OTHER_USER_ID,ROOM_ID));
 
         assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
     }
 
     @Test
-    @DisplayName("validateDeletable: 피드의 작성자인 경우 피드를 삭제 할 수 있다.")
-    void validateDeletable_byCreator_Success(){
+    @DisplayName("validateDeletable: 전달된 roomId가 기록의 roomId가 일치 하지않은 경우 기록을 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byOtherRoomId_throws(){
         Record record = createWithCommentRecord();
-        assertDoesNotThrow(() -> record.validateDeletable(CREATOR_ID));
-    }
-
-
-    @Test
-    @DisplayName("validateRoomId: 전달된 roomId가 일치하면 예외가 발생하지 않는다")
-    void validateRoomId_validRoom_noException() {
-        Record record =  createWithCommentRecord();
-
-        assertDoesNotThrow(() -> record.validateRoomId(ROOM_ID));
-    }
-
-    @Test
-    @DisplayName("validateRoomId: 전달된 roomId가 다르면 InvalidStateException이 발생한다.")
-    void validateRoomId_differentRoom_throwsInvalidStateException() {
-        Record record =  createWithCommentRecord();
-
         InvalidStateException ex = assertThrows(InvalidStateException.class,
-                () -> record.validateRoomId(OTHER_ROOM_ID));
+                () -> record.validateDeletable(CREATOR_ID,OTHER_ROOM_ID));
 
         assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 피드의 작성자면서, 전달된 roomId가 기록의 roomId와 일치할 경우 기록을 삭제 할 수 있다.")
+    void validateDeletable_byCreator_byRoomId_Success(){
+        Record record = createWithCommentRecord();
+        assertDoesNotThrow(() -> record.validateDeletable(CREATOR_ID,ROOM_ID));
     }
 
 }
