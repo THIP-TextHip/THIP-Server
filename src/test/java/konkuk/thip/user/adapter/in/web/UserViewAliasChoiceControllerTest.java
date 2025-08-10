@@ -75,7 +75,7 @@ class UserViewAliasChoiceControllerTest {
                 .extracting("aliasName", "categoryName", "imageUrl", "color")
                 .containsExactlyInAnyOrder(
                         tuple("문학가", "문학", "문학_image", "문학_color"),
-                        tuple("과학자", "과학/IT", "과학_image", "과학_color")
+                        tuple("과학자", "과학·IT", "과학_image", "과학_color")
                 );
     }
 

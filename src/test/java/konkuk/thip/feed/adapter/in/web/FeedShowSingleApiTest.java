@@ -84,8 +84,8 @@ class FeedShowSingleApiTest {
 
         // 피드 및 피드 태그 생성
         CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
-        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_REPORT.getValue()));
-        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_RECOMMEND.getValue()));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.PHYSICS.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.GENERAL_SCIENCE.getValue()));
         FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(feedCreator, book, true, 50, 10, List.of("content1", "content2")));      // feedCreator가 작성한 공개 피드
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(f1, t1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(f1, t2));
@@ -123,8 +123,8 @@ class FeedShowSingleApiTest {
 
         // 피드 및 피드 태그 생성
         CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
-        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_REPORT.getValue()));
-        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_RECOMMEND.getValue()));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.PHYSICS.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.GENERAL_SCIENCE.getValue()));
         FeedJpaEntity privateFeed = feedJpaRepository.save(TestEntityFactory.createFeed(feedCreator, book, false, 50, 10, List.of("content1", "content2")));      // feedCreator가 작성한 비공개 피드
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t2));
@@ -147,8 +147,8 @@ class FeedShowSingleApiTest {
 
         // 피드 및 피드 태그 생성
         CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
-        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_REPORT.getValue()));
-        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.BOOK_RECOMMEND.getValue()));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.PHYSICS.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.GENERAL_SCIENCE.getValue()));
         FeedJpaEntity privateFeed = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, false, 50, 10, List.of("content1", "content2")));      // me가 작성한 비공개 피드
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t2));
