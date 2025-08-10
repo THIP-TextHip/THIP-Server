@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.feed.domain.Tag.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -62,9 +63,9 @@ class FeedUpdateControllerTest {
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "소설추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "책추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "오늘의책"));
+        tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createTag(category,CLASSIC_LITERATURE.getValue()));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true)).getPostId();
         creatorUserId = user.getUserId();
@@ -74,7 +75,7 @@ class FeedUpdateControllerTest {
         Map<String, Object> request = new HashMap<>();
         request.put("contentBody", "수정된 테스트 콘텐츠");
         request.put("isPublic", true);
-        request.put("tagList", List.of("책추천", "소설추천"));
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue()));
         request.put("remainImageUrls", List.of());
         return request;
     }
@@ -132,7 +133,7 @@ class FeedUpdateControllerTest {
         @DisplayName("태그리스트 중 존재하지 않는 태그가 있을 때 400 반환")
         void invalidTagNames() throws Exception {
             Map<String, Object> req = buildValidUpdateRequest();
-            req.put("tagList", List.of("에세이", "휴식", "힐링"));
+            req.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(),"존재하지않는 태그"));
             mockMvc.perform(patch("/feeds/" + savedFeedId)
                             .requestAttr("userId",creatorUserId)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -141,9 +142,7 @@ class FeedUpdateControllerTest {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").value(TAG_NAME_NOT_MATCH.getCode()))
                     .andExpect(jsonPath("$.message", containsString("일치하는 태그 이름이 없습니다")))
-                    .andExpect(jsonPath("$.message", containsString("에세이")))
-                    .andExpect(jsonPath("$.message", containsString("휴식")))
-                    .andExpect(jsonPath("$.message", containsString("힐링")));
+                    .andExpect(jsonPath("$.message", containsString("존재하지않는 태그")));
         }
 
         @Test

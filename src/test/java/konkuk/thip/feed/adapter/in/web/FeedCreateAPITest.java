@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static konkuk.thip.feed.domain.Tag.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -85,9 +86,9 @@ class FeedCreateAPITest {
         alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,"소설추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,"책추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,"오늘의책"));
+        tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createTag(category,CLASSIC_LITERATURE.getValue()));
 
     }
 
@@ -115,7 +116,7 @@ class FeedCreateAPITest {
         request.put("contentBody", "이 책 정말 좋아요.");
         request.put("isPublic", true);
         request.put("category", "문학"); //실제 카테고리 값
-        request.put("tagList", List.of("소설추천", "책추천", "오늘의책")); //실제 태그 값
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
                 "request",                     // requestPart name
@@ -159,7 +160,7 @@ class FeedCreateAPITest {
         request.put("contentBody", "외부 API를 통해 등록된 책 피드입니다.");
         request.put("isPublic", true);
         request.put("category", "문학"); //실제 카테고리 값
-        request.put("tagList", List.of("소설추천", "책추천", "오늘의책")); //실제 태그 값
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
                 "request",                     // requestPart name
@@ -212,7 +213,7 @@ class FeedCreateAPITest {
         request.put("contentBody", "이미지 테스트 피드");
         request.put("isPublic", true);
         request.put("category", "문학"); //실제 카테고리 값
-        request.put("tagList", List.of("소설추천")); // 실제 태그 값
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
                 "request", "", MediaType.APPLICATION_JSON_VALUE,
@@ -272,7 +273,7 @@ class FeedCreateAPITest {
         request.put("contentBody", "이미지 없는 피드");
         request.put("isPublic", true);
         request.put("category", "문학");
-        request.put("tagList", List.of("소설추천")); // 태그 있는 상황
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
                 "request", "",
@@ -312,8 +313,7 @@ class FeedCreateAPITest {
         request.put("contentBody", "태그 매핑 테스트 중입니다.");
         request.put("isPublic", true);
         request.put("category", "문학");
-        List<String> tags = List.of("소설추천", "책추천", "오늘의책");
-        request.put("tagList", tags);
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
                 "request", "", MediaType.APPLICATION_JSON_VALUE,
