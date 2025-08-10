@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity, Long> {
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = "DELETE FROM saved_feeds WHERE user_id = :userId AND post_id = :feedId", nativeQuery = true)
     void deleteByUserIdAndFeedId(@Param("userId") Long userId, @Param("feedId") Long feedId);
 

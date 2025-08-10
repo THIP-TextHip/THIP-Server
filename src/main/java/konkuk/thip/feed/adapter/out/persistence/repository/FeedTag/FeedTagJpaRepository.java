@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface FeedTagJpaRepository extends JpaRepository<FeedTagJpaEntity, Long>{
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM FeedTagJpaEntity ft WHERE ft.feedJpaEntity = :feedJpaEntity")
     void deleteAllByFeedJpaEntity(@Param("feedJpaEntity") FeedJpaEntity feedJpaEntity);
 
