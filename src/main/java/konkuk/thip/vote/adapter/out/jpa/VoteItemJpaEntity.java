@@ -5,6 +5,9 @@ import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.vote.domain.VoteItem;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "vote_items")
 @Getter
@@ -28,6 +31,10 @@ public class VoteItemJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private VoteJpaEntity voteJpaEntity;
+
+    // 삭제용 투표 참여자 양방향 매핑 관계
+    @OneToMany(mappedBy = "voteItemJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<VoteParticipantJpaEntity> voteParticipants = new ArrayList<>();
 
     public VoteItemJpaEntity updateFrom(VoteItem voteItem) {
         this.itemName = voteItem.getItemName();

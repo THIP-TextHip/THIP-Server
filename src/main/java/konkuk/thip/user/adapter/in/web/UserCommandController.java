@@ -13,6 +13,7 @@ import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
 import konkuk.thip.user.adapter.in.web.response.UserFollowResponse;
 import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
+import konkuk.thip.user.application.port.in.UserDeleteUseCase;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
 import konkuk.thip.user.application.port.in.UserUpdateUseCase;
@@ -29,6 +30,7 @@ public class UserCommandController {
     private final UserSignupUseCase userSignupUseCase;
     private final UserFollowUsecase userFollowUsecase;
     private final UserUpdateUseCase userUpdateUseCase;
+    private final UserDeleteUseCase userDeleteUseCase;
 
     @Operation(
             summary = "사용자 회원가입",
@@ -68,6 +70,18 @@ public class UserCommandController {
             @Parameter(hidden = true) @UserId final Long userId,
             @RequestBody @Valid final UserUpdateRequest userUpdateRequest) {
         userUpdateUseCase.updateUser(userUpdateRequest.toCommand(userId));
+        return BaseResponse.ok(null);
+    }
+
+    @Operation(
+            summary = "회원 탈퇴",
+            description = "사용자가 회원탈퇴를 합니다."
+    )
+    //@ExceptionDescription(USER_DELETE)
+    @DeleteMapping("/users")
+    public BaseResponse<Void> deleteUser(
+            @Parameter(hidden = true) @UserId final Long userId) {
+        userDeleteUseCase.deleteUser(userId);
         return BaseResponse.ok(null);
     }
 }

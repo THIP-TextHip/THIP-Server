@@ -2,12 +2,17 @@ package konkuk.thip.room.adapter.out.jpa;
 
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
+import konkuk.thip.attendancecheck.adapter.out.jpa.AttendanceCheckJpaEntity;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "rooms")
@@ -56,6 +61,22 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryJpaEntity categoryJpaEntity;
+
+    // 삭제용 방 참여자 양방향 매핑 관계
+    @OneToMany(mappedBy = "roomJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RoomParticipantJpaEntity> roomParticipants = new ArrayList<>();
+
+    // 삭제용 방 출석체크 양방향 매핑 관계
+    @OneToMany(mappedBy = "roomJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<AttendanceCheckJpaEntity> attendanceChecks = new ArrayList<>();
+
+    // 삭제용 투표 양방향 매핑 관계
+    @OneToMany(mappedBy = "roomJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<VoteJpaEntity> votes = new ArrayList<>();
+
+    // 삭제용 기록 양방향 매핑 관계
+    @OneToMany(mappedBy = "roomJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RecordJpaEntity> records = new ArrayList<>();
 
     public RoomJpaEntity updateFrom(Room room) {
         this.title = room.getTitle();

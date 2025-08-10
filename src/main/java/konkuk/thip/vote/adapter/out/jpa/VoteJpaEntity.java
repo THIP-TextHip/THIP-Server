@@ -11,6 +11,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "votes")
 @DiscriminatorValue("VOTE")
@@ -26,6 +29,10 @@ public class VoteJpaEntity extends PostJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private RoomJpaEntity roomJpaEntity;
+
+    // 삭제용 투표 아이템 양방향 매핑 관계
+    @OneToMany(mappedBy = "voteJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<VoteItemJpaEntity> voteItemes = new ArrayList<>();
 
     @Builder
     public VoteJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity) {

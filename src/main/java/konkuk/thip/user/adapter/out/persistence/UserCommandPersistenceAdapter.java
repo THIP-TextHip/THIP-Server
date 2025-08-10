@@ -13,9 +13,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.ALIAS_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
@@ -38,16 +40,14 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
     }
 
     @Override
-    public User findById(Long userId) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException(USER_NOT_FOUND));
-
-        return userMapper.toDomainEntity(userJpaEntity);
+    public Optional<User> findById(Long id) {
+        return userJpaRepository.findByUserIdAndStatus(id, ACTIVE)
+                .map(userMapper::toDomainEntity);
     }
 
     @Override
     public Map<Long, User> findByIds(List<Long> userIds) {
-        List<UserJpaEntity> entities = userJpaRepository.findAllById(userIds);
+        List<UserJpaEntity> entities = userJpaRepository.findAllByUserIdInAndStatus(userIds,ACTIVE);
         return entities.stream()
                 .map(userMapper::toDomainEntity)
                 .collect(Collectors.toMap(User::getId, Function.identity()));
@@ -67,5 +67,13 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
         );
 
         userJpaRepository.save(userJpaEntity);
+    }
+
+    @Override
+    public void delete(User user) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findById(user.getId()).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND)
+        );
+        userJpaRepository.delete(userJpaEntity);
     }
 }
