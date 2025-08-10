@@ -82,7 +82,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         feedJpaEntity.getContentList().clear(); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
         applyFeedContents(feed, feedJpaEntity);
 
-        feedTagJpaRepository.deleteAllByFeedJpaEntity(feedJpaEntity); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
+        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId()); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
         applyFeedTags(feed, feedJpaEntity);
 
         return feedJpaEntity.getPostId();
