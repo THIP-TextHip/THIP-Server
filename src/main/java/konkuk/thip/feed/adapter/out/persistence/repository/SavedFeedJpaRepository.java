@@ -21,7 +21,7 @@ public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity
     @Query("SELECT s.feedJpaEntity.postId FROM SavedFeedJpaEntity s WHERE s.userJpaEntity.userId = :userId AND s.feedJpaEntity.postId IN :feedIds")
     Set<Long> findSavedFeedIdsByUserIdAndFeedIds(@Param("userId") Long userId, @Param("feedIds") Set<Long> feedIds);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SavedFeedJpaEntity sf WHERE sf.feedJpaEntity.postId = :feedId")
     int deleteAllByFeedId(@Param("feedId") Long feedId);
 }

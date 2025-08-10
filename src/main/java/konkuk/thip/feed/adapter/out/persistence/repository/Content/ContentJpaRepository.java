@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ContentJpaRepository extends JpaRepository<ContentJpaEntity, Long>{
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM ContentJpaEntity c WHERE c.postJpaEntity.postId = :feedId")
     void deleteAllByFeedId(@Param("feedId") Long feedId);
 }

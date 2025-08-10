@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface CommentJpaRepository extends JpaRepository<CommentJpaEntity, Long>, CommentQueryRepository {
     Optional<CommentJpaEntity> findByCommentIdAndStatus(Long commentId, StatusType status);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE CommentJpaEntity c SET c.status = 'INACTIVE' WHERE c.postJpaEntity.postId = :postId")
     void softDeleteAllByPostId(@Param("postId") Long postId);
 
