@@ -9,7 +9,6 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.DateExpression;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.entity.StatusType;
@@ -192,20 +191,13 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         where.and(room.startDate.loe(date));
         where.and(room.endDate.goe(date));
 
-        // TODO : Room 에 멤버 수 추가되면 로직 수정
-        // 멤버 수 서브쿼리
-        JPQLQuery<Long> memberCountSubQuery = JPAExpressions
-                .select(userRoomSub.count())
-                .from(userRoomSub)
-                .where(userRoomSub.roomJpaEntity.roomId.eq(room.roomId));
-
         // 2. 페이징된 목록 조회
         List<Tuple> tuples = queryFactory
                 .select(
                         room.roomId,
                         book.imageUrl,
                         room.title,
-                        memberCountSubQuery,
+                        room.memberCount,
                         room.recruitCount,
                         room.startDate,
                         book.title,
@@ -229,8 +221,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .map(t -> RoomGetHomeJoinedListResponse.RoomSearchResult.builder()
                         .roomId(t.get(room.roomId))
                         .bookImageUrl(t.get(book.imageUrl))
-                        .bookTitle(t.get(book.title))
-                        .memberCount(Optional.ofNullable(t.get(memberCountSubQuery)).map(Number::intValue).orElse(1))
+                        .roomTitle(t.get(room.title))
+                        .memberCount(t.get(room.memberCount))
                         .userPercentage(Optional.ofNullable(t.get(participant.userPercentage))
                                         .map(val -> ((Number) val).doubleValue())
                                                 .map(Math::round)
