@@ -9,6 +9,7 @@ public record RecordSearchResponse(
     List<PostDto> postList,
     Long roomId,
     String isbn,
+    boolean isOverviewEnabled,
     String nextCursor,
     Boolean isLast
 ){
