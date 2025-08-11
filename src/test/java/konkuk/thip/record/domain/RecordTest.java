@@ -200,7 +200,7 @@ class RecordTest {
     }
 
     @Test
-    @DisplayName("validateDeletable: 피드의 작성자면서, 전달된 roomId가 기록의 roomId와 일치할 경우 기록을 삭제 할 수 있다.")
+    @DisplayName("validateDeletable: 기록의 작성자면서, 전달된 roomId가 기록의 roomId와 일치할 경우 기록을 삭제 할 수 있다.")
     void validateDeletable_byCreator_byRoomId_Success(){
         Record record = createWithCommentRecord();
         assertDoesNotThrow(() -> record.validateDeletable(CREATOR_ID,ROOM_ID));
