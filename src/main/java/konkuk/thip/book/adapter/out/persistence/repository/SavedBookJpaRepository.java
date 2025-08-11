@@ -10,7 +10,7 @@ public interface SavedBookJpaRepository extends JpaRepository<SavedBookJpaEntity
            "WHERE s.userJpaEntity.userId = :userId AND s.bookJpaEntity.bookId = :bookId")
     boolean existsByUserIdAndBookId(Long userId, Long bookId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SavedBookJpaEntity s WHERE s.userJpaEntity.userId = :userId AND s.bookJpaEntity.bookId = :bookId")
     void deleteByUserIdAndBookId(Long userId, Long bookId);
 }

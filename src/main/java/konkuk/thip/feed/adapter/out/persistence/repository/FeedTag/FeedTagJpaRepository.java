@@ -18,7 +18,7 @@ public interface FeedTagJpaRepository extends JpaRepository<FeedTagJpaEntity, Lo
     """)
     List<FeedIdAndTagProjection> findFeedIdAndTagsByFeedIds(@Param("feedIds") List<Long> feedIds);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM FeedTagJpaEntity ft WHERE ft.feedJpaEntity.postId = :feedId")
     void deleteAllByFeedId(@Param("feedId") Long feedId);
 }

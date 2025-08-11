@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity, Long> {
-    @Modifying
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SavedFeedJpaEntity sf WHERE sf.userJpaEntity.userId = :userId AND sf.feedJpaEntity.postId = :feedId")
     void deleteByUserIdAndFeedId(@Param("userId") Long userId, @Param("feedId") Long feedId);
 
@@ -20,7 +21,7 @@ public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity
     @Query("SELECT s.feedJpaEntity.postId FROM SavedFeedJpaEntity s WHERE s.userJpaEntity.userId = :userId AND s.feedJpaEntity.postId IN :feedIds")
     Set<Long> findSavedFeedIdsByUserIdAndFeedIds(@Param("userId") Long userId, @Param("feedIds") Set<Long> feedIds);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SavedFeedJpaEntity sf WHERE sf.feedJpaEntity.postId = :feedId")
     int deleteAllByFeedId(@Param("feedId") Long feedId);
 }

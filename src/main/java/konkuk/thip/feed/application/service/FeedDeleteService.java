@@ -29,8 +29,11 @@ public class FeedDeleteService implements FeedDeleteUseCase {
 
         // TODO S3 이미지 삭제 이벤트 기반 처리 or 배치 삭제
         // 3. 피드 삭제
+        // 3-1. 피드 게시물 댓글 삭제
         commentCommandPort.softDeleteAllByPostId(feedId);
+        // 3-2. 피드 게시물 좋아요 삭제
         postLikeCommandPort.deleteAllByPostId(feedId);
+        // 3-3. 피드 삭제 및 관련 엔티티(피드_태그, 콘텐츠, 피드 저장) 삭제
         feedCommandPort.delete(feed);
     }
 }

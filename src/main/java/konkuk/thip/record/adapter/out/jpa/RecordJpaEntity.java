@@ -49,5 +49,10 @@ public class RecordJpaEntity extends PostJpaEntity {
         this.likeCount = likeCount;
     }
 
+    @VisibleForTesting
+    public void updateCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
 }
 

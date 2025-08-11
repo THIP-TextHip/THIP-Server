@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RecentSearchJpaRepository extends JpaRepository<RecentSearchJpaEntity, Long>, RecentSearchQueryRepository {
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE RecentSearchJpaEntity r SET r.modifiedAt = CURRENT_TIMESTAMP WHERE r.recentSearchId = :recentSearchId")
     void updateModifiedAt(@Param("recentSearchId") Long recentSearchId);
 }
