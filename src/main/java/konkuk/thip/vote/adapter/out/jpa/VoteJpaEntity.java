@@ -48,4 +48,9 @@ public class VoteJpaEntity extends PostJpaEntity {
     public void updateLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
+
+    @VisibleForTesting
+    public void updateCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
 }
