@@ -59,7 +59,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         if (voteItems.isEmpty()) return;
 
         Long voteId = voteItems.get(0).getVoteId();
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(voteId).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(voteId,ACTIVE).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 
@@ -138,7 +138,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void delete(Vote vote) {
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(vote.getId()).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(vote.getId(),ACTIVE).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 
@@ -152,7 +152,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void updateVote(Vote vote) {
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(vote.getId()).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(vote.getId(),ACTIVE).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 

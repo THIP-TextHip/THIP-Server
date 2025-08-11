@@ -75,7 +75,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
     @Override
     public Long update(Feed feed) {
-        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getId())
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostIdAndStatus(feed.getId(),ACTIVE)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
         feedJpaEntity.updateFrom(feed);
 
@@ -115,7 +115,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     public void saveSavedFeed(Long userId, Long feedId) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-        FeedJpaEntity feed = feedJpaRepository.findById(feedId)
+        FeedJpaEntity feed = feedJpaRepository.findByPostIdAndStatus(feedId,ACTIVE)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
         SavedFeedJpaEntity entity = SavedFeedJpaEntity.builder()
                 .userJpaEntity(user)
@@ -131,7 +131,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
     @Override
     public void delete(Feed feed) {
-        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getId())
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostIdAndStatus(feed.getId(),ACTIVE)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
 
         feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
