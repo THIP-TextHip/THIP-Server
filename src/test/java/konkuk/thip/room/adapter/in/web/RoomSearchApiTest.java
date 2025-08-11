@@ -283,7 +283,7 @@ class RoomSearchApiTest {
         //when
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
-                .param("category", "과학/IT")
+                .param("category", "과학·IT")
                 .param("sort", "deadline")
                 .param("page", "1"));
 
