@@ -53,7 +53,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private void addTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(JWT_HEADER_KEY.getValue(), token);
-        cookie.setSecure(true);
+        // cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(COOKIE_MAX_AGE);
         response.addCookie(cookie);
