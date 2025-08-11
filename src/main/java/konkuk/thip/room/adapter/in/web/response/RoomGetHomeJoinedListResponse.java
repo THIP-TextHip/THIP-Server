@@ -19,7 +19,7 @@ public record RoomGetHomeJoinedListResponse(
     public record RoomSearchResult(
             Long roomId,
             String bookImageUrl,
-            String bookTitle,
+            String roomTitle,
             int memberCount,
             int userPercentage
     ) {}
