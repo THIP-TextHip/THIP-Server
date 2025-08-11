@@ -118,10 +118,12 @@ class FeedDeleteAPITest {
         assertThat(commentJpaRepository.findById(comment.getCommentId()).get().getStatus()).isEqualTo(INACTIVE);
 
         // 5) 댓글 좋아요 삭제
-        long commentLikeCountAfter = commentLikeJpaRepository.count();
-        assertThat(commentLikeCountAfter).isEqualTo(0);
+        assertThat(commentLikeJpaRepository.count()).isEqualTo(0);
 
         // 6) 피드 저장 관계 삭제
         assertTrue(savedFeedJpaRepository.findAll().isEmpty());
+
+        // 7) 게시글 좋아요(PostLike) 삭제
+        assertThat(postLikeJpaRepository.count()).isEqualTo(0);
     }
 }
