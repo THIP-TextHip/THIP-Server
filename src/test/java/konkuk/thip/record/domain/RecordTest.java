@@ -206,4 +206,37 @@ class RecordTest {
         assertDoesNotThrow(() -> record.validateDeletable(CREATOR_ID,ROOM_ID));
     }
 
+    @Test
+    @DisplayName("validatePin: 작성자가 아닌 경우 기록을 핀하려고 하면 InvalidStateException이 발생한다.")
+    void validatePin_byNonCreator_throws() {
+        Record record = createWithCommentRecord();
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.validatePin(OTHER_USER_ID, ROOM_ID));
+
+        assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validatePin: 전달된 roomId가 기록의 roomId와 일치하지 않는 경우 기록을 핀하려고 하면 InvalidStateException이 발생한다.")
+    void validatePin_byOtherRoomId_throws() {
+        Record record = createWithCommentRecord();
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.validatePin(CREATOR_ID, OTHER_ROOM_ID));
+
+        assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validatePin: 작성자이면서 roomId가 기록의 roomId와 일치하면 핀 가능하다.")
+    void validatePin_byCreator_byRoomId_success() {
+        Record record = createWithCommentRecord();
+
+        assertDoesNotThrow(() -> record.validatePin(CREATOR_ID, ROOM_ID));
+    }
+
+
+
+
 }
