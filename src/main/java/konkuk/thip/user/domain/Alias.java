@@ -8,11 +8,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Alias {
-    WRITER("문학가", "문학_color", "문학_image"),
-    SCIENTIST("과학자", "과학_color", "과학_image"),
-    SOCIOLOGIST("사회학자", "사회과학_color", "사회과학_image"),
-    ARTIST("예술가", "예술_color", "예술_image"),
-    PHILOSOPHER("철학자", "철학_color", "철학_image");
+    WRITER("문학가", "#A0F8E8", "문학_image"),
+    SCIENTIST("과학자", "#C8A5FF", "과학_image"),
+    SOCIOLOGIST("사회학자", "#FDB770", "사회과학_image"),
+    ARTIST("예술가", "#FF8BAC", "예술_image"),
+    PHILOSOPHER("철학자", "#A1D5FF", "철학_image");
 
     private final String value;
     private final String color;
