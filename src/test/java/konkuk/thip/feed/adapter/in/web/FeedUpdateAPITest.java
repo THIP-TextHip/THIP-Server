@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static konkuk.thip.feed.domain.Tag.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,9 +77,9 @@ class FeedUpdateAPITest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
-        tag1 = tagJpaRepository.save(TestEntityFactory.createTag(category, "소설추천"));
-        tag2 = tagJpaRepository.save(TestEntityFactory.createTag(category, "책추천"));
-        tag3 = tagJpaRepository.save(TestEntityFactory.createTag(category, "오늘의책"));
+        tag1 = tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
+        tag2 = tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
+        tag3 = tagJpaRepository.save(TestEntityFactory.createTag(category, CLASSIC_LITERATURE.getValue()));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
     }
@@ -102,7 +103,7 @@ class FeedUpdateAPITest {
         Map<String, Object> request = new HashMap<>();
         request.put("contentBody", "태그 갱신 테스트");
         request.put("isPublic", false);
-        request.put("tagList", List.of("소설추천", "오늘의책")); // 하나 제거됨
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue(),FOREIGN_NOVEL.getValue())); // 하나 제거됨
 
         // when
         ResultActions result = mockMvc.perform(patch("/feeds/{feedId}", feedId)
@@ -182,7 +183,7 @@ class FeedUpdateAPITest {
         request.put("contentBody", "전부 수정되는 피드 테스트");
         request.put("isPublic", false);
         request.put("remainImageUrls", List.of("https://s3-mock/image-2.jpg")); // 이미지 1개 유지
-        request.put("tagList", List.of("소설추천", "오늘의책")); // 태그 2개만 남김
+        request.put("tagList", List.of(KOREAN_NOVEL.getValue(),FOREIGN_NOVEL.getValue())); // 하나 제거됨
 
         // when
         ResultActions result = mockMvc.perform(patch("/feeds/{feedId}", feedId)
