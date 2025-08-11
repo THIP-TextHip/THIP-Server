@@ -12,10 +12,11 @@ import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
+import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
+import konkuk.thip.feed.application.port.out.dto.FeedIdAndTagProjection;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.SavedFeeds;
-import konkuk.thip.feed.application.port.out.dto.FeedIdAndTagProjection;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -146,5 +147,10 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     @Override
     public Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId) {
         return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+    }
+
+    @Override
+    public List<TagCategoryQueryDto> findAllTags() {
+        return feedJpaRepository.findAllTags();
     }
 }
