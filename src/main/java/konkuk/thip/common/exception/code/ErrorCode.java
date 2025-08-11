@@ -24,6 +24,7 @@ public enum ErrorCode implements ResponseCode {
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
+    AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
 
     /* 60000부터 비즈니스 예외 */
     /**
@@ -31,7 +32,6 @@ public enum ErrorCode implements ResponseCode {
      */
     ALIAS_NOT_FOUND(HttpStatus.NOT_FOUND, 60001, "존재하지 않는 ALIAS 입니다."),
     ALIAS_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 60002, "일치하는 칭호 이름이 없습니다."),
-
 
     /**
      * 70000 : user error
