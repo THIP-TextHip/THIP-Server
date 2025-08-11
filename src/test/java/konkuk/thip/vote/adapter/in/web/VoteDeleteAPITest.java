@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.post.PostType.VOTE;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
