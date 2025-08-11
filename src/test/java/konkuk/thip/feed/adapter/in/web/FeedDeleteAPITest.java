@@ -34,7 +34,8 @@ import java.util.List;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.post.PostType.FEED;
-import static konkuk.thip.feed.domain.Tag.*;
+import static konkuk.thip.feed.domain.Tag.FOREIGN_NOVEL;
+import static konkuk.thip.feed.domain.Tag.KOREAN_NOVEL;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -79,8 +80,8 @@ class FeedDeleteAPITest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        tag1 = tagJpaRepository.save(TestEntityFactory.createTag(category, BOOK_RECOMMEND.getValue()));
-        tag2 = tagJpaRepository.save(TestEntityFactory.createTag(category, TODAY_BOOK.getValue()));
+        tag1 = tagJpaRepository.save(TestEntityFactory.createTag(category, KOREAN_NOVEL.getValue()));
+        tag2 = tagJpaRepository.save(TestEntityFactory.createTag(category, FOREIGN_NOVEL.getValue()));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true,1,1,List.of("url1", "url2", "url3")));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(feed, tag1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(feed, tag2));
