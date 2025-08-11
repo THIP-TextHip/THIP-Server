@@ -5,18 +5,26 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.function.Supplier;
+
 @Getter
 @RequiredArgsConstructor
 public enum Alias {
-    WRITER("문학가", "#A0F8E8", "https://thip-bucket.s3.ap-northeast-2.amazonaws.com/profile_literature.png"),
-    SCIENTIST("과학자", "#C8A5FF", "https://thip-bucket.s3.ap-northeast-2.amazonaws.com/profile_science.png"),
-    SOCIOLOGIST("사회학자", "#FDB770", "https://thip-bucket.s3.ap-northeast-2.amazonaws.com/profile_sociology.png"),
-    ARTIST("예술가", "#FF8BAC", "https://thip-bucket.s3.ap-northeast-2.amazonaws.com/profile_art.png"),
-    PHILOSOPHER("철학자", "#A1D5FF", "https://thip-bucket.s3.ap-northeast-2.amazonaws.com/profile_humanities.png");
+    WRITER("문학가", "#A0F8E8", "/profile_literature.png"),
+    SCIENTIST("과학자", "#C8A5FF", "/profile_science.png"),
+    SOCIOLOGIST("사회학자", "#FDB770", "/profile_sociology.png"),
+    ARTIST("예술가", "#FF8BAC", "/profile_art.png"),
+    PHILOSOPHER("철학자", "#A1D5FF", "/profile_humanities.png");
 
     private final String value;
     private final String color;
     private final String imageUrl;
+
+    private static volatile Supplier<String> baseUrlSupplier;
+
+    public static void registerBaseUrlSupplier(Supplier<String> supplier) {
+        baseUrlSupplier = supplier;
+    }
 
     public static Alias from(String value) {
         for (Alias alias : Alias.values()) {
@@ -25,5 +33,10 @@ public enum Alias {
             }
         }
         throw new InvalidStateException(ErrorCode.ALIAS_NAME_NOT_MATCH);
+    }
+
+    // aws bucket base url + 파일명
+    public String getImageUrl() {
+       return baseUrlSupplier.get() + imageUrl;
     }
 }
