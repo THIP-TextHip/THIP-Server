@@ -79,8 +79,8 @@ class FeedDeleteAPITest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        tag1 = tagJpaRepository.save(TestEntityFactory.createTag(category, BOOK_RECOMMEND.getValue()));
-        tag2 = tagJpaRepository.save(TestEntityFactory.createTag(category, TODAY_BOOK.getValue()));
+        tag1 = tagJpaRepository.save(TestEntityFactory.createTag(category, KOREAN_NOVEL.getValue()));
+        tag2 = tagJpaRepository.save(TestEntityFactory.createTag(category, FOREIGN_NOVEL.getValue()));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true,1,1,List.of("url1", "url2", "url3")));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(feed, tag1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(feed, tag2));
