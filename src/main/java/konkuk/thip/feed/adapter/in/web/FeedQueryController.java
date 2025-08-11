@@ -7,10 +7,7 @@ import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.feed.adapter.in.web.response.*;
-import konkuk.thip.feed.application.port.in.FeedShowAllUseCase;
-import konkuk.thip.feed.application.port.in.FeedShowAllOfUserUseCase;
-import konkuk.thip.feed.application.port.in.FeedShowSingleUseCase;
-import konkuk.thip.feed.application.port.in.FeedShowUserInfoUseCase;
+import konkuk.thip.feed.application.port.in.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +25,7 @@ public class FeedQueryController {
     private final FeedShowAllOfUserUseCase feedShowMineUseCase;
     private final FeedShowUserInfoUseCase feedShowUserInfoUseCase;
     private final FeedShowSingleUseCase feedShowSingleUseCase;
+    private final FeedShowWriteInfoUseCase feedShowWriteInfoUseCase;
 
     @Operation(
             summary = "피드 전체 조회",
@@ -101,14 +99,11 @@ public class FeedQueryController {
     }
 
     @Operation(
-            summary = "피드 작성을 위한 화면 조회 및 기록을 피드에 핀하기",
-            description = "기록을 피드에 핀하거나, 피드 작성시 필요한 정보들을 조회합니다 (선택한 책, 카테고리 및 하위 태그)"
+            summary = "피드 작성을 위한 화면 조회",
+            description = "피드 작성시 필요한 정보들을 조회합니다 (카테고리 및 하위 태그)"
     )
     @GetMapping("/feeds/write-info")
-    public BaseResponse<FeedWriteInfoResponse> showAnotherUserInfoInFeeds(
-            @Parameter(hidden = true) @UserId final Long userId,
-            @Parameter(description = "피드 조회할 유저의 userId 값") @PathVariable("userId") final Long feedOwnerId
-    ) {
-        return BaseResponse.ok(feedShowUserInfoUseCase.showAnotherUserInfoInFeeds(userId, feedOwnerId));
+    public BaseResponse<FeedShowWriteInfoResponse> showFeedWriteInfo() {
+        return BaseResponse.ok(feedShowWriteInfoUseCase.showFeedWriteInfo());
     }
 }
