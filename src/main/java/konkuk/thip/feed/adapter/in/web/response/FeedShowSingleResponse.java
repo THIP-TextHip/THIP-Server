@@ -5,7 +5,7 @@ public record FeedShowSingleResponse(
         Long creatorId,
         String creatorNickname,
         String creatorProfileImageUrl,
-        String alias,
+        String aliasName,
         String aliasColor,
         String postDate,
         String isbn,
