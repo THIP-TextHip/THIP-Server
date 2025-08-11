@@ -8,6 +8,6 @@ public record UserViewAliasChoiceResult(List<AliasChoice> aliasChoices) {
             String aliasName,
             String categoryName,
             String imageUrl,
-            String color
+            String aliasColor
     ) {}
 }
