@@ -44,4 +44,6 @@ public interface VoteCommandPort {
     void deleteVoteParticipant(VoteParticipant voteParticipant);
 
     void updateVoteItem(VoteItem voteItem);
+
+    void delete(Vote vote);
 }
