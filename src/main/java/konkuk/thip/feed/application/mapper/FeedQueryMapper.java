@@ -24,6 +24,7 @@ import java.util.Set;
 )
 public interface FeedQueryMapper {
 
+    @Mapping(target = "aliasName", source = "dto.alias")
     @Mapping(target = "aliasColor", expression = "java(Alias.from(dto.alias()).getColor())")
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
