@@ -42,12 +42,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 신규 유저 - 회원가입용 임시 토큰
             String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id());
             addTokenCookie(response, tempToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL);
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL.getValue());
         } else {
             // 기존 유저 - 로그인용 액세스 토큰
             String accessToken = jwtUtil.createAccessToken(loginUser.userId());
             addTokenCookie(response, accessToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL);
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL.getValue());
         }
     }
 
