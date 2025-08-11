@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -71,7 +72,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public Optional<Vote> findById(Long id) {
-        return voteJpaRepository.findById(id)
+        return voteJpaRepository.findByPostIdAndStatus(id,ACTIVE)
                 .map(voteMapper::toDomainEntity);
     }
 
@@ -133,6 +134,19 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         );
 
         voteItemJpaRepository.save(voteItemJpaEntity.updateFrom(voteItem));
+    }
+
+    @Override
+    public void delete(Vote vote) {
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(vote.getId()).orElseThrow(
+                () -> new EntityNotFoundException(VOTE_NOT_FOUND)
+        );
+
+        voteParticipantJpaRepository.deleteAllByVoteId(voteJpaEntity.getPostId());
+        voteItemJpaRepository.deleteAllByVoteId(voteJpaEntity.getPostId());
+
+        voteJpaEntity.softDelete();
+        voteJpaRepository.save(voteJpaEntity);
     }
 
 
