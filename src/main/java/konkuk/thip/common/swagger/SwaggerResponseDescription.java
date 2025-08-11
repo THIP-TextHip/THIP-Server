@@ -192,6 +192,10 @@ public enum SwaggerResponseDescription {
             POST_LIKE_COUNT_UNDERFLOW,
             FEED_ACCESS_FORBIDDEN
     ))),
+    FEED_DELETE(new LinkedHashSet<>(Set.of(
+            FEED_NOT_FOUND,
+            FEED_ACCESS_FORBIDDEN
+    ))),
 
     // Comment
     COMMENT_CREATE(new LinkedHashSet<>(Set.of(

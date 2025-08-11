@@ -167,6 +167,7 @@ public enum ErrorCode implements ResponseCode {
      * 180000 : Post error
      */
     POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [FEED, RECORD, VOTE] 중 하나여야 합니다."),
+    POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 180001, "이미 삭제된 게시물 입니다."),
 
     /**
      * 185000 : PostLike error

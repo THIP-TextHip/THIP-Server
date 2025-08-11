@@ -15,6 +15,7 @@ import konkuk.thip.feed.adapter.in.web.response.FeedIdResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsLikeResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsSavedResponse;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
+import konkuk.thip.feed.application.port.in.FeedDeleteUseCase;
 import konkuk.thip.feed.application.port.in.FeedSavedUseCase;
 import konkuk.thip.feed.application.port.in.FeedUpdateUseCase;
 import konkuk.thip.post.application.port.in.PostLikeUseCase;
@@ -35,6 +36,7 @@ public class FeedCommandController {
     private final FeedUpdateUseCase feedUpdateUseCase;
     private final FeedSavedUseCase feedSavedUseCase;
     private final PostLikeUseCase postLikeUseCase;
+    private final FeedDeleteUseCase feedDeleteUseCase;
 
     @Operation(
             summary = "피드 작성",
@@ -89,6 +91,19 @@ public class FeedCommandController {
             @Parameter(description = "좋아요 상태를 변경하려는 피드 ID", example = "1")@PathVariable("feedId") final Long feedId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(FeedIsLikeResponse.of(postLikeUseCase.changeLikeStatusPost(request.toCommand(userId, feedId))));
+    }
+
+    @Operation(
+            summary = "피드 삭제",
+            description = "사용자가 피드를 삭제합니다."
+    )
+    @ExceptionDescription(FEED_DELETE)
+    @DeleteMapping("/feeds/{feedId}")
+    public BaseResponse<Void> deleteFeed(
+            @Parameter(description = "삭제하려는 피드 ID", example = "1") @PathVariable("feedId") final Long feedId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        feedDeleteUseCase.deleteFeed(feedId, userId);
+        return BaseResponse.ok(null);
     }
 
 }
