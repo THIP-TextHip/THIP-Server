@@ -94,6 +94,7 @@ class BookQueryControllerTest {
                         .header("Authorization", "Bearer " + testToken)
                         .param("keyword", keyword)
                         .param("page", String.valueOf(page))
+                        .param("isFinalized", String.valueOf(false))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -115,6 +116,7 @@ class BookQueryControllerTest {
                         .header("Authorization", "Bearer " + testToken)
                         .param("keyword", keyword)
                         .param("page", String.valueOf(page))
+                        .param("isFinalized", String.valueOf(false))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.isSuccess").value(false))
@@ -136,6 +138,7 @@ class BookQueryControllerTest {
                         .header("Authorization", "Bearer " + testToken)
                         .param("keyword", keyword)
                         .param("page", String.valueOf(page))
+                        .param("isFinalized", String.valueOf(false))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ErrorCode.BOOK_KEYWORD_REQUIRED.getCode()))
@@ -155,6 +158,7 @@ class BookQueryControllerTest {
                         .header("Authorization", "Bearer " + testToken)
                         .param("keyword", keyword)
                         .param("page", String.valueOf(page))
+                        .param("isFinalized", String.valueOf(false))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ErrorCode.BOOK_PAGE_NUMBER_INVALID.getCode()))
@@ -175,6 +179,7 @@ class BookQueryControllerTest {
                         .header("Authorization", "Bearer " + testToken)
                         .param("keyword", keyword)
                         .param("page", String.valueOf(page))
+                        .param("isFinalized", String.valueOf(true))     // 검색 완료일 경우 : 최근검색어로 저장된다
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 

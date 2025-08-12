@@ -120,9 +120,10 @@ public class UserQueryController {
     @GetMapping("/users")
     public BaseResponse<UserSearchResponse> showSearchUsers(
             @Parameter(description = "검색어", example = "thip") @RequestParam @NotBlank(message = "검색어는 필수입니다.") final String keyword,
+            @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
             @Parameter(description = "단일 검색 결과 페이지 크기 (1~30) / default : 30", example = "30") @RequestParam(required = false, defaultValue = "30") @Min(1) @Max(30) final Integer size,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size)));
+        return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size, isFinalized)));
     }
 
     @Operation(

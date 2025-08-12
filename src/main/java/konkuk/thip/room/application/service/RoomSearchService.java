@@ -1,11 +1,13 @@
 package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.application.service.manager.RecentSearchCreateManager;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.adapter.out.persistence.RoomSearchSortParam;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
+import konkuk.thip.room.domain.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static konkuk.thip.common.exception.code.ErrorCode.CATEGORY_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_ROOM_SEARCH_SORT;
 
 @Service
@@ -25,9 +26,11 @@ public class RoomSearchService implements RoomSearchUseCase {
 
     private final RoomQueryPort roomQueryPort;
 
+    private final RecentSearchCreateManager recentSearchCreateManager;
+
     @Override
-    @Transactional(readOnly = true)
-    public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page) {
+    @Transactional // <- 최근 검색 저장으로 인한 트랜잭션
+    public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page, boolean isFinalized, Long userId) {
         // 1. validation
         String sortVal = validateSort(sort);
         String categoryVal = validateCategory(category);
@@ -38,6 +41,9 @@ public class RoomSearchService implements RoomSearchUseCase {
 
         // 3. 방 검색
         Page<RoomSearchResponse.RoomSearchResult> result = roomQueryPort.searchRoom(keyword, categoryVal, pageable);
+
+        // TODO 검색 완료일 경우, 최근 검색어로 저장되도록
+        recentSearchCreateManager.saveRecentSearchByUser(userId, keyword, RecentSearchType.ROOM_SEARCH, isFinalized);
 
         // 4. response 구성
         return new RoomSearchResponse(
