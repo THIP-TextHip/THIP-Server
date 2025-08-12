@@ -4,5 +4,5 @@ import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 
 public interface RoomSearchUseCase {
 
-    RoomSearchResponse searchRoom(String keyword, String category, String sort, int page);
+    RoomSearchResponse searchRoom(String keyword, String category, String sort, int page, boolean isFinalized);
 }

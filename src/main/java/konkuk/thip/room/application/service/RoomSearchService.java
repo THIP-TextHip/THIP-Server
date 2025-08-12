@@ -27,7 +27,7 @@ public class RoomSearchService implements RoomSearchUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page) {
+    public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page, boolean isFinalized) {
         // 1. validation
         String sortVal = validateSort(sort);
         String categoryVal = validateCategory(category);
@@ -38,6 +38,8 @@ public class RoomSearchService implements RoomSearchUseCase {
 
         // 3. 방 검색
         Page<RoomSearchResponse.RoomSearchResult> result = roomQueryPort.searchRoom(keyword, categoryVal, pageable);
+
+        // TODO 검색 완료일 경우, 최근 검색어로 저장되도록
 
         // 4. response 구성
         return new RoomSearchResponse(
