@@ -54,12 +54,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private void addTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(JWT_HEADER_KEY.getValue(), token);
         if(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue())) {
-            cookie.setSecure(true);
-            cookie.setDomain(webRedirectUrl.replace(HTTPS_PREFIX.getValue(), ""));
+            cookie.setDomain(".thip.co.kr");
         } else {
-            cookie.setSecure(false);
-            cookie.setDomain(webRedirectUrl.replace(HTTP_PREFIX.getValue(), ""));
+            cookie.setDomain("localhost");
         }
+        cookie.setSecure(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue()));
         cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setMaxAge(COOKIE_MAX_AGE);
