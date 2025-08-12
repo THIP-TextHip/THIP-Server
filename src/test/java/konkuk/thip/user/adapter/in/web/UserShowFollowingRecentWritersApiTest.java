@@ -226,4 +226,45 @@ class UserShowFollowingRecentWritersApiTest {
                 .andExpect(jsonPath("$.data.recentWriters[8].userId", is(user4.getUserId().intValue())))
                 .andExpect(jsonPath("$.data.recentWriters[9].userId", is(user3.getUserId().intValue())));
     }
+
+    @Test
+    @DisplayName("유저가 가장 최근에 작성한 피드의 작성 시각(= createdAt)을 기준으로 정렬하여 반환된다.")
+    void show_my_following_recent_writers_latest_feed_check_test() throws Exception {
+        //given
+        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
+        UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
+        UserJpaEntity user2 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user2"));
+
+        // me가 user1, user2를 팔로잉하였음
+        followingJpaRepository.save(TestEntityFactory.createFollowing(me, user1));
+        followingJpaRepository.save(TestEntityFactory.createFollowing(me, user2));
+
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
+        FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(user1, book, true, 50, 10, List.of()));
+        FeedJpaEntity f2 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, true, 50, 10, List.of()));
+        FeedJpaEntity f3 = feedJpaRepository.save(TestEntityFactory.createFeed(user1, book, true, 50, 10, List.of()));
+
+        // 피드 작성 순서 : user1이 작성한 f1 -> user2가 작성한 f2 -> user1가 작성한 f3
+        feedJpaRepository.flush();
+        LocalDateTime base = LocalDateTime.now();
+        jdbcTemplate.update(
+                "UPDATE posts SET created_at = ? WHERE post_id = ?",
+                Timestamp.valueOf(base.minusMinutes(10)), f1.getPostId());
+        jdbcTemplate.update(
+                "UPDATE posts SET created_at = ? WHERE post_id = ?",
+                Timestamp.valueOf(base.minusMinutes(5)), f2.getPostId());
+        jdbcTemplate.update(
+                "UPDATE posts SET created_at = ? WHERE post_id = ?",
+                Timestamp.valueOf(base.minusMinutes(1)), f3.getPostId());
+
+        //when //then
+        mockMvc.perform(get("/users/my-followings/recent-feeds")
+                        .requestAttr("userId", me.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.recentWriters", hasSize(2)))
+                // 정렬 조건 : 내가 팔로잉하는 사람들 중, 최근에 공개 피드를 작성한 사람 순
+                .andExpect(jsonPath("$.data.recentWriters[0].userId", is(user1.getUserId().intValue())))
+                .andExpect(jsonPath("$.data.recentWriters[1].userId", is(user2.getUserId().intValue())));
+    }
 }
