@@ -45,7 +45,7 @@ public class BookSearchService implements BookSearchUseCase {
 
     @Override
     @Transactional
-    public NaverBookParseResult searchBooks(String keyword, int page, Long userId) {
+    public NaverBookParseResult searchBooks(String keyword, int page, Long userId, boolean isFinalized) {
 
         if (keyword == null || keyword.isBlank()) {
             throw new BusinessException(BOOK_KEYWORD_REQUIRED);
@@ -65,13 +65,15 @@ public class BookSearchService implements BookSearchUseCase {
             throw new BusinessException(BOOK_SEARCH_PAGE_OUT_OF_RANGE);
         }
 
-        //최근검색어 추가
-        RecentSearch  recentSearch =  RecentSearch.builder()
-                        .searchTerm(keyword)
-                        .type(BOOK_SEARCH)
-                        .userId(userId)
-                        .build();
-        recentSearchCommandPort.save(recentSearch);
+        // 검색완료일 경우에 최근검색어 추가
+        if (isFinalized) {
+            RecentSearch  recentSearch =  RecentSearch.builder()
+                    .searchTerm(keyword)
+                    .type(BOOK_SEARCH)
+                    .userId(userId)
+                    .build();
+            recentSearchCommandPort.save(recentSearch);
+        }
 
         return result;
     }
