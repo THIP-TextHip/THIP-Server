@@ -29,7 +29,7 @@ public class RoomSearchService implements RoomSearchUseCase {
     private final RecentSearchCreateManager recentSearchCreateManager;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional // <- 최근 검색 저장으로 인한 트랜잭션
     public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page, boolean isFinalized, Long userId) {
         // 1. validation
         String sortVal = validateSort(sort);
