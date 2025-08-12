@@ -14,7 +14,7 @@ public enum AuthParameters {
     JWT_SIGNUP_TOKEN_KEY("oauth2Id"),
     REDIRECT_SIGNUP_URL("/signup"),
     REDIRECT_HOME_URL("/feed"),
-    HTTPS_PREFIX("https://www"),
+    HTTPS_PREFIX("https://"),
     HTTP_PREFIX("http://")
     ;
 
