@@ -3,12 +3,10 @@ package konkuk.thip.user.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.Oauth2Id;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.user.adapter.in.web.request.UserFollowRequest;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
@@ -21,8 +19,6 @@ import konkuk.thip.user.application.port.in.UserUpdateUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static konkuk.thip.common.security.constant.AuthParameters.JWT_HEADER_KEY;
-import static konkuk.thip.common.security.constant.AuthParameters.JWT_PREFIX;
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "User Command API", description = "사용자가 주체가 되는 정보 수정")
@@ -34,8 +30,6 @@ public class UserCommandController {
     private final UserFollowUsecase userFollowUsecase;
     private final UserUpdateUseCase userUpdateUseCase;
 
-    private final JwtUtil jwtUtil;
-
     @Operation(
             summary = "사용자 회원가입",
             description = "사용자가 회원가입을 합니다. OAuth2 ID를 통해 사용자를 식별합니다."
@@ -43,12 +37,10 @@ public class UserCommandController {
     @ExceptionDescription(USER_SIGNUP)
     @PostMapping("/users/signup")
     public BaseResponse<UserSignupResponse> signup(@Valid @RequestBody final UserSignupRequest request,
-                                                   @Parameter(hidden = true) @Oauth2Id final String oauth2Id,
-                                                   HttpServletResponse response) {
-        Long userId = userSignupUseCase.signup(request.toCommand(oauth2Id));
-        String accessToken = jwtUtil.createAccessToken(userId);
-        response.setHeader(JWT_HEADER_KEY.getValue(), JWT_PREFIX.getValue() + accessToken);
-        return BaseResponse.ok(UserSignupResponse.of(userId));
+                                                   @Parameter(hidden = true) @Oauth2Id final String oauth2Id) {
+        return BaseResponse.ok(
+                UserSignupResponse.of(userSignupUseCase.signup(request.toCommand(oauth2Id)))
+        );
     }
 
     @Operation(

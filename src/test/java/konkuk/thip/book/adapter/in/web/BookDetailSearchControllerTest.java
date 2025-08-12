@@ -13,8 +13,8 @@ import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.saved.adapter.out.jpa.SavedBookJpaEntity;
-import konkuk.thip.saved.adapter.out.persistence.repository.SavedBookJpaRepository;
+import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
+import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -121,7 +121,7 @@ class BookDetailSearchControllerTest {
     @AfterEach
     void tearDown() {
         savedBookJpaRepository.deleteAll();
-        feedJpaRepository.deleteAll();
+        feedJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
@@ -181,7 +181,7 @@ class BookDetailSearchControllerTest {
         String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
-        feedJpaRepository.deleteAll();
+        feedJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());

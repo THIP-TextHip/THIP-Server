@@ -23,4 +23,8 @@ public interface BookCommandPort {
     void updateForPageCount(Book book);
 
     Book findBookByRoomId(Long roomId);
+
+    void saveSavedBook(Long userId, Long bookId);
+    void deleteSavedBook(Long userId, Long bookId);
+
 }

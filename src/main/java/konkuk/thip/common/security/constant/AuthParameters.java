@@ -12,6 +12,8 @@ public enum AuthParameters {
     GOOGLE_PROVIDER_ID_KEY("sub"),
     JWT_ACCESS_TOKEN_KEY("userId"),
     JWT_SIGNUP_TOKEN_KEY("oauth2Id"),
+    REDIRECT_SIGNUP_URL("/signup"),
+    REDIRECT_HOME_URL("/feed"),
     ;
 
     private final String value;

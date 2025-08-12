@@ -15,7 +15,7 @@ public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEn
     List<CommentLikeJpaEntity> findAllByUserId(@Param("userId") Long userId);
 
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM CommentLikeJpaEntity cl WHERE cl.userJpaEntity.userId = :userId AND cl.commentJpaEntity.commentId = :commentId")
     void deleteByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
@@ -24,10 +24,20 @@ public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEn
             "WHERE cl.userJpaEntity.userId = :userId AND cl.commentJpaEntity.commentId = :commentId")
     boolean existsByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM CommentLikeJpaEntity cl WHERE cl.commentJpaEntity.commentId = :commentId")
     void deleteAllByCommentId(@Param("commentId") Long commentId);
 
     @Query("SELECT c.commentJpaEntity.commentId FROM CommentLikeJpaEntity c WHERE c.userJpaEntity.userId = :userId AND c.commentJpaEntity.commentId IN :commentIds")
     Set<Long> findCommentIdsLikedByUser(@Param("commentIds") Set<Long> commentIds, @Param("userId") Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           DELETE FROM CommentLikeJpaEntity cl
+           WHERE cl.commentJpaEntity.commentId IN (
+                SELECT c.commentId FROM CommentJpaEntity c
+                WHERE c.postJpaEntity.postId = :postId
+           )
+           """)
+    void deleteAllByPostId(@Param("postId") Long postId);
 }

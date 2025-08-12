@@ -68,12 +68,9 @@ public class FeedCreateService implements FeedCreateUseCase {
      * ISBN으로 책을 조회하고, 없으면 외부 API(Naver)에서 상세 정보를 조회해 새로 저장 후 ID 반환
      */
     private Long findOrCreateBookByIsbn(String isbn) {
-        try {
-            Book existing = bookCommandPort.getByIsbnOrThrow(isbn);
-            return existing.getId();
-        } catch (EntityNotFoundException e) {
-            return saveNewBookWithFromExternalApi(isbn);
-        }
+        return bookCommandPort.findByIsbn(isbn)
+                .map(Book::getId)
+                .orElseGet(() -> saveNewBookWithFromExternalApi(isbn));
     }
 
     /**

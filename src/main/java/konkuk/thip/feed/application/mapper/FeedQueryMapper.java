@@ -7,6 +7,7 @@ import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.domain.Content;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,11 +19,13 @@ import java.util.Set;
 
 @Mapper(
         componentModel = "spring",
-        imports = DateUtil.class,
+        imports = {DateUtil.class, Alias.class},
         unmappedTargetPolicy = ReportingPolicy.IGNORE       // 명시적으로 매핑하지 않은 필드를 무시하도록 설정
 )
 public interface FeedQueryMapper {
 
+    @Mapping(target = "aliasName", source = "dto.alias")
+    @Mapping(target = "aliasColor", expression = "java(Alias.from(dto.alias()).getColor())")
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
     @Mapping(
@@ -67,7 +70,7 @@ public interface FeedQueryMapper {
     @Mapping(target = "creatorId", source = "feedCreator.id")
     @Mapping(target = "creatorNickname", source = "feedCreator.nickname")
     @Mapping(target = "creatorProfileImageUrl", source = "feedCreator.alias.imageUrl")
-    @Mapping(target = "alias", source = "feedCreator.alias.value")
+    @Mapping(target = "aliasName", source = "feedCreator.alias.value")
     @Mapping(target = "aliasColor", source = "feedCreator.alias.color")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(feed.getCreatedAt()))")
     @Mapping(target = "isbn", source = "book.isbn")
