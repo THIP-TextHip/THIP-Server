@@ -29,11 +29,8 @@ public class UserSearchService implements UserSearchUsecase {
                         userSearchQuery.size()
                 ));
 
-        // 검색 완료일 경우, 최근 검색어 저장
-        if (userSearchQuery.isFinalized()) {
-            recentSearchCreateManager.saveRecentSearchByUser(userSearchQuery.userId(), userSearchQuery.keyword(), RecentSearchType.USER_SEARCH);
-        }
-
+        recentSearchCreateManager.saveRecentSearchByUser(userSearchQuery.userId(), userSearchQuery.keyword(), RecentSearchType.USER_SEARCH, userSearchQuery.isFinalized());
+        
         return UserSearchResponse.of(userDtoList);
     }
 }
