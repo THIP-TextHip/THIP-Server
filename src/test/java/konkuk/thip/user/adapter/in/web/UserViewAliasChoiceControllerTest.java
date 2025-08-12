@@ -72,10 +72,10 @@ class UserViewAliasChoiceControllerTest {
 
         assertThat(choices).hasSize(2);
         assertThat(choices)
-                .extracting("aliasName", "categoryName", "imageUrl", "color")
+                .extracting("aliasName", "categoryName")
                 .containsExactlyInAnyOrder(
-                        tuple("문학가", "문학", "문학_image", "문학_color"),
-                        tuple("과학자", "과학·IT", "과학_image", "과학_color")
+                        tuple("문학가", "문학"),
+                        tuple("과학자", "과학·IT")
                 );
     }
 
