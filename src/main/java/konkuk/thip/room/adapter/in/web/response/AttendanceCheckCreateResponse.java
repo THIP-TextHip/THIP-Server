@@ -1,4 +1,4 @@
-package konkuk.thip.attendancecheck.adapter.in.web.response;
+package konkuk.thip.room.adapter.in.web.response;
 
 public record AttendanceCheckCreateResponse(
         Long attendanceCheckId

@@ -1,8 +1,7 @@
-package konkuk.thip.attendancecheck.adapter.out.jpa;
+package konkuk.thip.room.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 

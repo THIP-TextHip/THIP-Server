@@ -1,8 +1,8 @@
-package konkuk.thip.attendancecheck.adapter.out.persistence;
+package konkuk.thip.room.adapter.out.persistence;
 
-import konkuk.thip.attendancecheck.adapter.out.mapper.AttendanceCheckMapper;
-import konkuk.thip.attendancecheck.adapter.out.persistence.repository.AttendanceCheckJpaRepository;
-import konkuk.thip.attendancecheck.application.port.out.AttendanceCheckQueryPort;
+import konkuk.thip.room.adapter.out.mapper.AttendanceCheckMapper;
+import konkuk.thip.room.adapter.out.persistence.repository.attendanceCheck.AttendanceCheckJpaRepository;
+import konkuk.thip.room.application.port.out.AttendanceCheckQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

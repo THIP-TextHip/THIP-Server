@@ -1,4 +1,4 @@
-package konkuk.thip.attendancecheck.domain;
+package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import lombok.Getter;

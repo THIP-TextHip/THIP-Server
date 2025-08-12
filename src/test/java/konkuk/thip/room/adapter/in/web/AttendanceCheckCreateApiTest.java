@@ -1,8 +1,8 @@
-package konkuk.thip.attendancecheck.adapter.in.web;
+package konkuk.thip.room.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.attendancecheck.adapter.out.persistence.repository.AttendanceCheckJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.attendanceCheck.AttendanceCheckJpaRepository;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;

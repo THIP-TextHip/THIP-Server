@@ -1,9 +1,9 @@
-package konkuk.thip.attendancecheck.adapter.out.persistence;
+package konkuk.thip.room.adapter.out.persistence;
 
-import konkuk.thip.attendancecheck.adapter.out.mapper.AttendanceCheckMapper;
-import konkuk.thip.attendancecheck.adapter.out.persistence.repository.AttendanceCheckJpaRepository;
-import konkuk.thip.attendancecheck.application.port.out.AttendanceCheckCommandPort;
-import konkuk.thip.attendancecheck.domain.AttendanceCheck;
+import konkuk.thip.room.adapter.out.mapper.AttendanceCheckMapper;
+import konkuk.thip.room.adapter.out.persistence.repository.attendanceCheck.AttendanceCheckJpaRepository;
+import konkuk.thip.room.application.port.out.AttendanceCheckCommandPort;
+import konkuk.thip.room.domain.AttendanceCheck;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
