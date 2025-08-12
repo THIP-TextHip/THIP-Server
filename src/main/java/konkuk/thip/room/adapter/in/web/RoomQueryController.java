@@ -42,9 +42,10 @@ public class RoomQueryController {
             @Parameter(description = "모임방 카테고리", example = "문학") @RequestParam(value = "category", required = false, defaultValue = "") final String category,
             @Parameter(description = "정렬 방식 (마감 임박 : deadline, 신청 인원 : memberCount)", example = "deadline") @RequestParam("sort") final String sort,
             @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
-            @Parameter(description = "페이지 번호", example = "1") @RequestParam("page") final int page
+            @Parameter(description = "페이지 번호", example = "1") @RequestParam("page") final int page,
+            @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(roomSearchUseCase.searchRoom(keyword, category, sort, page, isFinalized));
+        return BaseResponse.ok(roomSearchUseCase.searchRoom(keyword, category, sort, page, isFinalized, userId));
     }
 
     @Operation(
