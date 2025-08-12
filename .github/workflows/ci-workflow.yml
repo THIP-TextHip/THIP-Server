@@ -1,0 +1,61 @@
+name: CI with Gradle
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+      - 'develop'
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+env:
+  RESOURCE_PATH: src/main/resources
+  TEST_RESOURCE_PATH: src/test/resources
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          server-id: github
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+      - name: 🧾 Create application.yml from secret (base64)
+        run: |
+          mkdir -p ${{ env.RESOURCE_PATH }}
+          mkdir -p ${{ env.TEST_RESOURCE_PATH }}
+          echo "${{ secrets.APPLICATION_YML_DEV }}" | base64 --decode > ${{ env.RESOURCE_PATH }}/application.yml
+          echo "${{ secrets.APPLICATION_YML_TEST }}" | base64 --decode > ${{ env.TEST_RESOURCE_PATH }}/application-test.yml
+
+      - name: 👏🏻 grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: 🚀 Start Redis
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: 7
+
+      - name: 🐘 build with Gradle
+        run: ./gradlew build --parallel --stacktrace
+
+      - name: ✉️ Post test results as a comment on the PR
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/build/test-results/test/TEST-*.xml'
+
+      - name: 🙁 Annotate failed test cases on changed lines
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          token: ${{ github.token }}

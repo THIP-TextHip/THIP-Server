@@ -1,0 +1,38 @@
+package konkuk.thip.user.adapter.out.mapper;
+
+import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.User;
+import org.springframework.stereotype.Component;
+
+@Component
+public class UserMapper {
+
+    public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
+        return UserJpaEntity.builder()
+                .nickname(user.getNickname())
+                .nicknameUpdatedAt(user.getNicknameUpdatedAt())
+                .role(UserRole.from(user.getUserRole()))
+                .oauth2Id(user.getOauth2Id())
+                .followerCount(user.getFollowerCount())
+                .aliasForUserJpaEntity(aliasJpaEntity)
+                .build();
+    }
+
+    public User toDomainEntity(UserJpaEntity userJpaEntity) {
+        return User.builder()
+                .id(userJpaEntity.getUserId())
+                .nickname(userJpaEntity.getNickname())
+                .nicknameUpdatedAt(userJpaEntity.getNicknameUpdatedAt())
+                .userRole(userJpaEntity.getRole().getType())
+                .oauth2Id(userJpaEntity.getOauth2Id())
+                .followerCount(userJpaEntity.getFollowerCount())
+                .alias(Alias.from(userJpaEntity.getAliasForUserJpaEntity().getValue()))
+                .createdAt(userJpaEntity.getCreatedAt())
+                .modifiedAt(userJpaEntity.getModifiedAt())
+                .status(userJpaEntity.getStatus())
+                .build();
+    }
+}
