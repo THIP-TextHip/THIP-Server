@@ -1,6 +1,5 @@
 package konkuk.thip.record.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.record.application.port.in.RecordDeleteUseCase;
@@ -10,6 +9,7 @@ import konkuk.thip.record.domain.Record;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,6 +1,5 @@
 package konkuk.thip.feed.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.feed.application.port.in.FeedDeleteUseCase;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
@@ -8,6 +7,7 @@ import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
