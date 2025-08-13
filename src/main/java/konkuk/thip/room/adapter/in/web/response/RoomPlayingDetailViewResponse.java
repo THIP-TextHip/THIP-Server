@@ -14,6 +14,7 @@ public record RoomPlayingDetailViewResponse(
         String progressStartDate,
         String progressEndDate,
         String category,
+        String categoryColor,
         String roomDescription,
         int memberCount,
         int recruitCount,

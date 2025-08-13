@@ -4,6 +4,7 @@ import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record RoomRecruitingDetailViewResponse(
         boolean isHost,
         boolean isJoining,
@@ -15,6 +16,7 @@ public record RoomRecruitingDetailViewResponse(
         String progressEndDate,
         String recruitEndDate,
         String category,
+        String categoryColor,
         String roomDescription,
         int memberCount,
         int recruitCount,

@@ -6,6 +6,7 @@ import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.room.application.port.in.RoomShowPlayingDetailViewUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipants;
@@ -24,6 +25,7 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
     private static final int TOP_PARTICIPATION_VOTES_COUNT = 3;
 
     private final RoomCommandPort roomCommandPort;
+    private final RoomQueryPort roomQueryPort;
     private final BookCommandPort bookCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final VoteQueryPort voteQueryPort;
@@ -31,7 +33,7 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
     @Override
     @Transactional(readOnly = true)
     public RoomPlayingDetailViewResponse getPlayingRoomDetailView(Long userId, Long roomId) {
-        // 1. Room 조회, Book 조회
+        // 1. Room 조회, Book 조회, Category와 연관된 Alias 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
         Book book = bookCommandPort.findById(room.getBookId());
 
@@ -66,6 +68,7 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
                 .currentPage(roomParticipants.getCurrentPageOfUser(userId))
                 .userPercentage(roomParticipants.getUserPercentageOfUser(userId))
                 .currentVotes(topParticipationVotes)
+                .categoryColor(roomQueryPort.findAliasColorOfCategory(room.getCategory()))      // TODO : 리펙토링 대상
                 .build();
     }
 }
