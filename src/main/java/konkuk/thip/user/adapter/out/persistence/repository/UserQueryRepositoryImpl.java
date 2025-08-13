@@ -7,11 +7,13 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.comment.adapter.out.jpa.QCommentJpaEntity;
 import konkuk.thip.common.entity.StatusType;
+import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.QPostLikeJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import konkuk.thip.user.application.port.out.dto.QReactionQueryDto;
 import konkuk.thip.user.application.port.out.dto.QUserQueryDto;
@@ -159,5 +161,36 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 .toList();
     }
 
+    @Override
+    public List<UserQueryDto> findFeedWritersOfMyFollowingsOrderByCreatedAtDesc(Long userId, Integer size) {
+        QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
+        QUserJpaEntity writer = new QUserJpaEntity("writer");
+        QFeedJpaEntity feed = QFeedJpaEntity.feedJpaEntity;
+        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
+        return queryFactory
+                .select(new QUserQueryDto(
+                        writer.userId,
+                        writer.nickname,
+                        alias.imageUrl
+                ))
+                .from(following)
+                .join(following.followingUserJpaEntity, writer)     // writer : 나에게 팔로잉 당하는 사람들
+                .join(feed).on(feed.userJpaEntity.eq(writer))
+                .join(writer.aliasForUserJpaEntity, alias)
+                .where(
+                        following.userJpaEntity.userId.eq(userId)       // 내가 팔로잉 하는 사람
+                                .and(writer.status.eq(StatusType.ACTIVE))       // 그 중 아직 회원인 사람
+                                .and(feed.status.eq(StatusType.ACTIVE))     // 그 중 삭제 X & 공개피드를 작성한 사람
+                                .and(feed.isPublic.isTrue())
+                )
+                .groupBy(       // 그룹핑
+                        writer.userId,
+                        writer.nickname,
+                        alias.imageUrl
+                )
+                .orderBy(feed.createdAt.max().desc())       // 피드 작성 시각 중 최대값 == 가장 최근에 작성한 피드
+                .limit(size)        // 무한 스크롤 X
+                .fetch();
+    }
 }

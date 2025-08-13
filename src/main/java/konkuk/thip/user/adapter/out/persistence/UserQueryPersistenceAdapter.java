@@ -69,6 +69,11 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
         );
     }
 
+    @Override
+    public List<UserQueryDto> findRecentFeedWritersOfMyFollowings(Long userId, int size) {
+        return userJpaRepository.findFeedWritersOfMyFollowingsOrderByCreatedAtDesc(userId, size);
+    }
+
     private CursorBasedList<ReactionQueryDto> getReactions(Long userId, Cursor cursor, ReactionQueryFunction reactionQueryFunction) {
         LocalDateTime cursorLocalDateTime = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
 
