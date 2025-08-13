@@ -2,9 +2,11 @@ package konkuk.thip.feed.application.port.out;
 
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.domain.SavedFeeds;
 
+import java.util.List;
 import java.util.Set;
 
 public interface FeedQueryPort {
@@ -37,4 +39,6 @@ public interface FeedQueryPort {
     SavedFeeds findSavedFeedsByUserId(Long userId);
 
     Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId);
+
+    List<TagCategoryQueryDto> findAllTags();
 }
