@@ -53,6 +53,7 @@ public class SecurityConfig {
             "/v3/api-docs/**","/oauth2/authorization/**",
             "/login/oauth2/code/**", "/actuator/health",
             "/oauth2/users",
+            "/api/set-cookie",
 
     };
 
