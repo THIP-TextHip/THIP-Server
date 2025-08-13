@@ -38,8 +38,10 @@ public class SecurityConfig {
     private String webDomainUrl;
 
     @Value("${server.https-url}")
-    private String httpsUrl;
+    private String prodServerUrl;
 
+    @Value("${server.http-url}")
+    private String devServerUrl;
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -98,7 +100,8 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 webUrl,
                 webDomainUrl,
-                httpsUrl
+                prodServerUrl,
+                devServerUrl
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(Collections.singletonList("*"));
