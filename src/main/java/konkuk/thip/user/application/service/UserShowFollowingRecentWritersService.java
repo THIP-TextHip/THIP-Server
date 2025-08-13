@@ -6,6 +6,7 @@ import konkuk.thip.user.application.port.in.UserShowFollowingRecentWritersUseCas
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class UserShowFollowingRecentWritersService implements UserShowFollowingR
     private final UserQueryMapper userQueryMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public UserFollowingRecentWritersResponse showMyFollowingRecentWriters(Long userId) {
         return userQueryMapper.toRecentWriterResponses(userQueryPort.findRecentFeedWritersOfMyFollowings(userId, SIZE));
     }
