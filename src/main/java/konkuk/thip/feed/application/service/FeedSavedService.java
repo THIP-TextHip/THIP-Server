@@ -1,6 +1,5 @@
 package konkuk.thip.feed.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.feed.application.port.in.FeedSavedUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedIsSavedCommand;
 import konkuk.thip.feed.application.port.in.dto.FeedIsSavedResult;
@@ -10,6 +9,7 @@ import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.SavedFeeds;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

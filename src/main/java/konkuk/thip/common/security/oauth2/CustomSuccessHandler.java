@@ -42,18 +42,24 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 신규 유저 - 회원가입용 임시 토큰
             String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id());
             addTokenCookie(response, tempToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL);
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL.getValue());
         } else {
             // 기존 유저 - 로그인용 액세스 토큰
             String accessToken = jwtUtil.createAccessToken(loginUser.userId());
             addTokenCookie(response, accessToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL);
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL.getValue());
         }
     }
 
     private void addTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(JWT_HEADER_KEY.getValue(), token);
-        cookie.setSecure(true);
+        if(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue())) {
+            cookie.setDomain(webRedirectUrl.replace(HTTPS_PREFIX.getValue(), ""));
+        } else {
+            cookie.setDomain("localhost");
+        }
+        cookie.setSecure(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue()));
+        cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setMaxAge(COOKIE_MAX_AGE);
         response.addCookie(cookie);

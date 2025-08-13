@@ -48,6 +48,6 @@ public class UserMyPageService implements UserMyPageUseCase {
     public UserProfileResponse getUserProfile(Long userId) {
         User user = userCommandPort.findById(userId);
 
-        return UserProfileResponse.of(user.getAlias().getImageUrl(), user.getNickname(), user.getAlias().getValue());
+        return UserProfileResponse.of(user.getAlias().getImageUrl(), user.getNickname(), user.getAlias().getValue(),  user.getAlias().getColor());
     }
 }

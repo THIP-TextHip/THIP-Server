@@ -23,14 +23,15 @@ public interface CommentQueryMapper {
     @Mapping(target = "isLike", expression = "java(likedCommentIds.contains(root.commentId()))")
     @Mapping(target = "isDeleted", constant = "false")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(root.createdAt()))")
-    CommentForSinglePostResponse.RootCommentDto toRoot(CommentQueryDto root,
-                                                       @Context Set<Long> likedCommentIds);
+    @Mapping(target = "aliasName", source = "root.alias")
+    CommentForSinglePostResponse.RootCommentDto toRoot(CommentQueryDto root, @Context Set<Long> likedCommentIds);
 
     /**
      * 개별 답글 매핑
      */
     @Mapping(target = "isLike", expression = "java(likedCommentIds.contains(child.commentId()))")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(child.createdAt()))")
+    @Mapping(target = "aliasName", source = "child.alias")
     CommentForSinglePostResponse.RootCommentDto.ReplyDto toReply(CommentQueryDto child, @Context Set<Long> likedCommentIds);
 
     /**

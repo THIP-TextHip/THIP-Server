@@ -1,5 +1,6 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
+import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 
 import java.time.LocalDateTime;
@@ -16,4 +17,6 @@ public interface FeedQueryRepository {
     List<FeedQueryDto> findMyFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
 
     List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
+
+    List<TagCategoryQueryDto> findAllTags();
 }

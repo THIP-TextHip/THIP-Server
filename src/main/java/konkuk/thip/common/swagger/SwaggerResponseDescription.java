@@ -136,6 +136,12 @@ public enum SwaggerResponseDescription {
             RECORD_NOT_FOUND,
             RECORD_ACCESS_FORBIDDEN
     ))),
+    RECORD_PIN(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            BOOK_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            RECORD_ACCESS_FORBIDDEN
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(

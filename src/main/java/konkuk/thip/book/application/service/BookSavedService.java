@@ -1,6 +1,5 @@
 package konkuk.thip.book.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.in.BookSavedUseCase;
 import konkuk.thip.book.application.port.in.dto.BookIsSavedResult;
@@ -11,6 +10,7 @@ import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 

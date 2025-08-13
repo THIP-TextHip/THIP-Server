@@ -24,6 +24,7 @@ public class AliasQueryRepositoryImpl implements AliasQueryRepository {
         List<UserViewAliasChoiceResult.AliasChoice> aliasChoices = jpaQueryFactory
                 .select(Projections.constructor(
                         UserViewAliasChoiceResult.AliasChoice.class,
+                        // TODO : DB에 String alias 만 저장하도록 바뀐다면 쿼리 수정해야함
                         alias.value,
                         category.value,
                         alias.imageUrl,

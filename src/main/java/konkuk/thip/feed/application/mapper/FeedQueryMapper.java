@@ -3,26 +3,31 @@ package konkuk.thip.feed.application.mapper;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.feed.adapter.in.web.response.*;
+import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.domain.Content;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.user.domain.Alias;
+import konkuk.thip.feed.application.port.in.dto.TagsWithCategoryResult;
 import konkuk.thip.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Mapper(
         componentModel = "spring",
-        imports = DateUtil.class,
+        imports = {DateUtil.class, Alias.class},
         unmappedTargetPolicy = ReportingPolicy.IGNORE       // 명시적으로 매핑하지 않은 필드를 무시하도록 설정
 )
 public interface FeedQueryMapper {
 
+    @Mapping(target = "aliasName", source = "dto.alias")
+    @Mapping(target = "aliasColor", expression = "java(Alias.from(dto.alias()).getColor())")
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
     @Mapping(
@@ -67,7 +72,7 @@ public interface FeedQueryMapper {
     @Mapping(target = "creatorId", source = "feedCreator.id")
     @Mapping(target = "creatorNickname", source = "feedCreator.nickname")
     @Mapping(target = "creatorProfileImageUrl", source = "feedCreator.alias.imageUrl")
-    @Mapping(target = "alias", source = "feedCreator.alias.value")
+    @Mapping(target = "aliasName", source = "feedCreator.alias.value")
     @Mapping(target = "aliasColor", source = "feedCreator.alias.color")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(feed.getCreatedAt()))")
     @Mapping(target = "isbn", source = "book.isbn")
@@ -91,5 +96,20 @@ public interface FeedQueryMapper {
     default String[] mapTagList(List<Tag> tagList) {
         if (tagList == null) return new String[0];
         return tagList.stream().map(Tag::getValue).toArray(String[]::new);
+    }
+
+    default List<TagsWithCategoryResult> toTagsWithCategoryResult(List<TagCategoryQueryDto> rows) {
+        Map<String, Set<String>> grouped = rows.stream()
+                .collect(Collectors.groupingBy(
+                        TagCategoryQueryDto::categoryValue,
+                        Collectors.mapping(
+                                TagCategoryQueryDto::tagValue,
+                                Collectors.toCollection(LinkedHashSet::new)
+                        )
+                ));
+
+        return grouped.entrySet().stream()
+                .map(e -> new TagsWithCategoryResult(e.getKey(), new ArrayList<>(e.getValue())))
+                .toList();
     }
 }
