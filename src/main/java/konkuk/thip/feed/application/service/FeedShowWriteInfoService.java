@@ -6,6 +6,7 @@ import konkuk.thip.feed.application.port.in.FeedShowWriteInfoUseCase;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class FeedShowWriteInfoService implements FeedShowWriteInfoUseCase {
     private final FeedQueryMapper feedQueryMapper;
 
     @Override
+    @Cacheable("allTags")
     @Transactional(readOnly = true)
     public FeedShowWriteInfoResponse showFeedWriteInfo() {
         List<TagCategoryQueryDto> rows = feedQueryPort.findAllTags();
