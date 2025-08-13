@@ -1,6 +1,5 @@
 package konkuk.thip.post.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.common.post.CountUpdatable;
 import konkuk.thip.common.post.service.PostHandler;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeCommand;
@@ -12,6 +11,7 @@ import konkuk.thip.post.application.service.validator.PostLikeAuthorizationValid
 import konkuk.thip.post.domain.service.PostCountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

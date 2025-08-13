@@ -6,7 +6,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
+import konkuk.thip.record.adapter.in.web.response.RecordPinResponse;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
+import konkuk.thip.record.application.port.in.RecordPinUseCase;
+import konkuk.thip.record.application.port.in.dto.RecordPinQuery;
 import konkuk.thip.record.application.port.in.dto.RecordSearchQuery;
 import konkuk.thip.record.application.port.in.dto.RecordSearchUseCase;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_SEARCH;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "Record Query API", description = "기록 조회 관련 API")
 @RestController
@@ -23,6 +26,7 @@ import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_SEARC
 public class RecordQueryController {
 
     private final RecordSearchUseCase recordSearchUseCase;
+    private final RecordPinUseCase recordPinUseCase;
 
     @Operation(
             summary = "방의 게시글(기록, 투표) 목록 조회",
@@ -61,6 +65,19 @@ public class RecordQueryController {
                         .userId(userId)
                         .build()
         ));
+    }
+
+    @Operation(
+            summary = "기록을 피드에 핀하기 및 피드 핀을 위한 책 정보 조회",
+            description = "사용자가 기록을 피드에 핀할 수 있는지 검증 및, 피드 핀할시 필요한 책 정보를 조회합니다"
+    )
+    @ExceptionDescription(RECORD_PIN)
+    @GetMapping("/rooms/{roomId}/records/{recordId}/pin")
+    public BaseResponse<RecordPinResponse> pinRecord(
+            @Parameter(description = "핀하려는 기록이 작성된 모임 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(description = "핀하려는 기록 ID", example = "1") @PathVariable("recordId") final Long recordId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(recordPinUseCase.pinRecord(new RecordPinQuery(roomId, recordId, userId)));
     }
 
 }

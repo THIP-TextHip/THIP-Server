@@ -184,6 +184,7 @@ class RoomSearchApiTest {
                 .requestAttr("userId", 1L)
                 .param("keyword", "과학")
                 .param("sort", "deadline")
+                .param("isFinalized", String.valueOf(false))
                 .param("page", "1"));
 
         //then
@@ -233,6 +234,7 @@ class RoomSearchApiTest {
                 .requestAttr("userId", 1L)
                 .param("keyword", "과학")
                 .param("sort", "memberCount")
+                .param("isFinalized", String.valueOf(false))
                 .param("page", "1"));
 
         //then
@@ -285,6 +287,7 @@ class RoomSearchApiTest {
                 .requestAttr("userId", 1L)
                 .param("category", "과학·IT")
                 .param("sort", "deadline")
+                .param("isFinalized", String.valueOf(false))
                 .param("page", "1"));
 
         //then
@@ -324,6 +327,7 @@ class RoomSearchApiTest {
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
                 .param("sort", "deadline")
+                .param("isFinalized", String.valueOf(false))
                 .param("page", "1"));
 
         //then
@@ -366,6 +370,7 @@ class RoomSearchApiTest {
                 .param("keyword", "과학")
                 .param("category", Category.SCIENCE_IT.getValue())
                 .param("sort", "deadline")
+                .param("isFinalized", String.valueOf(false))
                 .param("page", "1"));
 
         // then

@@ -72,7 +72,7 @@ class UserSearchApiTest {
                         .param("keyword", keyword)
                         .requestAttr("userId", currentUserId)
                         .param("size", "10")
-
+                        .param("isFinalized", String.valueOf(true))     // 검색 완료 -> 최근 검색어 저장
         );
 
         // then: 검색 결과 검증
