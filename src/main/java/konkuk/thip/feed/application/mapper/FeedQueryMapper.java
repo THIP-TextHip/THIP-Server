@@ -16,6 +16,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -104,6 +105,7 @@ public interface FeedQueryMapper {
         Map<String, List<String>> grouped = rows.stream()
                 .collect(Collectors.groupingBy(
                         TagCategoryQueryDto::categoryValue,
+                        LinkedHashMap::new, // 순서 보장
                         Collectors.mapping(TagCategoryQueryDto::tagValue, Collectors.toList())
                 ));
 

@@ -224,6 +224,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .select(new QTagCategoryQueryDto(c.value, t.value))
                 .from(c)
                 .join(t).on(t.categoryJpaEntity.eq(c))
+                .orderBy(c.categoryId.asc(), t.tagId.asc()) //Id 순 정렬
                 .fetch();
     }
 
