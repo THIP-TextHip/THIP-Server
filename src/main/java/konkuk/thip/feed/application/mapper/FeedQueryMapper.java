@@ -16,10 +16,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Mapper(
@@ -102,16 +99,17 @@ public interface FeedQueryMapper {
     }
 
     default List<TagsWithCategoryResult> toTagsWithCategoryResult(List<TagCategoryQueryDto> rows) {
-        Map<String, List<String>> grouped = rows.stream()
+        Map<String, Set<String>> grouped = rows.stream()
                 .collect(Collectors.groupingBy(
                         TagCategoryQueryDto::categoryValue,
-                        LinkedHashMap::new, // 순서 보장
-                        Collectors.mapping(TagCategoryQueryDto::tagValue, Collectors.toList())
+                        Collectors.mapping(
+                                TagCategoryQueryDto::tagValue,
+                                Collectors.toCollection(LinkedHashSet::new)
+                        )
                 ));
 
         return grouped.entrySet().stream()
-                .map(e -> new TagsWithCategoryResult(e.getKey(), e.getValue()))
+                .map(e -> new TagsWithCategoryResult(e.getKey(), new ArrayList<>(e.getValue())))
                 .toList();
     }
-
 }
