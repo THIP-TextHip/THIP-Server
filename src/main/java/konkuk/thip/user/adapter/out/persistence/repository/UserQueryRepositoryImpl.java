@@ -177,7 +177,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 .from(following)
                 .join(following.followingUserJpaEntity, writer)     // writer : 나에게 팔로잉 당하는 사람들
                 .join(feed).on(feed.userJpaEntity.eq(writer))
-                .leftJoin(writer.aliasForUserJpaEntity, alias)
+                .join(writer.aliasForUserJpaEntity, alias)
                 .where(
                         following.userJpaEntity.userId.eq(userId)       // 내가 팔로잉 하는 사람
                                 .and(writer.status.eq(StatusType.ACTIVE))       // 그 중 아직 회원인 사람
