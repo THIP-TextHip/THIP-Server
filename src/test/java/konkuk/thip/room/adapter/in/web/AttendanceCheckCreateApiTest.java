@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Map;
 
+import static konkuk.thip.common.exception.code.ErrorCode.ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED;
 import static konkuk.thip.common.exception.code.ErrorCode.ROOM_ACCESS_FORBIDDEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -117,5 +118,66 @@ class AttendanceCheckCreateApiTest {
                 .andExpect(jsonPath("$.code").value(ROOM_ACCESS_FORBIDDEN.getCode()))
                 .andExpect(jsonPath("$.message", containsString(ROOM_ACCESS_FORBIDDEN.getMessage())));
     }
-}
 
+    @Test
+    @DisplayName("방의 참석자가 출석체크(= 오늘의 한마디) 를 처음 작성할 경우, response의 isFirstWrite는 true 이다.")
+    void attendance_check_create_first_test() throws Exception {
+        //given
+        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
+
+        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
+        RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
+
+        // me 가 room에 참여중인 상황
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, me, RoomParticipantRole.MEMBER, 0.0));
+
+        Map<String, Object> request = Map.of("content", "오늘의 한마디~~~");
+
+        //when //then
+        ResultActions result = mockMvc.perform(post("/rooms/{roomId}/daily-greeting", room.getRoomId().intValue())
+                        .requestAttr("userId", me.getUserId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        String responseBody = result.andReturn().getResponse().getContentAsString();
+        JsonNode responseJson = objectMapper.readTree(responseBody);
+
+        assertThat(responseJson.path("data").path("isFirstWrite").asBoolean()).isTrue();
+    }
+
+    @Test
+    @DisplayName("방의 참석자가 출석체크(= 오늘의 한마디) 를 하루 최대 5회만 작성할 수 있다. 5회를 초과할 경우, 400 error를 반환한다.")
+    void attendance_check_create_too_many_test() throws Exception {
+        //given
+        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
+
+        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
+        RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
+
+        // me 가 room에 참여중인 상황
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, me, RoomParticipantRole.MEMBER, 0.0));
+
+        // me 가 이미 오늘의 한마디를 5회 작성한 상황
+        attendanceCheckJpaRepository.save(TestEntityFactory.createAttendanceCheck("오한1", room, me));
+        attendanceCheckJpaRepository.save(TestEntityFactory.createAttendanceCheck("오한2", room, me));
+        attendanceCheckJpaRepository.save(TestEntityFactory.createAttendanceCheck("오한3", room, me));
+        attendanceCheckJpaRepository.save(TestEntityFactory.createAttendanceCheck("오한4", room, me));
+        attendanceCheckJpaRepository.save(TestEntityFactory.createAttendanceCheck("오한5", room, me));
+
+        Map<String, Object> request = Map.of("content", "6번째 오늘의 한마디~~~");
+
+        //when //then
+        mockMvc.perform(post("/rooms/{roomId}/daily-greeting", room.getRoomId().intValue())
+                        .requestAttr("userId", me.getUserId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED.getCode()))
+                .andExpect(jsonPath("$.message", containsString(ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED.getMessage())));
+    }
+}
