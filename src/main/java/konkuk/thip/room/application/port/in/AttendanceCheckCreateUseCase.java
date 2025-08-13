@@ -1,8 +1,9 @@
 package konkuk.thip.room.application.port.in;
 
 import konkuk.thip.room.application.port.in.dto.AttendanceCheckCreateCommand;
+import konkuk.thip.room.application.port.in.dto.AttendanceCheckCreateResult;
 
 public interface AttendanceCheckCreateUseCase {
 
-    Long create(AttendanceCheckCreateCommand command);
+    AttendanceCheckCreateResult create(AttendanceCheckCreateCommand command);
 }
