@@ -2,6 +2,7 @@ package konkuk.thip.common.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import konkuk.thip.common.exception.AuthException;
@@ -68,9 +69,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractToken(HttpServletRequest request) {
+        // 1. Authorization 헤더 우선 (앱)
         String authorization = request.getHeader(JWT_HEADER_KEY.getValue());
         if (authorization != null && authorization.startsWith(JWT_PREFIX.getValue())) {
             return authorization.split(" ")[1];
+        }
+
+        // 2. Cookie에서 JWT 추출 (웹)
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (JWT_HEADER_KEY.getValue().equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         log.info("토큰이 없습니다.");
         return null;
