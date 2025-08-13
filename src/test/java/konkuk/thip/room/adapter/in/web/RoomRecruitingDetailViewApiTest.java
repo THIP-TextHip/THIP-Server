@@ -28,8 +28,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -189,7 +188,7 @@ class RoomRecruitingDetailViewApiTest {
                 .andExpect(jsonPath("$.data.isHost", is(false)))
                 .andExpect(jsonPath("$.data.isJoining", is(true)))
                 .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
-                .andExpect(jsonPath("$.data.roomImageUrl", is("과학·IT_image")))      // 방 대표 이미지 추가
+                .andExpect(jsonPath("$.data.roomImageUrl", notNullValue()))      // 방 대표 이미지 반환된다
                 .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))

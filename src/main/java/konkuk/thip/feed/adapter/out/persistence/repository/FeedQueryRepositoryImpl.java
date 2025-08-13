@@ -268,7 +268,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .feedId(e.getPostId())
                 .creatorId(e.getUserJpaEntity().getUserId())
                 .creatorNickname(e.getUserJpaEntity().getNickname())
-                .creatorProfileImageUrl(e.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())
+                .creatorProfileImageUrl(e.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
                 .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
                 .createdAt(e.getCreatedAt())
                 .isbn(e.getBookJpaEntity().getIsbn())

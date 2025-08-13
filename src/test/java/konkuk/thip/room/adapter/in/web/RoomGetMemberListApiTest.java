@@ -151,17 +151,17 @@ class RoomGetMemberListApiTest {
                 .andExpect(jsonPath("$.data.userList[0].userId").value(user1.getUserId().intValue()))
                 .andExpect(jsonPath("$.data.userList[0].nickname").exists())
                 .andExpect(jsonPath("$.data.userList[0].imageUrl").exists())
-                .andExpect(jsonPath("$.data.userList[0].alias").exists())
+                .andExpect(jsonPath("$.data.userList[0].aliasName").exists())
                 .andExpect(jsonPath("$.data.userList[0].followerCount").isNumber())
                 .andExpect(jsonPath("$.data.userList[1].userId").value(user2.getUserId().intValue()))
                 .andExpect(jsonPath("$.data.userList[1].nickname").exists())
                 .andExpect(jsonPath("$.data.userList[1].imageUrl").exists())
-                .andExpect(jsonPath("$.data.userList[1].alias").exists())
+                .andExpect(jsonPath("$.data.userList[1].aliasName").exists())
                 .andExpect(jsonPath("$.data.userList[1].followerCount").isNumber())
                 .andExpect(jsonPath("$.data.userList[2].userId").value(user3.getUserId().intValue()))
                 .andExpect(jsonPath("$.data.userList[2].nickname").exists())
                 .andExpect(jsonPath("$.data.userList[2].imageUrl").exists())
-                .andExpect(jsonPath("$.data.userList[2].alias").exists())
+                .andExpect(jsonPath("$.data.userList[2].aliasName").exists())
                 .andExpect(jsonPath("$.data.userList[2].followerCount").isNumber());
     }
 

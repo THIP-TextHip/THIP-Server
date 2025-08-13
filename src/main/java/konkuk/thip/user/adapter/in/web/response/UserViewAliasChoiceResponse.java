@@ -12,7 +12,7 @@ public record UserViewAliasChoiceResponse(List<AliasChoice> aliasChoices) {
                         ac.aliasName(),
                         ac.categoryName(),
                         ac.imageUrl(),
-                        ac.color()
+                        ac.aliasColor()
                 ))
                 .toList();
         return new UserViewAliasChoiceResponse(choices);
@@ -22,6 +22,6 @@ public record UserViewAliasChoiceResponse(List<AliasChoice> aliasChoices) {
             String aliasName,
             String categoryName,
             String imageUrl,
-            String color
+            String aliasColor
     ) {}
 }
