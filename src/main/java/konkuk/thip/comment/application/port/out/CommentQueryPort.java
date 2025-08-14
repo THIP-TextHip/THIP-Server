@@ -10,9 +10,9 @@ import java.util.Set;
 
 public interface CommentQueryPort {
 
-    CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, String postTypeStr, Cursor cursor);
+    CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, Long userId, String postTypeStr, Cursor cursor);
 
-    List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId);
+    List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId,Long userId);
 
-    Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds);
+    Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds,Long userId);
 }

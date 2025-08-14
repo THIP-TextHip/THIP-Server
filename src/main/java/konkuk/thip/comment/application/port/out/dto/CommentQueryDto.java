@@ -17,7 +17,8 @@ public record CommentQueryDto(
         LocalDateTime createdAt,    // 댓글 작성 시각
         String content,
         int likeCount,
-        Boolean isDeleted
+        Boolean isDeleted,
+        Boolean isWriter
 ) {
     /**
      * child comment
@@ -39,9 +40,10 @@ public record CommentQueryDto(
             LocalDateTime createdAt,    // 댓글 작성 시각
             String content,
             int likeCount,
-            boolean isDeleted
+            boolean isDeleted,
+            boolean isWriter
     ) {
         this(commentId, null, null, creatorId, creatorProfileImageUrl, creatorNickname,
-                alias, aliasColor, createdAt, content, likeCount, isDeleted);
+                alias, aliasColor, createdAt, content, likeCount, isDeleted,isWriter);
     }
 }
