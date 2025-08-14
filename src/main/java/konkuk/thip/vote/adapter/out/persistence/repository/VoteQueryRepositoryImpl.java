@@ -131,11 +131,11 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
                                         voteParticipant.voteItemJpaEntity.eq(voteItem),
                                         voteParticipant.userJpaEntity.userId.eq(userId)
                                 )
-                                .orderBy(voteItem.count.desc(), voteItem.voteItemId.asc())
                                 .exists() // isVoted : 로그인한 사용자가 해당 투표 아이템에 투표했는지 여부 서브 쿼리
                 ))
                 .from(voteItem)
                 .where(voteItem.voteJpaEntity.postId.eq(voteId))
+                .orderBy(voteItem.count.desc(), voteItem.voteItemId.asc())
                 .fetch();
     }
 }
