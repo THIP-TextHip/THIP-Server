@@ -27,7 +27,7 @@ public class UserSignupService implements UserSignupUseCase {
     public UserSignupResult signup(UserSignupCommand command) {
         Alias alias = Alias.from(command.aliasName());
         User user = User.withoutId(
-                command.nickname(), null, USER.getType(), command.oauth2Id(), alias
+                command.nickname(), USER.getType(), command.oauth2Id(), alias
         );
         Long userId = userCommandPort.save(user);
         String accessToken = jwtUtil.createAccessToken(userId);
