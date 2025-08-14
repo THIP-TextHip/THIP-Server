@@ -53,27 +53,28 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
             RoomParticipants participants,
             List<RoomRecruitingDetailViewResponse.RecommendRoom> recommendRooms
     ) {
-        return new RoomRecruitingDetailViewResponse(
-                participants.isHostOfRoom(userId),
-                participants.isJoiningToRoom(userId),
-                room.getId(),
-                room.getTitle(),
-                room.getCategory().getImageUrl(),
-                room.isPublic(),
-                DateUtil.formatDate(room.getStartDate()),
-                DateUtil.formatDate(room.getEndDate()),
-                DateUtil.formatAfterTime(room.getStartDate()),
-                room.getCategory().getValue(),
-                room.getDescription(),
-                participants.calculateMemberCount(),
-                room.getRecruitCount(),
-                book.getIsbn(),
-                book.getImageUrl(),
-                book.getTitle(),
-                book.getAuthorName(),
-                book.getDescription(),
-                book.getPublisher(),
-                recommendRooms
-        );
+        return RoomRecruitingDetailViewResponse.builder()
+                .isHost(participants.isHostOfRoom(userId))
+                .isJoining(participants.isJoiningToRoom(userId))
+                .roomId(room.getId())
+                .roomName(room.getTitle())
+                .roomImageUrl(room.getCategory().getImageUrl())
+                .isPublic(room.isPublic())
+                .progressStartDate(DateUtil.formatDate(room.getStartDate()))
+                .progressEndDate(DateUtil.formatDate(room.getEndDate()))
+                .recruitEndDate(DateUtil.formatAfterTime(room.getStartDate()))
+                .category(room.getCategory().getValue())
+                .categoryColor(roomQueryPort.findAliasColorOfCategory(room.getCategory()))      // TODO : 리펙토링 대상
+                .roomDescription(room.getDescription())
+                .memberCount(participants.calculateMemberCount())
+                .recruitCount(room.getRecruitCount())
+                .isbn(book.getIsbn())
+                .bookImageUrl(book.getImageUrl())
+                .bookTitle(book.getTitle())
+                .authorName(book.getAuthorName())
+                .bookDescription(book.getDescription())
+                .publisher(book.getPublisher())
+                .recommendRooms(recommendRooms)
+                .build();
     }
 }

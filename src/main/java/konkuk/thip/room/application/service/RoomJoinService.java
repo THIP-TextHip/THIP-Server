@@ -75,7 +75,7 @@ public class RoomJoinService implements RoomJoinUseCase {
             throw new BusinessException(ErrorCode.USER_ALREADY_PARTICIPATE);
         });
 
-        RoomParticipant roomParticipant = RoomParticipant.withoutId(roomJoinCommand.userId(), roomJoinCommand.roomId(), MEMBER.getType());
+        RoomParticipant roomParticipant = RoomParticipant.memberWithoutId(roomJoinCommand.userId(), roomJoinCommand.roomId());
         roomParticipantCommandPort.save(roomParticipant);
 
         //Room의 memberCount 업데이트

@@ -15,6 +15,7 @@ import konkuk.thip.vote.adapter.in.web.response.VoteResponse;
 import konkuk.thip.vote.application.port.in.VoteCreateUseCase;
 import konkuk.thip.vote.application.port.in.VoteDeleteUseCase;
 import konkuk.thip.vote.application.port.in.VoteUseCase;
+import konkuk.thip.vote.application.port.in.dto.VoteResult;
 import konkuk.thip.vote.application.port.in.dto.VoteDeleteCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -57,9 +58,8 @@ public class VoteCommandController {
             @Parameter(description = "투표를 진행할 방 ID", example = "1") @PathVariable Long roomId,
             @Parameter(description = "투표할 투표 ID", example = "1") @PathVariable Long voteId,
             @Valid @RequestBody VoteRequest request) {
-        return BaseResponse.ok(VoteResponse.of(
-                        voteUseCase.vote(request.toCommand(userId, roomId, voteId)))
-        );
+        VoteResult voteResult = voteUseCase.vote(request.toCommand(userId, roomId, voteId));
+        return BaseResponse.ok(VoteResponse.of(voteResult.postId(), voteResult.roomId(), voteResult.voteItems()));
     }
 
     @Operation(

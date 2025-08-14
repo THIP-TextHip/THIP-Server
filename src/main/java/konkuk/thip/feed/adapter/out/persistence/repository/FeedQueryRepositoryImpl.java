@@ -197,9 +197,9 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     }
 
     @Override
-    public List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+    public List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long feedOwnerId, LocalDateTime lastCreatedAt, int size) {
         // 1. 특정 유저 피드 ID 목록만 최신순 페이징 조회
-        List<Long> feedIds = fetchSpecificUserFeedIdsByCreatedAt(userId, lastCreatedAt, size);
+        List<Long> feedIds = fetchSpecificUserFeedIdsByCreatedAt(feedOwnerId, lastCreatedAt, size);
 
         // 2. 엔티티 조회 및 순서 보존
         List<FeedJpaEntity> entities = fetchFeedEntitiesByIds(feedIds);

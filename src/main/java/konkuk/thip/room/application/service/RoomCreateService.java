@@ -3,12 +3,14 @@ package konkuk.thip.room.application.service;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.application.port.in.RoomCreateUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomCreateCommand;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
+import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoomCreateService implements RoomCreateUseCase {
 
     private final RoomCommandPort roomCommandPort;
+    private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final BookCommandPort bookCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
 
@@ -42,11 +45,13 @@ public class RoomCreateService implements RoomCreateUseCase {
                 bookId,
                 category
         );
+        Long savedRoomId = roomCommandPort.save(room);
 
-        // TODO : 방 생성한 사람 (= api 호출 토큰에 포함된 userId) 이 해당 방에 속한 멤버라는 사실을 DB에 영속화 해야함
-        // UserRoom 도메인이 정리되면 개발 ㄱㄱ
+        // 4. 방장 RoomParticipant 생성 및 DB save
+        RoomParticipant roomParticipant = RoomParticipant.hostWithoutId(userId, savedRoomId);
+        roomParticipantCommandPort.save(roomParticipant);
 
-        return roomCommandPort.save(room);
+        return savedRoomId;
     }
 
     private Long resolveBookAndEnsurePage(String isbn) {

@@ -37,4 +37,9 @@ public class VoteQueryPersistenceAdapter implements VoteQueryPort {
                         )
                 );
     }
+
+    @Override
+    public List<VoteItemQueryDto> findVoteItemsByVoteId(Long voteId, Long userId) {
+        return voteJpaRepository.findVoteItemsByVoteId(voteId, userId);
+    }
 }

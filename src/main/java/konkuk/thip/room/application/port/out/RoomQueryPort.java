@@ -38,5 +38,9 @@ public interface RoomQueryPort {
 
     List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId);
 
-
+    /**
+     * 임시 메서드
+     * TODO 리펙토링 대상
+     */
+    String findAliasColorOfCategory(Category category);
 }

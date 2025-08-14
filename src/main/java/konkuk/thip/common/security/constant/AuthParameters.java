@@ -15,7 +15,11 @@ public enum AuthParameters {
     REDIRECT_SIGNUP_URL("/signup"),
     REDIRECT_HOME_URL("/feed"),
     HTTPS_PREFIX("https://"),
-    HTTP_PREFIX("http://")
+    HTTP_PREFIX("http://"),
+
+    COOKIE_ACCESS_TOKEN("access_token"),
+    COOKIE_TEMP_TOKEN("temp_token"),
+
     ;
 
     private final String value;

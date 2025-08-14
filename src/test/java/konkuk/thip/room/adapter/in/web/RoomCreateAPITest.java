@@ -7,8 +7,10 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -24,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -63,13 +66,17 @@ class RoomCreateAPITest {
     @Autowired
     private RoomJpaRepository roomJpaRepository;
 
+    @Autowired
+    private RoomParticipantJpaRepository roomParticipantJpaRepository;
+
     @AfterEach
     void tearDown() {
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+        categoryJpaRepository.deleteAllInBatch();
+        aliasJpaRepository.deleteAllInBatch();
     }
 
     private void saveUserAndCategory() {
@@ -273,4 +280,35 @@ class RoomCreateAPITest {
                 );
     }
 
+    @Test
+    @DisplayName("방 생성에 성공하면, 방장의 정보가 DB에 저장된다.")
+    @Transactional      // RoomParticipant -> Room, User 의 manyToOne 지연로딩을 위해 추가
+    void room_create_room_participant_save_success() throws Exception {
+        //given : user, category, pageCount값이 있는 book 생성, request 생성
+        saveUserAndCategory();
+        saveBookWithPageCount();
+
+        Long userId = userJpaRepository.findAll().get(0).getUserId();
+        Long bookId = bookJpaRepository.findAll().get(0).getBookId();
+        Long categoryId = categoryJpaRepository.findAll().get(0).getCategoryId();
+
+        Map<String, Object> request = buildRoomCreateRequest();
+
+        //when
+        ResultActions result = mockMvc.perform(post("/rooms")
+                .requestAttr("userId", userId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)
+                ));
+
+        //then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.roomId").exists());
+
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAll().get(0);
+        assertThat(roomParticipantJpaEntity.getUserJpaEntity().getUserId()).isEqualTo(userId);
+
+        RoomJpaEntity savedRoomJpaEntity = roomJpaRepository.findAll().get(0);
+        assertThat(roomParticipantJpaEntity.getRoomJpaEntity().getRoomId()).isEqualTo(savedRoomJpaEntity.getRoomId());
+    }
 }

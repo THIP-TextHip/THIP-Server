@@ -1,5 +1,7 @@
 package konkuk.thip.room.adapter.out.persistence;
 
+import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
@@ -7,6 +9,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.out.persistence.function.RoomQueryFunction;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.Category;
@@ -24,6 +27,7 @@ import java.util.List;
 public class RoomQueryPersistenceAdapter implements RoomQueryPort {
 
     private final RoomJpaRepository roomJpaRepository;
+    private final CategoryJpaRepository categoryJpaRepository;
 
     @Override
     public int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate) {
@@ -100,5 +104,13 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     @Override
     public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId) {
         return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category.getValue(), limit, userId);
+    }
+
+    // TODO : 리펙토링 대상
+    @Override
+    public String findAliasColorOfCategory(Category category) {
+        return categoryJpaRepository.findAliasColorByValue(category.getValue()).orElseThrow(
+                () -> new EntityNotFoundException(ErrorCode.CATEGORY_NOT_FOUND)
+        );
     }
 }

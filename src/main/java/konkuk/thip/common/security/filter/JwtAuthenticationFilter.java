@@ -78,7 +78,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 2. Cookie에서 JWT 추출 (웹)
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if (JWT_HEADER_KEY.getValue().equals(cookie.getName())) {
+                // access_token 또는 temp_token 둘 다 허용
+                if (COOKIE_ACCESS_TOKEN.getValue().equals(cookie.getName()) || COOKIE_TEMP_TOKEN.getValue().equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
@@ -98,6 +99,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.startsWith("/oauth2/authorization")
                 || path.startsWith("/login/oauth2/code")
                 || path.startsWith("/oauth2/users")
+                || path.equals("/api/set-cookie")
+//                || path.equals("/api/exchange-temp-token")
                 ;
     }
 

@@ -286,6 +286,14 @@ public enum SwaggerResponseDescription {
             RECENT_SEARCH_NOT_ADDED_BY_USER
     ))),
 
+    // Attendance Check
+    ATTENDANCE_CHECK_CREATE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_NOT_FOUND,
+            USER_NOT_FOUND,
+            ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED
+    ))),
+
   ;
     private final Set<ErrorCode> errorCodeList;
     SwaggerResponseDescription(Set<ErrorCode> errorCodeList) {

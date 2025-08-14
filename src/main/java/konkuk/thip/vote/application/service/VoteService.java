@@ -4,22 +4,30 @@ import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.vote.application.port.in.VoteUseCase;
-import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.application.port.in.dto.VoteCommand;
 import konkuk.thip.vote.application.port.in.dto.VoteResult;
+import konkuk.thip.vote.application.port.out.VoteCommandPort;
+import konkuk.thip.vote.application.port.out.VoteQueryPort;
+import konkuk.thip.vote.application.port.out.dto.VoteItemQueryDto;
 import konkuk.thip.vote.domain.VoteItem;
 import konkuk.thip.vote.domain.VoteParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 public class VoteService implements VoteUseCase {
 
     private final VoteCommandPort voteCommandPort;
+    private final VoteQueryPort voteQueryPort;
     private final RoomParticipantValidator roomParticipantValidator;
 
     @Override
+    @Transactional
     public VoteResult vote(VoteCommand command) {
         // 1. 방 참가자 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
@@ -32,7 +40,24 @@ public class VoteService implements VoteUseCase {
             cancelVote(command.userId(), command.voteItemId());
         }
 
-        return VoteResult.of(command.voteItemId(), command.roomId(), command.type());
+        // 2. 투표 결과 반환
+        List<VoteItemQueryDto> voteItems = voteQueryPort.findVoteItemsByVoteId(command.voteId(), command.userId());
+        List<Integer> counts = voteItems.stream()
+                .map(VoteItemQueryDto::voteCount)
+                .toList();
+
+        List<Integer> percentages = VoteItem.calculatePercentages(counts);
+
+        var voteItemDtos = IntStream.range(0, voteItems.size())
+                .mapToObj(i -> VoteResult.VoteItemDto.of(
+                        voteItems.get(i).voteItemId(),
+                        voteItems.get(i).itemName(),
+                        percentages.get(i),
+                        voteItems.get(i).isVoted()
+                ))
+                .toList();
+
+        return VoteResult.of(command.voteId(), command.roomId(), voteItemDtos);
     }
 
     private void voteOrUpdate(Long userId, Long voteId, Long voteItemId) {
