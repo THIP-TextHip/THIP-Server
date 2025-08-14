@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
+
 @Repository
 @RequiredArgsConstructor
 public class AttendanceCheckQueryPersistenceAdapter implements AttendanceCheckQueryPort {
@@ -16,10 +18,10 @@ public class AttendanceCheckQueryPersistenceAdapter implements AttendanceCheckQu
     private final AttendanceCheckMapper attendanceCheckMapper;
 
     @Override
-    public int countAttendanceChecksOnTodayByUser(Long userId) {
+    public int countAttendanceChecksOnTodayByUser(Long userId, Long roomId) {
         LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        return attendanceCheckJpaRepository.countByUserIdAndCreatedAtBetween(userId, startOfDay, endOfDay);
+        return attendanceCheckJpaRepository.countByUserIdAndRoomIdAndCreatedAtBetween(userId, roomId, startOfDay, endOfDay, ACTIVE);
     }
 }
