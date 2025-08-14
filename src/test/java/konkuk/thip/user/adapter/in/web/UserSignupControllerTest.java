@@ -125,7 +125,27 @@ class UserSignupControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
-                .andExpect(jsonPath("$.message", containsString("닉네임은 한글, 영어, 숫자로만 구성되어야 합니다.(공백불가)")));
+                .andExpect(jsonPath("$.message", containsString("닉네임은 한글, 영어 소문자, 숫자로만 구성되어야 합니다.(공백불가)")));
+    }
+
+    @Test
+    @DisplayName("[닉네임]값이 null일 경우, 400 error가 발생한다.")
+    void signup_nickname_null() throws Exception {
+        //given: nickname blank
+        UserSignupRequest request = new UserSignupRequest(
+                "문학가",
+                null
+        );
+
+        //when //then
+        String testToken = jwtUtil.createSignupToken("kakao_12345678");
+        mockMvc.perform(post("/users/signup")
+                        .header("Authorization", "Bearer " + testToken)  //헤더 추가
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
+                .andExpect(jsonPath("$.message", containsString("닉네임은 필수입니다.")));
     }
 
     @Test
@@ -145,7 +165,7 @@ class UserSignupControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
-                .andExpect(jsonPath("$.message", containsString("닉네임은 한글, 영어, 숫자로만 구성되어야 합니다.(공백불가)")));
+                .andExpect(jsonPath("$.message", containsString("닉네임은 한글, 영어 소문자, 숫자로만 구성되어야 합니다.(공백불가)")));
     }
 
     @Test

@@ -4,32 +4,45 @@ import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
-import konkuk.thip.vote.application.port.out.VoteCommandPort;
 import konkuk.thip.vote.application.port.in.dto.VoteCommand;
 import konkuk.thip.vote.application.port.in.dto.VoteResult;
+import konkuk.thip.vote.application.port.out.VoteCommandPort;
+import konkuk.thip.vote.application.port.out.VoteQueryPort;
+import konkuk.thip.vote.application.port.out.dto.VoteItemQueryDto;
 import konkuk.thip.vote.domain.VoteItem;
 import konkuk.thip.vote.domain.VoteParticipant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class VoteServiceTest {
 
     private VoteCommandPort voteCommandPort;
+    private VoteQueryPort voteQueryPort;
     private RoomParticipantValidator roomParticipantValidator;
     private VoteService voteService;
 
     @BeforeEach
     void setUp() {
         voteCommandPort = mock(VoteCommandPort.class);
+        voteQueryPort = mock(VoteQueryPort.class);
         roomParticipantValidator = mock(RoomParticipantValidator.class);
-        voteService = new VoteService(voteCommandPort, roomParticipantValidator);
+        voteService = new VoteService(voteCommandPort, voteQueryPort, roomParticipantValidator);
+    }
+
+    private void mockVoteQueryResult(Long voteId, Long voteItemId, String itemName, boolean isVoted, int count) {
+        when(voteQueryPort.findVoteItemsByVoteId(any(), any()))
+                .thenReturn(List.of(
+                        new VoteItemQueryDto(voteId, voteItemId, itemName, count, isVoted)
+                ));
     }
 
     @Test
@@ -39,15 +52,19 @@ class VoteServiceTest {
         VoteItem voteItem = mock(VoteItem.class);
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 100L, true);
 
-
-        // when
         when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
                 .thenReturn(Optional.empty());
         when(voteCommandPort.getVoteItemByIdOrThrow(100L)).thenReturn(voteItem);
+        mockVoteQueryResult(1L, 100L, "item1", true, 1);
+
+        // when
         VoteResult result = voteService.vote(command);
 
         // then
-        assertThat(result.voteItemId()).isEqualTo(100L);
+        assertThat(result.voteItems()).hasSize(1);
+        assertThat(result.voteItems().get(0).voteItemId()).isEqualTo(100L);
+        assertThat(result.voteItems().get(0).isVoted()).isTrue();
+
         verify(roomParticipantValidator).validateUserIsRoomMember(1L, 1L);
         verify(voteItem).increaseCount();
         verify(voteCommandPort).updateVoteItem(voteItem);
@@ -58,25 +75,29 @@ class VoteServiceTest {
     @DisplayName("이미 투표한 경우 - 다른 voteItemId로 변경 성공")
     void vote_alreadyVoted_changeVoteItem_success() {
         // given
-        VoteItem voteItem = mock(VoteItem.class);
-        VoteItem exsitingVoteItem = mock(VoteItem.class);
+        VoteItem newVoteItem = mock(VoteItem.class);
+        VoteItem oldVoteItem = mock(VoteItem.class);
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 200L, true);
         VoteParticipant existing = VoteParticipant.withoutId(1L, 100L);
 
-        // when
         when(voteCommandPort.findVoteParticipantByUserIdAndVoteId(1L, 1L))
                 .thenReturn(Optional.of(existing));
-        when(voteCommandPort.getVoteItemByIdOrThrow(200L)).thenReturn(voteItem);
-        when(voteCommandPort.getVoteItemByIdOrThrow(existing.getVoteItemId())).thenReturn(exsitingVoteItem);
+        when(voteCommandPort.getVoteItemByIdOrThrow(200L)).thenReturn(newVoteItem);
+        when(voteCommandPort.getVoteItemByIdOrThrow(100L)).thenReturn(oldVoteItem);
+        mockVoteQueryResult(1L, 200L, "item2", true, 5);
+
+        // when
         VoteResult result = voteService.vote(command);
 
         // then
-        assertThat(result.voteItemId()).isEqualTo(200L);
+        assertThat(result.voteItems().get(0).voteItemId()).isEqualTo(200L);
+        assertThat(result.voteItems().get(0).isVoted()).isTrue();
+
         verify(voteCommandPort).updateVoteParticipant(existing);
-        verify(voteItem).increaseCount();
-        verify(voteCommandPort).updateVoteItem(voteItem);
-        verify(exsitingVoteItem).decreaseCount();
-        verify(voteCommandPort).updateVoteItem(exsitingVoteItem);
+        verify(newVoteItem).increaseCount();
+        verify(voteCommandPort).updateVoteItem(newVoteItem);
+        verify(oldVoteItem).decreaseCount();
+        verify(voteCommandPort).updateVoteItem(oldVoteItem);
     }
 
     @Test
@@ -99,18 +120,19 @@ class VoteServiceTest {
     void vote_cancelVote_success() {
         // given
         VoteItem voteItem = mock(VoteItem.class);
-
         VoteCommand command = new VoteCommand(1L, 1L, 1L, 300L, false);
         VoteParticipant existing = VoteParticipant.withoutId(1L, 300L);
 
-        // when
         when(voteCommandPort.getVoteItemByIdOrThrow(300L)).thenReturn(voteItem);
         when(voteCommandPort.findVoteParticipantByUserIdAndVoteItemId(1L, 300L))
                 .thenReturn(Optional.of(existing));
+        mockVoteQueryResult(1L, 300L, "item3", false, 0);
+
+        // when
         VoteResult result = voteService.vote(command);
 
         // then
-        assertThat(result.type()).isFalse();
+        assertThat(result.voteItems().get(0).isVoted()).isFalse();
         verify(voteItem).decreaseCount();
         verify(voteCommandPort).updateVoteItem(voteItem);
         verify(voteCommandPort).deleteVoteParticipant(existing);
