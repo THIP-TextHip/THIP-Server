@@ -91,12 +91,15 @@ class VoteApiTest {
                         .requestAttr("userId", user.getUserId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.postId").value(vote.getPostId()))
+                .andExpect(jsonPath("$.data.roomId").value(room.getRoomId()))
+                .andExpect(jsonPath("$.data.voteItems[0].voteItemId").value(item.getVoteItemId()))
+                .andExpect(jsonPath("$.data.voteItems[0].isVoted").value(true));
 
         assertThat(voteParticipantJpaRepository.findAll())
                 .hasSize(1)
                 .allMatch(vp -> vp.getVoteItemJpaEntity().getVoteItemId().equals(item.getVoteItemId()));
-
         voteItemJpaRepository.findById(item.getVoteItemId())
                 .ifPresent(voteItem -> assertThat(voteItem.getCount()).isEqualTo(1));
     }
@@ -121,12 +124,13 @@ class VoteApiTest {
                         .requestAttr("userId", user.getUserId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.voteItems[?(@.voteItemId == %s)].isVoted", item2.getVoteItemId()).value(true))
+                .andExpect(jsonPath("$.data.voteItems[?(@.voteItemId == %s)].isVoted", item1.getVoteItemId()).value(false));
 
         assertThat(voteParticipantJpaRepository.findAll())
                 .hasSize(1)
                 .allMatch(vp -> vp.getVoteItemJpaEntity().getVoteItemId().equals(item2.getVoteItemId()));
-
         voteItemJpaRepository.findById(item1.getVoteItemId())
                 .ifPresent(voteItem -> assertThat(voteItem.getCount()).isEqualTo(0));
         voteItemJpaRepository.findById(item2.getVoteItemId())
@@ -167,7 +171,8 @@ class VoteApiTest {
                         .requestAttr("userId", user.getUserId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.voteItems[?(@.voteItemId == %s)].isVoted", item.getVoteItemId()).value(false));
 
         assertThat(voteParticipantJpaRepository.findAll()).isEmpty();
         voteItemJpaRepository.findById(item.getVoteItemId())
@@ -208,4 +213,5 @@ class VoteApiTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(ROOM_ACCESS_FORBIDDEN.getCode()));
     }
+
 }
