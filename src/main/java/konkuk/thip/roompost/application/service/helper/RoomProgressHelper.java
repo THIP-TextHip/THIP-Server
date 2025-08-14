@@ -21,7 +21,6 @@ public class RoomProgressHelper {
     private final RoomCommandPort roomCommandPort;
     private final BookCommandPort bookCommandPort;
 
-    @Transactional
     public void updateUserAndRoomProgress(Long userId, Long roomId, int currentPage) {
         RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(userId, roomId);
         Room room = roomCommandPort.getByIdOrThrow(roomId);
