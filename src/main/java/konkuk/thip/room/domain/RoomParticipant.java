@@ -21,13 +21,23 @@ public class RoomParticipant extends BaseDomainEntity {
 
     private Long roomId;
 
-    public static RoomParticipant withoutId(Long userId, Long roomId, String roomParticipantRole) {
+    public static RoomParticipant memberWithoutId(Long userId, Long roomId) {
         return RoomParticipant.builder()
                 .currentPage(0)
                 .userPercentage(0.0)
                 .userId(userId)
                 .roomId(roomId)
-                .roomParticipantRole(roomParticipantRole)
+                .roomParticipantRole(RoomParticipantRole.MEMBER.getType())
+                .build();
+    }
+
+    public static RoomParticipant hostWithoutId(Long userId, Long roomId) {
+        return RoomParticipant.builder()
+                .currentPage(0)
+                .userPercentage(0.0)
+                .userId(userId)
+                .roomId(roomId)
+                .roomParticipantRole(RoomParticipantRole.HOST.getType())
                 .build();
     }
 

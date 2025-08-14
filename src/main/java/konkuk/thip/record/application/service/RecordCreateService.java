@@ -13,11 +13,10 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.roompost.application.service.helper.RoomProgressHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERVIEW;
 
@@ -31,6 +30,7 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
 
     private final RoomParticipantValidator roomParticipantValidator;
+    private final RoomProgressHelper roomProgressHelper;
 
     @Override
     @Transactional
@@ -57,30 +57,13 @@ public class RecordCreateService implements RecordCreateUseCase {
         validateRoomParticipant(roomParticipant, command.isOverview());
         validateRecord(record, book);
 
-        // 4. RoomParticipant의 currentPage, userPercentage 업데이트
-        updateRoomProgress(roomParticipant, record, book, room);
-
-        // 5. Record 저장
+        // 4. 문제없는 경우 Record 저장
         Long newRecordId = recordCommandPort.saveRecord(record);
 
-        // 6. Room, RoomParticipant 업데이트
-        roomCommandPort.update(room);
-        roomParticipantCommandPort.update(roomParticipant);
+        // 5. RoomParticipant, Room progress 정보 update
+        roomProgressHelper.updateUserAndRoomProgress(record.getCreatorId(), record.getRoomId(), record.getPage());
 
         return RecordCreateResult.of(newRecordId, command.roomId());
-    }
-
-    private void updateRoomProgress(RoomParticipant roomParticipant, Record record, Book book, Room room) {
-        if(roomParticipant.updateUserProgress(record.getPage(), book.getPageCount())) {
-            // userPercentage가 업데이트되었으면 Room의 roomPercentage 업데이트
-            List<RoomParticipant> roomParticipantList = roomParticipantCommandPort.findAllByRoomId(record.getRoomId());
-            Double totalUserPercentage = roomParticipantList.stream()
-                    .filter(participant -> !roomParticipant.getId().equals(participant.getId())) // 현재 업데이트 중인 사용자 제외
-                    .map(RoomParticipant::getUserPercentage)
-                    .reduce(0.0, Double::sum);
-            totalUserPercentage += roomParticipant.getUserPercentage();
-            room.updateRoomPercentage(totalUserPercentage / roomParticipantList.size());
-        }
     }
 
     private void validateRoomParticipant(RoomParticipant roomParticipant, boolean isOverview) {

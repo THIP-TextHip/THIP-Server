@@ -101,6 +101,22 @@ public class TestEntityFactory {
                 .build();
     }
 
+    /**
+     * page 값을 지정할 수 있는 custom 생성자
+     */
+    public static BookJpaEntity createBook(int page) {
+        return BookJpaEntity.builder()
+                .title("책제목")
+                .authorName("저자")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(page)
+                .description("설명")
+                .build();
+    }
+
     public static BookJpaEntity createBookWithISBN(String isbn) {
         return BookJpaEntity.builder()
                 .title("책제목")

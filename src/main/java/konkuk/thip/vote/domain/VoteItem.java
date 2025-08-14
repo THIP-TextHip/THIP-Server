@@ -22,11 +22,11 @@ public class VoteItem extends BaseDomainEntity {
 
     private Long voteId;
 
-    public static VoteItem withoutId(String itemName, int count, Long voteId) {
+    public static VoteItem withoutId(String itemName, Long voteId) {
         return VoteItem.builder()
                 .id(null)
                 .itemName(itemName)
-                .count(count)
+                .count(0)
                 .voteId(voteId)
                 .build();
     }
