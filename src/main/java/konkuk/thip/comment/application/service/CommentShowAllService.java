@@ -29,7 +29,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
         Cursor cursor = Cursor.from(query.cursorStr(), PAGE_SIZE);
 
         // 1. size 크기만큼의 루트 댓글 최신순 조회 -> 삭제된 루트 댓글 포함해서 전부 조회
-        CursorBasedList<CommentQueryDto> commentQueryDtoCursorBasedList = commentQueryPort.findLatestRootCommentsWithDeleted(query.postId(), query.userId(), query.postType().getType(), cursor);
+        CursorBasedList<CommentQueryDto> commentQueryDtoCursorBasedList = commentQueryPort.findLatestRootCommentsWithDeleted(query.postId(), query.postType().getType(), cursor);
         List<CommentQueryDto> rootsInOrder = commentQueryDtoCursorBasedList.contents();
 
         // 2. 조회한 루트 댓글들의 전체 자식 댓귿들을(깊이 무관) 작성 시간순으로 조회
@@ -37,14 +37,14 @@ public class CommentShowAllService implements CommentShowAllUseCase {
                 .map(CommentQueryDto::commentId)
                 .collect(Collectors.toUnmodifiableSet());
 
-        Map<Long, List<CommentQueryDto>> childrenMap = commentQueryPort.findAllActiveChildCommentsOldestFirst(rootCommentIds, query.userId());
+        Map<Long, List<CommentQueryDto>> childrenMap = commentQueryPort.findAllActiveChildCommentsOldestFirst(rootCommentIds);
         
         // 3. 반환할 모든 댓글(루트 + 자식 모두 포함) 중 유저가 좋아한 댓글 조회
         Set<Long> allCommentIds = parseAllCommentIds(childrenMap);
         Set<Long> likedCommentIds = commentLikeQueryPort.findCommentIdsLikedByUser(allCommentIds, query.userId());
 
         // 4. response 매핑
-        List<CommentForSinglePostResponse.RootCommentDto> rootCommentResponses = buildRootCommentResponses(rootsInOrder, childrenMap, likedCommentIds);
+        List<CommentForSinglePostResponse.RootCommentDto> rootCommentResponses = buildRootCommentResponses(rootsInOrder, childrenMap, likedCommentIds, query.userId());
 
         return new CommentForSinglePostResponse(
                 rootCommentResponses,
@@ -66,7 +66,8 @@ public class CommentShowAllService implements CommentShowAllUseCase {
     private List<CommentForSinglePostResponse.RootCommentDto> buildRootCommentResponses(
             List<CommentQueryDto> roots,
             Map<Long, List<CommentQueryDto>> childrenMap,
-            Set<Long> likedCommentIds) {
+            Set<Long> likedCommentIds,
+            Long userId) {
         List<CommentForSinglePostResponse.RootCommentDto> responses = new ArrayList<>();
         for (CommentQueryDto root : roots) {
             List<CommentQueryDto> children = childrenMap.getOrDefault(root.commentId(), Collections.emptyList());
@@ -74,7 +75,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
             if (root.isDeleted() && children.isEmpty()) {
                 continue;
             }
-            responses.add(commentQueryMapper.toRootCommentResponseWithChildren(root, children, likedCommentIds));
+            responses.add(commentQueryMapper.toRootCommentResponseWithChildren(root, children, likedCommentIds, userId));
         }
         return responses;
     }
