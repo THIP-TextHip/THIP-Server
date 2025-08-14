@@ -6,8 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_COUNT_UNDERFLOW;
-import static konkuk.thip.common.exception.code.ErrorCode.POST_LIKE_COUNT_UNDERFLOW;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Vote 도메인 테스트")
@@ -21,6 +20,10 @@ class VoteTest {
     }
 
     private final Long CREATOR_ID = 1L;
+    private final Long OTHER_USER_ID = 2L;
+
+    private final Long ROOM_ID = 1L;
+    private final Long OTHER_ROOM_ID = 2L;
 
     private Vote createWithCommentVote() {
         return Vote.builder()
@@ -31,7 +34,7 @@ class VoteTest {
                 .isOverview(false)
                 .likeCount(0)
                 .commentCount(1)
-                .roomId(100L)
+                .roomId(ROOM_ID)
                 .build();
     }
 
@@ -44,7 +47,7 @@ class VoteTest {
                 .isOverview(false)
                 .likeCount(0)
                 .commentCount(0)
-                .roomId(100L)
+                .roomId(ROOM_ID)
                 .build();
     }
 
@@ -174,6 +177,33 @@ class VoteTest {
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 작성자가 아닌 경우 투표를 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byNonCreator_throws(){
+        Vote vote = createWithCommentVote();
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> vote.validateDeletable(OTHER_USER_ID,ROOM_ID));
+
+        assertEquals(VOTE_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 전달된 roomId가 투표의 roomId와 일치하지않은 경우 투표를 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byOtherRoomId_throws(){
+        Vote vote = createWithCommentVote();
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> vote.validateDeletable(CREATOR_ID,OTHER_ROOM_ID));
+
+        assertEquals(VOTE_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 투표의 작성자면서, 전달된 roomId가 투표의 roomId와 일치할 경우 투표를 삭제 할 수 있다.")
+    void validateDeletable_byCreator_byRoomId_Success(){
+        Vote vote = createWithCommentVote();
+        assertDoesNotThrow(() -> vote.validateDeletable(CREATOR_ID,ROOM_ID));
     }
 
 }

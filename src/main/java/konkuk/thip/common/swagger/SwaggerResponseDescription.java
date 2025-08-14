@@ -159,6 +159,11 @@ public enum SwaggerResponseDescription {
             VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL,
             VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE
     ))),
+    VOTE_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            VOTE_NOT_FOUND,
+            VOTE_ACCESS_FORBIDDEN
+    ))),
 
 
     // FEED
