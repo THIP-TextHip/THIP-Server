@@ -11,10 +11,7 @@ import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.user.domain.Alias;
 import konkuk.thip.feed.application.port.in.dto.TagsWithCategoryResult;
 import konkuk.thip.user.domain.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,16 +31,19 @@ public interface FeedQueryMapper {
             target = "postDate",
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
+    @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
     FeedShowAllResponse.FeedDto toFeedShowAllResponse(
             FeedQueryDto dto,
             Set<Long> savedFeedIds,
-            Set<Long> likedFeedIds
+            Set<Long> likedFeedIds,
+            @Context Long userId
     );
 
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))")
-    FeedShowMineResponse.FeedDto toFeedShowMineDto(FeedQueryDto dto);
+    @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
+    FeedShowMineResponse.FeedDto toFeedShowMineDto(FeedQueryDto dto, @Context Long userId);
 
-    List<FeedShowMineResponse.FeedDto> toFeedShowMineResponse(List<FeedQueryDto> dtos);
+    List<FeedShowMineResponse.FeedDto> toFeedShowMineResponse(List<FeedQueryDto> dtos, @Context Long userId);
 
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
@@ -51,10 +51,12 @@ public interface FeedQueryMapper {
             target = "postDate",
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
+    @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
     FeedShowByUserResponse.FeedDto toFeedShowByUserResponse(
             FeedQueryDto dto,
             Set<Long> savedFeedIds,
-            Set<Long> likedFeedIds
+            Set<Long> likedFeedIds,
+            @Context Long userId
     );
 
     @Mapping(target = "creatorId", source = "feedOwner.id")
@@ -83,9 +85,10 @@ public interface FeedQueryMapper {
     @Mapping(target = "commentCount", source = "feed.commentCount")
     @Mapping(target = "isSaved", source = "isSaved")
     @Mapping(target = "isLiked", source = "isLiked")
-    @Mapping(target = "isWriter", source = "isWriter")
+    @Mapping(target = "isWriter", source = "feedCreator.id", qualifiedByName = "isWriter")
     @Mapping(target = "tagList", source = "feed.tagList", qualifiedByName = "mapTagList")
-    FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked, boolean isWriter);
+    FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked,
+                                                    @Context Long userId);
 
     @Named("mapContentList")
     default String[] mapContentList(List<Content> contentList) {
@@ -112,5 +115,10 @@ public interface FeedQueryMapper {
         return grouped.entrySet().stream()
                 .map(e -> new TagsWithCategoryResult(e.getKey(), new ArrayList<>(e.getValue())))
                 .toList();
+    }
+
+    @Named("isWriter")
+    default boolean isWriter(Long creatorId, @Context Long userId) {
+        return creatorId != null && creatorId.equals(userId);
     }
 }
