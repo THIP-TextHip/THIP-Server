@@ -25,8 +25,8 @@ public class AttendanceCheckCreateService implements AttendanceCheckCreateUseCas
         // 1. 유저가 해당 방에 오늘의 한마디를 작성할 수 있는지 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.creatorId());
 
-        // 2. 유저가 오늘 이미 작성한 오늘의 한마디 개수 조회
-        int alreadyWrittenCountToday = attendanceCheckQueryPort.countAttendanceChecksOnTodayByUser(command.creatorId());
+        // 2. 유저가 해당 방에서 오늘 이미 작성한 오늘의 한마디 개수 조회
+        int alreadyWrittenCountToday = attendanceCheckQueryPort.countAttendanceChecksOnTodayByUser(command.creatorId(), command.roomId());
 
         // 3. 출석체크 도메인 생성 및 저장
         AttendanceCheck attendanceCheck = AttendanceCheck.withoutId(command.roomId(), command.creatorId(), command.content(), alreadyWrittenCountToday);
