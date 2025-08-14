@@ -24,7 +24,8 @@ public interface CommentQueryMapper {
     @Mapping(target = "isDeleted", constant = "false")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(root.createdAt()))")
     @Mapping(target = "aliasName", source = "root.alias")
-    CommentForSinglePostResponse.RootCommentDto toRoot(CommentQueryDto root, @Context Set<Long> likedCommentIds);
+    @Mapping(target = "isWriter", source = "root.creatorId", qualifiedByName = "isWriter")
+    CommentForSinglePostResponse.RootCommentDto toRoot(CommentQueryDto root, @Context Set<Long> likedCommentIds, @Context Long userId);
 
     /**
      * 개별 답글 매핑
@@ -32,29 +33,36 @@ public interface CommentQueryMapper {
     @Mapping(target = "isLike", expression = "java(likedCommentIds.contains(child.commentId()))")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(child.createdAt()))")
     @Mapping(target = "aliasName", source = "child.alias")
-    CommentForSinglePostResponse.RootCommentDto.ReplyDto toReply(CommentQueryDto child, @Context Set<Long> likedCommentIds);
+    @Mapping(target = "isWriter", source = "child.creatorId", qualifiedByName = "isWriter")
+    CommentForSinglePostResponse.RootCommentDto.ReplyDto toReply(CommentQueryDto child, @Context Set<Long> likedCommentIds, @Context Long userId);
 
     /**
      * 답글 리스트 헬퍼
      */
-    default List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> mapReplies(List<CommentQueryDto> children, @Context Set<Long> likedCommentIds) {
+    default List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> mapReplies(List<CommentQueryDto> children, @Context Set<Long> likedCommentIds, @Context Long userId) {
         if (children == null || children.isEmpty()) {
             return Collections.emptyList();
         }
         return children.stream()
-                .map(child -> toReply(child, likedCommentIds))
+                .map(child -> toReply(child, likedCommentIds, userId))
                 .toList();
     }
 
-    default CommentForSinglePostResponse.RootCommentDto toRootCommentResponseWithChildren(CommentQueryDto root, List<CommentQueryDto> children, @Context Set<Long> likedCommentIds) {
-        List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> replyDtos = mapReplies(children, likedCommentIds);
+    default CommentForSinglePostResponse.RootCommentDto toRootCommentResponseWithChildren(
+            CommentQueryDto root, List<CommentQueryDto> children, @Context Set<Long> likedCommentIds, @Context Long userId) {
+        List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> replyDtos = mapReplies(children, likedCommentIds, userId);
 
         if (root.isDeleted()) {     // 삭제된 루트 & children 이 존재하는 경우
             return CommentForSinglePostResponse.RootCommentDto.createDeletedRootCommentDto(replyDtos);
         }
 
-        CommentForSinglePostResponse.RootCommentDto rootDto = toRoot(root, likedCommentIds);
+        CommentForSinglePostResponse.RootCommentDto rootDto = toRoot(root, likedCommentIds, userId);
         rootDto.replyList().addAll(replyDtos);
         return rootDto;
+    }
+
+    @Named("isWriter")
+    default boolean isWriter(Long creatorId, @Context Long userId) {
+        return creatorId != null && creatorId.equals(userId);
     }
 }
