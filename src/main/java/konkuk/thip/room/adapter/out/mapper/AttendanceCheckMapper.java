@@ -1,7 +1,7 @@
-package konkuk.thip.attendancecheck.adapter.out.mapper;
+package konkuk.thip.room.adapter.out.mapper;
 
-import konkuk.thip.attendancecheck.adapter.out.jpa.AttendanceCheckJpaEntity;
-import konkuk.thip.attendancecheck.domain.AttendanceCheck;
+import konkuk.thip.room.adapter.out.jpa.AttendanceCheckJpaEntity;
+import konkuk.thip.room.domain.AttendanceCheck;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import org.springframework.stereotype.Component;
