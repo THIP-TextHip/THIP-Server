@@ -26,11 +26,11 @@ public class User extends BaseDomainEntity {
 
     private Alias alias;
 
-    public static User withoutId(String nickname, LocalDate nicknameUpdatedAt, String userRole, String oauth2Id, Alias alias) {
+    public static User withoutId(String nickname, String userRole, String oauth2Id, Alias alias) {
         return User.builder()
                 .id(null)
                 .nickname(nickname)
-                .nicknameUpdatedAt(nicknameUpdatedAt)
+                .nicknameUpdatedAt(null)
                 .userRole(userRole)
                 .oauth2Id(oauth2Id)
                 .followerCount(0)

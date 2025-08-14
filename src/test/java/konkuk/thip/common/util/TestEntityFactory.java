@@ -12,12 +12,10 @@ import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.jpa.*;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -99,6 +97,22 @@ public class TestEntityFactory {
                 .publisher("출판사")
                 .imageUrl("img")
                 .pageCount(100)
+                .description("설명")
+                .build();
+    }
+
+    /**
+     * page 값을 지정할 수 있는 custom 생성자
+     */
+    public static BookJpaEntity createBook(int page) {
+        return BookJpaEntity.builder()
+                .title("책제목")
+                .authorName("저자")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(page)
                 .description("설명")
                 .build();
     }
@@ -356,6 +370,14 @@ public class TestEntityFactory {
         return SavedBookJpaEntity.builder()
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
+                .build();
+    }
+
+    public static AttendanceCheckJpaEntity createAttendanceCheck(String todayComment, RoomJpaEntity roomJpaEntity, UserJpaEntity userJpaEntity) {
+        return AttendanceCheckJpaEntity.builder()
+                .todayComment(todayComment)
+                .roomJpaEntity(roomJpaEntity)
+                .userJpaEntity(userJpaEntity)
                 .build();
     }
 }

@@ -1,11 +1,24 @@
 package konkuk.thip.vote.application.port.in.dto;
 
+import java.util.List;
+
 public record VoteResult(
-        Long voteItemId,
+        Long postId,
         Long roomId,
-        Boolean type
+        List<VoteItemDto> voteItems
 ) {
-    public static VoteResult of(Long voteItemId, Long roomId, Boolean type) {
-        return new VoteResult(voteItemId, roomId, type);
+    public record VoteItemDto(
+            Long voteItemId,
+            String itemName,
+            int percentage,
+            Boolean isVoted
+    ) {
+        public static VoteItemDto of(Long voteItemId, String itemName, int percentage, Boolean isVoted) {
+            return new VoteItemDto(voteItemId, itemName, percentage, isVoted);
+        }
+    }
+
+    public static VoteResult of(Long postId, Long roomId, List<VoteItemDto> voteItems) {
+        return new VoteResult(postId, roomId, voteItems);
     }
 }

@@ -46,14 +46,24 @@ public class OpenApiConfig {
 
     @Value("${server.http-url}") private String httpUrl;
 
+    @Value(("${server.profile}")) private String profile;
+
     @Bean
     public OpenAPI openAPI() {
+        List<Server> serverList = switch (profile) {
+            case "prod" -> List.of(new Server().url(httpsUrl).description("HTTPS 배포 서버"));
+            case "dev" -> List.of(
+                    new Server().url(httpUrl).description("HTTP 개발 서버"),
+                    new Server().url(httpsUrl).description("HTTPS 배포 서버"),
+                    new Server().url("http://localhost:8080").description("로컬 개발 서버")
+            );
+            default -> List.of(
+                    new Server().url("http://localhost:8080").description("로컬 개발 서버")
+            );
+        };
+
         return new OpenAPI()
-                .servers(List.of(
-                        new Server().url(httpsUrl).description("HTTPS 배포 서버"),
-                        new Server().url(httpUrl).description("HTTP IP"),
-                        new Server().url("http://localhost:8080").description("로컬 개발 서버")
-                ))
+                .servers(serverList)
                 .components(setComponents())
                 .addSecurityItem(setSecurityItems());
     }
