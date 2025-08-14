@@ -52,7 +52,7 @@ public class FollowingPriorityFeedShowAllService implements FeedShowAllUseCase {
 
         // 4. response 로의 매핑
         List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()
-                .map(dto -> feedQueryMapper.toFeedShowAllResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser))
+                .map(dto -> feedQueryMapper.toFeedShowAllResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser, userId))
                 .toList();
 
         return new FeedShowAllResponse(

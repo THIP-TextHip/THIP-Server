@@ -44,8 +44,7 @@ public class FeedShowSingleService implements FeedShowSingleUseCase {
         Set<Long> likedFeedIds = postLikeQueryPort.findPostIdsLikedByUser(Set.of(feedId), userId);
         boolean isSaved = savedFeedIds.contains(feedId);
         boolean isLiked = likedFeedIds.contains(feedId);
-        boolean isWriter = feedCreator.getId().equals(userId);
 
-        return feedQueryMapper.toFeedShowSingleResponse(feed, feedCreator, book, isSaved, isLiked,isWriter);
+        return feedQueryMapper.toFeedShowSingleResponse(feed, feedCreator, book, isSaved, isLiked, userId);
     }
 }
