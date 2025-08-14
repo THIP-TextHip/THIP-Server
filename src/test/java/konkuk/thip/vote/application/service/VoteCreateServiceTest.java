@@ -28,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -108,7 +109,8 @@ class VoteCreateServiceTest {
         RoomJpaEntity refreshRoom = roomJpaRepository.findAll().get(0);
 
         // userPercentage, roomPercentage 값 update 확인
-        assertThat(roomParticipant.getUserPercentage()).isEqualTo((double) 89 / 369 * 100);
-        assertThat(refreshRoom.getRoomPercentage()).isEqualTo((7.7 + (double) 89 / 369 * 100) / 2);
+        // 허용 오차범위를 10의 -6제곱(= 0.000001) 로 설정
+        assertThat(roomParticipant.getUserPercentage()).isCloseTo((double) 89 / 369 * 100, within(1e-6));
+        assertThat(refreshRoom.getRoomPercentage()).isCloseTo((7.7 + (double) 89 / 369 * 100) / 2, within(1e-6));
     }
 }
