@@ -28,6 +28,7 @@ public record FeedShowByUserResponse(
             int commentCount,
             boolean isPublic,
             boolean isSaved,
-            boolean isLiked
+            boolean isLiked,
+            boolean isWriter
     ) { }
 }

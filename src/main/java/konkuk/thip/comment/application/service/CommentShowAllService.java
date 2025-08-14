@@ -44,7 +44,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
         Set<Long> likedCommentIds = commentLikeQueryPort.findCommentIdsLikedByUser(allCommentIds, query.userId());
 
         // 4. response 매핑
-        List<CommentForSinglePostResponse.RootCommentDto> rootCommentResponses = buildRootCommentResponses(rootsInOrder, childrenMap, likedCommentIds);
+        List<CommentForSinglePostResponse.RootCommentDto> rootCommentResponses = buildRootCommentResponses(rootsInOrder, childrenMap, likedCommentIds, query.userId());
 
         return new CommentForSinglePostResponse(
                 rootCommentResponses,
@@ -66,7 +66,8 @@ public class CommentShowAllService implements CommentShowAllUseCase {
     private List<CommentForSinglePostResponse.RootCommentDto> buildRootCommentResponses(
             List<CommentQueryDto> roots,
             Map<Long, List<CommentQueryDto>> childrenMap,
-            Set<Long> likedCommentIds) {
+            Set<Long> likedCommentIds,
+            Long userId) {
         List<CommentForSinglePostResponse.RootCommentDto> responses = new ArrayList<>();
         for (CommentQueryDto root : roots) {
             List<CommentQueryDto> children = childrenMap.getOrDefault(root.commentId(), Collections.emptyList());
@@ -74,7 +75,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
             if (root.isDeleted() && children.isEmpty()) {
                 continue;
             }
-            responses.add(commentQueryMapper.toRootCommentResponseWithChildren(root, children, likedCommentIds));
+            responses.add(commentQueryMapper.toRootCommentResponseWithChildren(root, children, likedCommentIds, userId));
         }
         return responses;
     }
