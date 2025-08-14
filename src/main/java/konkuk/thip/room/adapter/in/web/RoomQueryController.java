@@ -33,7 +33,7 @@ public class RoomQueryController {
 
     @Operation(
             summary = "방 검색",
-            description = "키워드, 카테고리, 정렬 방식, 페이지 번호를 기준으로 방을 검색합니다."
+            description = "키워드, 카테고리, 정렬 방식, 페이지 번호를 기준으로 방을 검색합니다. 아직 수정중입니다. 일단 request param 만 수정한 상태입니다."
     )
     @ExceptionDescription(ROOM_SEARCH)
     @GetMapping("/rooms/search")
@@ -41,9 +41,11 @@ public class RoomQueryController {
             @Parameter(description = "검색 키워드 (책 이름 or 방 이름", example = "해리") @RequestParam(value = "keyword", required = false, defaultValue = "") final String keyword,
             @Parameter(description = "모임방 카테고리", example = "문학") @RequestParam(value = "category", required = false, defaultValue = "") final String category,
             @Parameter(description = "정렬 방식 (마감 임박 : deadline, 신청 인원 : memberCount)", example = "deadline") @RequestParam("sort") final String sort,
-            @Parameter(description = "페이지 번호", example = "1") @RequestParam("page") final int page
+            @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
+            @Parameter(description = "페이지 번호", example = "1") @RequestParam("page") final int page,
+            @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(roomSearchUseCase.searchRoom(keyword, category, sort, page));
+        return BaseResponse.ok(roomSearchUseCase.searchRoom(keyword, category, sort, page, isFinalized, userId));
     }
 
     @Operation(

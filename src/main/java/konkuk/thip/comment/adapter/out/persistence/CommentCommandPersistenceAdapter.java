@@ -3,6 +3,7 @@ package konkuk.thip.comment.adapter.out.persistence;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.mapper.CommentMapper;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
+import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.EntityNotFoundException;
@@ -30,6 +31,8 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
     private final RecordJpaRepository recordJpaRepository;
     private final VoteJpaRepository voteJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final CommentLikeJpaRepository commentLikeJpaRepository;
+
     private final CommentMapper commentMapper;
 
     @Override
@@ -87,6 +90,12 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
                 () -> new EntityNotFoundException(COMMENT_NOT_FOUND)
         );
         commentJpaRepository.delete(commentJpaEntity);
+    }
+
+    @Override
+    public void softDeleteAllByPostId(Long postId) {
+        commentLikeJpaRepository.deleteAllByPostId(postId);
+        commentJpaRepository.softDeleteAllByPostId(postId);
     }
 
 }

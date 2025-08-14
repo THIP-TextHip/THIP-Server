@@ -1,6 +1,5 @@
 package konkuk.thip.record.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
@@ -17,6 +16,7 @@ import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.roompost.application.service.helper.RoomProgressHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERVIEW;
 
@@ -32,8 +32,8 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final RoomParticipantValidator roomParticipantValidator;
     private final RoomProgressHelper roomProgressHelper;
 
-    @Transactional
     @Override
+    @Transactional
     //todo updateRoomPercentage 스케줄러로 책임을 분리할지 논의
     public RecordCreateResult createRecord(RecordCreateCommand command) {
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());

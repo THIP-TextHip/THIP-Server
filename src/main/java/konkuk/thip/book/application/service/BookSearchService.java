@@ -12,7 +12,7 @@ import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
-import konkuk.thip.recentSearch.domain.RecentSearch;
+import konkuk.thip.recentSearch.application.service.manager.RecentSearchCreateManager;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
@@ -43,9 +43,11 @@ public class BookSearchService implements BookSearchUseCase {
     private final UserCommandPort userCommandPort;
     private final BookRedisCommandPort bookRedisCommandPort;
 
+    private final RecentSearchCreateManager recentSearchCreateManager;
+
     @Override
     @Transactional
-    public NaverBookParseResult searchBooks(String keyword, int page, Long userId) {
+    public NaverBookParseResult searchBooks(String keyword, int page, Long userId, boolean isFinalized) {
 
         if (keyword == null || keyword.isBlank()) {
             throw new BusinessException(BOOK_KEYWORD_REQUIRED);
@@ -65,13 +67,8 @@ public class BookSearchService implements BookSearchUseCase {
             throw new BusinessException(BOOK_SEARCH_PAGE_OUT_OF_RANGE);
         }
 
-        //최근검색어 추가
-        RecentSearch  recentSearch =  RecentSearch.builder()
-                        .searchTerm(keyword)
-                        .type(BOOK_SEARCH)
-                        .userId(userId)
-                        .build();
-        recentSearchCommandPort.save(recentSearch);
+        // 최근 검색어 저장
+        recentSearchCreateManager.saveRecentSearchByUser(userId, keyword, BOOK_SEARCH, isFinalized);
 
         return result;
     }

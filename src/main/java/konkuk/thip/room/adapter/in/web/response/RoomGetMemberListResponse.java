@@ -14,7 +14,8 @@ public record RoomGetMemberListResponse(
                 Long userId,
                 String nickname,
                 String imageUrl,
-                String alias,
+                String aliasName,
+                String aliasColor,
                 int followerCount
         ) {}
 }

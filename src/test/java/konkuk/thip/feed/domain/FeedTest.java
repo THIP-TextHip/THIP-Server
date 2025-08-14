@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.feed.domain.Tag.BOOK_RECOMMEND;
+import static konkuk.thip.feed.domain.Tag.KOREAN_NOVEL;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +34,7 @@ class FeedTest {
                 .creatorId(CREATOR_ID)
                 .content("공개 피드 입니다.")
                 .isPublic(true)
-                .tagList(List.of(Tag.from(BOOK_RECOMMEND.getValue())))
+                .tagList(List.of(Tag.from(KOREAN_NOVEL.getValue())))
                 .contentList(List.of(Content.builder()
                                         .contentUrl("url1")
                                         .targetPostId(100L).build()
@@ -160,7 +160,7 @@ class FeedTest {
     @DisplayName("updateTags: 작성자가 아닌 경우 피드의 태그를 수정하려고 하면 InvalidStateException이 발생한다.")
     void updateTags_byNonCreator_throws(){
         Feed feed = createPublicFeed();
-        List<String> tags = List.of(BOOK_RECOMMEND.getValue());
+        List<String> tags = List.of(KOREAN_NOVEL.getValue());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class,
                 () -> feed.updateTags(OTHER_USER_ID, tags));
@@ -345,6 +345,23 @@ class FeedTest {
         Feed feed = createPrivateFeed();
 
         assertDoesNotThrow(() -> feed.validateLike(CREATOR_ID));
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 작성자가 아닌 경우 피드를 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byNonCreator_throws(){
+        Feed feed = createPublicFeed();
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> feed.validateDeletable(OTHER_USER_ID));
+
+        assertEquals(FEED_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 피드의 작성자인 경우 피드를 삭제 할 수 있다.")
+    void validateDeletable_byCreator_Success(){
+        Feed feed = createPublicFeed();
+        assertDoesNotThrow(() -> feed.validateDeletable(CREATOR_ID));
     }
 
 }

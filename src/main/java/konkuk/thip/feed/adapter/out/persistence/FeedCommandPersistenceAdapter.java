@@ -6,6 +6,7 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.adapter.out.jpa.*;
 import konkuk.thip.feed.adapter.out.mapper.ContentMapper;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
+import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -32,14 +34,16 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     private final BookJpaRepository bookJpaRepository;
     private final TagJpaRepository tagJpaRepository;
     private final FeedTagJpaRepository feedTagJpaRepository;
+    private final ContentJpaRepository contentJpaRepository;
     private final SavedFeedJpaRepository savedFeedJpaRepository;
 
     private final FeedMapper feedMapper;
     private final ContentMapper contentMapper;
 
+
     @Override
     public Optional<Feed> findById(Long id) {
-        return feedJpaRepository.findById(id)
+        return feedJpaRepository.findByPostIdAndStatus(id,ACTIVE)
                 .map(feedJpaEntity -> {
                     List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
                     return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
@@ -78,7 +82,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         feedJpaEntity.getContentList().clear(); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
         applyFeedContents(feed, feedJpaEntity);
 
-        feedTagJpaRepository.deleteAllByFeedJpaEntity(feedJpaEntity); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
+        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId()); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
         applyFeedTags(feed, feedJpaEntity);
 
         return feedJpaEntity.getPostId();
@@ -125,4 +129,16 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         savedFeedJpaRepository.deleteByUserIdAndFeedId(userId, feedId);
     }
 
+    @Override
+    public void delete(Feed feed) {
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getId())
+                .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
+
+        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
+        contentJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
+        savedFeedJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
+
+        feedJpaEntity.softDelete();
+        feedJpaRepository.save(feedJpaEntity);
+    }
 }

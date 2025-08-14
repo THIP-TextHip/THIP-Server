@@ -77,7 +77,7 @@ class RoomPlayingDetailViewApiTest {
     @AfterEach
     void tearDown() {
         voteItemJpaRepository.deleteAll();
-        voteJpaRepository.deleteAll();
+        voteJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();

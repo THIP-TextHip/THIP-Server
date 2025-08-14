@@ -51,7 +51,8 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
                             .userId(userId)
                             .nickname(user.getNickname())
                             .imageUrl(user.getAlias().getImageUrl())
-                            .alias(user.getAlias().getValue())
+                            .aliasName(user.getAlias().getValue())
+                            .aliasColor(user.getAlias().getColor())
                             .followerCount(user.getFollowerCount())
                             .build();
                 })

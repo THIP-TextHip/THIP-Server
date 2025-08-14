@@ -20,4 +20,6 @@ public interface RecordCommandPort {
         return findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(RECORD_NOT_FOUND));
     }
+
+    void delete(Record record);
 }

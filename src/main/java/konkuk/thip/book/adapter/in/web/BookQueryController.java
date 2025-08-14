@@ -42,8 +42,9 @@ public class BookQueryController {
     public BaseResponse<BookSearchListResponse> showBookSearchList(
             @Parameter(description = "검색 키워드", example = "해리포터") @RequestParam final String keyword,
             @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") @RequestParam final int page,
+            @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(BookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page,userId), page));
+        return BaseResponse.ok(BookSearchListResponse.of(bookSearchUseCase.searchBooks(keyword, page, userId, isFinalized), page));
     }
 
     //책 상세검색 결과 조회

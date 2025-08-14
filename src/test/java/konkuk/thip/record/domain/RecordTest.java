@@ -6,8 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static konkuk.thip.common.exception.code.ErrorCode.COMMENT_COUNT_UNDERFLOW;
-import static konkuk.thip.common.exception.code.ErrorCode.POST_LIKE_COUNT_UNDERFLOW;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Record 도메인 테스트")
@@ -21,6 +20,10 @@ class RecordTest {
     }
 
     private final Long CREATOR_ID = 1L;
+    private final Long OTHER_USER_ID = 2L;
+
+    private final Long ROOM_ID = 1L;
+    private final Long OTHER_ROOM_ID = 2L;
 
     private Record createWithCommentRecord() {
         return Record.builder()
@@ -31,7 +34,7 @@ class RecordTest {
                 .isOverview(false)
                 .likeCount(0)
                 .commentCount(1)
-                .roomId(100L)
+                .roomId(ROOM_ID)
                 .build();
     }
 
@@ -175,5 +178,65 @@ class RecordTest {
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
     }
+
+    @Test
+    @DisplayName("validateDeletable: 작성자가 아닌 경우 기록을 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byNonCreator_throws(){
+        Record record = createWithCommentRecord();
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.validateDeletable(OTHER_USER_ID,ROOM_ID));
+
+        assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 전달된 roomId가 기록의 roomId가 일치 하지않은 경우 기록을 삭제하려고 하면 InvalidStateException이 발생한다.")
+    void validateDeletable_byOtherRoomId_throws(){
+        Record record = createWithCommentRecord();
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.validateDeletable(CREATOR_ID,OTHER_ROOM_ID));
+
+        assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validateDeletable: 피드의 작성자면서, 전달된 roomId가 기록의 roomId와 일치할 경우 기록을 삭제 할 수 있다.")
+    void validateDeletable_byCreator_byRoomId_Success(){
+        Record record = createWithCommentRecord();
+        assertDoesNotThrow(() -> record.validateDeletable(CREATOR_ID,ROOM_ID));
+    }
+
+    @Test
+    @DisplayName("validatePin: 작성자가 아닌 경우 기록을 핀하려고 하면 InvalidStateException이 발생한다.")
+    void validatePin_byNonCreator_throws() {
+        Record record = createWithCommentRecord();
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.validatePin(OTHER_USER_ID, ROOM_ID));
+
+        assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validatePin: 전달된 roomId가 기록의 roomId와 일치하지 않는 경우 기록을 핀하려고 하면 InvalidStateException이 발생한다.")
+    void validatePin_byOtherRoomId_throws() {
+        Record record = createWithCommentRecord();
+
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> record.validatePin(CREATOR_ID, OTHER_ROOM_ID));
+
+        assertEquals(RECORD_ACCESS_FORBIDDEN, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("validatePin: 작성자이면서 roomId가 기록의 roomId와 일치하면 핀 가능하다.")
+    void validatePin_byCreator_byRoomId_success() {
+        Record record = createWithCommentRecord();
+
+        assertDoesNotThrow(() -> record.validatePin(CREATOR_ID, ROOM_ID));
+    }
+
+
+
 
 }

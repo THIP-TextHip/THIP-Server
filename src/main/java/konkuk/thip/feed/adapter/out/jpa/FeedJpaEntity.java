@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,14 @@ public class FeedJpaEntity extends PostJpaEntity {
 
     @OneToMany(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ContentJpaEntity> contentList;
+
+    // 삭제용 피드 저장 양방향 매핑 관계
+    @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<SavedFeedJpaEntity> savedFeeds = new ArrayList<>();
+
+    // 삭제용 피드 태그 양방향 매핑 관계
+    @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<FeedTagJpaEntity> feedTags = new ArrayList<>();
 
     @Builder
     public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, List<ContentJpaEntity> contentList) {

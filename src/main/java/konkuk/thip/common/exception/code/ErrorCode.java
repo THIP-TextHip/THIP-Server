@@ -24,6 +24,7 @@ public enum ErrorCode implements ResponseCode {
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
+    AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
 
     /* 60000부터 비즈니스 예외 */
     /**
@@ -31,7 +32,6 @@ public enum ErrorCode implements ResponseCode {
      */
     ALIAS_NOT_FOUND(HttpStatus.NOT_FOUND, 60001, "존재하지 않는 ALIAS 입니다."),
     ALIAS_NAME_NOT_MATCH(HttpStatus.BAD_REQUEST, 60002, "일치하는 칭호 이름이 없습니다."),
-
 
     /**
      * 70000 : user error
@@ -120,6 +120,7 @@ public enum ErrorCode implements ResponseCode {
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, 130000, "존재하지 않는 RECORD 입니다."),
     RECORD_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 130001, "총평이 될 수 없는 RECORD 입니다."),
     INVALID_RECORD_PAGE_RANGE(HttpStatus.BAD_REQUEST, 130002, "RECORD의 page 값이 유효하지 않습니다."),
+    RECORD_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 130003, "기록 접근 권한이 없습니다."),
 
     /**
      * 140000 : roomParticipant error
@@ -167,6 +168,7 @@ public enum ErrorCode implements ResponseCode {
      * 180000 : Post error
      */
     POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 180000, "일치하는 게시물 타입 이름이 없습니다. [FEED, RECORD, VOTE] 중 하나여야 합니다."),
+    POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 180001, "이미 삭제된 게시물 입니다."),
 
     /**
      * 185000 : PostLike error

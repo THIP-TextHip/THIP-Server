@@ -10,6 +10,9 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "comments")
 @Getter
@@ -51,6 +54,10 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;
+
+    // 삭제용 댓글 좋아요 양방향 매핑 관계
+    @OneToMany(mappedBy = "commentJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CommentLikeJpaEntity> commentLikeList = new ArrayList<>();
 
     public CommentJpaEntity updateFrom(Comment comment) {
         this.reportCount = comment.getReportCount();

@@ -13,6 +13,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.util.UUID;
 
 import static konkuk.thip.common.security.constant.AuthParameters.*;
 
@@ -22,6 +24,7 @@ import static konkuk.thip.common.security.constant.AuthParameters.*;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private static final int COOKIE_MAX_AGE = 60 * 60 * 24; // 1일
+    private final LoginTokenStorage loginTokenStorage;
 
     @Value("${server.web-redirect-url}")
     private String webRedirectUrl;
@@ -41,19 +44,33 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (oAuth2User.isNewUser()) {
             // 신규 유저 - 회원가입용 임시 토큰
             String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id());
-            addTokenCookie(response, tempToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL);
+//            addTokenCookie(response, tempToken);
+
+            String loginTokenKey = UUID.randomUUID().toString();
+            loginTokenStorage.put(loginTokenKey, TokenType.TEMP, tempToken, Duration.ofMinutes(5));      // ttl 5분
+
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_SIGNUP_URL.getValue() + "?loginTokenKey=" + loginTokenKey);
         } else {
             // 기존 유저 - 로그인용 액세스 토큰
             String accessToken = jwtUtil.createAccessToken(loginUser.userId());
-            addTokenCookie(response, accessToken);
-            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL);
+//            addTokenCookie(response, accessToken);
+
+            String loginTokenKey = UUID.randomUUID().toString();
+            loginTokenStorage.put(loginTokenKey, TokenType.ACCESS, accessToken, Duration.ofMinutes(5));      // ttl 5분
+
+            getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL.getValue() + "?loginTokenKey=" + loginTokenKey);
         }
     }
 
     private void addTokenCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(JWT_HEADER_KEY.getValue(), token);
-        cookie.setSecure(true);
+        if(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue())) {
+            cookie.setDomain(webRedirectUrl.replace(HTTPS_PREFIX.getValue(), ""));
+        } else {
+            cookie.setDomain("localhost");
+        }
+        cookie.setSecure(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue()));
+        cookie.setHttpOnly(false);
         cookie.setPath("/");
         cookie.setMaxAge(COOKIE_MAX_AGE);
         response.addCookie(cookie);

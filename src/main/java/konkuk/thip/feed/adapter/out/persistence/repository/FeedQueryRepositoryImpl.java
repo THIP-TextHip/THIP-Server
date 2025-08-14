@@ -8,11 +8,11 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.QContentJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.*;
+import konkuk.thip.feed.application.port.out.dto.QTagCategoryQueryDto;
+import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
+import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
@@ -215,6 +215,19 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .toList();
     }
 
+    @Override
+    public List<TagCategoryQueryDto> findAllTags() {
+        QCategoryJpaEntity c = QCategoryJpaEntity.categoryJpaEntity;
+        QTagJpaEntity t = QTagJpaEntity.tagJpaEntity;
+
+        return jpaQueryFactory
+                .select(new QTagCategoryQueryDto(c.value, t.value))
+                .from(c)
+                .join(t).on(t.categoryJpaEntity.eq(c))
+                .orderBy(c.categoryId.asc(), t.tagId.asc()) //Id 순 정렬
+                .fetch();
+    }
+
     private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
@@ -256,7 +269,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .feedId(e.getPostId())
                 .creatorId(e.getUserJpaEntity().getUserId())
                 .creatorNickname(e.getUserJpaEntity().getNickname())
-                .creatorProfileImageUrl(e.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())
+                .creatorProfileImageUrl(e.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
                 .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
                 .createdAt(e.getCreatedAt())
                 .isbn(e.getBookJpaEntity().getIsbn())

@@ -1,6 +1,5 @@
 package konkuk.thip.comment.application.service;
 
-import jakarta.transaction.Transactional;
 import konkuk.thip.comment.application.port.in.CommentLikeUseCase;
 import konkuk.thip.comment.application.port.in.dto.CommentIsLikeCommand;
 import konkuk.thip.comment.application.port.in.dto.CommentIsLikeResult;
@@ -13,6 +12,7 @@ import konkuk.thip.common.post.CountUpdatable;
 import konkuk.thip.common.post.service.PostHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

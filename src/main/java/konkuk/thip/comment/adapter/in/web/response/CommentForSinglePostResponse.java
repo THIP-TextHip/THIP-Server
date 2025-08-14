@@ -12,7 +12,7 @@ public record CommentForSinglePostResponse(
             Long creatorId,
             String creatorProfileImageUrl,
             String creatorNickname,
-            String alias,
+            String aliasName,
             String aliasColor,
             String postDate,        // 댓글 작성 시각 (~ 전 형식)
             String content,
@@ -27,7 +27,7 @@ public record CommentForSinglePostResponse(
                 Long creatorId,
                 String creatorProfileImageUrl,
                 String creatorNickname,
-                String alias,
+                String aliasName,
                 String aliasColor,
                 String postDate,        // 댓글 작성 시각 (~ 전 형식)
                 String content,

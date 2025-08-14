@@ -131,6 +131,17 @@ public enum SwaggerResponseDescription {
             BOOK_NOT_FOUND,
             ROOM_ACCESS_FORBIDDEN
     ))),
+    RECORD_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            RECORD_NOT_FOUND,
+            RECORD_ACCESS_FORBIDDEN
+    ))),
+    RECORD_PIN(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            BOOK_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            RECORD_ACCESS_FORBIDDEN
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(
@@ -190,6 +201,10 @@ public enum SwaggerResponseDescription {
             POST_ALREADY_LIKED,
             POST_NOT_LIKED_CANNOT_CANCEL,
             POST_LIKE_COUNT_UNDERFLOW,
+            FEED_ACCESS_FORBIDDEN
+    ))),
+    FEED_DELETE(new LinkedHashSet<>(Set.of(
+            FEED_NOT_FOUND,
             FEED_ACCESS_FORBIDDEN
     ))),
 

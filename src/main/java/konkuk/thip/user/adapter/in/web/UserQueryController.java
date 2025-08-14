@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.user.application.port.in.*;
 import konkuk.thip.user.application.port.in.dto.UserReactionType;
 import konkuk.thip.user.adapter.in.web.response.*;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -18,13 +19,7 @@ import konkuk.thip.user.adapter.in.web.response.UserFollowingResponse;
 import konkuk.thip.user.adapter.in.web.response.UserVerifyNicknameResponse;
 import konkuk.thip.user.adapter.in.web.response.UserIsFollowingResponse;
 import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
-import konkuk.thip.user.application.port.in.UserGetFollowUsecase;
-import konkuk.thip.user.application.port.in.UserVerifyNicknameUseCase;
-import konkuk.thip.user.application.port.in.UserIsFollowingUsecase;
-import konkuk.thip.user.application.port.in.UserSearchUsecase;
-import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
 import konkuk.thip.user.application.port.in.dto.UserSearchQuery;
-import konkuk.thip.user.application.port.in.UserMyPageUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +43,7 @@ public class UserQueryController {
     private final UserVerifyNicknameUseCase userVerifyNicknameUseCase;
     private final UserSearchUsecase userSearchUsecase;
     private final UserMyPageUseCase userMyPageUseCase;
+    private final UserShowFollowingRecentWritersUseCase userShowFollowingRecentWritersUseCase;
 
     @Operation(
             summary = "닉네임 중복 확인",
@@ -120,9 +116,10 @@ public class UserQueryController {
     @GetMapping("/users")
     public BaseResponse<UserSearchResponse> showSearchUsers(
             @Parameter(description = "검색어", example = "thip") @RequestParam @NotBlank(message = "검색어는 필수입니다.") final String keyword,
+            @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
             @Parameter(description = "단일 검색 결과 페이지 크기 (1~30) / default : 30", example = "30") @RequestParam(required = false, defaultValue = "30") @Min(1) @Max(30) final Integer size,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size)));
+        return BaseResponse.ok(userSearchUsecase.searchUsers(UserSearchQuery.of(keyword, userId, size, isFinalized)));
     }
 
     @Operation(
@@ -159,5 +156,16 @@ public class UserQueryController {
     public BaseResponse<Long> showUserMyId(
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(userId);
+    }
+
+    @Operation(
+            summary = "최근에 공개 피드를 작성한 내 팔로잉 리스트(= 내 띱 리스트) 조회",
+            description = "내가 팔로잉 하는 사람들 중, 최근에 공개 피드를 작성한 사람들의 정보를 최대 10명 반환합니다."
+    )
+    @GetMapping("/users/my-followings/recent-feeds")
+    public BaseResponse<UserFollowingRecentWritersResponse> showMyFollowingRecentWriters(
+            @Parameter(hidden = true) @UserId Long userId
+    ) {
+        return BaseResponse.ok(userShowFollowingRecentWritersUseCase.showMyFollowingRecentWriters(userId));
     }
 }

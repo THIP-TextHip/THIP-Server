@@ -121,7 +121,7 @@ class BookDetailSearchControllerTest {
     @AfterEach
     void tearDown() {
         savedBookJpaRepository.deleteAll();
-        feedJpaRepository.deleteAll();
+        feedJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
@@ -181,7 +181,7 @@ class BookDetailSearchControllerTest {
         String isbn = "9791168342941";
         UserJpaEntity user = userJpaRepository.findAll().get(0);
 
-        feedJpaRepository.deleteAll();
+        feedJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
 
         var result = bookSearchService.searchDetailBooks(isbn, user.getUserId());
