@@ -17,6 +17,7 @@ public record FeedShowMineResponse(
             String[] contentUrls,
             int likeCount,
             int commentCount,
-            boolean isPublic
+            boolean isPublic,
+            boolean isWriter
     ) { }
 }

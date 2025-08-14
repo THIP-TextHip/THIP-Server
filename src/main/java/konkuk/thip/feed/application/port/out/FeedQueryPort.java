@@ -27,7 +27,7 @@ public interface FeedQueryPort {
     /**
      * 특정 유저 피드 조회
      */
-    CursorBasedList<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, Cursor cursor);
+    CursorBasedList<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId,Long feedOwnerId,Cursor cursor);
 
     int countAllFeedsByUserId(Long userId);
 

@@ -23,6 +23,7 @@ public record FeedShowAllResponse(
             int likeCount,
             int commentCount,
             boolean isSaved,
-            boolean isLiked
+            boolean isLiked,
+            boolean isWriter
     ) { }
 }

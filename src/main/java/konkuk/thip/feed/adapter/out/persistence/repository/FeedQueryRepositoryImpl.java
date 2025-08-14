@@ -79,7 +79,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환
         return ordered.stream()
-                .map(e -> toDto(e, priorityMap.get(e.getPostId())))
+                .map(e -> toDto(e, priorityMap.get(e.getPostId()),userId))
                 .toList();
     }
 
@@ -101,7 +101,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> toDto(e, null))
+                .map(e -> toDto(e, null, userId))
                 .toList();
     }
 
@@ -192,14 +192,14 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> toDto(e, null))
+                .map(e -> toDto(e, null, userId))
                 .toList();
     }
 
     @Override
-    public List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
+    public List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long userId, Long feedOwnerId, LocalDateTime lastCreatedAt, int size) {
         // 1. 특정 유저 피드 ID 목록만 최신순 페이징 조회
-        List<Long> feedIds = fetchSpecificUserFeedIdsByCreatedAt(userId, lastCreatedAt, size);
+        List<Long> feedIds = fetchSpecificUserFeedIdsByCreatedAt(feedOwnerId, lastCreatedAt, size);
 
         // 2. 엔티티 조회 및 순서 보존
         List<FeedJpaEntity> entities = fetchFeedEntitiesByIds(feedIds);
@@ -211,7 +211,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> toDto(e, null))
+                .map(e -> toDto(e, null, userId))
                 .toList();
     }
 
@@ -259,11 +259,12 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .fetch();
     }
 
-    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority) {
+    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority, Long userId) {
         String[] urls = e.getContentList().stream()
                 .map(ContentJpaEntity::getContentUrl)
                 .toArray(String[]::new);
         boolean isPriorityFeed = (priority != null && priority == 1);
+        boolean isWriter = e.getUserJpaEntity().getUserId().equals(userId);
 
         return FeedQueryDto.builder()
                 .feedId(e.getPostId())
@@ -280,6 +281,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .likeCount(e.getLikeCount())
                 .commentCount(e.getCommentCount())
                 .isPublic(e.getIsPublic())
+                .isWriter(isWriter)
                 .isPriorityFeed(isPriorityFeed)
                 .build();
     }

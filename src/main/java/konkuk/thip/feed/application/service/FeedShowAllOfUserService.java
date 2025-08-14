@@ -49,7 +49,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
         // 2. [최신순으로] 피드 조회 with 페이징 처리
-        CursorBasedList<FeedQueryDto> result = feedQueryPort.findSpecificUserFeedsByCreatedAt(feedOwnerId, nextCursor);
+        CursorBasedList<FeedQueryDto> result = feedQueryPort.findSpecificUserFeedsByCreatedAt(userId,feedOwnerId,nextCursor);
         Set<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
                 .collect(Collectors.toUnmodifiableSet());

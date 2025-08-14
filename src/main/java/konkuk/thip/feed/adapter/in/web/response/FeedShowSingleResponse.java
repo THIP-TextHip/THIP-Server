@@ -16,6 +16,7 @@ public record FeedShowSingleResponse(
         int commentCount,
         boolean isSaved,
         boolean isLiked,
+        boolean isWriter,
         String[] tagList
 ) {
 }

@@ -21,5 +21,6 @@ public record FeedQueryDto(
         int likeCount,
         int commentCount,
         boolean isPublic,
+        boolean isWriter,
         @Nullable Boolean isPriorityFeed
 ) { }

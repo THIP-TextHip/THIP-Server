@@ -83,8 +83,9 @@ public interface FeedQueryMapper {
     @Mapping(target = "commentCount", source = "feed.commentCount")
     @Mapping(target = "isSaved", source = "isSaved")
     @Mapping(target = "isLiked", source = "isLiked")
+    @Mapping(target = "isWriter", source = "isWriter")
     @Mapping(target = "tagList", source = "feed.tagList", qualifiedByName = "mapTagList")
-    FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked);
+    FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked, boolean isWriter);
 
     @Named("mapContentList")
     default String[] mapContentList(List<Content> contentList) {
