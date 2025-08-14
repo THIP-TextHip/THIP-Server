@@ -2,6 +2,7 @@ package konkuk.thip.roompost.application.service.helper;
 
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
+import konkuk.thip.common.annotation.HelperService;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
+@HelperService
 @RequiredArgsConstructor
 public class RoomProgressHelper {
 
