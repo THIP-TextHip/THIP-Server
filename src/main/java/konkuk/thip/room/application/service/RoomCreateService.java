@@ -48,8 +48,7 @@ public class RoomCreateService implements RoomCreateUseCase {
         Long savedRoomId = roomCommandPort.save(room);
 
         // 4. 방장 RoomParticipant 생성 및 DB save
-        RoomParticipant roomParticipant = RoomParticipant.withoutId(
-                userId, savedRoomId, RoomParticipantRole.HOST.getType());
+        RoomParticipant roomParticipant = RoomParticipant.hostWithoutId(userId, savedRoomId);
         roomParticipantCommandPort.save(roomParticipant);
 
         return savedRoomId;

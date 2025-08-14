@@ -55,7 +55,7 @@ class RoomJoinServiceTest {
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
-                    .willReturn(Optional.of(RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType())));
+                    .willReturn(Optional.of(RoomParticipant.memberWithoutId(USER_ID, ROOM_ID)));
 
             assertThatThrownBy(() -> roomJoinService.changeJoinState(command))
                     .isInstanceOf(BusinessException.class)
@@ -100,7 +100,7 @@ class RoomJoinServiceTest {
         @DisplayName("정상적으로 취소 시 참여자 제거 및 인원수 감소")
         void successCancel() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
-            RoomParticipant participant = RoomParticipant.withoutId(USER_ID, ROOM_ID, MEMBER.getType());
+            RoomParticipant participant = RoomParticipant.memberWithoutId(USER_ID, ROOM_ID);
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
