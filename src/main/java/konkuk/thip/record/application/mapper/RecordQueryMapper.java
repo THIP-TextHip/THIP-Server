@@ -1,5 +1,6 @@
 package konkuk.thip.record.application.mapper;
 
+import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.record.adapter.in.web.response.RecordSearchResponse;
 import konkuk.thip.record.application.port.out.dto.PostQueryDto;
 import org.mapstruct.Mapper;
@@ -8,7 +9,7 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring", imports = DateUtil.class, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface RecordQueryMapper {
 
     @Mapping(target = "postId",         source = "dto.postId")
