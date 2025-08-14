@@ -29,7 +29,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     private final QUserJpaEntity parentCommentCreator = new QUserJpaEntity("parentCommentCreator");
 
     @Override
-    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, Long userId, String postTypeStr, LocalDateTime lastCreatedAt, int size) {
+    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size) {
         // 최상위 댓글(size+1) 프로젝션 생성
         QCommentQueryDto proj = new QCommentQueryDto(
                 comment.commentId,
@@ -41,8 +41,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
-                comment.status.eq(StatusType.INACTIVE),      // 루트 댓글이 삭제된 상태인지 아닌지,
-                commentCreator.userId.eq(userId)
+                comment.status.eq(StatusType.INACTIVE)      // 루트 댓글이 삭제된 상태인지 아닌지
         );
 
         // WHERE 절 분리
@@ -67,7 +66,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     }
 
     @Override
-    public List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId,Long userId) {
+    public List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId) {
         List<CommentQueryDto> allDescendants = new ArrayList<>();       // 결과 누적용 리스트
 
         // 1) 부모 ID 집합에 루트 댓글 ID 추가
@@ -87,8 +86,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
-                comment.status.eq(StatusType.INACTIVE),
-                commentCreator.userId.eq(userId)
+                comment.status.eq(StatusType.INACTIVE)
         );
 
         // 3) 단계별 자식 댓글 조회
@@ -121,7 +119,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     }
 
     @Override
-    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsByCreatedAtAsc(Set<Long> rootCommentIds,Long userId) {
+    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsByCreatedAtAsc(Set<Long> rootCommentIds) {
         // 1) 루트 ID별로 최상위 매핑 초기화
         Map<Long, Long> idToRoot = new HashMap<>();
         for (Long rootId : rootCommentIds) {
@@ -150,8 +148,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
-                comment.status.eq(StatusType.INACTIVE),
-                commentCreator.userId.eq(userId)
+                comment.status.eq(StatusType.INACTIVE)
         );
 
         // 5) 루프를 돌며 모든 깊이의 자식 댓글 조회 및 매핑
