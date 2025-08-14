@@ -190,6 +190,14 @@ public class TestEntityFactory {
                 .build();
     }
 
+    public static VoteItemJpaEntity createVoteItem(String itemName, VoteJpaEntity vote) {
+        return VoteItemJpaEntity.builder()
+                .itemName(itemName)
+                .count(0)
+                .voteJpaEntity(vote)
+                .build();
+    }
+
     public static CommentJpaEntity createComment(PostJpaEntity post, UserJpaEntity user,PostType postType) {
         return CommentJpaEntity.builder()
                 .content("댓글 내용")

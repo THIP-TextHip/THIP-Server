@@ -10,16 +10,17 @@ import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.vote.adapter.in.web.request.VoteCreateRequest;
 import konkuk.thip.vote.adapter.in.web.request.VoteRequest;
 import konkuk.thip.vote.adapter.in.web.response.VoteCreateResponse;
+import konkuk.thip.vote.adapter.in.web.response.VoteDeleteResponse;
 import konkuk.thip.vote.adapter.in.web.response.VoteResponse;
 import konkuk.thip.vote.application.port.in.VoteCreateUseCase;
+import konkuk.thip.vote.application.port.in.VoteDeleteUseCase;
 import konkuk.thip.vote.application.port.in.VoteUseCase;
 import konkuk.thip.vote.application.port.in.dto.VoteResult;
+import konkuk.thip.vote.application.port.in.dto.VoteDeleteCommand;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_DELETE;
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.VOTE;
 
 @Tag(name = "Vote Command API", description = "투표 상태변경 관련 API")
@@ -28,6 +29,7 @@ import static konkuk.thip.common.swagger.SwaggerResponseDescription.VOTE;
 public class VoteCommandController {
 
     private final VoteCreateUseCase voteCreateUseCase;
+    private final VoteDeleteUseCase voteDeleteUseCase;
     private final VoteUseCase voteUseCase;
 
     @Operation(
@@ -58,5 +60,18 @@ public class VoteCommandController {
             @Valid @RequestBody VoteRequest request) {
         VoteResult voteResult = voteUseCase.vote(request.toCommand(userId, roomId, voteId));
         return BaseResponse.ok(VoteResponse.of(voteResult.postId(), voteResult.roomId(), voteResult.voteItems()));
+    }
+
+    @Operation(
+            summary = "투표 삭제",
+            description = "사용자가 투표를 삭제합니다."
+    )
+    @ExceptionDescription(RECORD_DELETE)
+    @DeleteMapping("/rooms/{roomId}/vote/{voteId}")
+    public BaseResponse<VoteDeleteResponse> deleteVote(
+            @Parameter(description = "삭제하려는 투표 ID", example = "1") @PathVariable("voteId") final Long voteId,
+            @Parameter(description = "삭제하려는 투표가 작성된 모임 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(VoteDeleteResponse.of(voteDeleteUseCase.deleteVote(new VoteDeleteCommand(roomId, voteId, userId))));
     }
 }
