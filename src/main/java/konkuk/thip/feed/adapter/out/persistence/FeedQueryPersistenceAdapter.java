@@ -162,7 +162,8 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
         List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findFeedsByBookIsbnOrderByLikeCount(isbn, userId, lastCreatedAt, lastLikeCount, size);
 
         return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
-            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
+            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString(),
+                    feedQueryDto.likeCount().toString()));
             return nextCursor.toEncodedString();
         });
     }
