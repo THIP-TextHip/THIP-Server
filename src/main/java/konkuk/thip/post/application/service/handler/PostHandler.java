@@ -1,14 +1,14 @@
-package konkuk.thip.common.post.service;
+package konkuk.thip.post.application.service.handler;
 
 import konkuk.thip.common.annotation.HelperService;
-import konkuk.thip.common.post.CountUpdatable;
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.CountUpdatable;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.record.application.port.out.RecordCommandPort;
-import konkuk.thip.record.domain.Record;
-import konkuk.thip.vote.application.port.out.VoteCommandPort;
-import konkuk.thip.vote.domain.Vote;
+import konkuk.thip.roompost.application.port.out.RecordCommandPort;
+import konkuk.thip.roompost.domain.Record;
+import konkuk.thip.roompost.application.port.out.VoteCommandPort;
+import konkuk.thip.roompost.domain.Vote;
 import lombok.RequiredArgsConstructor;
 
 @HelperService

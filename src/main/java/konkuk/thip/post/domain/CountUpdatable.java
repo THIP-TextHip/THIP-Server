@@ -1,4 +1,4 @@
-package konkuk.thip.common.post;
+package konkuk.thip.post.domain;
 
 import konkuk.thip.post.domain.service.PostCountService;
 
