@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 댓글 삭제 api 통합 테스트")
-class CommentDeleteAPITest {
+class CommentDeleteApiTest {
 
     @Autowired
     private MockMvc mockMvc;

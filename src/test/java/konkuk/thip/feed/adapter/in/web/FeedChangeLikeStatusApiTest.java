@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @DisplayName("[통합] 피드 좋아요 api 통합 테스트")
-class FeedChangeLikeStatusAPITest {
+class FeedChangeLikeStatusApiTest {
 
     @Autowired
     private MockMvc mockMvc;

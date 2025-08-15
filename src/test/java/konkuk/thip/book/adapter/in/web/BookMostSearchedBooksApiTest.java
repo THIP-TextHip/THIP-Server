@@ -35,7 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-class BookMostSearchedBooksControllerTest {
+@DisplayName("[통합] 가장 많이 검색된 책 조회 API 통합 테스트")
+class BookMostSearchedBooksApiTest {
 
     @Autowired
     private MockMvc mockMvc;

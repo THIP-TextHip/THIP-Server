@@ -10,14 +10,13 @@ import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.roompost.application.service.VoteCreateService;
+import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
+import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
+import konkuk.thip.roompost.application.port.in.dto.vote.VoteCreateCommand;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
-import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
-import konkuk.thip.roompost.application.port.in.dto.vote.VoteCreateCommand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ import static org.assertj.core.api.Assertions.within;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("[단위] 투표 생성 service 단위 테스트")
+@DisplayName("[통합] 투표 생성 service 통합 테스트")
 class VoteCreateServiceTest {
 
     @Autowired

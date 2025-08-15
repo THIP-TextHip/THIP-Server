@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @Import(TestS3MockConfig.class)
 @DisplayName("[통합] 피드 생성 api 통합 테스트")
-class FeedCreateAPITest {
+class FeedCreateApiTest {
 
     @Autowired
     private MockMvc mockMvc;

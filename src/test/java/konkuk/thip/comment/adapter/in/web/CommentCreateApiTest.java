@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @DisplayName("[통합] 댓글 생성 api 통합 테스트")
-class CommentCreateAPITest {
+class CommentCreateApiTest {
 
     @Autowired
     private MockMvc mockMvc;

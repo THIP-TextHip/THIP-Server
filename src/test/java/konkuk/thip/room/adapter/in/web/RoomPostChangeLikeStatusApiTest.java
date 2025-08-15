@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @DisplayName("[통합] 방 게시물(기록,투표) 좋아요 api 통합 테스트")
-class RoomPostChangeLikeStatusAPITest {
+class RoomPostChangeLikeStatusApiTest {
 
     @Autowired
     private MockMvc mockMvc;

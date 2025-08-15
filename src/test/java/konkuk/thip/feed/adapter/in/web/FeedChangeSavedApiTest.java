@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 피드 저장 상태 변경 api 통합 테스트")
-class FeedChangeSavedAPITest {
+class FeedChangeSavedApiTest {
 
     @Autowired
     private MockMvc mockMvc;

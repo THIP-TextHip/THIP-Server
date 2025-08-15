@@ -37,8 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@DisplayName("[통합] BookChangeSavedController 테스트")
-class BookChangeSavedControllerTest {
+@DisplayName("[통합] 방 저장상태 변경 api 통합 테스트")
+class BookChangeSavedApiTest {
 
     @Autowired
     private MockMvc mockMvc;
