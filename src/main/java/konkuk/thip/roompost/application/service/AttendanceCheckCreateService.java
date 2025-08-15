@@ -1,11 +1,11 @@
-package konkuk.thip.room.application.service;
+package konkuk.thip.roompost.application.service;
 
-import konkuk.thip.room.application.port.in.AttendanceCheckCreateUseCase;
-import konkuk.thip.room.application.port.in.dto.AttendanceCheckCreateCommand;
-import konkuk.thip.room.application.port.in.dto.AttendanceCheckCreateResult;
-import konkuk.thip.room.application.port.out.AttendanceCheckCommandPort;
-import konkuk.thip.room.application.port.out.AttendanceCheckQueryPort;
-import konkuk.thip.room.domain.AttendanceCheck;
+import konkuk.thip.roompost.application.port.in.AttendanceCheckCreateUseCase;
+import konkuk.thip.roompost.application.port.in.dto.attendancecheck.AttendanceCheckCreateCommand;
+import konkuk.thip.roompost.application.port.in.dto.attendancecheck.AttendanceCheckCreateResult;
+import konkuk.thip.roompost.application.port.out.AttendanceCheckCommandPort;
+import konkuk.thip.roompost.application.port.out.AttendanceCheckQueryPort;
+import konkuk.thip.roompost.domain.AttendanceCheck;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

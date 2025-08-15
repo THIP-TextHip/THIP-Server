@@ -1,4 +1,4 @@
-package konkuk.thip.room.domain;
+package konkuk.thip.roompost.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import org.junit.jupiter.api.DisplayName;

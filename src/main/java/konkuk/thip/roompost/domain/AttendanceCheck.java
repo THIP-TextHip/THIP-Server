@@ -1,4 +1,4 @@
-package konkuk.thip.room.domain;
+package konkuk.thip.roompost.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;

@@ -1,7 +1,7 @@
-package konkuk.thip.room.adapter.in.web;
+package konkuk.thip.roompost.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.room.adapter.in.web.request.AttendanceCheckCreateRequest;
+import konkuk.thip.roompost.adapter.in.web.request.AttendanceCheckCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

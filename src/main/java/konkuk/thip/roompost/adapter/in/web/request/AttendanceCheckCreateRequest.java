@@ -1,8 +1,8 @@
-package konkuk.thip.room.adapter.in.web.request;
+package konkuk.thip.roompost.adapter.in.web.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import konkuk.thip.room.application.port.in.dto.AttendanceCheckCreateCommand;
+import konkuk.thip.roompost.application.port.in.dto.attendancecheck.AttendanceCheckCreateCommand;
 
 public record AttendanceCheckCreateRequest(
         @Schema(description = "유저가 작성한 오늘의 한마디 내용")

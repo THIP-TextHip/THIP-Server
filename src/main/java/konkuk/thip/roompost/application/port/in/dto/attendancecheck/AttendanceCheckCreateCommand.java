@@ -1,4 +1,4 @@
-package konkuk.thip.room.application.port.in.dto;
+package konkuk.thip.roompost.application.port.in.dto.attendancecheck;
 
 public record AttendanceCheckCreateCommand(
         Long creatorId,

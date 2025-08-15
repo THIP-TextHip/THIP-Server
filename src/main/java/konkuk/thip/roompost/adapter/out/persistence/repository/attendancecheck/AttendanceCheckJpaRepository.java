@@ -1,7 +1,7 @@
-package konkuk.thip.room.adapter.out.persistence.repository.attendancecheck;
+package konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck;
 
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.room.adapter.out.jpa.AttendanceCheckJpaEntity;
+import konkuk.thip.roompost.adapter.out.jpa.AttendanceCheckJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

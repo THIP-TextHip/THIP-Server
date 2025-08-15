@@ -1,6 +1,6 @@
-package konkuk.thip.room.adapter.in.web.response;
+package konkuk.thip.roompost.adapter.in.web.response;
 
-import konkuk.thip.room.application.port.in.dto.AttendanceCheckCreateResult;
+import konkuk.thip.roompost.application.port.in.dto.attendancecheck.AttendanceCheckCreateResult;
 
 public record AttendanceCheckCreateResponse(
         Long attendanceCheckId,

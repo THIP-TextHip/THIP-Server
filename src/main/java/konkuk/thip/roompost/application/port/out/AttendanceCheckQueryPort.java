@@ -1,4 +1,4 @@
-package konkuk.thip.room.application.port.out;
+package konkuk.thip.roompost.application.port.out;
 
 public interface AttendanceCheckQueryPort {
 
