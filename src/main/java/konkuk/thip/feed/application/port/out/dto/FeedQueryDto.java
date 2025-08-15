@@ -19,8 +19,8 @@ public record FeedQueryDto(
         String bookAuthor,
         String contentBody,
         String[] contentUrls,
-        int likeCount,
-        int commentCount,
+        Integer likeCount,
+        Integer commentCount,
         boolean isPublic,
         @Nullable Boolean isPriorityFeed
 ) {
