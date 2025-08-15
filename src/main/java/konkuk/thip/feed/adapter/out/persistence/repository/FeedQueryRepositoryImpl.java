@@ -1,17 +1,17 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.*;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.Nullable;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.feed.adapter.out.jpa.*;
+import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
+import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QTagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
-import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
@@ -227,7 +227,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .orderBy(c.categoryId.asc(), t.tagId.asc()) //Id 순 정렬
                 .fetch();
     }
-
     private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
@@ -282,5 +281,109 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .isPublic(e.getIsPublic())
                 .isPriorityFeed(isPriorityFeed)
                 .build();
+    }
+
+    /**
+     * 책 ISBN으로 피드를 조회하고, 좋아요 수 기준으로 정렬하여 페이징 처리
+     */
+    @Override
+    public List<FeedQueryDto> findFeedsByBookIsbnOrderByLikeCount(
+            String isbn,
+            Long userId,
+            @Nullable LocalDateTime lastCreatedAt,
+            @Nullable Integer lastLikeCount,
+            int size
+    ) {
+        BooleanExpression where = feedByBooksFilter(isbn, userId);
+        if (lastLikeCount != null && lastCreatedAt != null) {
+            // likeCount DESC → createdAt DESC
+            where = where.and(
+                    feed.likeCount.lt(lastLikeCount)
+                            .or(feed.likeCount.eq(lastLikeCount)
+                                    .and(feed.createdAt.lt(lastCreatedAt)))
+                            .or(feed.likeCount.eq(lastLikeCount)
+                                    .and(feed.createdAt.eq(lastCreatedAt)))
+            );
+        }
+
+        return jpaQueryFactory
+                .select(toQueryDto())
+                .from(feed)
+                .join(feed.userJpaEntity, user)
+                .join(feed.bookJpaEntity, book)
+                .where(where)
+                .orderBy(feed.likeCount.desc(), feed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    /**
+     * 책 ISBN으로 피드를 조회하고, 최신순 정렬하여 페이징 처리
+     */
+    @Override
+    public List<FeedQueryDto> findFeedsByBookIsbnOrderByCreatedAt(
+            String isbn,
+            Long userId,
+            @Nullable LocalDateTime lastCreatedAt,
+            int size
+    ) {
+        BooleanExpression where = feedByBooksFilter(isbn, userId);
+        if (lastCreatedAt != null) {
+            // createdAt DESC
+            where = where.and(
+                    feed.createdAt.lt(lastCreatedAt)
+                            .or(feed.createdAt.eq(lastCreatedAt))
+            );
+        }
+
+        return jpaQueryFactory
+                .select(toQueryDto())
+                .from(feed)
+                .join(feed.userJpaEntity, user)
+                .join(feed.bookJpaEntity, book)
+                .where(where)
+                .orderBy(feed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    private QFeedQueryDto toQueryDto() {
+        return new QFeedQueryDto(
+                feed.postId,
+                feed.userJpaEntity.userId,
+                user.nickname,
+                user.aliasForUserJpaEntity.imageUrl,
+                user.aliasForUserJpaEntity.value,
+                feed.createdAt,
+                book.isbn,
+                book.title,
+                book.authorName,
+                feed.content,
+                // 서브쿼리로 N:1 방지
+                JPAExpressions
+                        .select(contentUrlAggExpr())
+                        .from(content)
+                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.likeCount,
+                feed.commentCount,
+                feed.isPublic,
+                Expressions.nullExpression()
+        );
+    }
+
+    // contentUrl을 GROUP_CONCAT으로 묶어서 반환하는 표현식
+    private StringExpression contentUrlAggExpr() {
+        return Expressions.stringTemplate(
+                "group_concat({0})",
+                content.contentUrl
+        );
+    }
+
+    // 필터링 조건: 책 ISBN과 사용자 ID를 제외한 다른 사용자 공개 피드
+    private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
+        return feed.status.eq(StatusType.ACTIVE)
+                .and(feed.bookJpaEntity.isbn.eq(isbn))
+                .and(feed.userJpaEntity.userId.ne(userId))
+                .and(feed.isPublic.eq(true));
     }
 }

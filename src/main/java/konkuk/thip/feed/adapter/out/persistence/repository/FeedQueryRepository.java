@@ -19,4 +19,8 @@ public interface FeedQueryRepository {
     List<FeedQueryDto> findSpecificUserFeedsByCreatedAt(Long feedOwnerId, LocalDateTime lastCreatedAt, int size);
 
     List<TagCategoryQueryDto> findAllTags();
+
+    List<FeedQueryDto> findFeedsByBookIsbnOrderByLikeCount(String isbn, Long userId, LocalDateTime lastCreatedAt, Integer lastLikeCount, int size);
+
+    List<FeedQueryDto> findFeedsByBookIsbnOrderByCreatedAt(String isbn, Long userId, LocalDateTime lastCreatedAt, int size);
 }

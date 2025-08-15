@@ -103,7 +103,6 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
 
     @Override
     public int countAllFeedsByUserId(Long userId) {
-        // int 로 강제 형변환 해도 괜찮죠??
         return (int) feedJpaRepository.countAllFeedsByUserId(userId, StatusType.ACTIVE);
     }
 
@@ -152,5 +151,32 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     @Override
     public List<TagCategoryQueryDto> findAllTags() {
         return feedJpaRepository.findAllTags();
+    }
+
+    @Override
+    public CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLike(String isbn, Long userId, Cursor cursor) {
+        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+        Integer lastLikeCount = cursor.isFirstRequest() ? null : cursor.getInteger(1);
+        int size = cursor.getPageSize();
+
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findFeedsByBookIsbnOrderByLikeCount(isbn, userId, lastCreatedAt, lastLikeCount, size);
+
+        return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
+            return nextCursor.toEncodedString();
+        });
+    }
+
+    @Override
+    public CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLatest(String isbn, Long userId, Cursor cursor) {
+        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+        int size = cursor.getPageSize();
+
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findFeedsByBookIsbnOrderByCreatedAt(isbn, userId, lastCreatedAt, size);
+
+        return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
+            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
+            return nextCursor.toEncodedString();
+        });
     }
 }
