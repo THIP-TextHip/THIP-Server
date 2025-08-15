@@ -301,8 +301,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                     feed.likeCount.lt(lastLikeCount)
                             .or(feed.likeCount.eq(lastLikeCount)
                                     .and(feed.createdAt.lt(lastCreatedAt)))
-                            .or(feed.likeCount.eq(lastLikeCount)
-                                    .and(feed.createdAt.eq(lastCreatedAt)))
             );
         }
 
@@ -332,7 +330,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
             // createdAt DESC
             where = where.and(
                     feed.createdAt.lt(lastCreatedAt)
-                            .or(feed.createdAt.eq(lastCreatedAt))
             );
         }
 
