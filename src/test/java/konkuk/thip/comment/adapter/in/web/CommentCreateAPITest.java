@@ -7,20 +7,20 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaReposito
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
+import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
+import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
+import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
-import konkuk.thip.vote.adapter.out.persistence.repository.VoteJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
-import static konkuk.thip.common.post.PostType.*;
+import static konkuk.thip.post.domain.PostType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -124,7 +124,7 @@ class CommentCreateAPITest {
 
         // given
         //부모 댓글 생성
-        Long feedParentId = commentJpaRepository.save(TestEntityFactory.createComment(feed,user,FEED)).getCommentId();
+        Long feedParentId = commentJpaRepository.save(TestEntityFactory.createComment(feed,user, FEED)).getCommentId();
         Long recordParentId = commentJpaRepository.save(TestEntityFactory.createComment(record,user,RECORD)).getCommentId();
         Long voteParentId = commentJpaRepository.save(TestEntityFactory.createComment(vote,user,VOTE)).getCommentId();
 

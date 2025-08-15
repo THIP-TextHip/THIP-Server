@@ -4,7 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
@@ -56,6 +56,7 @@ public class CommentJpaEntity extends BaseJpaEntity {
     private CommentJpaEntity parent;
 
     // 삭제용 댓글 좋아요 양방향 매핑 관계
+    @Builder.Default
     @OneToMany(mappedBy = "commentJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentLikeJpaEntity> commentLikeList = new ArrayList<>();
 

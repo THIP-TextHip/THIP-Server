@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
-import static konkuk.thip.common.post.PostType.FEED;
+import static konkuk.thip.post.domain.PostType.FEED;
 import static konkuk.thip.feed.domain.Tag.FOREIGN_NOVEL;
 import static konkuk.thip.feed.domain.Tag.KOREAN_NOVEL;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

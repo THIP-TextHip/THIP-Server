@@ -1,6 +1,7 @@
-package konkuk.thip.post.application.service.policy;
+package konkuk.thip.feed.application.service.policy;
 
-import konkuk.thip.common.post.CountUpdatable;
+import konkuk.thip.post.application.service.policy.PostLikeAccessPolicy;
+import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.feed.domain.Feed;
 import org.springframework.stereotype.Component;
 

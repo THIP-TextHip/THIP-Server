@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static konkuk.thip.common.post.PostType.FEED;
+import static konkuk.thip.post.domain.PostType.FEED;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
