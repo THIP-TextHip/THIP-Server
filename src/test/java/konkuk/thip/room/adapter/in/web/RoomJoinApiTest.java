@@ -31,8 +31,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static konkuk.thip.room.domain.RoomJoinType.CANCEL;
-import static konkuk.thip.room.domain.RoomJoinType.JOIN;
+import static konkuk.thip.room.application.port.in.dto.RoomJoinType.CANCEL;
+import static konkuk.thip.room.application.port.in.dto.RoomJoinType.JOIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

@@ -8,15 +8,13 @@ import konkuk.thip.room.application.port.in.dto.RoomJoinResult;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
-import konkuk.thip.room.domain.RoomJoinType;
+import konkuk.thip.room.application.port.in.dto.RoomJoinType;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
-import static konkuk.thip.room.adapter.out.jpa.RoomParticipantRole.MEMBER;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class RoomJoinService implements RoomJoinUseCase {
     @Override
     @Transactional
     public RoomJoinResult changeJoinState(RoomJoinCommand roomJoinCommand) {
-        RoomJoinType type = RoomJoinType.from(roomJoinCommand.type());
+        RoomJoinType type = roomJoinCommand.type();
 
         // 방이 존재하지 않거나 만료된 경우
         Room room = roomCommandPort.findById(roomJoinCommand.roomId())
@@ -38,20 +36,16 @@ public class RoomJoinService implements RoomJoinUseCase {
 
         Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
 
-        // 참여하기 요청
-        if(type.isJoinType()) {
-            handleJoin(roomJoinCommand, roomParticipantOptional, room);
-        }
-
-        // 취소하기 요청
-        if(!type.isJoinType()) {
-            handleCancel(roomJoinCommand, roomParticipantOptional, roomParticipantOptional, room);
+        // 방 참여 상태 변경 요청에 따라 분기 처리
+        switch (type) {
+            case JOIN -> handleJoin(roomJoinCommand, roomParticipantOptional, room);
+            case CANCEL -> handleCancel(roomJoinCommand, roomParticipantOptional, roomParticipantOptional, room);
         }
 
         // 방의 상태 업데이트
         roomCommandPort.update(room);
 
-        return RoomJoinResult.of(room.getId(), roomJoinCommand.type());
+        return RoomJoinResult.of(room.getId(), type.getType());
     }
 
     private void handleCancel(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Optional<RoomParticipant> roomParticipantOptional, Room room) {
