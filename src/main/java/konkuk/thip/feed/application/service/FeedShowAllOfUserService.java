@@ -59,7 +59,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
         Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
 
         // 4. response 로의 매핑
-        List<FeedShowByUserResponse.FeedDto> feedList = result.contents().stream()
+        List<FeedShowByUserResponse.FeedShowByUserDto> feedList = result.contents().stream()
                 .map(dto -> feedQueryMapper.toFeedShowByUserResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser, userId))
                 .toList();
 

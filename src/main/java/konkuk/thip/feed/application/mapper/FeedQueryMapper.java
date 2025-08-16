@@ -32,7 +32,7 @@ public interface FeedQueryMapper {
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowAllResponse.FeedDto toFeedShowAllResponse(
+    FeedShowAllResponse.FeedShowAllDto toFeedShowAllResponse(
             FeedQueryDto dto,
             Set<Long> savedFeedIds,
             Set<Long> likedFeedIds,
@@ -41,9 +41,9 @@ public interface FeedQueryMapper {
 
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))")
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowMineResponse.FeedDto toFeedShowMineDto(FeedQueryDto dto, @Context Long userId);
+    FeedShowMineResponse.FeedShowMineDto toFeedShowMineDto(FeedQueryDto dto, @Context Long userId);
 
-    List<FeedShowMineResponse.FeedDto> toFeedShowMineResponse(List<FeedQueryDto> dtos, @Context Long userId);
+    List<FeedShowMineResponse.FeedShowMineDto> toFeedShowMineResponse(List<FeedQueryDto> dtos, @Context Long userId);
 
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
@@ -52,7 +52,7 @@ public interface FeedQueryMapper {
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowByUserResponse.FeedDto toFeedShowByUserResponse(
+    FeedShowByUserResponse.FeedShowByUserDto toFeedShowByUserResponse(
             FeedQueryDto dto,
             Set<Long> savedFeedIds,
             Set<Long> likedFeedIds,

@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserQueryMapper {
 
     // List<QueryDto> -> List<DTO>
-    List<UserSearchResponse.UserDto> toUserDtoList(List<UserQueryDto> userQueryDtos);
+    List<UserSearchResponse.UserSearchDto> toUserDtoList(List<UserQueryDto> userQueryDtos);
 
     // 단건 매핑: UserQueryDto -> RecentWriter
     UserFollowingRecentWritersResponse.RecentWriter toRecentWriter(UserQueryDto dto);

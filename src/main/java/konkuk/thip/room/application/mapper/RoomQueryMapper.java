@@ -28,9 +28,9 @@ public interface RoomQueryMapper {
             target = "deadlineDate",
             expression = "java(DateUtil.formatAfterTime(dto.endDate()))"
     )
-    RoomGetDeadlinePopularResponse.RoomDto toDeadlinePopularRoomDto(RoomQueryDto dto);
+    RoomGetDeadlinePopularResponse.RoomGetDeadlinePopularDto toDeadlinePopularRoomDto(RoomQueryDto dto);
 
-    List<RoomGetDeadlinePopularResponse.RoomDto> toDeadlinePopularRoomDtoList(List<RoomQueryDto> roomQueryDtos);
+    List<RoomGetDeadlinePopularResponse.RoomGetDeadlinePopularDto> toDeadlinePopularRoomDtoList(List<RoomQueryDto> roomQueryDtos);
 
 
 

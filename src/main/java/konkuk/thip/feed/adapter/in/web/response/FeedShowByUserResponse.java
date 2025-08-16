@@ -7,7 +7,7 @@ import java.util.List;
 @Schema(description = "특정 유저의 피드 목록 조회 응답 DTO")
 public record FeedShowByUserResponse(
         @Schema(description = "조회된 피드 목록")
-        List<FeedShowByUserResponse.FeedDto> feedList,
+        List<FeedShowByUserDto> feedList,
 
         @Schema(description = "다음 페이지를 요청할 때 사용할 커서")
         String nextCursor,
@@ -16,7 +16,7 @@ public record FeedShowByUserResponse(
         boolean isLast
 ) {
     @Schema(description = "피드 단일 항목 정보")
-    public record FeedDto(
+    public record FeedShowByUserDto(
             Long feedId,
             String postDate,
             String isbn,
