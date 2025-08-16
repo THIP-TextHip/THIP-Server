@@ -31,6 +31,11 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
     }
 
     @Override
+    public boolean existsBookByIsbn(String isbn) {
+        return bookJpaRepository.existsByIsbn(isbn);
+    }
+
+    @Override
     public List<Book> findSavedBooksByUserId(Long userId) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));

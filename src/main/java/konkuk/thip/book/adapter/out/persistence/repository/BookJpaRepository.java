@@ -24,4 +24,6 @@ public interface BookJpaRepository extends JpaRepository<BookJpaEntity, Long> {
             "AND r.startDate <= CURRENT_TIMESTAMP " + // 진행 중인 방만 조회 (모집 중 / 만료된 방 x)
             "ORDER BY r.roomPercentage DESC")  // 방의 진행률이 높은 순서로 정렬
     List<BookJpaEntity> findJoiningRoomsBooksByUserId(Long userId);
+
+    boolean existsByIsbn(String isbn);
 }

@@ -22,9 +22,9 @@ public interface BookQueryMapper {
             target = "deadlineEndDate",
             expression = "java(DateUtil.formatAfterTime(dto.endDate()))"
     )
-    BookRecruitingRoomsResponse.RecruitingRoomDto toRecruitingRoomDto(RoomQueryDto dto);
+    BookRecruitingRoomsResponse.BookRecruitingRoomDto toRecruitingRoomDto(RoomQueryDto dto);
 
-    List<BookRecruitingRoomsResponse.RecruitingRoomDto> toRecruitingRoomDtoList(List<RoomQueryDto> roomDtos);
+    List<BookRecruitingRoomsResponse.BookRecruitingRoomDto> toRecruitingRoomDtoList(List<RoomQueryDto> roomDtos);
 
     @Mapping(target = "bookId", source = "book.id")
     @Mapping(target = "bookTitle", source = "book.title")

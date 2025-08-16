@@ -2,8 +2,8 @@ package konkuk.thip.comment.application.service.validator;
 
 import konkuk.thip.comment.application.service.policy.CommentAccessPolicy;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CountUpdatable;
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.CountUpdatable;
+import konkuk.thip.post.domain.PostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

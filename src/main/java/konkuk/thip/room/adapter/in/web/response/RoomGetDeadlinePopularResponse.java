@@ -3,10 +3,10 @@ package konkuk.thip.room.adapter.in.web.response;
 import java.util.List;
 
 public record RoomGetDeadlinePopularResponse(
-        List<RoomDto> deadlineRoomList,
-        List<RoomDto> popularRoomList
+        List<RoomGetDeadlinePopularDto> deadlineRoomList,
+        List<RoomGetDeadlinePopularDto> popularRoomList
 ) {
-    public record RoomDto(
+    public record RoomGetDeadlinePopularDto(
             Long roomId,
             String bookImageUrl,
             String roomName,
@@ -16,7 +16,7 @@ public record RoomGetDeadlinePopularResponse(
     ) {
     }
 
-    public static RoomGetDeadlinePopularResponse of(List<RoomDto> deadlineRoomList, List<RoomDto> popularRoomList) {
+    public static RoomGetDeadlinePopularResponse of(List<RoomGetDeadlinePopularDto> deadlineRoomList, List<RoomGetDeadlinePopularDto> popularRoomList) {
         return new RoomGetDeadlinePopularResponse(deadlineRoomList, popularRoomList);
     }
 }

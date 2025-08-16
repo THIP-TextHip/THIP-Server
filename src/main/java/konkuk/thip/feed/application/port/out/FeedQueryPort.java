@@ -41,4 +41,11 @@ public interface FeedQueryPort {
     Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId);
 
     List<TagCategoryQueryDto> findAllTags();
+
+    /**
+     * 특정 책으로 작성된 피드 조회
+     */
+    CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLike(String isbn, Long userId, Cursor cursor);
+
+    CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLatest(String isbn, Long userId, Cursor cursor);
 }

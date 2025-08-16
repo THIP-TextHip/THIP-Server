@@ -1,17 +1,17 @@
 package konkuk.thip.post.application.service.validator;
 
+import konkuk.thip.common.annotation.HelperService;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CountUpdatable;
-import konkuk.thip.common.post.PostType;
 import konkuk.thip.post.application.service.policy.PostLikeAccessPolicy;
+import konkuk.thip.post.domain.CountUpdatable;
+import konkuk.thip.post.domain.PostType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
-@Component
+@HelperService
 @RequiredArgsConstructor
 public class PostLikeAuthorizationValidator {
 

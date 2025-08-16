@@ -51,7 +51,7 @@ public class FollowingPriorityFeedShowAllService implements FeedShowAllUseCase {
         Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
 
         // 4. response 로의 매핑
-        List<FeedShowAllResponse.FeedDto> feedList = result.contents().stream()
+        List<FeedShowAllResponse.FeedShowAllDto> feedList = result.contents().stream()
                 .map(dto -> feedQueryMapper.toFeedShowAllResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser, userId))
                 .toList();
 

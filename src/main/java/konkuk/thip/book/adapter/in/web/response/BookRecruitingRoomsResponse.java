@@ -3,16 +3,16 @@ package konkuk.thip.book.adapter.in.web.response;
 import java.util.List;
 
 public record BookRecruitingRoomsResponse(
-        List<RecruitingRoomDto> recruitingRoomList,
+        List<BookRecruitingRoomDto> recruitingRoomList,
         Integer totalRoomCount,
         String nextCursor,
         boolean isLast
 ) {
-    public static BookRecruitingRoomsResponse of(List<RecruitingRoomDto> recruitingRoomList, Integer totalRoomCount, String nextCursor, boolean isLast) {
+    public static BookRecruitingRoomsResponse of(List<BookRecruitingRoomDto> recruitingRoomList, Integer totalRoomCount, String nextCursor, boolean isLast) {
         return new BookRecruitingRoomsResponse(recruitingRoomList, totalRoomCount, nextCursor, isLast);
     }
 
-    public record RecruitingRoomDto(
+    public record BookRecruitingRoomDto(
             Long roomId,
             String bookImageUrl,
             String roomName,

@@ -3,9 +3,9 @@ package konkuk.thip.user.adapter.in.web.response;
 import java.util.List;
 
 public record UserSearchResponse(
-        List<UserDto> userList
+        List<UserSearchDto> userList
 ) {
-    public record UserDto(
+    public record UserSearchDto(
             Long userId,
             String nickname,
             String profileImageUrl,
@@ -15,7 +15,7 @@ public record UserSearchResponse(
     ) {
     }
 
-    public static UserSearchResponse of(List<UserDto> userList) {
+    public static UserSearchResponse of(List<UserSearchDto> userList) {
         return new UserSearchResponse(userList);
     }
 }
