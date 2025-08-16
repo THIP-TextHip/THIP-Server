@@ -43,4 +43,14 @@ public class CommentQueryPersistenceAdapter implements CommentQueryPort {
     public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds) {
         return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentIds);
     }
+
+    @Override
+    public CommentQueryDto findRootCommentById(Long rootCommentId) {
+        return commentJpaRepository.findRootCommentId(rootCommentId);
+    }
+
+    @Override
+    public CommentQueryDto findChildCommentById(Long rootCommentId, Long replyCommentId) {
+        return commentJpaRepository.findChildCommentId(rootCommentId, replyCommentId);
+    }
 }

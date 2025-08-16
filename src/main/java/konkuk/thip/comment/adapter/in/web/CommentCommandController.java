@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import konkuk.thip.comment.adapter.in.web.request.CommentCreateRequest;
 import konkuk.thip.comment.adapter.in.web.request.CommentIsLikeRequest;
 import konkuk.thip.comment.adapter.in.web.response.CommentDeleteResponse;
-import konkuk.thip.comment.adapter.in.web.response.CommentIdResponse;
+import konkuk.thip.comment.adapter.in.web.response.CommentCreateResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIsLikeResponse;
 import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.CommentDeleteUseCase;
@@ -42,11 +42,11 @@ public class CommentCommandController {
     )
     @ExceptionDescription(COMMENT_CREATE)
     @PostMapping("/comments/{postId}")
-    public BaseResponse<CommentIdResponse> createComment(
+    public BaseResponse<CommentCreateResponse> createComment(
             @RequestBody @Valid final CommentCreateRequest request,
             @Parameter(description = "댓글을 작성하려는 게시물 ID", example = "1") @PathVariable("postId") final Long postId,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(CommentIdResponse.of(commentCreateUseCase.createComment(request.toCommand(userId,postId))));
+        return BaseResponse.ok(commentCreateUseCase.createComment(request.toCommand(userId,postId)));
     }
 
     @Operation(

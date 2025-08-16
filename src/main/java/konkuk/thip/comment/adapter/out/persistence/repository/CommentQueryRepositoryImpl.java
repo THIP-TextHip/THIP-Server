@@ -186,4 +186,66 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
         return resultMap;
     }
+
+    @Override
+    public CommentQueryDto findRootCommentId(Long rootCommentId) {
+
+        QCommentQueryDto proj = new QCommentQueryDto(
+                comment.commentId,
+                commentCreator.userId,
+                aliasOfCommentCreator.imageUrl,
+                commentCreator.nickname,
+                aliasOfCommentCreator.value,
+                aliasOfCommentCreator.color,
+                comment.createdAt,
+                comment.content,
+                comment.likeCount,
+                comment.status.eq(StatusType.INACTIVE)
+        );
+
+        return queryFactory
+                .select(proj)
+                .from(comment)
+                .join(comment.userJpaEntity, commentCreator)
+                .join(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
+                .where(
+                        comment.commentId.eq(rootCommentId),
+                        comment.status.eq(StatusType.ACTIVE)
+                )
+                .fetchOne();
+    }
+
+    @Override
+    public CommentQueryDto findChildCommentId(Long rootCommentId, Long replyCommentId) {
+
+        QCommentQueryDto proj = new QCommentQueryDto(
+                comment.commentId,
+                comment.parent.commentId,
+                parentCommentCreator.nickname,
+                commentCreator.userId,
+                aliasOfCommentCreator.imageUrl,
+                commentCreator.nickname,
+                aliasOfCommentCreator.value,
+                aliasOfCommentCreator.color,
+                comment.createdAt,
+                comment.content,
+                comment.likeCount,
+                comment.status.eq(StatusType.INACTIVE)
+        );
+
+        return queryFactory
+                .select(proj)
+                .from(comment)
+                .join(comment.parent, parentComment)
+                .join(parentComment.userJpaEntity, parentCommentCreator)
+                .join(comment.userJpaEntity, commentCreator)
+                .join(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
+                .where(
+                        comment.parent.commentId.eq(rootCommentId),
+                        parentComment.status.eq(StatusType.ACTIVE),
+                        comment.status.eq(StatusType.ACTIVE),
+                        comment.commentId.eq(replyCommentId)
+                )
+                .fetchOne();
+    }
 }
