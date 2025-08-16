@@ -75,7 +75,8 @@ public enum SwaggerResponseDescription {
     ))),
 
     ROOM_SEARCH(new LinkedHashSet<>(Set.of(
-                INVALID_ROOM_SEARCH_SORT
+            INVALID_ROOM_SEARCH_SORT,
+            CATEGORY_NOT_MATCH
     ))),
     ROOM_PASSWORD_CHECK(new LinkedHashSet<>(Set.of(
             ROOM_NOT_FOUND,
