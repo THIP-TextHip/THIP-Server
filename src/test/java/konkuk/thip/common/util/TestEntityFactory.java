@@ -4,26 +4,22 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
-import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
+import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.room.adapter.out.jpa.*;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
-import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.domain.Alias;
-import konkuk.thip.vote.adapter.out.jpa.VoteItemJpaEntity;
-import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
-import konkuk.thip.vote.adapter.out.jpa.VoteParticipantJpaEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -102,7 +98,7 @@ public class TestEntityFactory {
     }
 
     /**
-     * page 값을 지정할 수 있는 custom 생성자
+     * Book custom 생성자
      */
     public static BookJpaEntity createBook(int page) {
         return BookJpaEntity.builder()
@@ -113,6 +109,19 @@ public class TestEntityFactory {
                 .publisher("출판사")
                 .imageUrl("img")
                 .pageCount(page)
+                .description("설명")
+                .build();
+    }
+
+    public static BookJpaEntity createBookWithBookTitle(String bookTitle) {
+        return BookJpaEntity.builder()
+                .title(bookTitle)
+                .authorName("저자")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(300)
                 .description("설명")
                 .build();
     }
@@ -143,7 +152,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category,LocalDate startDate,LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, LocalDate startDate, LocalDate endDate) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -151,6 +160,19 @@ public class TestEntityFactory {
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitCount(3)
+                .bookJpaEntity(book)
+                .categoryJpaEntity(category)
+                .build();
+    }
+
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, String roomName, LocalDate startDate, LocalDate endDate) {
+        return RoomJpaEntity.builder()
+                .title(roomName)
+                .description("설명")
+                .isPublic(true)
+                .startDate(startDate)
+                .endDate(endDate)
+                .recruitCount(20)
                 .bookJpaEntity(book)
                 .categoryJpaEntity(category)
                 .build();

@@ -11,7 +11,7 @@ import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipants;
 import konkuk.thip.room.domain.RoomParticipant;
-import konkuk.thip.vote.application.port.out.VoteQueryPort;
+import konkuk.thip.roompost.application.port.out.VoteQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

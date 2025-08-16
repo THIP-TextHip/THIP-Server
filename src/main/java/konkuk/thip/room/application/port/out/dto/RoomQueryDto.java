@@ -12,10 +12,11 @@ public record RoomQueryDto(
         Long roomId,
         String bookImageUrl,
         String roomName,
-        int recruitCount, // 방 최대 인원 수
-        int memberCount,
+        Integer recruitCount, // 방 최대 인원 수
+        Integer memberCount,
         @Nullable LocalDate startDate,    // 방 진행 시작일
-        LocalDate endDate       // 방 진행 마감일 or 방 모집 마감일
+        LocalDate endDate,       // 방 진행 마감일 or 방 모집 마감일
+        Boolean isPublic        // 공개방 여부
 ) {
     @QueryProjection
     public RoomQueryDto {
@@ -23,19 +24,34 @@ public record RoomQueryDto(
         Assert.notNull(bookImageUrl, "bookImageUrl must not be null");
         Assert.notNull(roomName, "roomName must not be null");
         Assert.notNull(endDate, "endDate must not be null");
-        Assert.isTrue(recruitCount > 0, "recruitCount must be greater than 0");
-        Assert.isTrue(memberCount >= 0, "memberCount must be greater than or equal to 0");
+        Assert.notNull(recruitCount, "recruitCount must not be null");
+        Assert.notNull(memberCount, "memberCount must not be null");
     }
 
+    // 내가 참여한 모임방(모집중, 진행중, 모집+진행중, 완료된) 조회 시 활용
     @QueryProjection
     public RoomQueryDto(
             Long roomId,
             String bookImageUrl,
             String roomName,
-            int recruitCount,
-            int memberCount,
+            Integer recruitCount,
+            Integer memberCount,
             LocalDate endDate
     ) {
-        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate);
+        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate, null);
+    }
+
+    // 방 검색 시 활용
+    @QueryProjection
+    public RoomQueryDto(
+            Long roomId,
+            String bookImageUrl,
+            String roomName,
+            Integer recruitCount,
+            Integer memberCount,
+            LocalDate endDate,
+            Boolean isPublic
+    ) {
+        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate, isPublic);
     }
 }

@@ -40,7 +40,7 @@ public class RoomGetHomeJoinedListService implements RoomGetHomeJoinedListUseCas
         Pageable pageable = PageRequest.of(pageIndex, DEFAULT_PAGE_SIZE);
 
         // 4. 모임 홈에서 참여중인 모임 방 검색
-        Page<RoomGetHomeJoinedListResponse.RoomSearchResult> result = roomQueryPort.searchHomeJoinedRooms(query.userId(), LocalDate.now(), pageable);
+        Page<RoomGetHomeJoinedListResponse.JoinedRoomInfo> result = roomQueryPort.searchHomeJoinedRooms(query.userId(), LocalDate.now(), pageable);
 
         // 5. response 구성
         return RoomGetHomeJoinedListResponse.builder()

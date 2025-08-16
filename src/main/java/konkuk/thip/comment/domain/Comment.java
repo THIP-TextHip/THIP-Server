@@ -2,7 +2,7 @@ package konkuk.thip.comment.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
