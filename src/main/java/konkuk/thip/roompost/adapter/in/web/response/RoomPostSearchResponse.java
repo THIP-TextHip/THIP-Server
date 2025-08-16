@@ -6,7 +6,7 @@ import java.util.List;
 
 @Builder
 public record RoomPostSearchResponse(
-    List<RoomPostDto> postList,
+    List<RoomPostSearchDto> postList,
     Long roomId,
     String isbn,
     boolean isOverviewEnabled,
@@ -14,7 +14,7 @@ public record RoomPostSearchResponse(
     Boolean isLast
 ){
     @Builder
-    public record RoomPostDto(
+    public record RoomPostSearchDto(
             Long postId,
             String postDate,
             String postType,

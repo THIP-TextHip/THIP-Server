@@ -27,12 +27,12 @@ public interface RoomPostQueryMapper {
     @Mapping(target = "isWriter",       source = "isWriter")
     @Mapping(target = "isLocked",       source = "isLocked")
     @Mapping(target = "voteItems",      source = "voteItems")
-    RoomPostSearchResponse.RoomPostDto toPostDto(
+    RoomPostSearchResponse.RoomPostSearchDto toPostDto(
             RoomPostQueryDto dto,
             String content,
             boolean isLiked,
             boolean isWriter,
             boolean isLocked,
-            List<RoomPostSearchResponse.RoomPostDto.VoteItemDto> voteItems
+            List<RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto> voteItems
     );
 }

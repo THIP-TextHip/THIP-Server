@@ -105,7 +105,7 @@ public class RoomPostSearchService implements RoomPostSearchUseCase {
                     boolean isLiked  = likedPostIds.contains(dto.postId());
                     String content   = isLocked ? roomPostAccessValidator.createBlurredString(dto.content()) : dto.content();
 
-                    List<RoomPostSearchResponse.RoomPostDto.VoteItemDto> voteItems =
+                    List<RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto> voteItems =
                             getVoteItemDtosIfApplicable(dto, voteItemQueryMap, isLocked);
 
                     return roomPostQueryMapper.toPostDto(dto, content, isLiked, isWriter, isLocked, voteItems);
@@ -133,7 +133,7 @@ public class RoomPostSearchService implements RoomPostSearchUseCase {
     }
 
     // 투표 게시물인 경우 VoteItem DTO 목록을 생성하는 메서드
-    private List<RoomPostSearchResponse.RoomPostDto.VoteItemDto> getVoteItemDtosIfApplicable(RoomPostQueryDto dto, Map<Long, List<VoteItemQueryDto>> voteItemMap, boolean isLocked) {
+    private List<RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto> getVoteItemDtosIfApplicable(RoomPostQueryDto dto, Map<Long, List<VoteItemQueryDto>> voteItemMap, boolean isLocked) {
         if (RECORD.getType().equals(dto.postType())) {
             return List.of();
         }
@@ -143,7 +143,7 @@ public class RoomPostSearchService implements RoomPostSearchUseCase {
     }
 
     // VoteItemQueryDto 목록을 RecordSearchResponse.PostDto.VoteItemDto 목록으로 변환하는 메서드
-    private List<RoomPostSearchResponse.RoomPostDto.VoteItemDto> mapToVoteItemDtos(List<VoteItemQueryDto> items, boolean isLocked) {
+    private List<RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto> mapToVoteItemDtos(List<VoteItemQueryDto> items, boolean isLocked) {
         // voteCount를 모아 리스트로 변환
         List<Integer> counts = items.stream()
                 .map(VoteItemQueryDto::voteCount)
@@ -154,7 +154,7 @@ public class RoomPostSearchService implements RoomPostSearchUseCase {
 
         // 계산 결과를 이용해 DTO 조립
         return IntStream.range(0, items.size())
-                .mapToObj(i -> RoomPostSearchResponse.RoomPostDto.VoteItemDto.of(
+                .mapToObj(i -> RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto.of(
                         items.get(i).voteItemId(),
                         isLocked ? roomPostAccessValidator.createBlurredString(items.get(i).itemName()) : items.get(i).itemName(),
                         percentages.get(i),
