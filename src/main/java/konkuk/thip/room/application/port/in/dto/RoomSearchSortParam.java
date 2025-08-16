@@ -1,9 +1,12 @@
-package konkuk.thip.room.adapter.out.persistence;
+package konkuk.thip.room.application.port.in.dto;
 
+import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+
+import static konkuk.thip.common.exception.code.ErrorCode.INVALID_ROOM_SEARCH_SORT;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,7 +23,7 @@ public enum RoomSearchSortParam {
                 .filter(param -> param.getValue().equals(value))
                 .findFirst()
                 .orElseThrow(
-                        () -> new IllegalArgumentException("현재 정렬 조건 param : " + value)
+                        () -> new InvalidStateException(INVALID_ROOM_SEARCH_SORT)
                 );
     }
 }
