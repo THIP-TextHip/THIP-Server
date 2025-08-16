@@ -15,7 +15,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static konkuk.thip.room.adapter.out.jpa.RoomParticipantRole.MEMBER;
+import static konkuk.thip.room.application.port.in.dto.RoomJoinType.CANCEL;
+import static konkuk.thip.room.application.port.in.dto.RoomJoinType.JOIN;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
@@ -51,7 +52,7 @@ class RoomJoinServiceTest {
         @Test
         @DisplayName("이미 참여한 경우 예외 발생")
         void alreadyParticipated() {
-            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
+            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, JOIN);
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
@@ -65,7 +66,7 @@ class RoomJoinServiceTest {
         @Test
         @DisplayName("정상적으로 참여 시 참여자 저장 및 인원수 증가")
         void successJoin() {
-            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "join");
+            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, JOIN);
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
@@ -85,7 +86,7 @@ class RoomJoinServiceTest {
         @Test
         @DisplayName("참여하지 않은 경우 예외 발생")
         void notParticipated() {
-            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
+            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, CANCEL);
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
@@ -99,7 +100,7 @@ class RoomJoinServiceTest {
         @Test
         @DisplayName("정상적으로 취소 시 참여자 제거 및 인원수 감소")
         void successCancel() {
-            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, "cancel");
+            RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, CANCEL);
             RoomParticipant participant = RoomParticipant.memberWithoutId(USER_ID, ROOM_ID);
 
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));

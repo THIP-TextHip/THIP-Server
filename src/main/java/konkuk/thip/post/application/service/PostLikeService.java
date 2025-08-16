@@ -1,7 +1,7 @@
 package konkuk.thip.post.application.service;
 
-import konkuk.thip.common.post.CountUpdatable;
-import konkuk.thip.common.post.service.PostHandler;
+import konkuk.thip.post.application.service.handler.PostHandler;
+import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeCommand;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeResult;
 import konkuk.thip.post.application.port.in.PostLikeUseCase;

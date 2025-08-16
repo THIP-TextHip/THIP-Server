@@ -1,6 +1,6 @@
 package konkuk.thip.comment.application.service.policy;
 
-import konkuk.thip.common.post.CountUpdatable;
+import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.feed.domain.Feed;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package konkuk.thip.post.application.port.out;
 
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 
 public interface PostLikeCommandPort {
     void save(Long userId, Long postId, PostType postType);
