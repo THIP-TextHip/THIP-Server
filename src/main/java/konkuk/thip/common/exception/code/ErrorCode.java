@@ -99,6 +99,8 @@ public enum ErrorCode implements ResponseCode {
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, 110000, "존재하지 않는 VOTE 입니다."),
     VOTE_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 110001, "총평이 될 수 없는 VOTE 입니다."),
     INVALID_VOTE_PAGE_RANGE(HttpStatus.BAD_REQUEST, 110002, "VOTE의 page 값이 유효하지 않습니다."),
+    VOTE_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 110003, "투표 접근 권한이 없습니다."),
+
 
     /**
      * 120000 : voteItem error
@@ -188,6 +190,11 @@ public enum ErrorCode implements ResponseCode {
     COMMENT_NOT_LIKED_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, 190004, "사용자가 좋아요하지 않은 댓글은 좋아요 취소 할 수 없습니다."),
     COMMENT_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, 190005, "댓글 삭제 권한이 없습니다."),
     COMMENT_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 190007, "댓글 수는 0 이하로 감소할 수 없습니다."),
+
+    /**
+     * 195000 : AttendanceCheck error
+     */
+    ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, 195000, "오늘의 한마디 작성 가능 횟수를 초과하였습니다."),
 
     ;
 

@@ -45,6 +45,6 @@ public class FeedShowSingleService implements FeedShowSingleUseCase {
         boolean isSaved = savedFeedIds.contains(feedId);
         boolean isLiked = likedFeedIds.contains(feedId);
 
-        return feedQueryMapper.toFeedShowSingleResponse(feed, feedCreator, book, isSaved, isLiked);
+        return feedQueryMapper.toFeedShowSingleResponse(feed, feedCreator, book, isSaved, isLiked, userId);
     }
 }

@@ -50,7 +50,7 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
     @Override
     public void delete(Record record) {
-        RecordJpaEntity recordJpaEntity = recordJpaRepository.findById(record.getId()).orElseThrow(
+        RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostIdAndStatus(record.getId(),ACTIVE).orElseThrow(
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
         );
 
@@ -60,7 +60,7 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
     @Override
     public void update(Record record) {
-        RecordJpaEntity recordJpaEntity = recordJpaRepository.findById(record.getId()).orElseThrow(
+        RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostIdAndStatus(record.getId(),ACTIVE).orElseThrow(
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
         );
 

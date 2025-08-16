@@ -13,4 +13,6 @@ public interface VoteQueryPort {
     List<RoomPlayingDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count);
 
     Map<Long, List<VoteItemQueryDto>> findVoteItemsByVoteIds(Set<Long> voteIds, Long userId);
+
+    List<VoteItemQueryDto> findVoteItemsByVoteId(Long voteId, Long userId);
 }

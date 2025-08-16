@@ -75,7 +75,8 @@ public enum SwaggerResponseDescription {
     ))),
 
     ROOM_SEARCH(new LinkedHashSet<>(Set.of(
-                INVALID_ROOM_SEARCH_SORT
+            INVALID_ROOM_SEARCH_SORT,
+            CATEGORY_NOT_MATCH
     ))),
     ROOM_PASSWORD_CHECK(new LinkedHashSet<>(Set.of(
             ROOM_NOT_FOUND,
@@ -158,6 +159,11 @@ public enum SwaggerResponseDescription {
             VOTE_ITEM_ALREADY_VOTED,
             VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL,
             VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE
+    ))),
+    VOTE_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            VOTE_NOT_FOUND,
+            VOTE_ACCESS_FORBIDDEN
     ))),
 
 
@@ -279,6 +285,14 @@ public enum SwaggerResponseDescription {
     RECENT_SEARCH_DELETE(new LinkedHashSet<>(Set.of(
             RECENT_SEARCH_NOT_FOUND,
             RECENT_SEARCH_NOT_ADDED_BY_USER
+    ))),
+
+    // Attendance Check
+    ATTENDANCE_CHECK_CREATE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_NOT_FOUND,
+            USER_NOT_FOUND,
+            ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED
     ))),
 
   ;

@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import konkuk.thip.room.adapter.in.web.request.AttendanceCheckCreateRequest;
+import konkuk.thip.room.adapter.in.web.response.AttendanceCheckCreateResponse;
+import konkuk.thip.room.application.port.in.AttendanceCheckCreateUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -35,6 +38,7 @@ public class RoomCommandController {
     private final RoomJoinUseCase roomJoinUsecase;
     private final RoomRecruitCloseUseCase roomRecruitCloseUsecase;
     private final PostLikeUseCase postLikeUseCase;
+    private final AttendanceCheckCreateUseCase attendanceCheckCreateUseCase;
 
     /**
      * 방 생성 요청
@@ -101,5 +105,23 @@ public class RoomCommandController {
             @Parameter(description = "좋아요 상태를 변경하려는 방 게시물 ID", example = "1")@PathVariable("postId") final Long postId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(RoomPostIsLikeResponse.of(postLikeUseCase.changeLikeStatusPost(request.toCommand(userId, postId))));
+    }
+
+    /**
+     * 오늘의 한마디 작성
+     */
+    @Operation(
+            summary = "오늘의 한마디 작성",
+            description = "방 참여자가 오늘의 한마디를 작성합니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_CREATE)
+    @PostMapping("/rooms/{roomId}/daily-greeting")
+    public BaseResponse<AttendanceCheckCreateResponse> createFeed(
+            @RequestBody @Valid final AttendanceCheckCreateRequest request,
+            @Parameter(description = "오늘의 한마디를 작성할 방 id값") @PathVariable("roomId") final Long roomId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(AttendanceCheckCreateResponse.of(
+                attendanceCheckCreateUseCase.create(request.toCommand(userId, roomId))
+        ));
     }
 }

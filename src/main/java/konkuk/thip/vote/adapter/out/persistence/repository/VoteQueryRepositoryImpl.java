@@ -112,4 +112,30 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
                 .where(voteItem.voteJpaEntity.postId.in(voteIds))
                 .fetch();
     }
+
+    @Override
+    public List<VoteItemQueryDto> findVoteItemsByVoteId(Long voteId, Long userId) {
+        QVoteItemJpaEntity voteItem = QVoteItemJpaEntity.voteItemJpaEntity;
+        QVoteParticipantJpaEntity voteParticipant = QVoteParticipantJpaEntity.voteParticipantJpaEntity;
+
+        return jpaQueryFactory
+                .select(new QVoteItemQueryDto(
+                        voteItem.voteJpaEntity.postId,
+                        voteItem.voteItemId,
+                        voteItem.itemName,
+                        voteItem.count,
+                        JPAExpressions
+                                .selectOne()
+                                .from(voteParticipant)
+                                .where(
+                                        voteParticipant.voteItemJpaEntity.eq(voteItem),
+                                        voteParticipant.userJpaEntity.userId.eq(userId)
+                                )
+                                .exists() // isVoted : 로그인한 사용자가 해당 투표 아이템에 투표했는지 여부 서브 쿼리
+                ))
+                .from(voteItem)
+                .where(voteItem.voteJpaEntity.postId.eq(voteId))
+                .orderBy(voteItem.count.desc(), voteItem.voteItemId.asc())
+                .fetch();
+    }
 }

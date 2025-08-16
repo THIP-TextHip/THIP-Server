@@ -12,12 +12,10 @@ import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.adapter.out.jpa.*;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -103,6 +101,35 @@ public class TestEntityFactory {
                 .build();
     }
 
+    /**
+     * Book custom 생성자
+     */
+    public static BookJpaEntity createBook(int page) {
+        return BookJpaEntity.builder()
+                .title("책제목")
+                .authorName("저자")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(page)
+                .description("설명")
+                .build();
+    }
+
+    public static BookJpaEntity createBookWithBookTitle(String bookTitle) {
+        return BookJpaEntity.builder()
+                .title(bookTitle)
+                .authorName("저자")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(300)
+                .description("설명")
+                .build();
+    }
+
     public static BookJpaEntity createBookWithISBN(String isbn) {
         return BookJpaEntity.builder()
                 .title("책제목")
@@ -129,7 +156,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category,LocalDate startDate,LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, LocalDate startDate, LocalDate endDate) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -137,6 +164,19 @@ public class TestEntityFactory {
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitCount(3)
+                .bookJpaEntity(book)
+                .categoryJpaEntity(category)
+                .build();
+    }
+
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, String roomName, LocalDate startDate, LocalDate endDate) {
+        return RoomJpaEntity.builder()
+                .title(roomName)
+                .description("설명")
+                .isPublic(true)
+                .startDate(startDate)
+                .endDate(endDate)
+                .recruitCount(20)
                 .bookJpaEntity(book)
                 .categoryJpaEntity(category)
                 .build();
@@ -173,6 +213,14 @@ public class TestEntityFactory {
                 .commentCount(0)
                 .likeCount(0)
                 .roomJpaEntity(room)
+                .build();
+    }
+
+    public static VoteItemJpaEntity createVoteItem(String itemName, VoteJpaEntity vote) {
+        return VoteItemJpaEntity.builder()
+                .itemName(itemName)
+                .count(0)
+                .voteJpaEntity(vote)
                 .build();
     }
 
@@ -356,6 +404,14 @@ public class TestEntityFactory {
         return SavedBookJpaEntity.builder()
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
+                .build();
+    }
+
+    public static AttendanceCheckJpaEntity createAttendanceCheck(String todayComment, RoomJpaEntity roomJpaEntity, UserJpaEntity userJpaEntity) {
+        return AttendanceCheckJpaEntity.builder()
+                .todayComment(todayComment)
+                .roomJpaEntity(roomJpaEntity)
+                .userJpaEntity(userJpaEntity)
                 .build();
     }
 }

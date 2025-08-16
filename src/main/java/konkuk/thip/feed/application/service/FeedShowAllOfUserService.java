@@ -36,7 +36,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
         CursorBasedList<FeedQueryDto> result = feedQueryPort.findMyFeedsByCreatedAt(userId, nextCursor);
 
         return new FeedShowMineResponse(
-                feedQueryMapper.toFeedShowMineResponse(result.contents()),
+                feedQueryMapper.toFeedShowMineResponse(result.contents(), userId),
                 result.nextCursor(),
                 !result.hasNext()
         );
@@ -49,7 +49,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
         // 2. [최신순으로] 피드 조회 with 페이징 처리
-        CursorBasedList<FeedQueryDto> result = feedQueryPort.findSpecificUserFeedsByCreatedAt(feedOwnerId, nextCursor);
+        CursorBasedList<FeedQueryDto> result = feedQueryPort.findSpecificUserFeedsByCreatedAt(feedOwnerId ,nextCursor);
         Set<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
                 .collect(Collectors.toUnmodifiableSet());
@@ -60,7 +60,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
 
         // 4. response 로의 매핑
         List<FeedShowByUserResponse.FeedDto> feedList = result.contents().stream()
-                .map(dto -> feedQueryMapper.toFeedShowByUserResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser))
+                .map(dto -> feedQueryMapper.toFeedShowByUserResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser, userId))
                 .toList();
 
         return new FeedShowByUserResponse(

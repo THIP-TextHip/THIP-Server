@@ -101,7 +101,10 @@ class RecordDeleteAPITest {
         assertThat(commentJpaRepository.findByCommentIdAndStatus(comment.getCommentId(),INACTIVE)).isPresent();
 
         // 3) 댓글 좋아요 삭제
-        long commentLikeCountAfter = commentLikeJpaRepository.count();
-        assertThat(commentLikeCountAfter).isEqualTo(0);
+        assertThat(commentLikeJpaRepository.count()).isEqualTo(0);
+
+        // 4) 게시글 좋아요(PostLike) 삭제
+        assertThat(postLikeJpaRepository.count()).isEqualTo(0);
+
     }
 }

@@ -19,6 +19,7 @@ public record CommentForSinglePostResponse(
             int likeCount,
             boolean isLike,
             boolean isDeleted,  // 삭제된 댓글인지 아닌지
+            boolean isWriter,
             List<ReplyDto> replyList
     ) {
         public record ReplyDto(
@@ -32,7 +33,8 @@ public record CommentForSinglePostResponse(
                 String postDate,        // 댓글 작성 시각 (~ 전 형식)
                 String content,
                 int likeCount,
-                boolean isLike
+                boolean isLike,
+                boolean isWriter
         ) {}
 
         /**
@@ -52,6 +54,7 @@ public record CommentForSinglePostResponse(
                     0,
                     false,
                     true,       // true
+                    false,
                     replyList);
         }
     }
