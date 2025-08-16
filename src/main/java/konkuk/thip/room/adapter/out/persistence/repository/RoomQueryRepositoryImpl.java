@@ -56,6 +56,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     /** 키워드(방 이름 OR 책 제목) 조건 추가 */
     private void applyKeyword(BooleanBuilder where, String keyword) {
+        // TODO : 현재는 like %keyword% 로 쿼리가 나감. 개선할 수 있는지 고민할 것
         if (keyword != null && !keyword.isBlank()) {
             where.and(room.title.containsIgnoreCase(keyword)
                     .or(book.title.containsIgnoreCase(keyword)));
