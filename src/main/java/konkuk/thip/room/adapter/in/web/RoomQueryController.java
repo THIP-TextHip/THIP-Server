@@ -11,6 +11,7 @@ import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.adapter.in.web.response.*;
 import konkuk.thip.room.application.port.in.*;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
+import konkuk.thip.room.application.port.in.dto.RoomSearchQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,20 +33,23 @@ public class RoomQueryController {
     private final RoomGetDeadlinePopularUseCase roomGetDeadlinePopularUsecase;
 
     @Operation(
-            summary = "방 검색",
-            description = "키워드, 카테고리, 정렬 방식, 페이지 번호를 기준으로 방을 검색합니다. 아직 수정중입니다. 일단 request param 만 수정한 상태입니다."
+            summary = "모집중인 방 검색",
+            description = "검색어(= 방이름 or 첵제목), 카테고리 와 매핑되는 모집중인 방을 검색합니다. 공개/비공개 방 모두 검색 가능합니다."
     )
     @ExceptionDescription(ROOM_SEARCH)
     @GetMapping("/rooms/search")
-    public BaseResponse<RoomSearchResponse> searchRooms(
-            @Parameter(description = "검색 키워드 (책 이름 or 방 이름", example = "해리") @RequestParam(value = "keyword", required = false, defaultValue = "") final String keyword,
+    public BaseResponse<RoomSearchResponse> searchRecruitingRooms(
+            @Parameter(description = "검색 키워드 (책 이름 or 방 이름)", example = "해리") @RequestParam(value = "keyword", required = false, defaultValue = "") final String keyword,
             @Parameter(description = "모임방 카테고리", example = "문학") @RequestParam(value = "category", required = false, defaultValue = "") final String category,
             @Parameter(description = "정렬 방식 (마감 임박 : deadline, 신청 인원 : memberCount)", example = "deadline") @RequestParam("sort") final String sort,
             @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
-            @Parameter(description = "페이지 번호", example = "1") @RequestParam("page") final int page,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(value = "cursor", required = false) final String cursor,
             @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(roomSearchUseCase.searchRoom(keyword, category, sort, page, isFinalized, userId));
+        return BaseResponse.ok(roomSearchUseCase.searchRecruitingRooms(
+                RoomSearchQuery.of(keyword, category, sort, isFinalized, cursor, userId)
+        ));
     }
 
     @Operation(
