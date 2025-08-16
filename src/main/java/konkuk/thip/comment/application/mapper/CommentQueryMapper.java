@@ -1,5 +1,6 @@
 package konkuk.thip.comment.application.mapper;
 
+import konkuk.thip.comment.adapter.in.web.response.CommentCreateResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentForSinglePostResponse;
 import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.common.util.DateUtil;
@@ -27,6 +28,15 @@ public interface CommentQueryMapper {
     @Mapping(target = "isWriter", source = "root.creatorId", qualifiedByName = "isWriter")
     CommentForSinglePostResponse.RootCommentDto toRoot(CommentQueryDto root, @Context Set<Long> likedCommentIds, @Context Long userId);
 
+    // 댓글/답글 생성시 루트 댓글 매핑
+    @Mapping(target = "replyList", expression = "java(new java.util.ArrayList<>())")
+    @Mapping(target = "isDeleted", constant = "false")
+    @Mapping(target = "isLike", expression = "java(isLike)")
+    @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(root.createdAt()))")
+    @Mapping(target = "aliasName", source = "root.alias")
+    @Mapping(target = "isWriter", source = "root.creatorId", qualifiedByName = "isWriter")
+    CommentCreateResponse toRoot(CommentQueryDto root, boolean isLike, @Context Long userId);
+
     /**
      * 개별 답글 매핑
      */
@@ -35,6 +45,13 @@ public interface CommentQueryMapper {
     @Mapping(target = "aliasName", source = "child.alias")
     @Mapping(target = "isWriter", source = "child.creatorId", qualifiedByName = "isWriter")
     CommentForSinglePostResponse.RootCommentDto.ReplyDto toReply(CommentQueryDto child, @Context Set<Long> likedCommentIds, @Context Long userId);
+
+    // 답글 생성시 답글 매핑
+    @Mapping(target = "isLike", constant = "false")
+    @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(child.createdAt()))")
+    @Mapping(target = "aliasName", source = "child.alias")
+    @Mapping(target = "isWriter", source = "child.creatorId", qualifiedByName = "isWriter")
+    CommentCreateResponse.ReplyCommentCreateDto toReply(CommentQueryDto child, @Context Long userId);
 
     /**
      * 답글 리스트 헬퍼
@@ -60,6 +77,16 @@ public interface CommentQueryMapper {
         rootDto.replyList().addAll(replyDtos);
         return rootDto;
     }
+
+    default CommentCreateResponse toRootCommentResponseWithChildren(
+            CommentQueryDto root, CommentQueryDto children, boolean isLikedParentComment, @Context Long userId) {
+        CommentCreateResponse.ReplyCommentCreateDto replyDto = toReply(children,userId);
+
+        CommentCreateResponse rootDto = toRoot(root, isLikedParentComment, userId);
+        rootDto.replyList().add(replyDto);
+        return rootDto;
+    }
+
 
     @Named("isWriter")
     default boolean isWriter(Long creatorId, @Context Long userId) {
