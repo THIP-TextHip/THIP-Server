@@ -34,7 +34,7 @@ public class RoomQueryController {
 
     @Operation(
             summary = "모집중인 방 검색",
-            description = "검색어(= 방이름 or 첵제목), 카테고리 와 매핑되는 모집중인 방을 검색합니다. 공개/비공개 방 모두 검색 가능합니다."
+            description = "검색어(= 방이름 or 책제목), 카테고리 와 매핑되는 모집중인 방을 검색합니다. 공개/비공개 방 모두 검색 가능합니다."
     )
     @ExceptionDescription(ROOM_SEARCH)
     @GetMapping("/rooms/search")
