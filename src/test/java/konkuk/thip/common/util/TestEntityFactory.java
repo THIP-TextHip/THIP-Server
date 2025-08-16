@@ -102,7 +102,7 @@ public class TestEntityFactory {
     }
 
     /**
-     * page 값을 지정할 수 있는 custom 생성자
+     * Book custom 생성자
      */
     public static BookJpaEntity createBook(int page) {
         return BookJpaEntity.builder()
@@ -113,6 +113,19 @@ public class TestEntityFactory {
                 .publisher("출판사")
                 .imageUrl("img")
                 .pageCount(page)
+                .description("설명")
+                .build();
+    }
+
+    public static BookJpaEntity createBookWithBookTitle(String bookTitle) {
+        return BookJpaEntity.builder()
+                .title(bookTitle)
+                .authorName("저자")
+                .isbn(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
+                .bestSeller(false)
+                .publisher("출판사")
+                .imageUrl("img")
+                .pageCount(300)
                 .description("설명")
                 .build();
     }
@@ -143,7 +156,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category,LocalDate startDate,LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, LocalDate startDate, LocalDate endDate) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -151,6 +164,19 @@ public class TestEntityFactory {
                 .startDate(startDate)
                 .endDate(endDate)
                 .recruitCount(3)
+                .bookJpaEntity(book)
+                .categoryJpaEntity(category)
+                .build();
+    }
+
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, String roomName, LocalDate startDate, LocalDate endDate) {
+        return RoomJpaEntity.builder()
+                .title(roomName)
+                .description("설명")
+                .isPublic(true)
+                .startDate(startDate)
+                .endDate(endDate)
+                .recruitCount(20)
                 .bookJpaEntity(book)
                 .categoryJpaEntity(category)
                 .build();

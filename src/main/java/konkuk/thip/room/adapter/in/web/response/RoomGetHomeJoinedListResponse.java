@@ -6,7 +6,7 @@ import java.util.List;
 
 @Builder
 public record RoomGetHomeJoinedListResponse(
-        List<RoomSearchResult> roomList,
+        List<JoinedRoomInfo> roomList,
         String nickname,
         int page,       // 현재 페이지
         int size,       // 현재 페이지에 포함된 데이터 수
@@ -16,7 +16,7 @@ public record RoomGetHomeJoinedListResponse(
 
 
     @Builder
-    public record RoomSearchResult(
+    public record JoinedRoomInfo(
             Long roomId,
             String bookImageUrl,
             String roomTitle,

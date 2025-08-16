@@ -6,6 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @FunctionalInterface
-public interface RoomQueryFunction {
+public interface LocalDateCursorRoomQueryFunction {
     List<RoomQueryDto> apply(LocalDate lastLocalDate, Long lastId, int pageSize);
 }
