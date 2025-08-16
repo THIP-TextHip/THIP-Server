@@ -3,11 +3,11 @@ package konkuk.thip.feed.adapter.in.web.response;
 import java.util.List;
 
 public record FeedShowMineResponse(
-        List<FeedDto> feedList,
+        List<FeedShowMineDto> feedList,
         String nextCursor,
         boolean isLast
 ) {
-    public record FeedDto(
+    public record FeedShowMineDto(
             Long feedId,
             String postDate,
             String isbn,
