@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 )
 public interface FeedQueryMapper {
 
+    /**
+     * 피드 전체 조회 응답 DTO 변환
+     */
     @Mapping(target = "aliasName", source = "dto.alias")
     @Mapping(target = "aliasColor", expression = "java(Alias.from(dto.alias()).getColor())")
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
@@ -32,18 +35,21 @@ public interface FeedQueryMapper {
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowAllResponse.FeedDto toFeedShowAllResponse(
+    FeedShowAllResponse.FeedShowAllDto toFeedShowAllResponse(
             FeedQueryDto dto,
             Set<Long> savedFeedIds,
             Set<Long> likedFeedIds,
             @Context Long userId
     );
 
+    /**
+     * 내 피드 조회 응답 DTO 변환
+     */
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))")
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowMineResponse.FeedDto toFeedShowMineDto(FeedQueryDto dto, @Context Long userId);
+    FeedShowMineResponse.FeedShowMineDto toFeedShowMineDto(FeedQueryDto dto, @Context Long userId);
 
-    List<FeedShowMineResponse.FeedDto> toFeedShowMineResponse(List<FeedQueryDto> dtos, @Context Long userId);
+    List<FeedShowMineResponse.FeedShowMineDto> toFeedShowMineResponse(List<FeedQueryDto> dtos, @Context Long userId);
 
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
@@ -52,13 +58,16 @@ public interface FeedQueryMapper {
             expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
     )
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowByUserResponse.FeedDto toFeedShowByUserResponse(
+    FeedShowByUserResponse.FeedShowByUserDto toFeedShowByUserResponse(
             FeedQueryDto dto,
             Set<Long> savedFeedIds,
             Set<Long> likedFeedIds,
             @Context Long userId
     );
 
+    /**
+     * 특정 유저의 피드 조회 응답 DTO 변환
+     */
     @Mapping(target = "creatorId", source = "feedOwner.id")
     @Mapping(target = "profileImageUrl", source = "feedOwner.alias.imageUrl")
     @Mapping(target = "nickname", source = "feedOwner.nickname")
@@ -70,6 +79,9 @@ public interface FeedQueryMapper {
     @Mapping(target = "latestFollowerProfileImageUrls", source = "latestFollowerProfileImageUrls")
     FeedShowUserInfoResponse toFeedShowUserInfoResponse(User feedOwner, int totalFeedCount, boolean isFollowing, List<String> latestFollowerProfileImageUrls);
 
+    /**
+     * 피드 상세 조회 응답 DTO 변환
+     */
     @Mapping(target = "feedId", source = "feed.id")
     @Mapping(target = "creatorId", source = "feedCreator.id")
     @Mapping(target = "creatorNickname", source = "feedCreator.nickname")
@@ -121,4 +133,43 @@ public interface FeedQueryMapper {
     default boolean isWriter(Long creatorId, @Context Long userId) {
         return creatorId != null && creatorId.equals(userId);
     }
+
+    /**
+     * 특정 책 관련 피드 조회 응답 DTO 변환
+     */
+    @Mapping(target = "feedId", source = "dto.feedId")
+    @Mapping(target = "creatorId", source = "dto.creatorId")
+    @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
+    @Mapping(target = "creatorNickname", source = "dto.creatorNickname")
+    @Mapping(target = "creatorProfileImageUrl", source = "dto.creatorProfileImageUrl")
+    @Mapping(target = "aliasName", expression = "java(Alias.from(dto.alias()).getValue())")
+    @Mapping(target = "aliasColor", expression = "java(Alias.from(dto.alias()).getColor())")
+    @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))")
+    @Mapping(target = "isbn", source = "dto.isbn")
+    @Mapping(target = "bookTitle", source = "dto.bookTitle")
+    @Mapping(target = "bookAuthor", source = "dto.bookAuthor")
+    @Mapping(target = "contentBody", source = "dto.contentBody")
+    @Mapping(target = "contentUrls", source = "dto.contentUrls")
+    @Mapping(target = "likeCount", source = "dto.likeCount")
+    @Mapping(target = "commentCount", source = "dto.commentCount")
+    @Mapping(target = "isSaved", source = "isSaved")
+    @Mapping(target = "isLiked", source = "isLiked")
+    FeedRelatedWithBookResponse.FeedRelatedWithBookDto toFeedRelatedWithBookDto(
+            FeedQueryDto dto,
+            boolean isSaved,
+            boolean isLiked,
+            @Context Long userId
+    );
+
+    default List<FeedRelatedWithBookResponse.FeedRelatedWithBookDto> toFeedRelatedWithBookDtos(
+            List<FeedQueryDto> dtos,
+            Set<Long> savedFeedIds,
+            Set<Long> likedFeedIds,
+            @Context Long userId
+    ) {
+        return dtos.stream()
+                .map(dto -> toFeedRelatedWithBookDto(dto, savedFeedIds.contains(dto.feedId()), likedFeedIds.contains(dto.feedId()), userId))
+                .collect(Collectors.toList());
+    }
+
 }
