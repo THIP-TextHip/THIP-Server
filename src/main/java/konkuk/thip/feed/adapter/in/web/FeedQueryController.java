@@ -3,6 +3,10 @@ package konkuk.thip.feed.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Pattern;
+import konkuk.thip.feed.adapter.in.web.response.FeedRelatedWithBookResponse;
+import konkuk.thip.feed.application.port.in.dto.FeedRelatedWithBookQuery;
+import konkuk.thip.feed.application.port.in.dto.FeedRelatedWithBookSortType;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -26,6 +30,7 @@ public class FeedQueryController {
     private final FeedShowUserInfoUseCase feedShowUserInfoUseCase;
     private final FeedShowSingleUseCase feedShowSingleUseCase;
     private final FeedShowWriteInfoUseCase feedShowWriteInfoUseCase;
+    private final FeedRelatedWithBookUseCase feedRelatedWithBookUseCase;
 
     @Operation(
             summary = "피드 전체 조회",
@@ -105,5 +110,28 @@ public class FeedQueryController {
     @GetMapping("/feeds/write-info")
     public BaseResponse<FeedShowWriteInfoResponse> showFeedWriteInfo() {
         return BaseResponse.ok(feedShowWriteInfoUseCase.showFeedWriteInfo());
+    }
+
+    @GetMapping("/feeds/related-books/{isbn}")
+    @Operation(
+            summary = "특정 책으로 작성된 피드 조회",
+            description = "책의 ISBN을 통해 해당 책과 관련된 피드를 조회합니다."
+    )
+    public BaseResponse<FeedRelatedWithBookResponse> showFeedsByBook(
+            @Parameter(description = "책의 ISBN 번호 (13자리 숫자)", example = "9781234567890")
+            @PathVariable("isbn") @Pattern(regexp = "\\d{13}", message = "ISBN은 13자리 숫자여야 합니다.") final String isbn,
+            @Parameter(description = "정렬 기준 (like: 좋아요순, latest: 최신순) / 기본 : 좋아요 순", example = "like")
+            @RequestParam(required = false, defaultValue = "like") final String sort,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(required = false) final String cursor,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(feedRelatedWithBookUseCase.getFeedsByBook(FeedRelatedWithBookQuery.builder()
+                .isbn(isbn)
+                .sortType(FeedRelatedWithBookSortType.from(sort))
+                .cursor(cursor)
+                .userId(userId)
+                .build())
+        );
     }
 }
