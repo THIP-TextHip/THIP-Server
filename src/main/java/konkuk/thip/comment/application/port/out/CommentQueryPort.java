@@ -15,4 +15,8 @@ public interface CommentQueryPort {
     List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId);
 
     Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds);
+
+    CommentQueryDto findRootCommentById(Long rootCommentId);
+
+    CommentQueryDto findChildCommentById(Long rootCommentId , Long replyCommentId);
 }
