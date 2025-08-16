@@ -1,12 +1,13 @@
 package konkuk.thip.room.adapter.in.web;
 
+import com.jayway.jsonpath.JsonPath;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
+import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.domain.Category;
@@ -20,19 +21,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.IntStream;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -40,215 +41,134 @@ import static org.hamcrest.Matchers.is;
 @DisplayName("[통합] 방 검색 api 통합 테스트")
 class RoomSearchApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private AliasJpaRepository aliasJpaRepository;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private CategoryJpaRepository categoryJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private RecentSearchJpaRepository recentSearchJpaRepository;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @AfterEach
     void tearDown() {
+        recentSearchJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+        categoryJpaRepository.deleteAllInBatch();
+        aliasJpaRepository.deleteAllInBatch();
     }
 
-    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
+    private RoomJpaEntity saveScienceRoom(String bookTitle, String roomName, LocalDate startDate, LocalDate endDate) {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-
-        BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
-                .title(bookTitle)
-                .isbn(isbn)
-                .authorName("한강")
-                .bestSeller(false)
-                .publisher("문학동네")
-                .imageUrl("https://image1.jpg")
-                .pageCount(300)
-                .description("한강의 소설")
-                .build());
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithBookTitle(bookTitle));
 
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
-
-        return roomJpaRepository.save(RoomJpaEntity.builder()
-                .title(roomName)
-                .description("한강 작품 읽기 모임")
-                .isPublic(true)
-                .roomPercentage(0.0)
-                .startDate(startDate)
-                .endDate(LocalDate.now().plusDays(30))
-                .recruitCount(recruitCount)
-                .bookJpaEntity(book)
-                .categoryJpaEntity(category)
-                .build());
+        return roomJpaRepository.save(TestEntityFactory.createCustomRoom(book, category, roomName, startDate, endDate));
     }
 
-    private RoomJpaEntity saveLiteratureRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
+    private RoomJpaEntity saveLiteratureRoom(String bookTitle, String roomName, LocalDate startDate, LocalDate endDate) {
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
-
-        BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
-                .title(bookTitle)
-                .isbn(isbn)
-                .authorName("한강")
-                .bestSeller(false)
-                .publisher("문학동네")
-                .imageUrl("https://image1.jpg")
-                .pageCount(300)
-                .description("한강의 소설")
-                .build());
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithBookTitle(bookTitle));
 
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
-
-        return roomJpaRepository.save(RoomJpaEntity.builder()
-                .title(roomName)
-                .description("한강 작품 읽기 모임")
-                .isPublic(true)
-                .roomPercentage(0.0)
-                .startDate(startDate)
-                .endDate(LocalDate.now().plusDays(30))
-                .recruitCount(recruitCount)
-                .bookJpaEntity(book)
-                .categoryJpaEntity(category)
-                .build());
+        return roomJpaRepository.save(TestEntityFactory.createCustomRoom(book, category, roomName, startDate, endDate));
     }
 
-    private void saveUsersToRoom(RoomJpaEntity roomJpaEntity, int count) {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-
-        // User 리스트 생성 및 저장
-        List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
-                .mapToObj(i -> UserJpaEntity.builder()
-                        .nickname("user" + i)
-                        .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
-                        .oauth2Id("oauth2Id")
-                        .role(UserRole.USER)
-                        .aliasForUserJpaEntity(alias)
-                        .build())
-                .toList();
-
-        List<UserJpaEntity> savedUsers = userJpaRepository.saveAll(users);
-
-        // UserRoom 매핑 리스트 생성 및 저장
-        List<RoomParticipantJpaEntity> mappings = savedUsers.stream()
-                .map(user -> RoomParticipantJpaEntity.builder()
-                        .userJpaEntity(user)
-                        .roomJpaEntity(roomJpaEntity)
-                        .roomParticipantRole(RoomParticipantRole.MEMBER)
-                        .build())
-                .toList();
-
-        roomParticipantJpaRepository.saveAll(mappings);
+    private void updateRoomMemberCount(RoomJpaEntity roomJpaEntity, int count) {
+        jdbcTemplate.update(
+                "UPDATE rooms SET member_count = ? WHERE room_id = ?",
+                count, roomJpaEntity.getRoomId()
+        );
     }
 
     @Test
-    @DisplayName("keyword = [과학], 카테고리 선택 X, 정렬 = [마감임박순] 일 경우, 방이름 or 책제목에 '과학'이 포함된 방 검색 결과가 마감임박순으로 반환된다.")
+    @DisplayName("keyword = [과학], 카테고리 선택 X, 정렬 = [마감임박순] 일 경우, 방이름 or 책제목에 '과학'이 포함된 모집중인 방 검색 결과가 마감임박순으로 반환된다.")
     void search_keyword_and_sort_deadline() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_1, 4);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_1, 4);
 
-        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_2, 5);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "방이름입니다", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_3, 2);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "무슨방일까요??", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_4, 1);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_4, 1);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
-        saveUsersToRoom(room_3, 6);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
-        saveUsersToRoom(recruit_expired_room_4, 6);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "모집기한-지난-과학방", LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(recruit_expired_room_4, 6);
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
                 .param("keyword", "과학")
                 .param("sort", "deadline")
-                .param("isFinalized", String.valueOf(false))
-                .param("page", "1"));
+                .param("isFinalized", String.valueOf(false)));
 
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(5)))     // 결과 리스트 크기 확인
-                .andExpect(jsonPath("$.data.page", is(1)))      // 페이징 정보 검증
-                .andExpect(jsonPath("$.data.size", is(5)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 /**
                  * roomList 검증 : 정렬 순서, 방 검색 결과 검증
                  * <정렬 순서>
                  * 1. 정렬 조건
-                 * 2. 정렬 조건이 같을 경우, 방이름에 keyword가 포함된 검색결과가 책제목에 keyword가 포함된 검색결과보다 우선순위가 더 높다
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
                  */
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("방이름입니다")))
-                .andExpect(jsonPath("$.data.roomList[2].roomName", is("과학-방-5일뒤-활동시작")))
-                .andExpect(jsonPath("$.data.roomList[3].roomName", is("무슨방일까요??")))
+                .andExpect(jsonPath("$.data.roomList[2].roomName", is("무슨방일까요??")))
+                .andExpect(jsonPath("$.data.roomList[3].roomName", is("과학-방-5일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[4].roomName", is("방제목에-과학-포함된-문학방")));
     }
 
     @Test
-    @DisplayName("keyword = [과학], 카테고리 선택 X, 정렬 = [인기순] 일 경우, 방이름 or 책제목에 '과학'이 포함된 방 검색 결과가 인기순(= 현재까지 모집된 인원 많은 순)으로 반환된다.")
+    @DisplayName("keyword = [과학], 카테고리 선택 X, 정렬 = [인기순] 일 경우, 방이름 or 책제목에 '과학'이 포함된 모집중인 방 검색 결과가 인기순(= 현재까지 모집된 인원 많은 순)으로 반환된다.")
     void search_keyword_and_sort_member_count() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_1, 4);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_1, 4);
 
-        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_2, 5);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "방이름입니다", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_3, 2);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "무슨방일까요??", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_4, 1);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_4, 1);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
-        saveUsersToRoom(room_3, 6);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
-        saveUsersToRoom(recruit_expired_room_4, 6);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "모집기한-지난-과학방", LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(recruit_expired_room_4, 6);
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
                 .param("keyword", "과학")
                 .param("sort", "memberCount")
-                .param("isFinalized", String.valueOf(false))
-                .param("page", "1"));
+                .param("isFinalized", String.valueOf(false)));
 
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(5)))     // 결과 리스트 크기 확인
-                .andExpect(jsonPath("$.data.page", is(1)))      // 페이징 정보 검증
-                .andExpect(jsonPath("$.data.size", is(5)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 /**
                  * roomList 검증 : 정렬 순서, 방 검색 결과 검증
                  * <정렬 순서>
                  * 1. 정렬 조건
-                 * 2. 정렬 조건이 같을 경우, 방이름에 keyword가 포함된 검색결과가 책제목에 keyword가 포함된 검색결과보다 우선순위가 더 높다
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
                  */
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("방제목에-과학-포함된-문학방")))
                 .andExpect(jsonPath("$.data.roomList[0].memberCount", is(6)))
@@ -270,38 +190,34 @@ class RoomSearchApiTest {
     @DisplayName("keyword 입력 x, 카테고리 = [과학/IT], 정렬 = [마감임박순] 일 경우, [과학/IT] 카테고리에 속하는 방 검색 결과가 반환된다.")
     void search_category_and_sort_deadline() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_1, 4);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_1, 4);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_3, 2);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "무슨방일까요??", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_3, 2);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
-        saveUsersToRoom(room_3, 6);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
-        saveUsersToRoom(recruit_expired_room_4, 6);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "모집기한-지난-과학방", LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(recruit_expired_room_4, 6);
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
-                .param("category", "과학·IT")
+                .param("category", Category.SCIENCE_IT.getValue())
                 .param("sort", "deadline")
-                .param("isFinalized", String.valueOf(false))
-                .param("page", "1"));
+                .param("isFinalized", String.valueOf(false)));
 
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(2)))     // 결과 리스트 크기 확인
-                .andExpect(jsonPath("$.data.page", is(1)))      // 페이징 정보 검증
-                .andExpect(jsonPath("$.data.size", is(2)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 /**
                  * roomList 검증 : 정렬 순서, 방 검색 결과 검증
                  * <정렬 순서>
                  * 1. 정렬 조건
-                 * 2. 정렬 조건이 같을 경우, 방이름에 keyword가 포함된 검색결과가 책제목에 keyword가 포함된 검색결과보다 우선순위가 더 높다
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
                  */
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("무슨방일까요??")));
@@ -311,37 +227,33 @@ class RoomSearchApiTest {
     @DisplayName("keyword 입력 x, 카테고리 입력 x, 정렬 = [마감임박순] 일 경우, DB에 존재하는 전체 방 검색 결과가 반환된다.")
     void search_sort_deadline() throws Exception {
         //given
-        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_1, 4);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_1, 4);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_3, 2);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "무슨방일까요??", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_3, 2);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
-        saveUsersToRoom(room_3, 6);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
-        saveUsersToRoom(recruit_expired_room_4, 6);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "모집기한-지난-과학방", LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(recruit_expired_room_4, 6);
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/search")
                 .requestAttr("userId", 1L)
                 .param("sort", "deadline")
-                .param("isFinalized", String.valueOf(false))
-                .param("page", "1"));
+                .param("isFinalized", String.valueOf(false)));
 
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(3)))     // 결과 리스트 크기 확인
-                .andExpect(jsonPath("$.data.page", is(1)))      // 페이징 정보 검증
-                .andExpect(jsonPath("$.data.size", is(3)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 /**
                  * roomList 검증 : 정렬 순서, 방 검색 결과 검증
                  * <정렬 순서>
                  * 1. 정렬 조건
-                 * 2. 정렬 조건이 같을 경우, 방이름에 keyword가 포함된 검색결과가 책제목에 keyword가 포함된 검색결과보다 우선순위가 더 높다
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
                  */
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("무슨방일까요??")))
@@ -352,17 +264,17 @@ class RoomSearchApiTest {
     @DisplayName("keyword=[과학], category=[과학/IT], 정렬=[마감임박순] 일 경우, keyword, category 조건을 모두 만족하는 방만 반환된다.")
     void search_keyword_and_category() throws Exception {
         // given
-        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
-        saveUsersToRoom(science_room_1, 4);
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_1, 4);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
-        saveUsersToRoom(science_room_3, 2);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "무슨방일까요??", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_3, 2);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "문학방입니다", LocalDate.now().plusDays(10), 8);
-        saveUsersToRoom(room_3, 6);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
-        saveUsersToRoom(recruit_expired_room_4, 6);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "모집기한-지난-과학방", LocalDate.now().minusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(recruit_expired_room_4, 6);
 
         // when
         ResultActions result = mockMvc.perform(get("/rooms/search")
@@ -370,23 +282,118 @@ class RoomSearchApiTest {
                 .param("keyword", "과학")
                 .param("category", Category.SCIENCE_IT.getValue())
                 .param("sort", "deadline")
-                .param("isFinalized", String.valueOf(false))
-                .param("page", "1"));
+                .param("isFinalized", String.valueOf(false)));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(2)))
-                .andExpect(jsonPath("$.data.page", is(1)))
-                .andExpect(jsonPath("$.data.size", is(2)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 /**
                  * roomList 검증 : 정렬 순서, 방 검색 결과 검증
                  * <정렬 순서>
                  * 1. 정렬 조건
-                 * 2. 정렬 조건이 같을 경우, 방이름에 keyword가 포함된 검색결과가 책제목에 keyword가 포함된 검색결과보다 우선순위가 더 높다
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
                  */
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("무슨방일까요??")));
+    }
+
+    @Test
+    @DisplayName("finalized가 true이면 최근 검색어 목록으로 저장된다.")
+    void search_keyword_saved() throws Exception {
+        // given
+        AliasJpaEntity aliasJpa = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(aliasJpa));
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        updateRoomMemberCount(science_room_1, 4);
+
+        // when
+        ResultActions result = mockMvc.perform(get("/rooms/search")
+                .requestAttr("userId", me.getUserId())
+                .param("keyword", "과학")
+                .param("sort", "deadline")
+                .param("isFinalized", String.valueOf(true)));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.roomList", hasSize(1)))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
+                /**
+                 * roomList 검증 : 정렬 순서, 방 검색 결과 검증
+                 * <정렬 순서>
+                 * 1. 정렬 조건
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
+                 */
+                .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")));
+
+        RecentSearchJpaEntity recentSearchJpaEntity = recentSearchJpaRepository.findAll().get(0);
+        assertThat(recentSearchJpaEntity.getSearchTerm()).isEqualTo("과학");
+        assertThat(recentSearchJpaEntity.getUserJpaEntity().getUserId()).isEqualTo(me.getUserId());
+    }
+
+    @Test
+    @DisplayName("검색결과에 해당하는 방이 많은 경우, 정렬 조건 기준으로 페이징 처리한다.")
+    void comment_show_all_page_test() throws Exception {
+        //given
+        RoomJpaEntity science_room_1 = saveScienceRoom("과학-책", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_5 = saveScienceRoom("과학-책", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_6 = saveScienceRoom("과학-책", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_7 = saveScienceRoom("과학-책", "과학-방-7일뒤-활동시작", LocalDate.now().plusDays(7), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_8 = saveScienceRoom("과학-책", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_9 = saveScienceRoom("과학-책", "과학-방-9일뒤-활동시작", LocalDate.now().plusDays(9), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_10 = saveScienceRoom("과학-책", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_11 = saveScienceRoom("과학-책", "과학-방-11일뒤-활동시작", LocalDate.now().plusDays(11), LocalDate.now().plusDays(30));
+        RoomJpaEntity science_room_12 = saveScienceRoom("과학-책", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30));
+
+        //when //then
+        MvcResult firstResult = mockMvc.perform(get("/rooms/search")
+                        .requestAttr("userId", 1L)
+                        .param("keyword", "과학")
+                        .param("sort", "deadline")
+                        .param("isFinalized", String.valueOf(false)))
+                .andExpect(jsonPath("$.data.nextCursor", notNullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(false)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(10)))
+                /**
+                 * roomList 검증 : 정렬 순서, 방 검색 결과 검증
+                 * <정렬 순서>
+                 * 1. 정렬 조건
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
+                 */
+                .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-2일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[2].roomName", is("과학-방-3일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[3].roomName", is("과학-방-4일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[4].roomName", is("과학-방-5일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[5].roomName", is("과학-방-6일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[6].roomName", is("과학-방-7일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[7].roomName", is("과학-방-8일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[8].roomName", is("과학-방-9일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[9].roomName", is("과학-방-10일뒤-활동시작")))
+                .andReturn();
+
+        String responseBody = firstResult.getResponse().getContentAsString();
+        String nextCursor = JsonPath.read(responseBody, "$.data.nextCursor");
+
+        mockMvc.perform(get("/rooms/search")
+                        .requestAttr("userId", 1L)
+                        .param("keyword", "과학")
+                        .param("sort", "deadline")
+                        .param("isFinalized", String.valueOf(false))
+                        .param("cursor", nextCursor))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isLast", is(true)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(2)))
+                /**
+                 * roomList 검증 : 정렬 순서, 방 검색 결과 검증
+                 * <정렬 순서>
+                 * 1. 정렬 조건
+                 * 2. 정렬 조건이 같을 경우, roomId 기준 오름차순 정렬 (무한 스크롤 시 누락 & 중복 되는 데이터 발생하지 않도록)
+                 */
+                .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-11일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-12일뒤-활동시작")));
     }
 }

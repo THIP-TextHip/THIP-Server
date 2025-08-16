@@ -1,6 +1,5 @@
 package konkuk.thip.room.domain;
 
-import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +12,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
-@DisplayName("[단위] Room 단위 테스트")
+@DisplayName("[단위] Room 도메인 테스트")
 class RoomTest {
 
     private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();

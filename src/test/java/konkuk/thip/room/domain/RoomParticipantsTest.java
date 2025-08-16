@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("[단위] RoomParticipants 도메인 테스트")
 class RoomParticipantsTest {
 
     private RoomParticipant createUserRoom(Long id, Long userId, Long roomId, RoomParticipantRole role) {

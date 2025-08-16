@@ -1,8 +1,8 @@
 package konkuk.thip.comment.application.service.policy;
 
-import konkuk.thip.common.post.CountUpdatable;
+import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
-import konkuk.thip.room.domain.RoomPost;
+import konkuk.thip.roompost.domain.RoomPost;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

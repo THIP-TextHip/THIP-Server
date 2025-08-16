@@ -1,6 +1,6 @@
 package konkuk.thip.post.application.port.in.dto;
 
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 
 public record PostIsLikeCommand(
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("[단위] UserRoom 도메인 테스트")
+@DisplayName("[단위] RoomParticipant 도메인 테스트")
 class RoomParticipantTest {
 
     @Test

@@ -3,7 +3,6 @@ package konkuk.thip.post.adapter.out.jpa;
 import jakarta.persistence.*;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.AccessLevel;

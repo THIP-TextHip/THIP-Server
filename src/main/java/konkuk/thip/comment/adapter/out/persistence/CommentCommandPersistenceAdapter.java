@@ -7,13 +7,13 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepo
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
-import konkuk.thip.record.adapter.out.persistence.repository.RecordJpaRepository;
+import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.vote.adapter.out.persistence.repository.VoteJpaRepository;
+import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,7 @@
 package konkuk.thip.comment.application.port.in.dto;
 
 
-import konkuk.thip.common.post.PostType;
+import konkuk.thip.post.domain.PostType;
 
 public record CommentShowAllQuery(
         Long postId,

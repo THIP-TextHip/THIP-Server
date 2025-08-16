@@ -2,6 +2,7 @@ package konkuk.thip.room.application.mapper;
 
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.adapter.in.web.response.RoomGetDeadlinePopularResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomShowMineResponse;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.application.port.in.dto.MyRoomType;
@@ -30,4 +31,12 @@ public interface RoomQueryMapper {
     RoomGetDeadlinePopularResponse.RoomDto toDeadlinePopularRoomDto(RoomQueryDto dto);
 
     List<RoomGetDeadlinePopularResponse.RoomDto> toDeadlinePopularRoomDtoList(List<RoomQueryDto> roomQueryDtos);
+
+
+
+    @Mapping(target = "deadlineDate", expression = "java(DateUtil.formatAfterTime(dto.endDate()))")
+    @Mapping(target = "isPublic", expression = "java(Boolean.TRUE.equals(dto.isPublic()))")
+    RoomSearchResponse.RoomSearchDto toRoomSearchDto(RoomQueryDto dto);
+
+    List<RoomSearchResponse.RoomSearchDto> toRoomSearchResponse(List<RoomQueryDto> dtos);
 }

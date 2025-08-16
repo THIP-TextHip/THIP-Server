@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeCommand;
 
-import static konkuk.thip.common.post.PostType.FEED;
+import static konkuk.thip.post.domain.PostType.FEED;
 
 @Schema(description = "피드 좋아요 상태 변경 요청 DTO")
 public record FeedIsLikeRequest(

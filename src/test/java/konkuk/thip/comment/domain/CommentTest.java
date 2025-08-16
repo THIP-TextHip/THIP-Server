@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.common.post.PostType.FEED;
+import static konkuk.thip.post.domain.PostType.FEED;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] Comment 단위 테스트")

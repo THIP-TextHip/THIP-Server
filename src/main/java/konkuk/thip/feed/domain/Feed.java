@@ -3,7 +3,7 @@ package konkuk.thip.feed.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.post.CountUpdatable;
+import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.service.PostCountService;
 import lombok.Builder;
 import lombok.Getter;

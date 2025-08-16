@@ -1,22 +1,20 @@
 package konkuk.thip.room.application.service;
 
-import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.util.Cursor;
+import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.application.service.manager.RecentSearchCreateManager;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.adapter.out.persistence.RoomSearchSortParam;
+import konkuk.thip.room.application.mapper.RoomQueryMapper;
+import konkuk.thip.room.application.port.in.dto.RoomSearchSortParam;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
+import konkuk.thip.room.application.port.in.dto.RoomSearchQuery;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
+import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.Category;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_ROOM_SEARCH_SORT;
 
 @Service
 @RequiredArgsConstructor
@@ -25,64 +23,58 @@ public class RoomSearchService implements RoomSearchUseCase {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     private final RoomQueryPort roomQueryPort;
-
     private final RecentSearchCreateManager recentSearchCreateManager;
+    private final RoomQueryMapper roomQueryMapper;
 
     @Override
     @Transactional // <- 최근 검색 저장으로 인한 트랜잭션
-    public RoomSearchResponse searchRoom(String keyword, String category, String sort, int page, boolean isFinalized, Long userId) {
+    public RoomSearchResponse searchRecruitingRooms(RoomSearchQuery query) {
         // 1. validation
-        String sortVal = validateSort(sort);
-        String categoryVal = validateCategory(category);
+        RoomSearchSortParam sortParam = RoomSearchSortParam.from(query.sortStr());
+        Category category = validateCategory(query.categoryStr());
 
-        // 2. Pageable 생성
-        int pageIndex = page > 0 ? page - 1 : 0;
-        Pageable pageable = PageRequest.of(pageIndex, DEFAULT_PAGE_SIZE, buildSort(sortVal));
+        // 2. Cursor 생성
+        Cursor cursor = Cursor.from(query.cursorStr(), DEFAULT_PAGE_SIZE);
 
         // 3. 방 검색
-        Page<RoomSearchResponse.RoomSearchResult> result = roomQueryPort.searchRoom(keyword, categoryVal, pageable);
+        CursorBasedList<RoomQueryDto> result = executeRecruitingRoomSearch(query, category, sortParam, cursor);
 
-        // TODO 검색 완료일 경우, 최근 검색어로 저장되도록
-        recentSearchCreateManager.saveRecentSearchByUser(userId, keyword, RecentSearchType.ROOM_SEARCH, isFinalized);
+        // 4. 검색 완료일 경우, 최근 검색어 저장
+        recentSearchCreateManager.saveRecentSearchByUser(query.userId(), query.keyword(), RecentSearchType.ROOM_SEARCH, query.isFinalized());
 
-        // 4. response 구성
+        // 5. response 구성
         return new RoomSearchResponse(
-                result.getContent(),
-                page,
-                result.getNumberOfElements(),
-                result.isLast(),
-                result.isFirst());
+                roomQueryMapper.toRoomSearchResponse(result.contents()),
+                result.nextCursor(),
+                result.isLast()
+        );
     }
 
-    private String validateSort(String sort) {
-        try {
-            return RoomSearchSortParam.from(sort).getValue();
-        } catch (IllegalArgumentException ex) {
-            throw new BusinessException(INVALID_ROOM_SEARCH_SORT, ex);
+    private CursorBasedList<RoomQueryDto> executeRecruitingRoomSearch(RoomSearchQuery query, Category category, RoomSearchSortParam sortParam, Cursor cursor) {
+        CursorBasedList<RoomQueryDto> result = null;
+        if (category == null) {
+            switch (sortParam) {
+                case DEADLINE:
+                    return roomQueryPort.searchRecruitingRoomsByDeadline(query.keyword(), cursor);
+                case MEMBER_COUNT:
+                    return roomQueryPort.searchRecruitingRoomsByMemberCount(query.keyword(), cursor);
+            }
+        } else {
+            switch (sortParam) {
+                case DEADLINE:
+                    return roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(query.keyword(), category, cursor);
+                case MEMBER_COUNT:
+                    return roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(query.keyword(), category, cursor);
+            }
         }
+        return result;
     }
 
-    private String validateCategory(String category) {
-        if (category == null || category.isEmpty()) {
-            return "";
+    private Category validateCategory(String categoryStr) {
+        if (categoryStr == null || categoryStr.isEmpty()) {
+            return null;
         }
 
-        return Category.from(category).getValue();
-    }
-
-    /**
-     * 정렬 키에 따른 Sort 객체 생성
-     */
-    private Sort buildSort(String sortVal) {
-        if (sortVal.equals(RoomSearchSortParam.MEMBER_COUNT.getValue())) {
-            // 인기순: 참여자 수 내림차순
-            return Sort.by(Sort.Direction.DESC, RoomSearchSortParam.MEMBER_COUNT.getValue());
-        }
-        if (sortVal.equals(RoomSearchSortParam.RECOMMEND.getValue())) {
-            // TODO: 추후 추천 로직 구현 시 반영
-            return Sort.unsorted();
-        }
-        // default: 마감 임박순(deadLine) = 시작일 빠른 순서대로 오름차순
-        return Sort.by(Sort.Direction.ASC, RoomSearchSortParam.DEADLINE.getValue());
+        return Category.from(categoryStr);
     }
 }

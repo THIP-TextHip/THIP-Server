@@ -9,7 +9,7 @@ import org.mapstruct.Named;
 
 import java.util.List;
 
-import static konkuk.thip.common.post.PostType.*;
+import static konkuk.thip.post.domain.PostType.*;
 
 @Mapper(componentModel = "spring")
 public interface ReactionQueryMapper {

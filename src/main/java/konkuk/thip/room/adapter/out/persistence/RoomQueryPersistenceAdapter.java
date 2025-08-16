@@ -6,8 +6,8 @@ import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
-import konkuk.thip.room.adapter.out.persistence.function.RoomQueryFunction;
+import konkuk.thip.room.adapter.out.persistence.function.IntegerCursorRoomQueryFunction;
+import konkuk.thip.room.adapter.out.persistence.function.LocalDateCursorRoomQueryFunction;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
@@ -35,8 +35,36 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public Page<RoomSearchResponse.RoomSearchResult> searchRoom(String keyword, String category, Pageable pageable) {
-        return roomJpaRepository.searchRoom(keyword, category, pageable);
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsByDeadline(String keyword, Cursor cursor) {
+        return findRoomsByDeadlineCursor(cursor, ((lastLocalDate, lastId, pageSize) ->
+                roomJpaRepository.findRecruitingRoomsOrderByStartDateAsc(keyword, lastLocalDate, lastId, pageSize)));
+    }
+
+    @Override
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByDeadline(String keyword, Category category, Cursor cursor) {
+        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
+                roomJpaRepository.findRecruitingRoomsWithCategoryOrderByStartDateAsc(
+                        keyword, category.getValue(), lastLocalDate, lastId, pageSize
+                )
+        );
+    }
+
+    @Override
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsByMemberCount(String keyword, Cursor cursor) {
+        return findRoomsByMemberCountCursor(cursor, (lastMemberCount, lastId, pageSize) ->
+                roomJpaRepository.findRecruitingRoomsOrderByMemberCountDesc(
+                        keyword, lastMemberCount, lastId, pageSize
+                )
+        );
+    }
+
+    @Override
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor) {
+        return findRoomsByMemberCountCursor(cursor, (lastMemberCount, lastId, pageSize) ->
+                roomJpaRepository.findRecruitingRoomsWithCategoryOrderByMemberCountDesc(
+                        keyword, category.getValue(), lastMemberCount, lastId, pageSize
+                )
+        );
     }
 
     @Override
@@ -46,51 +74,67 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public Page<RoomGetHomeJoinedListResponse.RoomSearchResult> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
+    public Page<RoomGetHomeJoinedListResponse.JoinedRoomInfo> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
         return roomJpaRepository.searchHomeJoinedRooms(userId, date, pageable);
     }
 
     @Override
     public CursorBasedList<RoomQueryDto> findRecruitingRoomsUserParticipated(Long userId, Cursor cursor) {
-        return findRooms(cursor, (lastLocalDate, lastId, pageSize) ->
+        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize));
     }
 
     @Override
     public CursorBasedList<RoomQueryDto> findPlayingRoomsUserParticipated(Long userId, Cursor cursor) {
-        return findRooms(cursor, (lastLocalDate, lastId, pageSize) ->
+        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findPlayingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize));
     }
 
     @Override
     public CursorBasedList<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Cursor cursor) {
-        return findRooms(cursor, (lastLocalDate, lastId, pageSize) ->
+        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize));
     }
 
     @Override
     public CursorBasedList<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor) {
-        return findRooms(cursor, (lastLocalDate, lastId, pageSize) ->
+        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findExpiredRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize));
     }
 
     @Override
     public CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor) {
-        return findRooms(cursor, (lastLocalDate, lastId, pageSize) ->
+        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findRoomsByIsbnOrderByStartDateAsc(isbn, lastLocalDate, lastId, pageSize));
     }
 
-    private CursorBasedList<RoomQueryDto> findRooms(Cursor cursor, RoomQueryFunction queryFunction) {
+    private CursorBasedList<RoomQueryDto> findRoomsByDeadlineCursor(Cursor cursor, LocalDateCursorRoomQueryFunction queryFunction) {
         LocalDate lastLocalDate = cursor.isFirstRequest() ? null : cursor.getLocalDate(0);
         Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(1);
         int pageSize = cursor.getPageSize();
 
         List<RoomQueryDto> dtos = queryFunction.apply(lastLocalDate, lastId, pageSize);
 
-        return CursorBasedList.of(dtos, pageSize, roomShowMineQueryDto -> {
+        return CursorBasedList.of(dtos, pageSize, dto -> {
             Cursor nextCursor = new Cursor(List.of(
-                    roomShowMineQueryDto.endDate().toString(),
-                    roomShowMineQueryDto.roomId().toString()
+                    dto.endDate().toString(),
+                    dto.roomId().toString()
+            ));
+            return nextCursor.toEncodedString();
+        });
+    }
+
+    private CursorBasedList<RoomQueryDto> findRoomsByMemberCountCursor(Cursor cursor, IntegerCursorRoomQueryFunction queryFunction) {
+        Integer lastInteger = cursor.isFirstRequest() ? null : cursor.getInteger(0);
+        Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(1);
+        int pageSize = cursor.getPageSize();
+
+        List<RoomQueryDto> dtos = queryFunction.apply(lastInteger, lastId, pageSize);
+
+        return CursorBasedList.of(dtos, pageSize, dto -> {
+            Cursor nextCursor = new Cursor(List.of(
+                    String.valueOf(dto.memberCount()), // 인원수 커서
+                    dto.roomId().toString()
             ));
             return nextCursor.toEncodedString();
         });

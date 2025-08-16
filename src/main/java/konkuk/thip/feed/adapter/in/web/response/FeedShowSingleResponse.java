@@ -8,6 +8,7 @@ public record FeedShowSingleResponse(
         String aliasName,
         String aliasColor,
         String postDate,
+        String bookTitle,
         String isbn,
         String bookAuthor,
         String contentBody,
