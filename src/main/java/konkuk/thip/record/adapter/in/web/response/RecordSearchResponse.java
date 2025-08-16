@@ -25,6 +25,7 @@ public record RecordSearchResponse(
             String content,
             int likeCount,
             int commentCount,
+            boolean isOverview,
             boolean isLiked,
             boolean isWriter,
             boolean isLocked,

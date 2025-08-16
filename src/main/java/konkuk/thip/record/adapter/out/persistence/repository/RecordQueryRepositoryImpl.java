@@ -4,26 +4,24 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
 import konkuk.thip.record.adapter.out.jpa.QRecordJpaEntity;
-import konkuk.thip.record.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.record.adapter.out.persistence.constants.SortType;
 import konkuk.thip.record.application.port.out.dto.PostQueryDto;
 import konkuk.thip.record.application.port.out.dto.QPostQueryDto;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import konkuk.thip.vote.adapter.out.jpa.QVoteJpaEntity;
-import konkuk.thip.vote.adapter.out.jpa.VoteJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static konkuk.thip.common.post.PostType.*;
+import static konkuk.thip.common.post.PostType.RECORD;
+import static konkuk.thip.common.post.PostType.VOTE;
 
 
 @Repository
@@ -62,11 +60,11 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         BooleanBuilder where = new BooleanBuilder();
 
         BooleanBuilder voteCondition = new BooleanBuilder();
-        voteCondition.and(post.instanceOf(VoteJpaEntity.class))
+        voteCondition.and(post.dtype.eq(VOTE.getType()))
                 .and(vote.roomJpaEntity.roomId.eq(roomId));
 
         BooleanBuilder recordCondition = new BooleanBuilder();
-        recordCondition.and(post.instanceOf(RecordJpaEntity.class))
+        recordCondition.and(post.dtype.eq(RECORD.getType()))
                 .and(record.roomJpaEntity.roomId.eq(roomId));
 
         where.and(voteCondition.or(recordCondition))
@@ -99,7 +97,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         BooleanBuilder where = new BooleanBuilder();
 
         BooleanBuilder voteCondition = new BooleanBuilder();
-        voteCondition.and(post.instanceOf(VoteJpaEntity.class))
+        voteCondition.and(post.dtype.eq(VOTE.getType()))
                 .and(vote.roomJpaEntity.roomId.eq(roomId));
 
         if (isOverview) {
@@ -110,7 +108,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         }
 
         BooleanBuilder recordCondition = new BooleanBuilder();
-        recordCondition.and(post.instanceOf(RecordJpaEntity.class))
+        recordCondition.and(post.dtype.eq(RECORD.getType()))
                 .and(record.roomJpaEntity.roomId.eq(roomId));
 
         if (isOverview) {
@@ -128,25 +126,17 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     // Case: pageExpr (Record, Vote 분기)
     private NumberExpression<Integer> pageExpr() {
         return new CaseBuilder()
-                .when(post.instanceOf(RecordJpaEntity.class)).then(record.page)
-                .when(post.instanceOf(VoteJpaEntity.class)).then(vote.page)
+                .when(post.dtype.eq(RECORD.getType())).then(record.page)
+                .when(post.dtype.eq(VOTE.getType())).then(vote.page)
                 .otherwise(0);
     }
 
     // Case: isOverviewExpr (총평 여부를 정렬 기준으로 사용)
     private NumberExpression<Integer> isOverviewExpr() {
         return new CaseBuilder()
-                .when(post.instanceOf(RecordJpaEntity.class)).then(record.isOverview.castToNum(Integer.class))
-                .when(post.instanceOf(VoteJpaEntity.class)).then(vote.isOverview.castToNum(Integer.class))
+                .when(post.dtype.eq(RECORD.getType())).then(record.isOverview.castToNum(Integer.class))
+                .when(post.dtype.eq(VOTE.getType())).then(vote.isOverview.castToNum(Integer.class))
                 .otherwise(0);
-    }
-
-    // Case: postTypeExpr ("RECORD" or "VOTE")
-    private StringExpression postTypeExpr() {
-        return new CaseBuilder()
-                .when(post.instanceOf(RecordJpaEntity.class)).then(RECORD.getType())
-                .when(post.instanceOf(VoteJpaEntity.class)).then(VOTE.getType())
-                .otherwise(FEED.getType());
     }
 
     private BooleanBuilder buildCursorPredicateForSortType(SortType sortType, Cursor cursor) {
@@ -198,7 +188,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     private QPostQueryDto selectPostQueryDto() {
         return new QPostQueryDto(
                 post.postId,
-                postTypeExpr(), //추후에 상속 구조 해지시 type 필드로 구분
+                post.dtype, //추후에 상속 구조 해지시 type 필드로 구분
                 post.createdAt,
                 pageExpr(),
                 user.userId,
