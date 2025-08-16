@@ -14,4 +14,8 @@ public interface CommentQueryRepository {
     List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId);
 
     Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsByCreatedAtAsc(Set<Long> rootCommentIds);
+
+    CommentQueryDto findRootCommentId(Long commentId);
+
+    CommentQueryDto findChildCommentId(Long rootCommentId, Long commentId);
 }
