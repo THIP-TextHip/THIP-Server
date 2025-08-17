@@ -18,9 +18,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VoteJpaEntity extends PostJpaEntity {
 
+    @Column(name = "page")
     private Integer page;
 
-    @Column(name = "is_overview",nullable = false)
+    @Column(name = "is_overview")
     private boolean isOverview;
 
     @ManyToOne(fetch = FetchType.LAZY)
