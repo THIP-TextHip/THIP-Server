@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "records")
+//@Table(name = "records")
 @DiscriminatorValue("RECORD")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

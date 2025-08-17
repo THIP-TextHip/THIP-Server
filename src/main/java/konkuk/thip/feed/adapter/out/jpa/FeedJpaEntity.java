@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "feeds")
+//@Table(name = "feeds")
 @DiscriminatorValue("FEED")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

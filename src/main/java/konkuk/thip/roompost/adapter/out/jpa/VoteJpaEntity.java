@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "votes")
+//@Table(name = "votes")
 @DiscriminatorValue("VOTE")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
