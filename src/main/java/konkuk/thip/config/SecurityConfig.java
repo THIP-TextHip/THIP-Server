@@ -52,11 +52,9 @@ public class SecurityConfig {
             "/swagger-ui/**", "/api-docs/**", "/swagger-ui.html",
             "/v3/api-docs/**","/oauth2/authorization/**",
             "/login/oauth2/code/**", "/actuator/health",
-            "/auth/users",
-            "/auth/set-cookie",
-            "/auth/exchange-temp-token",
+            "/auth/users", "/auth/token",
 
-            "/auth/token", "/api/set-cookie",
+            "/auth/exchange-temp-token", "/auth/set-cookie", // deprecated
     };
 
     @Bean
