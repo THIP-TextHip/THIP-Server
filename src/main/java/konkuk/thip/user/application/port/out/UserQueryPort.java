@@ -27,6 +27,4 @@ public interface UserQueryPort {
     CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor, String label);
 
     CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor, String likeLabel, String commentLabel);
-
-    List<UserQueryDto> findRecentFeedWritersOfMyFollowings(Long userId, int size);
 }

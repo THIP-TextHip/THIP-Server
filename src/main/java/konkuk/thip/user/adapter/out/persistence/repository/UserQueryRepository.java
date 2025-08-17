@@ -17,6 +17,4 @@ public interface UserQueryRepository {
     List<ReactionQueryDto> findCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String commentLabel);
 
     List<ReactionQueryDto> findLikeAndCommentByUserId(Long userId, LocalDateTime cursorLocalDateTime, Integer size, String likeLabel, String commentLabel);
-
-    List<UserQueryDto> findFeedWritersOfMyFollowingsOrderByCreatedAtDesc(Long userId, Integer size);
 }
