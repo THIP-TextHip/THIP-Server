@@ -32,8 +32,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     private final QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
-//    private final QRecordJpaEntity record = QRecordJpaEntity.recordJpaEntity;
-//    private final QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
     @Override
@@ -48,8 +46,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         return queryFactory
                 .select(selectPostQueryDto())
                 .from(post)
-//                .leftJoin(record).on(post.postId.eq(record.postId))
-//                .leftJoin(vote).on(post.postId.eq(vote.postId))
                 .join(post.userJpaEntity, user)
                 .where(where)
                 .orderBy(getOrderSpecifiers(roomPostSortType))
@@ -85,8 +81,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         return queryFactory
                 .select(selectPostQueryDto())
                 .from(post)
-//                .leftJoin(record).on(post.postId.eq(record.postId))
-//                .leftJoin(vote).on(post.postId.eq(vote.postId))
                 .join(post.userJpaEntity, user)
                 .where(where)
                 .orderBy(getOrderSpecifiers(roomPostSortType))
