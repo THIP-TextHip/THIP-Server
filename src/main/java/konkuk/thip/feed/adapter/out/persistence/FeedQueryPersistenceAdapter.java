@@ -180,4 +180,9 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
             return nextCursor.toEncodedString();
         });
     }
+
+    @Override
+    public List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size) {
+        return feedJpaRepository.findLatestPublicFeedCreatorsIn(userIds, size);
+    }
 }

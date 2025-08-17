@@ -48,4 +48,6 @@ public interface FeedQueryPort {
     CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLike(String isbn, Long userId, Cursor cursor);
 
     CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLatest(String isbn, Long userId, Cursor cursor);
+
+    List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size);
 }
