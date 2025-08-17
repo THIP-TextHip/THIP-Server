@@ -43,7 +43,7 @@ public class UserQueryController {
     private final UserVerifyNicknameUseCase userVerifyNicknameUseCase;
     private final UserSearchUsecase userSearchUsecase;
     private final UserMyPageUseCase userMyPageUseCase;
-    private final UserShowFollowingRecentWritersUseCase userShowFollowingRecentWritersUseCase;
+    private final UserShowFollowingsInFeedViewUseCase userShowFollowingsInFeedViewUseCase;
 
     @Operation(
             summary = "닉네임 중복 확인",
@@ -159,13 +159,13 @@ public class UserQueryController {
     }
 
     @Operation(
-            summary = "최근에 공개 피드를 작성한 내 팔로잉 리스트(= 내 띱 리스트) 조회",
-            description = "내가 팔로잉 하는 사람들 중, 최근에 공개 피드를 작성한 사람들의 정보를 최대 10명 반환합니다."
+            summary = "전체 피드 화면 상단의 내 팔로잉 리스트(= 내 띱 리스트) 조회",
+            description = "내가 팔로잉 하는 사람들을 반환합니다. 최근에 공개 피드를 작성한 사람들의 정보를 우선적으로 반환합니다. 최대 10명 반환합니다."
     )
     @GetMapping("/users/my-followings/recent-feeds")
-    public BaseResponse<UserFollowingRecentWritersResponse> showMyFollowingRecentWriters(
+    public BaseResponse<UserShowFollowingsInFeedViewResponse> showMyFollowingsInFeedView(
             @Parameter(hidden = true) @UserId Long userId
     ) {
-        return BaseResponse.ok(userShowFollowingRecentWritersUseCase.showMyFollowingRecentWriters(userId));
+        return BaseResponse.ok(userShowFollowingsInFeedViewUseCase.showMyFollowingsInFeedView(userId));
     }
 }
