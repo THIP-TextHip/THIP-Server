@@ -30,14 +30,19 @@ public class UserCommandController {
     private final UserFollowUsecase userFollowUsecase;
     private final UserUpdateUseCase userUpdateUseCase;
 
+
     @Operation(
             summary = "사용자 회원가입",
             description = "사용자가 회원가입을 합니다. OAuth2 ID를 통해 사용자를 식별합니다."
     )
+    //TODO isTokenRequired 라는 파라미터 추가해서 안드는 바로 토큰 발급, 웹은 토큰 발급 여기서 안받고 다른 api 호출해서 temp -> access token으로 변경
     @ExceptionDescription(USER_SIGNUP)
     @PostMapping("/users/signup")
-    public BaseResponse<UserSignupResponse> signup(@Valid @RequestBody final UserSignupRequest request,
-                                                   @Parameter(hidden = true) @Oauth2Id final String oauth2Id) {
+    public BaseResponse<UserSignupResponse> signup(
+            @Valid @RequestBody final UserSignupRequest request,
+            @RequestParam(required = false, defaultValue = "true") final boolean isTokenRequired,
+            @Parameter(hidden = true) @Oauth2Id final String oauth2Id
+    ) {
         return BaseResponse.ok(
                 UserSignupResponse.of(userSignupUseCase.signup(request.toCommand(oauth2Id)))
         );
