@@ -90,6 +90,7 @@ public interface FeedQueryMapper {
     @Mapping(target = "aliasColor", source = "feedCreator.alias.color")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(feed.getCreatedAt()))")
     @Mapping(target = "bookTitle", source = "book.title")
+    @Mapping(target = "bookImageUrl", source = "book.imageUrl")
     @Mapping(target = "isbn", source = "book.isbn")
     @Mapping(target = "bookAuthor", source = "book.authorName")
     @Mapping(target = "contentBody", source = "feed.content")
@@ -100,6 +101,7 @@ public interface FeedQueryMapper {
     @Mapping(target = "isLiked", source = "isLiked")
     @Mapping(target = "isWriter", source = "feedCreator.id", qualifiedByName = "isWriter")
     @Mapping(target = "tagList", source = "feed.tagList", qualifiedByName = "mapTagList")
+    @Mapping(target = "isPublic", source = "feed.isPublic")
     FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked, @Context Long userId);
 
     @Named("mapContentList")
