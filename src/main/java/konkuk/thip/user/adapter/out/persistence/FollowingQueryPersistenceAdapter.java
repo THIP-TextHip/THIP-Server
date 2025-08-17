@@ -2,6 +2,7 @@ package konkuk.thip.user.adapter.out.persistence;
 
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.user.application.port.out.dto.FollowingQueryDto;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
@@ -54,5 +55,10 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
     @Override
     public int getFollowingCountByUser(Long userId) {
         return followingJpaRepository.countFollowingByUserId(userId);
+    }
+
+    @Override
+    public List<FollowingQueryDto> findAllFollowingUsersOrderByFollowedAtDesc(Long userId) {
+        return followingJpaRepository.findAllFollowingUsersOrderByFollowedAtDesc(userId);
     }
 }
