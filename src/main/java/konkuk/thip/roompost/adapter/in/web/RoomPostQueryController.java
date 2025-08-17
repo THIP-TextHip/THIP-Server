@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_PIN;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_SEARCH;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "RoomPost Query API", description = "방 게시글 조회 관련 API")
 @RestController
@@ -84,6 +83,11 @@ public class RoomPostQueryController {
         return BaseResponse.ok(recordPinUseCase.pinRecord(new RecordPinQuery(roomId, recordId, userId)));
     }
 
+    @Operation(
+            summary = "오늘의 한마디 조회",
+            description = "방 참여자가 오늘의 한마디를 조회합니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_SHOW)
     @GetMapping("/rooms/{roomId}/daily-greeting")
     public BaseResponse<AttendanceCheckShowResponse> showDailyGreeting(
             @Parameter(description = "게시글을 조회할 방 ID", example = "1") @PathVariable final Long roomId,

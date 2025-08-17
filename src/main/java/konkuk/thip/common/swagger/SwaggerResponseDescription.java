@@ -295,6 +295,10 @@ public enum SwaggerResponseDescription {
             ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED
     ))),
 
+    ATTENDANCE_CHECK_SHOW(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN
+    ))),
+
   ;
     private final Set<ErrorCode> errorCodeList;
     SwaggerResponseDescription(Set<ErrorCode> errorCodeList) {
