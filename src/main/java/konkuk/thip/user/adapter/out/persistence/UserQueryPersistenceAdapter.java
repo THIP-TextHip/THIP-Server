@@ -34,6 +34,11 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
     }
 
     @Override
+    public boolean existsByOauth2Id(String oauth2Id) {
+        return userJpaRepository.existsByOauth2Id(oauth2Id);
+    }
+
+    @Override
     public Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId) {
         return  userJpaRepository.findUserIdsByBookId(bookId);
     }
