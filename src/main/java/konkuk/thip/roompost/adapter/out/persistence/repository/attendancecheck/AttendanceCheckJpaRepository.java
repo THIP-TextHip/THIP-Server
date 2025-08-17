@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 
-public interface AttendanceCheckJpaRepository extends JpaRepository<AttendanceCheckJpaEntity, Long> {
+public interface AttendanceCheckJpaRepository extends JpaRepository<AttendanceCheckJpaEntity, Long>, AttendanceCheckQueryRepository {
 
     // TODO : count 값을 매번 쿼리를 통해 계산하는게 아니라 DB에 저장 or redis 캐시에 저장하는 방법도 좋을 듯
     @Query("SELECT COUNT(a) FROM AttendanceCheckJpaEntity a " +
