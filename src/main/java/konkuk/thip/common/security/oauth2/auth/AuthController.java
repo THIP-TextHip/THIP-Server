@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.exception.AuthException;
+import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.security.annotation.Oauth2Id;
 import konkuk.thip.common.security.oauth2.LoginTokenStorage;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieRequest;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieResponse;
@@ -62,12 +65,12 @@ public class AuthController {
                 .map(user -> {
                     // 기존 유저: AccessToken 발급
                     String accessToken = jwtUtil.createAccessToken(user.getUserId());
-                    return BaseResponse.ok(AuthTokenResponse.of(accessToken,false, ACCESS.getValue()));
+                    return BaseResponse.ok(AuthTokenResponse.of(accessToken, false));
                 })
                 .orElseGet(() -> {
                     // 신규 유저: SignupToken 발급
                     String tempToken = jwtUtil.createSignupToken(authTokenRequest.oauth2Id());
-                    return BaseResponse.ok(AuthTokenResponse.of(tempToken, true, TEMP.getValue()));
+                    return BaseResponse.ok(AuthTokenResponse.of(tempToken, true));
                 });
     }
 
@@ -92,19 +95,16 @@ public class AuthController {
 
         String token;
         boolean isNewUser;
-        String tokenType;
 
         if (entry.getType() == ACCESS) {
             token = entry.getToken();
             isNewUser = false;
-            tokenType = ACCESS.getValue();
         } else {
             token = entry.getToken();
             isNewUser = true;
-            tokenType = TEMP.getValue();
         }
 
-        return BaseResponse.ok(AuthTokenResponse.of(token, isNewUser, tokenType));
+        return BaseResponse.ok(AuthTokenResponse.of(token, isNewUser));
     }
 
     @Operation(
@@ -158,22 +158,27 @@ public class AuthController {
     public ResponseEntity<Void> exchangeTempToken(
             HttpServletRequest request,
             @RequestBody Map<String, String> body,
-            HttpServletResponse response
+            HttpServletResponse response,
+            @Oauth2Id String oauth2Id
     ) {
-        String tempCookieName = COOKIE_TEMP_TOKEN.getValue();
-        String tempToken = null;
-        if (request.getCookies() != null) {
-            for (jakarta.servlet.http.Cookie c : request.getCookies()) {
-                if (tempCookieName.equals(c.getName())) {
-                    tempToken = c.getValue();
-                    break;
-                }
-            }
-        }
+//        String tempCookieName = COOKIE_TEMP_TOKEN.getValue();
+//        String tempToken = null;
+//        if (request.getCookies() != null) {
+//            for (jakarta.servlet.http.Cookie c : request.getCookies()) {
+//                if (tempCookieName.equals(c.getName())) {
+//                    tempToken = c.getValue();
+//                    break;
+//                }
+//            }
+//        }
+//
+//        // 1) tempToken 존재 확인
+//        if (tempToken == null || tempToken.isBlank()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
 
-        // 1) tempToken 존재 확인
-        if (tempToken == null || tempToken.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (!userJpaRepository.existsByOauth2Id(oauth2Id)) {
+            throw new BusinessException(ErrorCode.USER_NOT_SIGNED_UP);
         }
 
         // 2) (선택) tempToken 유효성 검증 로직이 있다면 활성화

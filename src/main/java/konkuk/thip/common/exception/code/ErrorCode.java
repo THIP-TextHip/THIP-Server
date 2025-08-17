@@ -45,6 +45,7 @@ public enum ErrorCode implements ResponseCode {
     USER_NICKNAME_UPDATE_TOO_FREQUENT(HttpStatus.BAD_REQUEST, 70005, "사용자 닉네임은 6개월에 한번 변경할 수 있습니다."),
     USER_NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 70006, "다른 사용자가 이미 사용중인 닉네임입니다."),
     USER_ALREADY_SIGNED_UP(HttpStatus.BAD_REQUEST, 70007, "이미 가입된 사용자입니다."),
+    USER_NOT_SIGNED_UP(HttpStatus.BAD_REQUEST, 70008, "가입되지 않은 사용자입니다."),
 
     /**
      * 75000 : follow error
