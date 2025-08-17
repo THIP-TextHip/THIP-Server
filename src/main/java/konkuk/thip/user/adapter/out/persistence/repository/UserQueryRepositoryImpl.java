@@ -160,37 +160,4 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 .limit(size + 1)
                 .toList();
     }
-
-    @Override
-    public List<UserQueryDto> findFeedWritersOfMyFollowingsOrderByCreatedAtDesc(Long userId, Integer size) {
-        QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
-        QUserJpaEntity writer = new QUserJpaEntity("writer");
-        QFeedJpaEntity feed = QFeedJpaEntity.feedJpaEntity;
-        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
-
-        return queryFactory
-                .select(new QUserQueryDto(
-                        writer.userId,
-                        writer.nickname,
-                        alias.imageUrl
-                ))
-                .from(following)
-                .join(following.followingUserJpaEntity, writer)     // writer : 나에게 팔로잉 당하는 사람들
-                .join(feed).on(feed.userJpaEntity.eq(writer))
-                .join(writer.aliasForUserJpaEntity, alias)
-                .where(
-                        following.userJpaEntity.userId.eq(userId)       // 내가 팔로잉 하는 사람
-                                .and(writer.status.eq(StatusType.ACTIVE))       // 그 중 아직 회원인 사람
-                                .and(feed.status.eq(StatusType.ACTIVE))     // 그 중 삭제 X & 공개피드를 작성한 사람
-                                .and(feed.isPublic.isTrue())
-                )
-                .groupBy(       // 그룹핑
-                        writer.userId,
-                        writer.nickname,
-                        alias.imageUrl
-                )
-                .orderBy(feed.createdAt.max().desc())       // 피드 작성 시각 중 최대값 == 가장 최근에 작성한 피드
-                .limit(size)        // 무한 스크롤 X
-                .fetch();
-    }
 }
