@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.common.security.oauth2.LoginTokenStorage;
-import konkuk.thip.common.security.oauth2.TokenType;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieRequest;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieResponse;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthTokenRequest;
@@ -16,7 +15,6 @@ import konkuk.thip.common.security.oauth2.auth.dto.AuthTokenResponse;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +31,8 @@ import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static konkuk.thip.common.exception.code.ErrorCode.AUTH_INVALID_LOGIN_TOKEN_KEY;
 import static konkuk.thip.common.security.constant.AuthParameters.COOKIE_ACCESS_TOKEN;
 import static konkuk.thip.common.security.constant.AuthParameters.COOKIE_TEMP_TOKEN;
+import static konkuk.thip.common.security.oauth2.TokenType.ACCESS;
+import static konkuk.thip.common.security.oauth2.TokenType.TEMP;
 
 @Tag(name = "Auth API", description = "인증 관련 API")
 @RestController
@@ -44,9 +44,6 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     private final LoginTokenStorage loginTokenStorage;
-
-    @Value(("${server.profile}"))
-    private String profile;
 
     @Operation(
             summary = "소셜 로그인 유저 확인",
@@ -61,13 +58,49 @@ public class AuthController {
                 .map(user -> {
                     // 기존 유저: AccessToken 발급
                     String accessToken = jwtUtil.createAccessToken(user.getUserId());
-                    return BaseResponse.ok(AuthTokenResponse.of(accessToken,false));
+                    return BaseResponse.ok(AuthTokenResponse.of(accessToken,false, ACCESS.getValue()));
                 })
                 .orElseGet(() -> {
                     // 신규 유저: SignupToken 발급
                     String tempToken = jwtUtil.createSignupToken(authTokenRequest.oauth2Id());
-                    return BaseResponse.ok(AuthTokenResponse.of(tempToken, true));
+                    return BaseResponse.ok(AuthTokenResponse.of(tempToken, true, TEMP.getValue()));
                 });
+    }
+
+    @Operation(
+            summary = "로그인 토큰 키로 토큰 발급",
+            description = "로그인 토큰 키를 사용하여 AccessToken 또는 SignupToken을 발급합니다."
+    )
+    @PostMapping("/token")
+    public BaseResponse<AuthTokenResponse> getToken(
+            @RequestBody AuthSetCookieRequest request
+    ) {
+        String loginTokenKey = request.loginTokenKey();
+        if (loginTokenKey == null || loginTokenKey.isBlank()) {
+            throw new AuthException(API_INVALID_PARAM,
+                    new IllegalArgumentException("loginTokenKey는 필수 파라미터입니다."));
+        }
+
+        LoginTokenStorage.Entry entry = loginTokenStorage.consume(loginTokenKey);
+        if (entry == null) {
+            throw new AuthException(AUTH_INVALID_LOGIN_TOKEN_KEY);
+        }
+
+        String token;
+        boolean isNewUser;
+        String tokenType;
+
+        if (entry.getType() == ACCESS) {
+            token = entry.getToken();
+            isNewUser = false;
+            tokenType = ACCESS.getValue();
+        } else {
+            token = entry.getToken();
+            isNewUser = true;
+            tokenType = TEMP.getValue();
+        }
+
+        return BaseResponse.ok(AuthTokenResponse.of(token, isNewUser, tokenType));
     }
 
     @Operation(
@@ -93,7 +126,7 @@ public class AuthController {
         ResponseCookie cookie;
         String type;
 
-        if (entry.getType() == TokenType.ACCESS) {
+        if (entry.getType() == ACCESS) {
             cookie = ResponseCookie.from(COOKIE_ACCESS_TOKEN.getValue(), entry.getToken())
                     .httpOnly(true)
                     .secure(true)
@@ -101,7 +134,7 @@ public class AuthController {
                     .path("/")
                     .maxAge(Duration.ofDays(30))
                     .build();
-            type = TokenType.ACCESS.getValue();
+            type = ACCESS.getValue();
         } else {
             cookie = ResponseCookie.from(COOKIE_TEMP_TOKEN.getValue(), entry.getToken())
                     .httpOnly(true)
@@ -110,7 +143,7 @@ public class AuthController {
                     .path("/")
                     .maxAge(Duration.ofMinutes(10))
                     .build();
-            type = TokenType.TEMP.getValue();
+            type = TEMP.getValue();
         }
 
         response.addHeader("Set-Cookie", cookie.toString());
