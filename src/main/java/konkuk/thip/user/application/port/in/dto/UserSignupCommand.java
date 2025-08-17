@@ -6,5 +6,6 @@ import lombok.Builder;
 public record UserSignupCommand(
         String aliasName,
         String nickname,
+        boolean isTokenRequired,
         String oauth2Id
 ) {}

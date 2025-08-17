@@ -30,8 +30,10 @@ public class UserSignupService implements UserSignupUseCase {
                 command.nickname(), USER.getType(), command.oauth2Id(), alias
         );
         Long userId = userCommandPort.save(user);
-        String accessToken = jwtUtil.createAccessToken(userId);
-
+        String accessToken = null;
+        if (command.isTokenRequired()) {
+            accessToken = jwtUtil.createAccessToken(userId);
+        }
         return UserSignupResult.of(userId, accessToken);
     }
 }

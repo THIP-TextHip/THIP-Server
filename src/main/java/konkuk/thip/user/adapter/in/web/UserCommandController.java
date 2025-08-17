@@ -40,7 +40,6 @@ public class UserCommandController {
     @PostMapping("/users/signup")
     public BaseResponse<UserSignupResponse> signup(
             @Valid @RequestBody final UserSignupRequest request,
-            @RequestParam(required = false, defaultValue = "true") final boolean isTokenRequired,
             @Parameter(hidden = true) @Oauth2Id final String oauth2Id
     ) {
         return BaseResponse.ok(
