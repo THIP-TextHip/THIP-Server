@@ -9,6 +9,7 @@ public record FeedShowSingleResponse(
         String aliasColor,
         String postDate,
         String bookTitle,
+        String bookImageUrl,
         String isbn,
         String bookAuthor,
         String contentBody,
@@ -18,6 +19,7 @@ public record FeedShowSingleResponse(
         boolean isSaved,
         boolean isLiked,
         boolean isWriter,
-        String[] tagList
+        String[] tagList,
+        boolean isPublic
 ) {
 }
