@@ -15,6 +15,7 @@ import konkuk.thip.common.security.oauth2.auth.dto.AuthTokenResponse;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,9 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     private final LoginTokenStorage loginTokenStorage;
+
+    @Value("${server.profile}")
+    private String profile;
 
     @Operation(
             summary = "소셜 로그인 유저 확인",
@@ -129,7 +133,7 @@ public class AuthController {
         if (entry.getType() == ACCESS) {
             cookie = ResponseCookie.from(COOKIE_ACCESS_TOKEN.getValue(), entry.getToken())
                     .httpOnly(true)
-                    .secure(true)
+                    .secure(profile.equals("prod"))
                     .sameSite("None")
                     .path("/")
                     .maxAge(Duration.ofDays(30))
@@ -138,7 +142,7 @@ public class AuthController {
         } else {
             cookie = ResponseCookie.from(COOKIE_TEMP_TOKEN.getValue(), entry.getToken())
                     .httpOnly(true)
-                    .secure(true)
+                    .secure(profile.equals("prod"))
                     .sameSite("None")
                     .path("/")
                     .maxAge(Duration.ofMinutes(10))
@@ -188,7 +192,7 @@ public class AuthController {
         // 4) tempToken 삭제 + access_token 설정
         ResponseCookie deleteSignup = ResponseCookie.from(COOKIE_TEMP_TOKEN.getValue(), "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(profile.equals("prod"))
                 .sameSite("None")
                 .path("/")
                 .maxAge(0)
@@ -196,7 +200,7 @@ public class AuthController {
 
         ResponseCookie accessCookie = ResponseCookie.from(COOKIE_ACCESS_TOKEN.getValue(), accessToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(profile.equals("prod"))
                 .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ofDays(30))
