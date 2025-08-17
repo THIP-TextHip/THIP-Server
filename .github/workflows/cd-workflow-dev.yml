@@ -77,4 +77,4 @@ jobs:
             
             echo "🌱 Starting new container"
             sudo docker-compose up -d
-            sudo docker image prune -f
+            sudo docker image prune -a -f
