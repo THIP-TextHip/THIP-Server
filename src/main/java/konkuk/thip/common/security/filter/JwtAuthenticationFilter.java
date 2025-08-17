@@ -96,11 +96,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/api-docs")
+                || path.startsWith("/actuator/health")
                 || path.startsWith("/oauth2/authorization")
                 || path.startsWith("/login/oauth2/code")
-                || path.startsWith("/oauth2/users")
+                || path.startsWith("/auth/users")
+                || path.equals("/auth/set-cookie")
+                || path.equals("/auth/exchange-temp-token")
+
+                || path.equals("/auth/token")
                 || path.equals("/api/set-cookie")
-//                || path.equals("/api/exchange-temp-token")
                 ;
     }
 

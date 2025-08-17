@@ -1,10 +1,13 @@
 package konkuk.thip.user.application.service;
 
+import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
 import konkuk.thip.user.application.port.in.dto.UserSignupCommand;
 import konkuk.thip.user.application.port.in.dto.UserSignupResult;
 import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import static konkuk.thip.user.adapter.out.jpa.UserRole.USER;
 public class UserSignupService implements UserSignupUseCase {
 
     private final UserCommandPort userCommandPort;
+    private final UserQueryPort userQueryPort;
 
     private final JwtUtil jwtUtil;
 
@@ -29,9 +33,15 @@ public class UserSignupService implements UserSignupUseCase {
         User user = User.withoutId(
                 command.nickname(), USER.getType(), command.oauth2Id(), alias
         );
+
+        // 이미 가입된 사용자인지 확인
+        boolean isExistedUser = userQueryPort.existsByOauth2Id(command.oauth2Id());
+        if (isExistedUser) {
+            throw new BusinessException(ErrorCode.USER_ALREADY_SIGNED_UP);
+        }
+
         Long userId = userCommandPort.save(user);
         String accessToken = jwtUtil.createAccessToken(userId);
-
         return UserSignupResult.of(userId, accessToken);
     }
 }

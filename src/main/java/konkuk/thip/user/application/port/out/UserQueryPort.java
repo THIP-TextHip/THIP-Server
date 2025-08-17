@@ -14,6 +14,8 @@ public interface UserQueryPort {
 
     boolean existsByNicknameAndUserIdNot(String nickname, Long userId);
 
+    boolean existsByOauth2Id(String oauth2Id);
+
     Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId);
 
     UserViewAliasChoiceResult getAllAliasesAndCategories();

@@ -2,7 +2,7 @@ package konkuk.thip.config;
 
 import jakarta.annotation.PostConstruct;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.ymlProperties.AwsS3Properties;
+import konkuk.thip.config.properties.AwsS3Properties;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.domain.Alias;
 import lombok.RequiredArgsConstructor;

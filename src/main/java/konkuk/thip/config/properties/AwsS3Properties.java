@@ -1,4 +1,4 @@
-package konkuk.thip.common.ymlProperties;
+package konkuk.thip.config.properties;
 
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
