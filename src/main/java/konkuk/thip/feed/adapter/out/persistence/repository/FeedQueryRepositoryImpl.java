@@ -383,4 +383,20 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .and(feed.userJpaEntity.userId.ne(userId))
                 .and(feed.isPublic.eq(true));
     }
+
+    @Override
+    public List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size) {
+        return jpaQueryFactory
+                .select(feed.userJpaEntity.userId)
+                .from(feed)
+                .where(
+                        feed.userJpaEntity.userId.in(userIds),
+                        feed.isPublic.isTrue(),
+                        feed.status.eq(StatusType.ACTIVE)
+                )
+                .groupBy(feed.userJpaEntity.userId)
+                .orderBy(feed.createdAt.max().desc())
+                .limit(size)
+                .fetch();
+    }
 }

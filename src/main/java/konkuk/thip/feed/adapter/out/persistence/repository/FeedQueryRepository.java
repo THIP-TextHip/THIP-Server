@@ -23,4 +23,6 @@ public interface FeedQueryRepository {
     List<FeedQueryDto> findFeedsByBookIsbnOrderByLikeCount(String isbn, Long userId, LocalDateTime lastCreatedAt, Integer lastLikeCount, int size);
 
     List<FeedQueryDto> findFeedsByBookIsbnOrderByCreatedAt(String isbn, Long userId, LocalDateTime lastCreatedAt, int size);
+
+    List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size);
 }
