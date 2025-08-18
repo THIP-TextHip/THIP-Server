@@ -138,7 +138,7 @@ public class FeedQueryController {
 
     @Operation(
             summary = "저장한 피드 조회",
-            description = "사용자가 저장한 피드를 조회 합니다."
+            description = "사용자가 저장한 피드를 조회합니다."
     )
     @GetMapping("/feeds/saved")
     public BaseResponse<FeedShowSavedListResponse> showSavedFeedList(
