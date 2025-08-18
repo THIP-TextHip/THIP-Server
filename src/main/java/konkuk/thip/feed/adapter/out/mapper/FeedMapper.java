@@ -16,8 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedMapper {
 
-    private final ContentMapper contentMapper;
-
     public FeedJpaEntity toJpaEntity(Feed feed, UserJpaEntity userJpaEntity, BookJpaEntity bookJpaEntity) {
         return FeedJpaEntity.builder()
                 .content(feed.getContent())

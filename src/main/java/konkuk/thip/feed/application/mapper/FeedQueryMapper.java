@@ -3,13 +3,13 @@ package konkuk.thip.feed.application.mapper;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.feed.adapter.in.web.response.*;
-import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
+import konkuk.thip.feed.application.port.in.dto.TagsWithCategoryResult;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
-import konkuk.thip.feed.domain.Content;
+import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.user.domain.Alias;
-import konkuk.thip.feed.application.port.in.dto.TagsWithCategoryResult;
 import konkuk.thip.user.domain.User;
 import org.mapstruct.*;
 
@@ -105,9 +105,9 @@ public interface FeedQueryMapper {
     FeedShowSingleResponse toFeedShowSingleResponse(Feed feed, User feedCreator, Book book, boolean isSaved, boolean isLiked, @Context Long userId);
 
     @Named("mapContentList")
-    default String[] mapContentList(List<Content> contentList) {
+    default String[] mapContentList(ContentList contentList) {
         if (contentList == null) return new String[0];
-        return contentList.stream().map(Content::getContentUrl).toArray(String[]::new);
+        return contentList.toArray(String[]::new);
     }
 
     @Named("mapTagList")
