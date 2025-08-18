@@ -22,7 +22,8 @@ public record FeedQueryDto(
         Integer likeCount,
         Integer commentCount,
         boolean isPublic,
-        @Nullable Boolean isPriorityFeed
+        @Nullable Boolean isPriorityFeed,
+        @Nullable LocalDateTime savedCreatedAt
 ) {
     @QueryProjection
     public FeedQueryDto(
@@ -40,7 +41,8 @@ public record FeedQueryDto(
             Integer likeCount,
             Integer commentCount,
             Boolean isPublic,
-            @Nullable Boolean isPriorityFeed
+            @Nullable Boolean isPriorityFeed,
+            @Nullable LocalDateTime savedCreatedAt
     ) {
         this(
                 feedId,
@@ -57,7 +59,8 @@ public record FeedQueryDto(
                 likeCount == null ? 0 : likeCount,
                 commentCount == null ? 0 : commentCount,
                 isPublic,
-                isPriorityFeed
+                isPriorityFeed,
+                savedCreatedAt
         );
     }
 

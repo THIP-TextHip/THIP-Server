@@ -38,6 +38,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private final QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
+    private final QSavedFeedJpaEntity savedFeed = QSavedFeedJpaEntity.savedFeedJpaEntity;
 
     @Override
     public Set<Long> findUserIdsByBookId(Long bookId) {
@@ -364,6 +365,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 feed.likeCount,
                 feed.commentCount,
                 feed.isPublic,
+                Expressions.nullExpression(),
                 Expressions.nullExpression()
         );
     }
@@ -398,5 +400,59 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .orderBy(feed.createdAt.max().desc())
                 .limit(size)
                 .fetch();
+    }
+
+    @Override
+    public List<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, LocalDateTime lastSavedAt, int size) {
+
+        BooleanExpression where = savedFeed.userJpaEntity.userId.eq(userId)
+                .and(savedFeed.feedJpaEntity.status.eq(StatusType.ACTIVE))
+                .and(
+                        savedFeed.feedJpaEntity.userJpaEntity.userId.eq(userId)
+                                .or(savedFeed.feedJpaEntity.isPublic.eq(true))
+                );
+
+        if (lastSavedAt != null) {
+            where = where.and(savedFeed.createdAt.lt(lastSavedAt));
+        }
+
+        return jpaQueryFactory
+                .select(toSavedFeedQueryDto())
+                .from(savedFeed)
+                .join(savedFeed.feedJpaEntity, feed)
+                .join(feed.userJpaEntity, user)
+                .join(feed.bookJpaEntity, book)
+                .where(where)
+                .orderBy(savedFeed.createdAt.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    /**
+     * SavedFeed 전용 DTO 매핑
+     */
+    private QFeedQueryDto toSavedFeedQueryDto() {
+        return new QFeedQueryDto(
+                feed.postId,
+                feed.userJpaEntity.userId,
+                user.nickname,
+                user.aliasForUserJpaEntity.imageUrl,
+                user.aliasForUserJpaEntity.value,
+                feed.createdAt,
+                book.isbn,
+                book.title,
+                book.authorName,
+                feed.content,
+                // Content는 N:1 방지 위해 서브쿼리 사용
+                JPAExpressions
+                        .select(contentUrlAggExpr())
+                        .from(content)
+                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.likeCount,
+                feed.commentCount,
+                feed.isPublic,
+                Expressions.nullExpression(),
+                savedFeed.createdAt
+        );
     }
 }
