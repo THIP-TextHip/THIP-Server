@@ -25,4 +25,6 @@ public interface FeedQueryRepository {
     List<FeedQueryDto> findFeedsByBookIsbnOrderByCreatedAt(String isbn, Long userId, LocalDateTime lastCreatedAt, int size);
 
     List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size);
+
+    List<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size);
 }
