@@ -5,10 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import konkuk.thip.book.adapter.in.web.response.*;
-import konkuk.thip.book.application.port.in.BookMostSearchUseCase;
-import konkuk.thip.book.application.port.in.BookRecruitingRoomsUseCase;
-import konkuk.thip.book.application.port.in.BookSearchUseCase;
-import konkuk.thip.book.application.port.in.BookSelectableListUseCase;
+import konkuk.thip.book.application.port.in.*;
 import konkuk.thip.book.application.port.in.dto.BookSelectableType;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
@@ -32,6 +29,7 @@ public class BookQueryController {
     private final BookMostSearchUseCase bookMostSearchUseCase;
     private final BookRecruitingRoomsUseCase bookRecruitingRoomsUseCase;
     private final BookSelectableListUseCase bookSelectableListUseCase;
+    private final BookShowSavedListUseCase bookShowSavedListUseCase;
 
     @Operation(
             summary = "책 검색결과 조회",
@@ -101,6 +99,15 @@ public class BookQueryController {
         return BaseResponse.ok(
                 BookSelectableListResponse.of(bookSelectableListUseCase.getSelectableBookList(BookSelectableType.from(type), userId))
         );
+    }
+
+    @Operation(
+            summary = "저장한 책 조회",
+            description = "사용자가 저장한 책을 조회 합니다."
+    )
+    @GetMapping("/books/saved")
+    public BaseResponse<BookShowSavedListResponse> showSavedBookList(@Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(BookShowSavedListResponse.of(bookShowSavedListUseCase.getSavedBookList(userId)));
     }
 
 }

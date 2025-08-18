@@ -174,4 +174,14 @@ public interface FeedQueryMapper {
                 .collect(Collectors.toList());
     }
 
+    @Mapping(target = "aliasName", source = "dto.alias")
+    @Mapping(target = "aliasColor", expression = "java(Alias.from(dto.alias()).getColor())")
+    @Mapping(target = "isSaved",  constant = "true")
+    @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
+    @Mapping(
+            target = "postDate",
+            expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))"
+    )
+    @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
+    FeedShowSavedListResponse.FeedShowSavedInfoDto toFeedShowSavedListResponse(FeedQueryDto dto, Set<Long> likedFeedIds, @Context Long userId);
 }

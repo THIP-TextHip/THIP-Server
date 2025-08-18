@@ -37,8 +37,8 @@ public interface FeedQueryPort {
      */
 
     Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId);
-
      boolean existsSavedFeedByUserIdAndFeedId(Long userId, Long feedId);
+    CursorBasedList<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, Cursor cursor);
 
     /**
      * 특정 책으로 작성된 피드 조회
