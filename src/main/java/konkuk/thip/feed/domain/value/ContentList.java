@@ -1,8 +1,12 @@
 package konkuk.thip.feed.domain.value;
 
+import konkuk.thip.common.exception.InvalidStateException;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
+
+import static konkuk.thip.common.exception.code.ErrorCode.CONTENT_LIST_SIZE_OVERFLOW;
 
 public final class ContentList extends AbstractList<String> implements Serializable {
 
@@ -35,7 +39,7 @@ public final class ContentList extends AbstractList<String> implements Serializa
 
     private void validate() {
         if (contents.size() > maxSize) {
-            throw new IllegalArgumentException("content url 개수가 최대 허용치를 초과했습니다 size=" + contents.size() + " max=" + maxSize);
+            throw new InvalidStateException(CONTENT_LIST_SIZE_OVERFLOW);
         }
         //todo 필요 시 URL 형식 검증 추가 가능
     }
