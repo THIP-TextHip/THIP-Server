@@ -2,6 +2,7 @@ package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.domain.service.PostCountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,11 +36,7 @@ class FeedTest {
                 .content("공개 피드 입니다.")
                 .isPublic(true)
                 .tagList(List.of(Tag.from(KOREAN_NOVEL.getValue())))
-                .contentList(List.of(Content.builder()
-                                        .contentUrl("url1")
-                                        .targetPostId(100L).build()
-
-                ))
+                .contentList(ContentList.of(List.of("url1")))
                 .commentCount(1)
                 .build();
     }
@@ -87,20 +84,6 @@ class FeedTest {
         assertEquals(INVALID_FEED_COMMAND, ex.getErrorCode());
         assertTrue(ex.getCause().getMessage().contains("중복"));
     }
-
-
-    @Test
-    @DisplayName("validateImageCount: 3개 초과 이미지 업로드 시 InvalidStateException이 발생한다.")
-    void validateImageCount_exceedsMax_throws() {
-        int imageCount = 4;
-
-        InvalidStateException ex = assertThrows(InvalidStateException.class,
-                () -> Feed.validateImageCount(imageCount));
-
-        assertEquals(INVALID_FEED_COMMAND,  ex.getErrorCode());
-        assertTrue(ex.getCause().getMessage().contains("최대 3개"));
-    }
-
 
     @Test
     @DisplayName("validateCreateComment: 공개 피드면 누구나 댓글을 작성 할 수 있다")
@@ -273,7 +256,7 @@ class FeedTest {
                 .isPublic(isPublic)
                 .targetBookId(100L)
                 .tagList(Collections.emptyList())
-                .contentList(Collections.emptyList())
+                .contentList(ContentList.empty())
                 .build();
     }
 
