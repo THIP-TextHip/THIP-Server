@@ -41,7 +41,7 @@ public class FeedShowSavedListService implements FeedSavedListUseCase {
         Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
 
         // 4. response 로의 매핑
-        List<FeedShowSavedListResponse.FeedShowSavedInfoDto> feedList = result.contents().stream()
+        var feedList = result.contents().stream()
                 .map(dto -> feedQueryMapper.toFeedShowSavedListResponse(dto, likedFeedIdsByUser, userId))
                 .toList();
 
