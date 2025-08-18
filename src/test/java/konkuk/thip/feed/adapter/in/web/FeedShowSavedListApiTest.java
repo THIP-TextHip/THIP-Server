@@ -88,11 +88,10 @@ class FeedShowSavedListApiTest {
 
         // flush 후 feed 저장일자 덮어쓰기
         // feed 저장 순서 : f2 -> f1 (f1 이 가장 최신)
-        feedJpaRepository.flush();
         savedFeedJpaRepository.flush();
         jdbcTemplate.update("UPDATE saved_feeds SET created_at = ? WHERE saved_id = ?",
                 Timestamp.valueOf(baseTime.minusMinutes(1)), sf1.getSavedId());
-        jdbcTemplate.update("UPDATE saved_feeds SET created_at = ? WHERE post_id = ?",
+        jdbcTemplate.update("UPDATE saved_feeds SET created_at = ? WHERE saved_id = ?",
                 Timestamp.valueOf(baseTime.minusMinutes(10)), sf2.getSavedId());
 
         // when & then
