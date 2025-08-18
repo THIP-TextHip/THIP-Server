@@ -80,7 +80,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환
         return ordered.stream()
-                .map(e -> toDto(e, priorityMap.get(e.getPostId()),null))
+                .map(e -> toDto(e, priorityMap.get(e.getPostId())))
                 .toList();
     }
 
@@ -102,7 +102,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> toDto(e, null,null))
+                .map(e -> toDto(e, null))
                 .toList();
     }
 
@@ -193,7 +193,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> toDto(e, null, null))
+                .map(e -> toDto(e, null))
                 .toList();
     }
 
@@ -212,7 +212,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
         // 3) DTO 변환 (priority 없음)
         return ordered.stream()
-                .map(e -> toDto(e, null, null))
+                .map(e -> toDto(e, null))
                 .toList();
     }
 
@@ -259,7 +259,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .fetch();
     }
 
-    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority, LocalDateTime savedCreatedAt) {
+    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority) {
         String[] urls = e.getContentList().stream()
                 .map(ContentJpaEntity::getContentUrl)
                 .toArray(String[]::new);
@@ -281,7 +281,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .commentCount(e.getCommentCount())
                 .isPublic(e.getIsPublic())
                 .isPriorityFeed(isPriorityFeed)
-                .savedCreatedAt(savedCreatedAt)
                 .build();
     }
 
@@ -406,37 +405,54 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     @Override
     public List<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, LocalDateTime lastSavedAt, int size) {
 
-        // 1. SavedFeed를 한 번에 페이징 조회하며 feed와 연관 엔티티 fetch join
-        List<SavedFeedJpaEntity> savedFeeds = getSavedFeedJpaEntities(userId, lastSavedAt, size);
-        if (savedFeeds.isEmpty()) {
-            return List.of();
+        BooleanExpression where = savedFeed.userJpaEntity.userId.eq(userId)
+                .and(savedFeed.feedJpaEntity.status.eq(StatusType.ACTIVE))
+                .and(
+                        savedFeed.feedJpaEntity.userJpaEntity.userId.eq(userId)
+                                .or(savedFeed.feedJpaEntity.isPublic.eq(true))
+                );
+
+        if (lastSavedAt != null) {
+            where = where.and(savedFeed.createdAt.lt(lastSavedAt));
         }
 
-        // 2. 저장순대로 FeedQueryDto 변환 (Feed 및 savedCreatedAt 정보 포함)
-        return savedFeeds.stream()
-                .map(saved -> toDto(saved.getFeedJpaEntity(), null, saved.getCreatedAt()))
-                .collect(Collectors.toList());
-    }
-
-    private List<SavedFeedJpaEntity> getSavedFeedJpaEntities(Long userId, LocalDateTime lastSavedAt, int size) {
-        List<SavedFeedJpaEntity> savedFeeds = jpaQueryFactory
-                .select(savedFeed).distinct()
+        return jpaQueryFactory
+                .select(toSavedFeedQueryDto())
                 .from(savedFeed)
-                .leftJoin(savedFeed.feedJpaEntity, feed).fetchJoin()
-                .leftJoin(feed.contentList, content).fetchJoin()
-                .leftJoin(feed.userJpaEntity, user).fetchJoin()
-                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
-                .leftJoin(feed.bookJpaEntity, book).fetchJoin()
-                .where(
-                        savedFeed.userJpaEntity.userId.eq(userId),
-                        savedFeed.feedJpaEntity.status.eq(StatusType.ACTIVE),
-                        savedFeed.feedJpaEntity.userJpaEntity.userId.eq(userId)
-                                .or(savedFeed.feedJpaEntity.isPublic.eq(true)),
-                        lastSavedAt != null ? savedFeed.createdAt.lt(lastSavedAt) : Expressions.TRUE
-                )
+                .join(savedFeed.feedJpaEntity, feed)
+                .join(feed.userJpaEntity, user)
+                .join(feed.bookJpaEntity, book)
+                .where(where)
                 .orderBy(savedFeed.createdAt.desc())
                 .limit(size + 1)
                 .fetch();
-        return savedFeeds;
+    }
+
+    /**
+     * SavedFeed 전용 DTO 매핑
+     */
+    private QFeedQueryDto toSavedFeedQueryDto() {
+        return new QFeedQueryDto(
+                feed.postId,
+                feed.userJpaEntity.userId,
+                user.nickname,
+                user.aliasForUserJpaEntity.imageUrl,
+                user.aliasForUserJpaEntity.value,
+                feed.createdAt,
+                book.isbn,
+                book.title,
+                book.authorName,
+                feed.content,
+                // Content는 N:1 방지 위해 서브쿼리 사용
+                JPAExpressions
+                        .select(contentUrlAggExpr())
+                        .from(content)
+                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.likeCount,
+                feed.commentCount,
+                feed.isPublic,
+                Expressions.nullExpression(),
+                savedFeed.createdAt
+        );
     }
 }
