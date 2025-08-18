@@ -406,55 +406,36 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     @Override
     public List<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, LocalDateTime lastSavedAt, int size) {
 
-        // 1. 저장한 SavedFeed의 ID(PK) 목록 & 최신순 커서 페이징
-        List<Long> savedFeedIds = fetchSavedFeedIdsLatest(userId, lastSavedAt, size);
-        if (savedFeedIds.isEmpty()) {
+        // 1. SavedFeed를 한 번에 페이징 조회하며 feed와 연관 엔티티 fetch join
+        List<SavedFeedJpaEntity> savedFeeds = getSavedFeedJpaEntities(userId, lastSavedAt, size);
+        if (savedFeeds.isEmpty()) {
             return List.of();
         }
 
-        // 2. 저장한 SavedFeed를 가져오면서 Feed와 연관 엔티티를 fetch join
-        List<SavedFeedJpaEntity> savedEntities = fetchSavedFeedEntitiesByIds(savedFeedIds,userId);
-
-        // 3. SavedFeed ID 역순 정렬(커서 페이징 기준에 맞게)
-        Map<Long, SavedFeedJpaEntity> entityMap = savedEntities.stream()
-                .collect(Collectors.toMap(SavedFeedJpaEntity::getSavedId, e -> e));
-
-        // 4. SavedFeed ID 순서대로 FeedQueryDto 생성 (Feed와 저장 시각 함께 전달)
-        return savedFeedIds.stream()
-                .map(id -> {
-                    SavedFeedJpaEntity saved = entityMap.get(id);
-                    return toDto(saved.getFeedJpaEntity(),null, saved.getCreatedAt());
-                })
+        // 2. 저장순대로 FeedQueryDto 변환 (Feed 및 savedCreatedAt 정보 포함)
+        return savedFeeds.stream()
+                .map(saved -> toDto(saved.getFeedJpaEntity(), null, saved.getCreatedAt()))
                 .collect(Collectors.toList());
     }
 
-    private List<Long> fetchSavedFeedIdsLatest(Long userId, LocalDateTime lastCreatedAt, int size) {
-        return jpaQueryFactory
-                .select(savedFeed.savedId)
-                .from(savedFeed)
-                .where(
-                        savedFeed.userJpaEntity.userId.eq(userId),
-                        lastCreatedAt != null ? savedFeed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
-                )
-                .orderBy(savedFeed.createdAt.desc())
-                .limit(size + 1)
-                .fetch();
-    }
-
-    private List<SavedFeedJpaEntity> fetchSavedFeedEntitiesByIds(List<Long> ids, Long userId) {
-        return jpaQueryFactory
-                .select(savedFeed).distinct()
-                .from(savedFeed)
+    private List<SavedFeedJpaEntity> getSavedFeedJpaEntities(Long userId, LocalDateTime lastSavedAt, int size) {
+        List<SavedFeedJpaEntity> savedFeeds = jpaQueryFactory
+                .selectFrom(savedFeed)
                 .leftJoin(savedFeed.feedJpaEntity, feed).fetchJoin()
                 .leftJoin(feed.contentList, content).fetchJoin()
                 .leftJoin(feed.userJpaEntity, user).fetchJoin()
                 .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
                 .leftJoin(feed.bookJpaEntity, book).fetchJoin()
                 .where(
-                        savedFeed.savedId.in(ids),
-                        feed.status.eq(StatusType.ACTIVE),
-                        feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true))
+                        savedFeed.userJpaEntity.userId.eq(userId),
+                        savedFeed.feedJpaEntity.status.eq(StatusType.ACTIVE),
+                        savedFeed.feedJpaEntity.userJpaEntity.userId.eq(userId)
+                                .or(savedFeed.feedJpaEntity.isPublic.eq(true)),
+                        lastSavedAt != null ? savedFeed.createdAt.lt(lastSavedAt) : Expressions.TRUE
                 )
+                .orderBy(savedFeed.createdAt.desc())
+                .limit(size + 1)
                 .fetch();
+        return savedFeeds;
     }
 }
