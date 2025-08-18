@@ -184,7 +184,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .where(
                         room.categoryJpaEntity.value.eq(category)
                                 .and(room.startDate.after(LocalDate.now()))     // 모집 마감 시각 > 현재 시각
-                                .and(room.roomId.ne(roomId))       // 현재 방 제외
+                                .and(room.roomId.ne(roomId))// 현재 방 제외
+                                .and(room.isPublic.isTrue()) // 공개방 만
                 )
                 .groupBy(room.roomId, room.title, room.recruitCount, room.startDate)
                 .orderBy(room.startDate.asc())
@@ -413,7 +414,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
-                        cursorExpr
+                        cursorExpr,
+                        room.isPublic
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
