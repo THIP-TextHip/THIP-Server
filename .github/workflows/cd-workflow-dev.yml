@@ -68,7 +68,9 @@ jobs:
             cd ${{ env.COMPOSE_PATH }}
             
             echo "✋🏻Stopping existing container and Cleaning up old images"
-            sudo docker-compose down --rmi all
+#            sudo docker-compose down --rmi all
+            sudo docker-compose stop ${{ secrets.DOCKER_IMAGE }}
+            sudo docker rm -f ${{ secrets.DOCKER_IMAGE }}
             
             sudo docker ps -a
             
