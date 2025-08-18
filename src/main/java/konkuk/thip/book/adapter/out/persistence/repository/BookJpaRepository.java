@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface BookJpaRepository extends JpaRepository<BookJpaEntity, Long> {
     Optional<BookJpaEntity> findByIsbn(String isbn);
 
-    @Query("SELECT DISTINCT b FROM BookJpaEntity b " +
+    @Query("SELECT DISTINCT b, s.createdAt FROM BookJpaEntity b " +
             "JOIN SavedBookJpaEntity s ON s.bookJpaEntity.bookId = b.bookId " +
             "WHERE s.userJpaEntity.userId = :userId " +
             "ORDER BY s.createdAt DESC")
