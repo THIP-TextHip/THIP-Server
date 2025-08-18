@@ -162,6 +162,11 @@ public enum ErrorCode implements ResponseCode {
     FEED_CAN_NOT_SHOW_PRIVATE_ONE(HttpStatus.BAD_REQUEST, 160008, "비공개 피드는 피드 작성자 이외에는 조회할 수 없습니다."),
 
     /**
+     * 165000: ContentList error
+     */
+    CONTENT_LIST_SIZE_OVERFLOW(HttpStatus.BAD_REQUEST, 165000, "컨텐츠 리스트의 크기가 초과되었습니다. 최대 3개까지 가능합니다."),
+
+    /**
      * 170000 : Image File error
      */
     EMPTY_FILE_EXCEPTION(HttpStatus.BAD_REQUEST, 170001, "업로드하려는 이미지가 비어있습니다."),
