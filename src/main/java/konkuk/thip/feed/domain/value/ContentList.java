@@ -37,10 +37,14 @@ public final class ContentList extends AbstractList<String> implements Serializa
         return new ContentList(List.of(), DEFAULT_MAX_SIZE);
     }
 
-    private void validate() {
-        if (contents.size() > maxSize) {
+    public static void validateImageCount(int size) {
+        if (size > DEFAULT_MAX_SIZE) {
             throw new InvalidStateException(CONTENT_LIST_SIZE_OVERFLOW);
         }
+    }
+
+    private void validate() {
+        validateImageCount(contents.size());
         //todo 필요 시 URL 형식 검증 추가 가능
     }
 
