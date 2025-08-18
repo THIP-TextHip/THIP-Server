@@ -156,7 +156,6 @@ public enum ErrorCode implements ResponseCode {
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, 160002, "존재하지 않는 TAG 입니다."),
     INVALID_FEED_COMMAND(HttpStatus.BAD_REQUEST, 160003, "유효하지 않은 FEED 생성/수정 요청 입니다."),
     FEED_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 160004, "피드 접근 권한이 없습니다."),
-    DUPLICATED_FEEDS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 160005, "중복된 피드가 존재합니다."),
     FEED_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 160006, "사용자가 이미 저장한 피드입니다."),
     FEED_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 160007, "사용자가 저장하지 않은 피드는 저장삭제 할 수 없습니다."),
     FEED_CAN_NOT_SHOW_PRIVATE_ONE(HttpStatus.BAD_REQUEST, 160008, "비공개 피드는 피드 작성자 이외에는 조회할 수 없습니다."),
