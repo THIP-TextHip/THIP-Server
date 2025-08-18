@@ -4,7 +4,6 @@ import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
-import konkuk.thip.feed.domain.SavedFeeds;
 
 import java.util.List;
 import java.util.Set;
@@ -36,11 +35,10 @@ public interface FeedQueryPort {
     /**
      * 저장된 피드 조회
      */
-    SavedFeeds findSavedFeedsByUserId(Long userId);
 
     Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId);
 
-    List<TagCategoryQueryDto> findAllTags();
+     boolean existsSavedFeedByUserIdAndFeedId(Long userId, Long feedId);
 
     /**
      * 특정 책으로 작성된 피드 조회
@@ -50,4 +48,9 @@ public interface FeedQueryPort {
     CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLatest(String isbn, Long userId, Cursor cursor);
 
     List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size);
+
+    /**
+     * 모든 태그 조회
+     */
+    List<TagCategoryQueryDto> findAllTags();
 }
