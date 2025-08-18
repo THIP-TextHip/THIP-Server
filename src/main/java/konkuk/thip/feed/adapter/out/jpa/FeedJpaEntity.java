@@ -62,10 +62,7 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.reportCount = feed.getReportCount();
         this.likeCount = feed.getLikeCount();
         this.commentCount = feed.getCommentCount();
-    }
-
-    public void replaceContentUrls(List<String> urls) {
-        this.contentList = ContentList.of(urls);
+        this.contentList = feed.getContentList();
     }
 
     @VisibleForTesting
