@@ -8,7 +8,6 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepo
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
@@ -60,7 +59,6 @@ class FeedDeleteApiTest {
     @Autowired private CommentLikeJpaRepository commentLikeJpaRepository;
     @Autowired private TagJpaRepository tagJpaRepository;
     @Autowired private FeedTagJpaRepository feedTagJpaRepository;
-    @Autowired private ContentJpaRepository contentJpaRepository;
     @Autowired private PostLikeJpaRepository postLikeJpaRepository;
     @Autowired private SavedFeedJpaRepository savedFeedJpaRepository;
 
@@ -109,9 +107,6 @@ class FeedDeleteApiTest {
 
         // 2) 피드 태그 관계 삭제
         assertTrue(feedTagJpaRepository.findAll().isEmpty());
-
-        // 3) 콘텐츠 삭제
-        assertTrue(contentJpaRepository.findAll().isEmpty());
 
         // 4) 댓글 삭제 soft delete
         assertThat(commentJpaRepository.findById(comment.getCommentId())).isPresent();
