@@ -420,7 +420,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
     private List<SavedFeedJpaEntity> getSavedFeedJpaEntities(Long userId, LocalDateTime lastSavedAt, int size) {
         List<SavedFeedJpaEntity> savedFeeds = jpaQueryFactory
-                .selectFrom(savedFeed)
+                .select(savedFeed).distinct()
+                .from(savedFeed)
                 .leftJoin(savedFeed.feedJpaEntity, feed).fetchJoin()
                 .leftJoin(feed.contentList, content).fetchJoin()
                 .leftJoin(feed.userJpaEntity, user).fetchJoin()
