@@ -18,7 +18,8 @@ public record BookRecruitingRoomsResponse(
             String roomName,
             int memberCount,
             int recruitCount,
-            String deadlineEndDate
+            String deadlineEndDate,
+            boolean isPublic
     ) {
     }
 }
