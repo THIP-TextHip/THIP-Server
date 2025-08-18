@@ -2,6 +2,7 @@ package konkuk.thip.book.application.mapper;
 
 import konkuk.thip.book.adapter.in.web.response.BookRecruitingRoomsResponse;
 import konkuk.thip.book.application.port.in.dto.BookSelectableResult;
+import konkuk.thip.book.application.port.in.dto.BookShowSavedInfoResult;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
@@ -35,4 +36,16 @@ public interface BookQueryMapper {
     BookSelectableResult toBookSelectableResult(Book book);
 
     List<BookSelectableResult> toBookSelectableResultList(List<Book> books);
+
+
+    @Mapping(target = "bookId", source = "book.id")
+    @Mapping(target = "bookTitle", source = "book.title")
+    @Mapping(target = "authorName", source = "book.authorName")
+    @Mapping(target = "publisher", source = "book.publisher")
+    @Mapping(target = "bookImageUrl", source = "book.imageUrl")
+    @Mapping(target = "isbn", source = "book.isbn")
+    @Mapping(target = "isSaved", constant = "true")
+    BookShowSavedInfoResult toBookShowSavedInfoResult(Book book);
+
+    List<BookShowSavedInfoResult> toBookShowSavedInfoResultList(List<Book> savedBookList);
 }
