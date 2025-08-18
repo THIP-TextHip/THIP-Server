@@ -3,13 +3,13 @@ package konkuk.thip.feed.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.service.PostCountService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -43,7 +43,7 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     private List<Tag> tagList;
 
     @Builder.Default
-    private List<Content> contentList = new ArrayList<>();
+    private ContentList contentList = ContentList.empty();
 
     @Override
     public boolean equals(Object o) {
@@ -62,7 +62,7 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
                                  List<String> tagValues, List<String> imageUrls) {
 
         validateTags(tagValues);
-        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
+//        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
 
         return Feed.builder()
                 .id(null)
@@ -78,12 +78,9 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
                 .build();
     }
 
-    private static List<Content> convertToContentList(List<String> imageUrls) {
-        if (imageUrls == null) return new ArrayList<>();
-        return imageUrls.stream()
-                .filter(url -> url != null && !url.isBlank())
-                .map(url -> Content.builder().contentUrl(url).build())
-                .collect(Collectors.toList());
+    private static ContentList convertToContentList(List<String> imageUrls) {
+        if (imageUrls == null) return ContentList.empty();
+        return ContentList.of(imageUrls);
     }
 
     public static void validateTags(List<String> tagList) {
@@ -102,12 +99,12 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
             }
         }
     }
-
-    public static void validateImageCount(int imageSize) {
-        if (imageSize > 3) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
-        }
-    }
+//
+//    public static void validateImageCount(int imageSize) {
+//        if (imageSize > 3) {
+//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
+//        }
+//    }
 
     // 공통된 비공개 접근 권한 검증 로직
     private void validatePrivateAccessPermission(Long userId, String action) {
@@ -155,15 +152,14 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     public void updateImages(Long userId, List<String> newImageUrls) {
         validateCreator(userId);
-        validateImageCount(newImageUrls.size());
+//        validateImageCount(newImageUrls.size());
         validateOwnsImages(newImageUrls);
 
         this.contentList = convertToContentList(newImageUrls);
     }
 
     public void validateOwnsImages(List<String> candidateImageUrls) {
-        Set<String> myImageUrls = this.getContentList().stream()
-                .map(Content::getContentUrl)
+        Set<String> myImageUrls = contentList.stream()
                 .filter(url -> url != null && !url.isBlank())
                 .collect(Collectors.toSet());
         for (String url : candidateImageUrls) {
