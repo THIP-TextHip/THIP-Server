@@ -31,6 +31,7 @@ public class FeedQueryController {
     private final FeedShowSingleUseCase feedShowSingleUseCase;
     private final FeedShowWriteInfoUseCase feedShowWriteInfoUseCase;
     private final FeedRelatedWithBookUseCase feedRelatedWithBookUseCase;
+    private final FeedSavedListUseCase feedSavedListUseCase;
 
     @Operation(
             summary = "피드 전체 조회",
@@ -134,4 +135,18 @@ public class FeedQueryController {
                 .build())
         );
     }
+
+    @Operation(
+            summary = "저장한 피드 조회",
+            description = "사용자가 저장한 피드를 조회 합니다."
+    )
+    @GetMapping("/feeds/saved")
+    public BaseResponse<FeedShowSavedListResponse> showSavedFeedList(
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(required = false) final String cursor,
+            @Parameter(hidden = true) @UserId final Long userId
+    ) {
+        return BaseResponse.ok(feedSavedListUseCase.getSavedFeedList(userId,cursor));
+    }
+
 }
