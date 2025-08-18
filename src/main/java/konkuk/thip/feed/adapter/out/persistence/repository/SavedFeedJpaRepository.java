@@ -27,5 +27,5 @@ public interface SavedFeedJpaRepository extends JpaRepository<SavedFeedJpaEntity
 
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM SavedFeedJpaEntity s " +
             "WHERE s.userJpaEntity.userId = :userId AND s.feedJpaEntity.postId = :feedId")
-    boolean existsByUserIdAndFeedId(Long userId, Long feedId);
+    boolean existsByUserIdAndFeedId(@Param("userId") Long userId, @Param("feedId") Long feedId);
 }
