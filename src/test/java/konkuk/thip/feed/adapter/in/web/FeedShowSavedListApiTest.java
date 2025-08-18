@@ -229,85 +229,85 @@ class FeedShowSavedListApiTest {
                 .andExpect(jsonPath("$.data.feedList[1].feedId", is(feeds[11].getPostId().intValue())));
     }
 
-    @Test
-    @DisplayName("[깨짐 재현] 최신 저장 피드에 contents가 많으면 첫 페이지 결과 개수가 10개보다 적게 반환된다")
-    void saved_feed_paging_breaks_with_many_contents() throws Exception {
-        // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(alias, "me"));
-        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
-
-        LocalDateTime baseTime = LocalDateTime.now();
-
-        // 피드 12개 생성. 가장 최신(f0)과 그 다음(f1, f2)에 많은 contents 부여 → row 폭발 유도
-        FeedJpaEntity[] feeds = new FeedJpaEntity[12];
-        SavedFeedJpaEntity[] savedFeeds = new SavedFeedJpaEntity[12];
-
-        for (int i = 0; i < 12; i++) {
-            List<String> contentUrls;
-            if (i == 0) {
-                // 최신 저장된 피드: 컨텐츠 3개
-                contentUrls = java.util.stream.IntStream.range(0, 3)
-                        .mapToObj(n -> "url_f0_" + n)
-                        .toList();
-            } else if (i == 1) {
-                // 두 번째: 컨텐츠 3개
-                contentUrls = java.util.stream.IntStream.range(0, 3)
-                        .mapToObj(n -> "url_f1_" + n)
-                        .toList();
-            } else if (i == 2) {
-                // 세 번째: 컨텐츠 2개
-                contentUrls = java.util.stream.IntStream.range(0, 2)
-                        .mapToObj(n -> "url_f2_" + n)
-                        .toList();
-            } else {
-                // 나머지: 컨텐츠 0개
-                contentUrls = List.of();
-            }
-
-            FeedJpaEntity feed = feedJpaRepository.save(
-                    TestEntityFactory.createFeed(
-                            me,                       // 작성자: me (가시성 조건 단순화)
-                            book,
-                            true,                     // 공개
-                            10 + i,                   // likeCount
-                            5 + i,                    // commentCount
-                            contentUrls
-                    )
-            );
-            feeds[i] = feed;
-
-            SavedFeedJpaEntity saved = savedFeedJpaRepository.save(
-                    SavedFeedJpaEntity.builder()
-                            .userJpaEntity(me)
-                            .feedJpaEntity(feed)
-                            .build()
-            );
-            savedFeeds[i] = saved;
-        }
-        savedFeedJpaRepository.flush();
-
-        // created_at 덮어쓰기: i가 작을수록 더 최신 (f0가 가장 최신)
-        for (int i = 0; i < 12; i++) {
-            jdbcTemplate.update("UPDATE saved_feeds SET created_at = ? WHERE saved_id = ?",
-                    Timestamp.valueOf(baseTime.minusMinutes(i)), savedFeeds[i].getSavedId());
-        }
-
-        // when & then
-        mockMvc.perform(get("/feeds/saved")
-                        .requestAttr("userId", me.getUserId()))
-                .andExpect(status().isOk())
-                // ⚠️ 현재 구현(컬렉션 fetch join + limit)에서는 행 기준으로 잘려 루트 엔티티 개수가 모자라게 반환됨
-                .andExpect(jsonPath("$.data.feedList", hasSize(10)))    // 총 응답개수는 10개가 맞음
-                .andExpect(result -> {
-                    String body = result.getResponse().getContentAsString();
-                    // com.jayway.jsonpath.JsonPath 사용 (spring-boot-starter-test에 포함)
-                    List<Integer> ids = com.jayway.jsonpath.JsonPath.read(body, "$.data.feedList[*].feedId");
-                    Set<Integer> distinct = new HashSet<>(ids);
-                    // 중복이 있음을 기대(= 실패를 통해 버그 재현). 만약 여기서 실패하면 중복이 안 나온 것.
-                    assertThat(distinct.size())
-                            .as("feedId가 중복 없이 10개 모두 달라야 하지만, 1:N 조인으로 인해 중복이 발생해야 합니다.")
-                            .isLessThan(ids.size());
-                });
-    }
+//    @Test
+//    @DisplayName("[깨짐 재현] 최신 저장 피드에 contents가 많으면 첫 페이지 결과 개수가 10개보다 적게 반환된다")
+//    void saved_feed_paging_breaks_with_many_contents() throws Exception {
+//        // given
+//        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+//        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(alias, "me"));
+//        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
+//
+//        LocalDateTime baseTime = LocalDateTime.now();
+//
+//        // 피드 12개 생성. 가장 최신(f0)과 그 다음(f1, f2)에 많은 contents 부여 → row 폭발 유도
+//        FeedJpaEntity[] feeds = new FeedJpaEntity[12];
+//        SavedFeedJpaEntity[] savedFeeds = new SavedFeedJpaEntity[12];
+//
+//        for (int i = 0; i < 12; i++) {
+//            List<String> contentUrls;
+//            if (i == 0) {
+//                // 최신 저장된 피드: 컨텐츠 3개
+//                contentUrls = java.util.stream.IntStream.range(0, 3)
+//                        .mapToObj(n -> "url_f0_" + n)
+//                        .toList();
+//            } else if (i == 1) {
+//                // 두 번째: 컨텐츠 3개
+//                contentUrls = java.util.stream.IntStream.range(0, 3)
+//                        .mapToObj(n -> "url_f1_" + n)
+//                        .toList();
+//            } else if (i == 2) {
+//                // 세 번째: 컨텐츠 2개
+//                contentUrls = java.util.stream.IntStream.range(0, 2)
+//                        .mapToObj(n -> "url_f2_" + n)
+//                        .toList();
+//            } else {
+//                // 나머지: 컨텐츠 0개
+//                contentUrls = List.of();
+//            }
+//
+//            FeedJpaEntity feed = feedJpaRepository.save(
+//                    TestEntityFactory.createFeed(
+//                            me,                       // 작성자: me (가시성 조건 단순화)
+//                            book,
+//                            true,                     // 공개
+//                            10 + i,                   // likeCount
+//                            5 + i,                    // commentCount
+//                            contentUrls
+//                    )
+//            );
+//            feeds[i] = feed;
+//
+//            SavedFeedJpaEntity saved = savedFeedJpaRepository.save(
+//                    SavedFeedJpaEntity.builder()
+//                            .userJpaEntity(me)
+//                            .feedJpaEntity(feed)
+//                            .build()
+//            );
+//            savedFeeds[i] = saved;
+//        }
+//        savedFeedJpaRepository.flush();
+//
+//        // created_at 덮어쓰기: i가 작을수록 더 최신 (f0가 가장 최신)
+//        for (int i = 0; i < 12; i++) {
+//            jdbcTemplate.update("UPDATE saved_feeds SET created_at = ? WHERE saved_id = ?",
+//                    Timestamp.valueOf(baseTime.minusMinutes(i)), savedFeeds[i].getSavedId());
+//        }
+//
+//        // when & then
+//        mockMvc.perform(get("/feeds/saved")
+//                        .requestAttr("userId", me.getUserId()))
+//                .andExpect(status().isOk())
+//                // ⚠️ 현재 구현(컬렉션 fetch join + limit)에서는 행 기준으로 잘려 루트 엔티티 개수가 모자라게 반환됨
+//                .andExpect(jsonPath("$.data.feedList", hasSize(10)))    // 총 응답개수는 10개가 맞음
+//                .andExpect(result -> {
+//                    String body = result.getResponse().getContentAsString();
+//                    // com.jayway.jsonpath.JsonPath 사용 (spring-boot-starter-test에 포함)
+//                    List<Integer> ids = com.jayway.jsonpath.JsonPath.read(body, "$.data.feedList[*].feedId");
+//                    Set<Integer> distinct = new HashSet<>(ids);
+//                    // 중복이 있음을 기대(= 실패를 통해 버그 재현). 만약 여기서 실패하면 중복이 안 나온 것.
+//                    assertThat(distinct.size())
+//                            .as("feedId가 중복 없이 10개 모두 달라야 하지만, 1:N 조인으로 인해 중복이 발생해야 합니다.")
+//                            .isLessThan(ids.size());
+//                });
+//    }
 }
