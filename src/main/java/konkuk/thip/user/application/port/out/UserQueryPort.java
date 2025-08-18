@@ -14,6 +14,8 @@ public interface UserQueryPort {
 
     boolean existsByNicknameAndUserIdNot(String nickname, Long userId);
 
+    boolean existsByOauth2Id(String oauth2Id);
+
     Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId);
 
     UserViewAliasChoiceResult getAllAliasesAndCategories();
@@ -25,6 +27,4 @@ public interface UserQueryPort {
     CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor, String label);
 
     CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor, String likeLabel, String commentLabel);
-
-    List<UserQueryDto> findRecentFeedWritersOfMyFollowings(Long userId, int size);
 }

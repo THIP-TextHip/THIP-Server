@@ -34,6 +34,11 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
     }
 
     @Override
+    public boolean existsByOauth2Id(String oauth2Id) {
+        return userJpaRepository.existsByOauth2Id(oauth2Id);
+    }
+
+    @Override
     public Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId) {
         return  userJpaRepository.findUserIdsByBookId(bookId);
     }
@@ -67,11 +72,6 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
         return getReactions(userId, cursor,
                 (id, cursorDateTime, size) -> userJpaRepository.findLikeAndCommentByUserId(id, cursorDateTime, size, likeLabel, commentLabel)
         );
-    }
-
-    @Override
-    public List<UserQueryDto> findRecentFeedWritersOfMyFollowings(Long userId, int size) {
-        return userJpaRepository.findFeedWritersOfMyFollowingsOrderByCreatedAtDesc(userId, size);
     }
 
     private CursorBasedList<ReactionQueryDto> getReactions(Long userId, Cursor cursor, ReactionQueryFunction reactionQueryFunction) {

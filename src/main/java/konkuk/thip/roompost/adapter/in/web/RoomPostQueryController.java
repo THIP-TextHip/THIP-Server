@@ -6,8 +6,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
+import konkuk.thip.roompost.adapter.in.web.response.AttendanceCheckShowResponse;
 import konkuk.thip.roompost.adapter.in.web.response.RecordPinResponse;
 import konkuk.thip.roompost.adapter.in.web.response.RoomPostSearchResponse;
+import konkuk.thip.roompost.application.port.in.AttendanceCheckShowUseCase;
 import konkuk.thip.roompost.application.port.in.RecordPinUseCase;
 import konkuk.thip.roompost.application.port.in.RoomPostSearchUseCase;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordPinQuery;
@@ -18,8 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_PIN;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.RECORD_SEARCH;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "RoomPost Query API", description = "방 게시글 조회 관련 API")
 @RestController
@@ -28,6 +29,7 @@ public class RoomPostQueryController {
 
     private final RoomPostSearchUseCase roomPostSearchUseCase;
     private final RecordPinUseCase recordPinUseCase;
+    private final AttendanceCheckShowUseCase attendanceCheckShowUseCase;
 
     @Operation(
             summary = "방의 게시글(기록, 투표) 목록 조회",
@@ -81,4 +83,17 @@ public class RoomPostQueryController {
         return BaseResponse.ok(recordPinUseCase.pinRecord(new RecordPinQuery(roomId, recordId, userId)));
     }
 
+    @Operation(
+            summary = "오늘의 한마디 조회",
+            description = "방 참여자가 오늘의 한마디를 조회합니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_SHOW)
+    @GetMapping("/rooms/{roomId}/daily-greeting")
+    public BaseResponse<AttendanceCheckShowResponse> showDailyGreeting(
+            @Parameter(description = "게시글을 조회할 방 ID", example = "1") @PathVariable final Long roomId,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(required = false) final String cursor,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(attendanceCheckShowUseCase.showDailyGreeting(userId, roomId, cursor));
+    }
 }

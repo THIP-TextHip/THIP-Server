@@ -1,7 +1,6 @@
 package konkuk.thip.common.security.oauth2;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import konkuk.thip.common.security.util.JwtUtil;
@@ -16,7 +15,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
 
-import static konkuk.thip.common.security.constant.AuthParameters.*;
+import static konkuk.thip.common.security.constant.AuthParameters.REDIRECT_HOME_URL;
+import static konkuk.thip.common.security.constant.AuthParameters.REDIRECT_SIGNUP_URL;
 
 @Slf4j
 @Component
@@ -44,7 +44,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (oAuth2User.isNewUser()) {
             // 신규 유저 - 회원가입용 임시 토큰
             String tempToken = jwtUtil.createSignupToken(loginUser.oauth2Id());
-//            addTokenCookie(response, tempToken);
 
             String loginTokenKey = UUID.randomUUID().toString();
             loginTokenStorage.put(loginTokenKey, TokenType.TEMP, tempToken, Duration.ofMinutes(5));      // ttl 5분
@@ -53,26 +52,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         } else {
             // 기존 유저 - 로그인용 액세스 토큰
             String accessToken = jwtUtil.createAccessToken(loginUser.userId());
-//            addTokenCookie(response, accessToken);
 
             String loginTokenKey = UUID.randomUUID().toString();
             loginTokenStorage.put(loginTokenKey, TokenType.ACCESS, accessToken, Duration.ofMinutes(5));      // ttl 5분
 
             getRedirectStrategy().sendRedirect(request, response, webRedirectUrl + REDIRECT_HOME_URL.getValue() + "?loginTokenKey=" + loginTokenKey);
         }
-    }
-
-    private void addTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie(JWT_HEADER_KEY.getValue(), token);
-        if(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue())) {
-            cookie.setDomain(webRedirectUrl.replace(HTTPS_PREFIX.getValue(), ""));
-        } else {
-            cookie.setDomain("localhost");
-        }
-        cookie.setSecure(webRedirectUrl.startsWith(HTTPS_PREFIX.getValue()));
-        cookie.setHttpOnly(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(COOKIE_MAX_AGE);
-        response.addCookie(cookie);
     }
 }

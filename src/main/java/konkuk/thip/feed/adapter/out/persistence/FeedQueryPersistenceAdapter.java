@@ -1,34 +1,22 @@
 package konkuk.thip.feed.adapter.out.persistence;
 
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
-import konkuk.thip.feed.application.port.out.dto.FeedIdAndTagProjection;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
-import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.feed.domain.SavedFeeds;
-import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
@@ -112,40 +100,13 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     }
 
     @Override
-    public SavedFeeds findSavedFeedsByUserId(Long userId) {
-        UserJpaEntity user = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-
-        List<SavedFeedJpaEntity> savedFeedEntities =
-                savedFeedJpaRepository.findAllByUserId(user.getUserId());
-
-        List<Long> feedIds = savedFeedEntities.stream()
-                .map(entity -> entity.getFeedJpaEntity().getPostId())
-                .toList();
-
-        // Projection 기반 조회
-        List<FeedIdAndTagProjection> results = feedTagJpaRepository.findFeedIdAndTagsByFeedIds(feedIds);
-
-        Map<Long, List<TagJpaEntity>> feedTagsMap = results.stream()
-                .collect(Collectors.groupingBy(
-                        FeedIdAndTagProjection::getFeedId,
-                        Collectors.mapping(FeedIdAndTagProjection::getTagJpaEntity, Collectors.toList())
-                ));
-
-        List<Feed> feeds = savedFeedEntities.stream()
-                .map(entity -> {
-                    FeedJpaEntity feedJpa = entity.getFeedJpaEntity();
-                    List<TagJpaEntity> tags = feedTagsMap.getOrDefault(feedJpa.getPostId(), List.of());
-                    return feedMapper.toDomainEntity(feedJpa, tags);
-                })
-                .toList();
-
-        return new SavedFeeds(feeds);
+    public Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId) {
+        return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
     }
 
     @Override
-    public Set<Long> findSavedFeedIdsByUserIdAndFeedIds(Set<Long> feedIds, Long userId) {
-        return savedFeedJpaRepository.findSavedFeedIdsByUserIdAndFeedIds(userId, feedIds);
+    public boolean existsSavedFeedByUserIdAndFeedId(Long userId, Long feedId) {
+        return savedFeedJpaRepository.existsByUserIdAndFeedId(userId, feedId);
     }
 
     @Override
@@ -179,5 +140,10 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
             Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
             return nextCursor.toEncodedString();
         });
+    }
+
+    @Override
+    public List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size) {
+        return feedJpaRepository.findLatestPublicFeedCreatorsIn(userIds, size);
     }
 }
