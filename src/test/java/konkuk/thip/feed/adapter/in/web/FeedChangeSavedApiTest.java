@@ -9,11 +9,9 @@ import konkuk.thip.feed.adapter.in.web.request.FeedIsSavedRequest;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
@@ -65,9 +63,9 @@ class FeedChangeSavedApiTest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "소설추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "책추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "오늘의책"));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category, "소설추천"));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category, "책추천"));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category, "오늘의책"));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
     }

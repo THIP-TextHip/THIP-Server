@@ -6,9 +6,7 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
@@ -63,9 +61,9 @@ class FeedUpdateControllerTest {
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
 
-        tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,CLASSIC_LITERATURE.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,KOREAN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,FOREIGN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,CLASSIC_LITERATURE.getValue()));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true)).getPostId();
         creatorUserId = user.getUserId();

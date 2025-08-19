@@ -4,18 +4,15 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
@@ -84,8 +81,8 @@ class FeedShowSingleApiTest {
 
         // 피드 및 피드 태그 생성
         CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
-        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.PHYSICS.getValue()));
-        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.GENERAL_SCIENCE.getValue()));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(c1, Tag.PHYSICS.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(c1, Tag.GENERAL_SCIENCE.getValue()));
         FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(feedCreator, book, true, 50, 10, List.of("content1", "content2")));      // feedCreator가 작성한 공개 피드
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(f1, t1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(f1, t2));
@@ -123,8 +120,8 @@ class FeedShowSingleApiTest {
 
         // 피드 및 피드 태그 생성
         CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
-        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.PHYSICS.getValue()));
-        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.GENERAL_SCIENCE.getValue()));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(c1, Tag.PHYSICS.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(c1, Tag.GENERAL_SCIENCE.getValue()));
         FeedJpaEntity privateFeed = feedJpaRepository.save(TestEntityFactory.createFeed(feedCreator, book, false, 50, 10, List.of("content1", "content2")));      // feedCreator가 작성한 비공개 피드
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t2));
@@ -147,8 +144,8 @@ class FeedShowSingleApiTest {
 
         // 피드 및 피드 태그 생성
         CategoryJpaEntity c1 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
-        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.PHYSICS.getValue()));
-        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createTag(c1, Tag.GENERAL_SCIENCE.getValue()));
+        TagJpaEntity t1 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(c1, Tag.PHYSICS.getValue()));
+        TagJpaEntity t2 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(c1, Tag.GENERAL_SCIENCE.getValue()));
         FeedJpaEntity privateFeed = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, false, 50, 10, List.of("content1", "content2")));      // me가 작성한 비공개 피드
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t1));
         feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(privateFeed, t2));

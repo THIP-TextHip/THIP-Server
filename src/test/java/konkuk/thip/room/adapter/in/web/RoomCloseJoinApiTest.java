@@ -4,17 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,9 +44,7 @@ class RoomCloseJoinApiTest {
     @Autowired RoomJpaRepository roomJpaRepository;
     @Autowired RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired BookJpaRepository bookJpaRepository;
-    @Autowired CategoryJpaRepository categoryJpaRepository;
     @Autowired UserJpaRepository userJpaRepository;
-    @Autowired AliasJpaRepository aliasJpaRepository;
 
     private RoomJpaEntity room;
     private UserJpaEntity host;
@@ -57,32 +53,32 @@ class RoomCloseJoinApiTest {
 
     @BeforeEach
     void setup() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         host = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("호스트")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .build());
         member = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("방 참여자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .build());
         outsider = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("방 미참여자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .build());
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("방 제목")
@@ -93,7 +89,7 @@ class RoomCloseJoinApiTest {
                 .recruitCount(5)
                 .memberCount(2)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
 
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
@@ -102,12 +98,10 @@ class RoomCloseJoinApiTest {
 
     @AfterEach
     void tearDown() {
-        roomParticipantJpaRepository.deleteAll();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
+        roomParticipantJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

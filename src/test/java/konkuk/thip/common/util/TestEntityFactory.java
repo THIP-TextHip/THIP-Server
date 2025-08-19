@@ -7,15 +7,12 @@ import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.room.adapter.out.jpa.*;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
@@ -32,54 +29,38 @@ public class TestEntityFactory {
      * 유효한 Jpa entity를 만들어주는 Factory
      */
 
-    public static AliasJpaEntity createLiteratureAlias() {
-        return AliasJpaEntity.builder()         // 실제 존재하는 값으로
-                .value(Alias.WRITER.getValue())
-                .imageUrl(Alias.WRITER.getImageUrl())
-                .color(Alias.WRITER.getColor())
-                .build();
+    public static Alias createLiteratureAlias() {
+        return Alias.WRITER;
     }
 
-    public static CategoryJpaEntity createLiteratureCategory(AliasJpaEntity alias) {
-        return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
-                .value(Category.LITERATURE.getValue())
-                .imageUrl(Category.LITERATURE.getImageUrl())
-                .aliasForCategoryJpaEntity(alias)
-                .build();
+    public static Category createLiteratureCategory() {
+        return Category.LITERATURE;
     }
 
-    public static AliasJpaEntity createScienceAlias() {
-        return AliasJpaEntity.builder()         // 실제 존재하는 값으로
-                .value(Alias.SCIENTIST.getValue())
-                .imageUrl(Alias.SCIENTIST.getImageUrl())
-                .color(Alias.SCIENTIST.getColor())
-                .build();
+    public static Alias createScienceAlias() {
+        return Alias.SCIENTIST;
     }
 
-    public static CategoryJpaEntity createScienceCategory(AliasJpaEntity alias) {
-        return CategoryJpaEntity.builder()      // 실제 존재하는 값으로
-                .value(Category.SCIENCE_IT.getValue())
-                .imageUrl(Category.SCIENCE_IT.getImageUrl())
-                .aliasForCategoryJpaEntity(alias)
-                .build();
+    public static Category createScienceCategory() {
+        return Category.SCIENCE_IT;
     }
 
-    public static UserJpaEntity createUser(AliasJpaEntity alias) {
+    public static UserJpaEntity createUser(Alias alias) {
         return UserJpaEntity.builder()
                 .nickname("테스터")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .build();
     }
 
-    public static UserJpaEntity createUser(AliasJpaEntity alias, String nickname) {
+    public static UserJpaEntity createUser(Alias alias, String nickname) {
         return UserJpaEntity.builder()
                 .nickname(nickname)
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_12345678")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .build();
     }
@@ -139,7 +120,7 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static RoomJpaEntity createRoom(BookJpaEntity book, CategoryJpaEntity category) {
+    public static RoomJpaEntity createRoom(BookJpaEntity book, Category category) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -148,11 +129,11 @@ public class TestEntityFactory {
                 .endDate(LocalDate.now().plusDays(5))
                 .recruitCount(3)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, LocalDate startDate, LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, LocalDate startDate, LocalDate endDate) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -161,11 +142,11 @@ public class TestEntityFactory {
                 .endDate(endDate)
                 .recruitCount(3)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, CategoryJpaEntity category, String roomName, LocalDate startDate, LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, String roomName, LocalDate startDate, LocalDate endDate) {
         return RoomJpaEntity.builder()
                 .title(roomName)
                 .description("설명")
@@ -174,7 +155,7 @@ public class TestEntityFactory {
                 .endDate(endDate)
                 .recruitCount(20)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build();
     }
 
@@ -286,13 +267,6 @@ public class TestEntityFactory {
                 .build();
     }
 
-    public static TagJpaEntity createTag(CategoryJpaEntity category,String value) {
-        return TagJpaEntity.builder()
-                .categoryJpaEntity(category)
-                .value(value)
-                .build();
-    }
-
     /**
      * 공개/비공개 여부만을 설정하는 기본 피드 생성을 위한 팩토리 메서드
      */
@@ -309,14 +283,6 @@ public class TestEntityFactory {
                 .contentList(new ArrayList<>())
                 .build();
     }
-
-    public static FeedTagJpaEntity createFeedTagMapping(FeedJpaEntity feed, TagJpaEntity tag) {
-        return FeedTagJpaEntity.builder()
-                .feedJpaEntity(feed)
-                .tagJpaEntity(tag)
-                .build();
-    }
-
 
     public static FeedJpaEntity createFeedWithContents(UserJpaEntity user, BookJpaEntity book, List<String> imageUrls, boolean isPublic) {
 

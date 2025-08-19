@@ -4,9 +4,7 @@ package konkuk.thip.feed.adapter.in.web;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestS3MockConfig;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,12 +59,12 @@ class FeedShowWriteInfoApiTest {
         // given
         literatureCategory = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(literatureAlias));
         scienceCategory = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(scienceAlias));
-        tagJpaRepository.save(TestEntityFactory.createTag(literatureCategory,KOREAN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(literatureCategory,FOREIGN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(literatureCategory,CLASSIC_LITERATURE.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(scienceCategory,GENERAL_SCIENCE.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(scienceCategory,PHYSICS.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag( scienceCategory,CHEMISTRY.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(literatureCategory,KOREAN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(literatureCategory,FOREIGN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(literatureCategory,CLASSIC_LITERATURE.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(scienceCategory,GENERAL_SCIENCE.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(scienceCategory,PHYSICS.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag( scienceCategory,CHEMISTRY.getValue()));
 
         // when // then
         mockMvc.perform(get("/feeds/write-info")

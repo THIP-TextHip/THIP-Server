@@ -10,9 +10,7 @@ import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -86,9 +84,9 @@ class FeedCreateApiTest {
         alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,CLASSIC_LITERATURE.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,KOREAN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,FOREIGN_NOVEL.getValue()));
+        tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,CLASSIC_LITERATURE.getValue()));
 
     }
 
