@@ -142,7 +142,7 @@ public class RoomQueryController {
             @Parameter(description = "방 ID", example = "1") @PathVariable("roomId") final Long roomId,
             @Parameter(hidden = true) @UserId final Long userId
     ) {
-        return BaseResponse.ok(roomGetBookPageUseCase.getBookPage(roomId, userId));
+        return BaseResponse.ok(roomGetBookPageUseCase.getBookPage(userId, roomId));
     }
 
     @Operation(
