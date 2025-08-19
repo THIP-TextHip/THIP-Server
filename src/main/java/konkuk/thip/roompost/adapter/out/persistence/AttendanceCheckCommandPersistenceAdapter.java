@@ -12,6 +12,8 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 import static konkuk.thip.common.exception.code.ErrorCode.ROOM_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
@@ -37,5 +39,11 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
         return attendanceCheckJpaRepository.save(
                 attendanceCheckMapper.toJpaEntity(attendanceCheck, roomJpaEntity, userJpaEntity)
         ).getAttendanceCheckId();
+    }
+
+    @Override
+    public Optional<AttendanceCheck> findById(Long id) {
+        return attendanceCheckJpaRepository.findById(id)
+                .map(attendanceCheckMapper::toDomainEntity);
     }
 }
