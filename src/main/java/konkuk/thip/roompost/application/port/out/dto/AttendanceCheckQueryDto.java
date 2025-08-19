@@ -22,11 +22,13 @@ public record AttendanceCheckQueryDto(
             String todayComment,
             LocalDateTime createdAt
     ) {
-        this.attendanceCheckId = attendanceCheckId;
-        this.creatorId = creatorId;
-        this.creatorNickname = creatorNickname;
-        this.creatorProfileImageUrl = alias.getImageUrl();
-        this.todayComment = todayComment;
-        this.createdAt = createdAt;
+        this(
+                attendanceCheckId,
+                creatorId,
+                creatorNickname,
+                alias.getImageUrl(),
+                todayComment,
+                createdAt
+        );
     }
 }
