@@ -188,7 +188,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                                 .and(room.roomId.ne(roomId))// 현재 방 제외
                                 .and(room.isPublic.isTrue()) // 공개방 만
                 )
-                .groupBy(room.roomId, room.title, room.recruitCount, room.startDate)
+                .groupBy(room.roomId, room.title, room.recruitCount, room.startDate, book.imageUrl)
                 .orderBy(room.startDate.asc())
                 .limit(count)
                 .fetch();
