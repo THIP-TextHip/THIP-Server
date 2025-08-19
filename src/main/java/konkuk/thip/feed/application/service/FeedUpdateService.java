@@ -5,6 +5,8 @@ import konkuk.thip.feed.application.port.in.dto.FeedUpdateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.S3CommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class FeedUpdateService implements FeedUpdateUseCase {
     public Long updateFeed(FeedUpdateCommand command) {
 
         //1. 유효성 검증
-        Feed.validateTags(command.tagList());
+        TagList.validateTags(Tag.fromList(command.tagList()));
         ContentList.validateImageCount(command.remainImageUrls() != null ? command.remainImageUrls().size() : 0);
 
         // 2. 피드 조회

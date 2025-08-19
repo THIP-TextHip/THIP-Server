@@ -62,10 +62,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
 
-        validateTags(tagValues);
+//        validateTags(tagValues);
 //        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
-
-        List<Tag> tags = Tag.fromList(tagValues);
 
         return Feed.builder()
                 .id(null)
@@ -76,9 +74,17 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
                 .likeCount(0)
                 .commentCount(0)
                 .targetBookId(targetBookId)
-                .tagList(TagList.of(tags))
+                .tagList(convertToTagList(tagValues))
                 .contentList(convertToContentList(imageUrls))
                 .build();
+    }
+
+    private static TagList convertToTagList(List<String> tagValues) {
+        if (tagValues == null || tagValues.isEmpty()) {
+            return TagList.empty();
+        }
+        List<Tag> tags = Tag.fromList(tagValues);
+        return TagList.of(tags);
     }
 
     private static ContentList convertToContentList(List<String> imageUrls) {
@@ -86,22 +92,22 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
         return ContentList.of(imageUrls);
     }
 
-    public static void validateTags(List<String> tagList) {
-        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
-
-        // 태그가 있는 경우, 개수 최대 5개 제한
-        if (!tagListEmpty && tagList.size() > 5) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
-        }
-
-        // 태그 중복 체크
-        if (!tagListEmpty) {
-            long distinctCount = tagList.stream().distinct().count();
-            if (distinctCount != tagList.size()) {
-                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
-            }
-        }
-    }
+//    public static void validateTags(List<String> tagList) {
+//        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
+//
+//        // 태그가 있는 경우, 개수 최대 5개 제한
+//        if (!tagListEmpty && tagList.size() > 5) {
+//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
+//        }
+//
+//        // 태그 중복 체크
+//        if (!tagListEmpty) {
+//            long distinctCount = tagList.stream().distinct().count();
+//            if (distinctCount != tagList.size()) {
+//                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
+//            }
+//        }
+//    }
 //
 //    public static void validateImageCount(int imageSize) {
 //        if (imageSize > 3) {
@@ -149,7 +155,6 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     public void updateTags(Long userId, List<String> newTagValues) {
         validateCreator(userId);
-        validateTags(newTagValues);
         List<Tag> tags = Tag.fromList(newTagValues);
         this.tagList = TagList.of(tags);
     }

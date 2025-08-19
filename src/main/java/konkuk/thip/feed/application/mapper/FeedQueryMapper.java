@@ -5,10 +5,11 @@ import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.feed.adapter.in.web.response.*;
 import konkuk.thip.feed.application.port.in.dto.TagsWithCategoryResult;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
-import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
 import org.mapstruct.*;
@@ -111,18 +112,18 @@ public interface FeedQueryMapper {
     }
 
     @Named("mapTagList")
-    default String[] mapTagList(List<Tag> tagList) {
+    default String[] mapTagList(TagList tagList) {
         if (tagList == null) return new String[0];
         return tagList.stream().map(Tag::getValue).toArray(String[]::new);
     }
 
-    default List<TagsWithCategoryResult> toTagsWithCategoryResult(List<TagCategoryQueryDto> rows) {
-        Map<String, Set<String>> grouped = rows.stream()
+    default List<TagsWithCategoryResult> toTagsWithCategoryResult(Map<Category, List<Tag>> categoryToTags) {
+        Map<String, Set<String>> grouped = categoryToTags.entrySet().stream()
                 .collect(Collectors.groupingBy(
-                        TagCategoryQueryDto::categoryValue,
-                        Collectors.mapping(
-                                TagCategoryQueryDto::tagValue,
-                                Collectors.toCollection(LinkedHashSet::new)
+                        e -> e.getKey().getValue(),
+                        Collectors.flatMapping(
+                                e -> e.getValue().stream().map(Tag::getValue),
+                                Collectors.toSet()
                         )
                 ));
 
