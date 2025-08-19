@@ -84,7 +84,9 @@ public enum SwaggerResponseDescription {
             ROOM_PASSWORD_NOT_REQUIRED
     ))),
     ROOM_RECRUITING_DETAIL_VIEW(new LinkedHashSet<>(Set.of(
-            ROOM_NOT_FOUND
+            ROOM_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            ROOM_RECRUITMENT_PERIOD_EXPIRED
     ))),
     ROOM_GET_HOME_JOINED_LIST(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
