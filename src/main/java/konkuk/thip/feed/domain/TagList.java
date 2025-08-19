@@ -1,13 +1,13 @@
 package konkuk.thip.feed.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.feed.domain.Tag;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_COMMAND;
+import static konkuk.thip.common.exception.code.ErrorCode.TAG_SHOULD_BE_UNIQUE;
 
 public final class TagList extends AbstractList<Tag> implements Serializable {
 
@@ -31,17 +31,21 @@ public final class TagList extends AbstractList<Tag> implements Serializable {
         return new TagList(List.of());
     }
 
-    private void validate() {
+    // todo presignedURL 도입 전 임시 유효성 검증 메서드
+    public static void validateTags(List<Tag> tags) {
         if (tags.size() > MAX_SIZE) {
             throw new InvalidStateException(INVALID_FEED_COMMAND,
                     new IllegalArgumentException("태그는 최대 " + MAX_SIZE + "개까지 입력할 수 있습니다."));
         }
-
         long distinctCount = tags.stream().distinct().count();
         if (distinctCount != tags.size()) {
             throw new InvalidStateException(INVALID_FEED_COMMAND,
-                    new IllegalArgumentException("태그는 중복될 수 없습니다."));
+                    new IllegalArgumentException(TAG_SHOULD_BE_UNIQUE.getMessage()));
         }
+    }
+
+    private void validate() {
+        validateTags(tags);
     }
 
     public List<Tag> toUnmodifiableList() {

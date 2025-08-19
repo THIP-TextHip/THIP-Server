@@ -106,4 +106,12 @@ public final class EnumMappings {
     public static Category categoryFrom(Tag tag) {
         return tagToCategory.get(tag);
     }
+
+    public static Map<Category, List<Tag>> getCategoryToTags() {
+        return Collections.unmodifiableMap(categoryToTags);
+    }
+
+    public static Map<Alias, Category> getAliasToCategory() {
+        return Collections.unmodifiableMap(aliasToCategory);
+    }
 }
