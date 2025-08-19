@@ -288,5 +288,4 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, room::startRoomProgress);
         assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());
     }
-
 }

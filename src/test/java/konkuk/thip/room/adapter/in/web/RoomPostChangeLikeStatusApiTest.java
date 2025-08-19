@@ -7,19 +7,19 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.room.adapter.in.web.request.RoomPostIsLikeRequest;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
@@ -50,22 +49,19 @@ class RoomPostChangeLikeStatusApiTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private PostLikeJpaRepository postLikeJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private RecordJpaRepository recordJpaRepository;
     @Autowired private VoteJpaRepository voteJpaRepository;
 
-
     private UserJpaEntity user;
     private BookJpaEntity book;
     private FeedJpaEntity feed;
-    private CategoryJpaEntity category;
+    private Category category;
     private RoomJpaEntity room;
     private RecordJpaEntity record;
     private VoteJpaEntity vote;
@@ -74,11 +70,11 @@ class RoomPostChangeLikeStatusApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        category = TestEntityFactory.createLiteratureCategory();
         room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
         // 1번방에 유저 1이 호스트
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room,user, RoomParticipantRole.HOST, 80.0));

@@ -11,7 +11,7 @@ import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,6 @@ class FeedShowSavedListApiTest {
 
     @Autowired private MockMvc mockMvc;
 
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
@@ -55,7 +54,7 @@ class FeedShowSavedListApiTest {
     @DisplayName("저장된 피드 조회 시 피드 정보를 피드를 저장한 최신순으로 정렬해서 반환한다.")
     void saved_feed_show_test_success() throws Exception {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(alias, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(alias, "user1"));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
@@ -122,7 +121,7 @@ class FeedShowSavedListApiTest {
     void saved_feed_show_with_first_page() throws Exception {
 
         // given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
 
@@ -178,7 +177,7 @@ class FeedShowSavedListApiTest {
     @DisplayName("request parameter의 cursor 값이 존재할 경우, 해당 페이지에 해당하는 피드 10개와, nextCursor, last 값을 반환한다.")
     void saved_feed_show_with_cursor() throws Exception {
         // given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
 

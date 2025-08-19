@@ -6,8 +6,8 @@ import konkuk.thip.book.application.port.in.dto.BookMostSearchResult;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,9 +44,6 @@ class BookMostSearchedBooksApiTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
@@ -63,7 +60,7 @@ class BookMostSearchedBooksApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
@@ -71,14 +68,13 @@ class BookMostSearchedBooksApiTest {
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(1))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
     }
 
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
@@ -163,6 +159,4 @@ class BookMostSearchedBooksApiTest {
         assertThat(bookList).isNotNull();
         assertThat(bookList.size()).isEqualTo(0);
     }
-
-
 }

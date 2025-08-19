@@ -6,6 +6,8 @@ import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
@@ -15,13 +17,13 @@ import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.domain.Category;
 import konkuk.thip.roompost.adapter.out.jpa.*;
-import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.domain.Alias;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +47,10 @@ public class TestEntityFactory {
 
     public static Category createScienceCategory() {
         return Category.SCIENCE_IT;
+    }
+
+    public static List<Tag> createTagsFromCategory(Category category) {
+        return EnumMappings.tagsFrom(category);
     }
 
     public static UserJpaEntity createUser(Alias alias) {
@@ -274,32 +280,53 @@ public class TestEntityFactory {
      */
     public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic) {
 
-        return FeedJpaEntity.builder()
-                .content("기본 피드 본문입니다.")
-                .isPublic(isPublic)
-                .likeCount(0)
-                .commentCount(0)
-                .reportCount(0)
-                .userJpaEntity(user)
-                .bookJpaEntity(book)
-                .contentList(ContentList.empty())
-                .build();
+//        return FeedJpaEntity.builder()
+//                .content("기본 피드 본문입니다.")
+//                .isPublic(isPublic)
+//                .likeCount(0)
+//                .commentCount(0)
+//                .reportCount(0)
+//                .userJpaEntity(user)
+//                .bookJpaEntity(book)
+//                .contentList(ContentList.empty())
+//                .build();
+        return createFeed(user, book, isPublic, 0, 0, Collections.emptyList(), Collections.emptyList());
     }
 
-    public static FeedJpaEntity createFeedWithContents(UserJpaEntity user, BookJpaEntity book, List<String> imageUrls, boolean isPublic) {
+    public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic, int likeCount, int commentCount, List<String> imageUrls) {
 
-        FeedJpaEntity feed = FeedJpaEntity.builder()
-                .content("이미지 포함 피드")
-                .isPublic(isPublic)
-                .likeCount(0)
-                .commentCount(0)
-                .reportCount(0)
-                .userJpaEntity(user)
-                .bookJpaEntity(book)
-                .contentList(ContentList.of(imageUrls))
-                .build();
+//        FeedJpaEntity feed = FeedJpaEntity.builder()
+//                .content("이미지 포함 피드")
+//                .isPublic(isPublic)
+//                .likeCount(0)
+//                .commentCount(0)
+//                .reportCount(0)
+//                .userJpaEntity(user)
+//                .bookJpaEntity(book)
+//                .contentList(ContentList.of(imageUrls))
+//                .build();
+//
+        return createFeed(user, book, isPublic, likeCount, commentCount, imageUrls, Collections.emptyList());
+    }
 
-        return feed;
+    public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, List<String> imageUrls, boolean isPublic) {
+
+//        FeedJpaEntity feed = FeedJpaEntity.builder()
+//                .content("이미지 포함 피드")
+//                .isPublic(isPublic)
+//                .likeCount(0)
+//                .commentCount(0)
+//                .reportCount(0)
+//                .userJpaEntity(user)
+//                .bookJpaEntity(book)
+//                .contentList(ContentList.of(imageUrls))
+//                .build();
+//
+        return createFeed(user, book, isPublic, 0, 0, imageUrls, Collections.emptyList());
+    }
+
+    public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic, List<Tag> tags) {
+        return createFeed(user, book, isPublic, 0, 0, Collections.emptyList(), tags);
     }
 
     /**
@@ -310,7 +337,9 @@ public class TestEntityFactory {
                                            boolean isPublic,
                                            int likeCount,
                                            int commentCount,
-                                           List<String> imageUrls) {
+                                           List<String> imageUrls,
+                                           List<Tag> tags
+                                           ) {
         // 1) 기본 Feed 엔티티 빌드 (content, reportCount 등은 테스트용 기본값)
         FeedJpaEntity feed = FeedJpaEntity.builder()
                 .content("기본 피드 본문입니다.")
@@ -321,6 +350,7 @@ public class TestEntityFactory {
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
                 .contentList(ContentList.of(imageUrls))
+                .tagList(TagList.of(tags))
                 .build();
 
         return feed;

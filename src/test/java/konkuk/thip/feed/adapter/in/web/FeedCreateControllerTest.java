@@ -1,6 +1,7 @@
 package konkuk.thip.feed.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.feed.domain.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,14 +36,13 @@ class FeedCreateControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     private Map<String, Object> buildValidRequest() {
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152");
         request.put("contentBody", "테스트 콘텐츠");
         request.put("isPublic", true);
         request.put("category", "문학");
-        request.put("tagList", List.of("책추천", "소설추천"));
+        request.put("tagList", List.of(Tag.PHYSICS.getValue(), Tag.CHEMISTRY.getValue()));
         return request;
     }
 
@@ -108,7 +108,8 @@ class FeedCreateControllerTest {
         @DisplayName("태그가 6개 이상이면 400 반환")
         void tooManyTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
-            req.put("tagList", List.of("1", "2", "3", "4", "5", "6"));
+            req.put("tagList", List.of(Tag.PHYSICS.getValue(), Tag.CHEMISTRY.getValue(), Tag.BIOLOGY.getValue(),
+                    Tag.ARCHITECTURE.getValue(), Tag.ARCHITECTURE.getValue(), Tag.DANCE.getValue()));
             assertBadRequest_InvalidFeedCreate(req, "태그는 최대 5개까지 입력할 수 있습니다.");
         }
 
@@ -116,8 +117,8 @@ class FeedCreateControllerTest {
         @DisplayName("태그가 중복되면 400 반환")
         void duplicatedTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
-            req.put("tagList", List.of("중복", "중복"));
-            assertBadRequest_InvalidFeedCreate(req, "태그는 중복 될 수 없습니다.");
+            req.put("tagList", List.of(Tag.PHYSICS.getValue(), Tag.PHYSICS.getValue()));
+            assertBadRequest_InvalidFeedCreate(req, TAG_SHOULD_BE_UNIQUE.getMessage());
         }
     }
 
@@ -142,7 +143,6 @@ class FeedCreateControllerTest {
                     new MockMultipartFile("images", "img4.jpg", MediaType.IMAGE_JPEG_VALUE, "4".getBytes())
             );
 
-
             ResultActions result = mockMvc.perform(multipart("/feeds")
                     .file(requestPart)
                     .file(images.get(0))
@@ -159,5 +159,4 @@ class FeedCreateControllerTest {
 
         }
     }
-
 }

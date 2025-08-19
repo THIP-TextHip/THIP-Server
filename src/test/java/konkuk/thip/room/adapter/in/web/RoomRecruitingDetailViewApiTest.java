@@ -7,12 +7,12 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,26 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("[통합] 모집 중인 방 상세조회 api 통합 테스트")
 class RoomRecruitingDetailViewApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @AfterEach
     void tearDown() {
@@ -65,12 +50,10 @@ class RoomRecruitingDetailViewApiTest {
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
@@ -83,7 +66,7 @@ class RoomRecruitingDetailViewApiTest {
                 .description("한강의 소설")
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
+        Category category = TestEntityFactory.createScienceCategory();
 
         return roomJpaRepository.save(RoomJpaEntity.builder()
                 .title(roomName)
@@ -94,12 +77,12 @@ class RoomRecruitingDetailViewApiTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(recruitCount)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
     }
 
     private RoomJpaEntity saveLiteratureRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
@@ -112,7 +95,7 @@ class RoomRecruitingDetailViewApiTest {
                 .description("한강의 소설")
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         return roomJpaRepository.save(RoomJpaEntity.builder()
                 .title(roomName)
@@ -123,12 +106,12 @@ class RoomRecruitingDetailViewApiTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(recruitCount)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
     }
 
     private void saveUsersToRoom(RoomJpaEntity roomJpaEntity, int count) {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         // User 리스트 생성 및 저장
         List<UserJpaEntity> users = IntStream.rangeClosed(1, count)
@@ -137,7 +120,7 @@ class RoomRecruitingDetailViewApiTest {
                         .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                         .oauth2Id("oauth2Id")
                         .role(UserRole.USER)
-                        .aliasForUserJpaEntity(alias)
+                        .alias(alias)
                         .build())
                 .toList();
 

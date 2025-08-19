@@ -7,17 +7,17 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.roompost.adapter.in.web.request.VoteRequest;
 import konkuk.thip.roompost.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteParticipantJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,18 +44,16 @@ class VoteApiTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private VoteJpaRepository voteJpaRepository;
     @Autowired private VoteItemJpaRepository voteItemJpaRepository;
     @Autowired private VoteParticipantJpaRepository voteParticipantJpaRepository;
 
-    private AliasJpaEntity alias;
+    private Alias alias;
     private UserJpaEntity user;
-    private CategoryJpaEntity category;
+    private Category category;
     private RoomJpaEntity room;
     private VoteJpaEntity vote;
     @Autowired
@@ -63,9 +61,9 @@ class VoteApiTest {
 
     @BeforeEach
     void setUp() {
-        alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        alias = TestEntityFactory.createScienceAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        category = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
+        category = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
         vote = voteJpaRepository.save(TestEntityFactory.createVote(user, room));

@@ -2,6 +2,7 @@ package konkuk.thip.roompost.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.AttendanceCheckJpaRepository;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
@@ -9,11 +10,10 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,9 +45,7 @@ class AttendanceCheckCreateApiTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
@@ -59,19 +57,17 @@ class AttendanceCheckCreateApiTest {
         roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
     }
 
     @Test
     @DisplayName("방의 참석자는 출석체크(= 오늘의 한마디) 를 작성할 수 있다.")
     void attendance_check_create_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 
@@ -99,10 +95,10 @@ class AttendanceCheckCreateApiTest {
     @DisplayName("방의 참석자가 아닐 경우, 오늘의 한마디를 작성 요청 시 403 에러 발생한다(400 에러 아님).")
     void attendance_check_fail_test() throws Exception {
         //given : me 는 room에 속하지 않는 유저
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 
@@ -121,10 +117,10 @@ class AttendanceCheckCreateApiTest {
     @DisplayName("방의 참석자가 출석체크(= 오늘의 한마디) 를 처음 작성할 경우, response의 isFirstWrite는 true 이다.")
     void attendance_check_create_first_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 
@@ -150,10 +146,10 @@ class AttendanceCheckCreateApiTest {
     @DisplayName("방의 참석자가 출석체크(= 오늘의 한마디) 를 하루 최대 5회만 작성할 수 있다. 5회를 초과할 경우, 400 error를 반환한다.")
     void attendance_check_create_too_many_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 

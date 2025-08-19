@@ -7,11 +7,11 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,26 +36,11 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("[통합] 내 방 목록 조회 api 통합 테스트")
 class RoomShowMineApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @AfterEach
     void tearDown() {
@@ -63,12 +48,10 @@ class RoomShowMineApiTest {
         roomJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
     }
 
     private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, LocalDate endDate, int recruitCount) {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
@@ -81,7 +64,7 @@ class RoomShowMineApiTest {
                 .description("한강의 소설")
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
+        Category category = TestEntityFactory.createScienceCategory();
 
         return roomJpaRepository.save(RoomJpaEntity.builder()
                 .title(roomName)
@@ -92,7 +75,7 @@ class RoomShowMineApiTest {
                 .endDate(endDate)
                 .recruitCount(recruitCount)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
     }
 
@@ -129,7 +112,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
         changeRoomMemberCount(expiredRoom1, 7);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정
@@ -168,7 +151,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
         changeRoomMemberCount(expiredRoom1, 7);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정
@@ -207,7 +190,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
         changeRoomMemberCount(expiredRoom1, 7);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정
@@ -247,7 +230,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity expiredRoom2 = saveScienceRoom("만료된방-책-2", "isbn4", "과학-방-10일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(10), 10);
         changeRoomMemberCount(expiredRoom2, 1);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정
@@ -286,7 +269,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
         changeRoomMemberCount(expiredRoom1, 7);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정
@@ -346,7 +329,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity recruitingRoom12 = saveScienceRoom("모집중인방-책-12", "isbn12", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30), 10);
         changeRoomMemberCount(recruitingRoom12, 8);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정
@@ -425,7 +408,7 @@ class RoomShowMineApiTest {
         RoomJpaEntity recruitingRoom12 = saveScienceRoom("모집중인방-책-12", "isbn12", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30), 10);
         changeRoomMemberCount(recruitingRoom12, 8);
 
-        AliasJpaEntity scienceAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
 
         // user가 생성한 방에 참여한 상황 가정

@@ -5,12 +5,12 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +33,6 @@ class RecordJpaEntityTest {
     private UserJpaRepository userRepository;
 
     @Autowired
-    private AliasJpaRepository aliasRepository;
-
-    @Autowired
     private BookJpaRepository bookRepository;
 
     @Autowired
@@ -44,17 +41,14 @@ class RecordJpaEntityTest {
     @Autowired
     private RecordJpaRepository recordRepository;
 
-    @Autowired
-    private CategoryJpaRepository categoryRepository;
-
     @Test
     @DisplayName("RecordJpaEntity 저장 및 조회 테스트")
     void saveAndFindRecord() {
         // given
-        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
         BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
-        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
         RoomJpaEntity room = roomRepository.save(TestEntityFactory.createRoom(book, category));
         RecordJpaEntity record = recordRepository.save(TestEntityFactory.createRecord(user, room));
 

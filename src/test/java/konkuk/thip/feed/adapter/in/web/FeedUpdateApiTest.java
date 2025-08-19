@@ -7,9 +7,11 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestS3MockConfig;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
+import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
@@ -53,18 +54,18 @@ class FeedUpdateApiTest {
     private UserJpaEntity user;
     private BookJpaEntity book;
     private FeedJpaEntity feed;
+    private List<Tag> tags;
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
-        tag1 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,KOREAN_NOVEL.getValue()));
-        tag2 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category,FOREIGN_NOVEL.getValue()));
-        tag3 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category, CLASSIC_LITERATURE.getValue()));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
+
+        tags = List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE);
+        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, tags));
     }
 
     @Test
@@ -73,14 +74,6 @@ class FeedUpdateApiTest {
 
         // given
         Long feedId = feed.getPostId();
-
-        // 기존 태그 3개 연관
-        List<TagJpaEntity> existingTags = List.of(tag1, tag2, tag3);
-        List<FeedTagJpaEntity> mappings = existingTags.stream()
-                .map(tag -> TestEntityFactory.createFeedTagMapping(feed, tag))
-                .toList();
-
-        feedTagJpaRepository.saveAll(mappings);
 
         // 수정 요청
         Map<String, Object> request = new HashMap<>();
@@ -96,9 +89,7 @@ class FeedUpdateApiTest {
 
         // then
         result.andExpect(status().isOk());
-        long tagCount = feedTagJpaRepository.findAll().stream()
-                .filter(ft -> ft.getFeedJpaEntity().getPostId().equals(feedId))
-                .count();
+        long tagCount = feedJpaRepository.findById(feedId).orElseThrow().getTagList().size();
         assertThat(tagCount).isEqualTo(2);
     }
 
@@ -113,7 +104,7 @@ class FeedUpdateApiTest {
                 "https://s3-mock/image-3.jpg"
         );
 
-        FeedJpaEntity feed = feedJpaRepository.save(TestEntityFactory.createFeedWithContents(user, book, originalImages, true));
+        FeedJpaEntity feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, originalImages, true));
         Long feedId = feed.getPostId();
 
         // 수정 요청: 이미지 1개만 유지
@@ -146,15 +137,9 @@ class FeedUpdateApiTest {
                 "https://s3-mock/image-2.jpg",
                 "https://s3-mock/image-3.jpg"
         );
-        FeedJpaEntity feed = feedJpaRepository.save(TestEntityFactory.createFeedWithContents(user, book, originalImages, true));
+        FeedJpaEntity feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true, 0, 0, originalImages, tags));
         Long feedId = feed.getPostId();
 
-        // 기존 태그 3개 매핑
-        List<TagJpaEntity> existingTags = List.of(tag1, tag2, tag3);
-        List<FeedTagJpaEntity> tagMappings = existingTags.stream()
-                .map(tag -> TestEntityFactory.createFeedTagMapping(feed, tag))
-                .collect(Collectors.toList());
-        feedTagJpaRepository.saveAll(tagMappings);
 
         // 수정 요청: 태그 일부 삭제 & 이미지 일부 삭제 & 본문 변경 & 공개 여부 변경
         Map<String, Object> request = new HashMap<>();
@@ -181,9 +166,7 @@ class FeedUpdateApiTest {
         assertThat(updated.getContentList()).hasSize(1);
         assertThat(updated.getContentList().get(0)).isEqualTo("https://s3-mock/image-2.jpg");
         // 4. 태그 갯수
-        long tagCount = feedTagJpaRepository.findAll().stream()
-                .filter(tag -> tag.getFeedJpaEntity().getPostId().equals(feedId))
-                .count();
+        long tagCount = feedJpaRepository.findById(feedId).orElseThrow().getTagList().size();
         assertThat(tagCount).isEqualTo(2);
     }
 

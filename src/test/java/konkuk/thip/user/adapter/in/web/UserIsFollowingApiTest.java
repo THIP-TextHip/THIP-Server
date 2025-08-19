@@ -4,8 +4,8 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,23 +33,19 @@ class UserIsFollowingApiTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private FollowingJpaRepository followingJpaRepository;
 
     @AfterEach
     void tearDown() {
         followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
     @DisplayName("팔로우 관계가 존재하면 true를 반환한다.")
     void isFollowing_true() throws Exception {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
@@ -73,7 +69,7 @@ class UserIsFollowingApiTest {
     @DisplayName("팔로우 관계가 없으면 false를 반환한다.")
     void isFollowing_false() throws Exception {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
 

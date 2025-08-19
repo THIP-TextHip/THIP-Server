@@ -10,11 +10,11 @@ import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +48,7 @@ class FeedRelatedWithBookApiTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
 
     @Autowired
     private BookJpaRepository bookJpaRepository;
@@ -264,17 +258,17 @@ class FeedRelatedWithBookApiTest {
     @DisplayName("비공개 피드 제외 및 자기 자신 피드 제외 검증")
     void getFeedsByBook_visibility_and_self_filter() throws Exception {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity requester = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_req")
                 .nickname("요청자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN(VALID_ISBN));
 
@@ -308,15 +302,15 @@ class FeedRelatedWithBookApiTest {
     }
 
     private TestData prepareDataForFeeds() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Alias alias = TestEntityFactory.createLiteratureAlias();
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         UserJpaEntity requester = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_req")
                 .nickname("요청자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         UserJpaEntity author = userJpaRepository.save(TestEntityFactory.createUser(alias, "작성자"));
@@ -324,7 +318,7 @@ class FeedRelatedWithBookApiTest {
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN(VALID_ISBN));
 
         // 공개 피드 두 개 비공개 하나 생성
-        FeedJpaEntity publicFeed1 = TestEntityFactory.createFeedWithContents(
+        FeedJpaEntity publicFeed1 = TestEntityFactory.createFeed(
                 author,
                 book,
                 List.of("http://img/1.jpg", "http://img/2.jpg"),
@@ -332,7 +326,7 @@ class FeedRelatedWithBookApiTest {
         );
         publicFeed1.updateLikeCount(7); // 좋아요 정렬을 위해 수치 조정
 
-        FeedJpaEntity publicFeed2 = TestEntityFactory.createFeedWithContents(
+        FeedJpaEntity publicFeed2 = TestEntityFactory.createFeed(
                 author,
                 book,
                 List.of("http://img/3.jpg"),
@@ -348,15 +342,14 @@ class FeedRelatedWithBookApiTest {
     }
 
     private TestData prepareDataManyFeeds(int count) {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         UserJpaEntity requester = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_req_many")
                 .nickname("요청자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         UserJpaEntity author = userJpaRepository.save(TestEntityFactory.createUser(alias, "작성자"));
@@ -364,7 +357,7 @@ class FeedRelatedWithBookApiTest {
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN(VALID_ISBN));
 
         for (int i = 0; i < count; i++) {
-            FeedJpaEntity f = TestEntityFactory.createFeedWithContents(
+            FeedJpaEntity f = TestEntityFactory.createFeed(
                     author,
                     book,
                     List.of("http://img/" + i + ".jpg"),

@@ -12,6 +12,7 @@ import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepositor
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class FeedDeleteApiTest {
 
     @BeforeEach
     void setUp() {
-        user = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        user = userJpaRepository.save(TestEntityFactory.createUser(Alias.ARTIST));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true,1,1,List.of("url1", "url2", "url3")));
         postLikeJpaRepository.save(TestEntityFactory.createPostLike(user,feed));
@@ -83,9 +84,6 @@ class FeedDeleteApiTest {
 
         // then: 1) 피드 soft delete (status=INACTIVE)
         assertThat(feedJpaRepository.findByPostIdAndStatus(feed.getPostId(), INACTIVE)).isPresent();
-
-        // 2) 피드 태그 관계 삭제
-        assertTrue(feedTagJpaRepository.findAll().isEmpty());
 
         // 4) 댓글 삭제 soft delete
         assertThat(commentJpaRepository.findById(comment.getCommentId())).isPresent();

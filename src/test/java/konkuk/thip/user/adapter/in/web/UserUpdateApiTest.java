@@ -6,7 +6,7 @@ import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,28 +39,24 @@ class UserUpdateApiTest {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
     @DisplayName("사용자 닉네임과 별칭이 정상적으로 업데이트된다.")
     void updateUser_success() throws Exception {
         // given: 기존 alias 및 user 생성
-        AliasJpaEntity oldAlias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        AliasJpaEntity newAlias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias oldAlias = TestEntityFactory.createScienceAlias();
+        Alias newAlias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("oldthip")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("oauth2_user100")
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(oldAlias)
+                .alias(oldAlias)
                 .build());
 
         Long userId = user.getUserId();
@@ -79,8 +75,6 @@ class UserUpdateApiTest {
         // DB 검증: 닉네임과 alias가 업데이트되었는지 확인
         UserJpaEntity updatedUser = userJpaRepository.findById(userId).orElseThrow();
         assertThat(updatedUser.getNickname()).isEqualTo("newthip");
-
-        AliasJpaEntity updatedAlias = aliasJpaRepository.findById(updatedUser.getAliasForUserJpaEntity().getAliasId()).orElseThrow();
-        assertThat(updatedAlias.getValue()).isEqualTo(newAlias.getValue());
+        assertThat(updatedUser.getAlias()).isEqualTo(newAlias);
     }
 }

@@ -4,10 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.room.domain.Category;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("[JPA] RoomJpaEntity 테스트")
 class RoomJpaEntityTest {
 
-    @PersistenceContext
-    private EntityManager em;
-
-    @Autowired
-    private BookJpaRepository bookRepository;
-
-    @Autowired
-    private AliasJpaRepository aliasRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryRepository;
-
-    @Autowired
-    private RoomJpaRepository roomRepository;
+    @PersistenceContext private EntityManager em;
+    @Autowired private BookJpaRepository bookRepository;
+    @Autowired private RoomJpaRepository roomRepository;
 
     @Test
     @DisplayName("RoomJpaEntity 저장 및 조회 테스트")
@@ -44,8 +33,7 @@ class RoomJpaEntityTest {
         // given
         String isbn = "1234567890";
         BookJpaEntity book = bookRepository.save(TestEntityFactory.createBookWithISBN(isbn));
-        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
-        CategoryJpaEntity category = categoryRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
         RoomJpaEntity room = roomRepository.save(TestEntityFactory.createRoom(book, category));
 
         // when

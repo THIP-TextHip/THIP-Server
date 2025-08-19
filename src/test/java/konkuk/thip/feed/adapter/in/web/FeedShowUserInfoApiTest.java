@@ -7,8 +7,8 @@ import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FeedShowUserInfoApiTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private FollowingJpaRepository followingJpaRepository;
@@ -47,7 +46,6 @@ class FeedShowUserInfoApiTest {
         feedJpaRepository.deleteAllInBatch();
         followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
     }
 
@@ -55,8 +53,8 @@ class FeedShowUserInfoApiTest {
     @DisplayName("내 피드에서의 유저 정보를 조회할 경우, 내 개인 정보, 나의 팔로워 정보, 내가 작성한 모든 피드 개수 를 반환한다.")
     void feed_show_mine_info_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
+        Alias a1 = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity follower1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower1"));
         UserJpaEntity follower2 = userJpaRepository.save(TestEntityFactory.createUser(a1, "follower2"));
@@ -100,8 +98,8 @@ class FeedShowUserInfoApiTest {
     @DisplayName("나를 팔로우하는 사람이 많을 경우, 팔로우 맺은 일자 기준 최신순으로 최대 5명의 팔로워 프로필 이미지만을 반환한다.")
     void feed_show_mine_info_follower_many_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
+        Alias a1 = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity follower1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower1"));
         UserJpaEntity follower2 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower2"));
@@ -164,8 +162,8 @@ class FeedShowUserInfoApiTest {
     @DisplayName("특정 유저 피드에서의 유저 정보를 조회할 경우, 유저 개인 정보, 유저의 팔로워 정보, 유저가 작성한 모든 '공개' 피드 개수 를 반환한다.")
     void feed_show_user_info_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
+        Alias a1 = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity anotherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "anotherUser"));
         UserJpaEntity follower1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower1"));
@@ -213,8 +211,8 @@ class FeedShowUserInfoApiTest {
     @DisplayName("accessToken의 유저가 특정 유저를 팔로잉하는 경우, isFollowing은 true이다.")
     void feed_show_user_info_isFollowing_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
+        Alias a1 = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity anotherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "anotherUser"));
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a1, "me"));
         followingJpaRepository.save(TestEntityFactory.createFollowing(me, anotherUser));// me 가 anotherUser를 follow 하는 상황
@@ -239,8 +237,8 @@ class FeedShowUserInfoApiTest {
     @DisplayName("특정 유저를 팔로우하는 사람이 많을 경우, 팔로우 맺은 일자 기준 최신순으로 최대 5명의 팔로워 프로필 이미지만을 반환한다.")
     void feed_show_user_info_follower_many_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        AliasJpaEntity a1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
+        Alias a1 = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity anotherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "anotherUser"));
         UserJpaEntity follower1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "follower1"));
