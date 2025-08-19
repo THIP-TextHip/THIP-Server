@@ -42,12 +42,12 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(nullable = false)
     private Alias alias;
 
-    public void updateIncludeAliasFrom(User user, Alias alias) {
+    public void updateIncludeAliasFrom(User user) {
         this.nickname = user.getNickname();
         this.nicknameUpdatedAt = user.getNicknameUpdatedAt();
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
-        this.alias = alias;
+        this.alias = user.getAlias();
     }
 
     public void updateFrom(User user) {

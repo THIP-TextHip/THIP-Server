@@ -53,13 +53,7 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
-        aliasJpaRepository.findByValue(user.getAlias().getValue()).ifPresentOrElse(
-                aliasJpaEntity -> userJpaEntity.updateIncludeAliasFrom(user, aliasJpaEntity),
-                () -> {
-                    throw new EntityNotFoundException(ALIAS_NOT_FOUND);
-                }
-        );
-
+        userJpaEntity.updateIncludeAliasFrom(user);
         userJpaRepository.save(userJpaEntity);
     }
 }

@@ -14,8 +14,6 @@ import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
-import konkuk.thip.feed.application.port.out.dto.QTagCategoryQueryDto;
-import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
@@ -214,18 +212,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .toList();
     }
 
-    @Override
-    public List<TagCategoryQueryDto> findAllTags() {
-        QCategoryJpaEntity c = QCategoryJpaEntity.categoryJpaEntity;
-        QTagJpaEntity t = QTagJpaEntity.tagJpaEntity;
-
-        return jpaQueryFactory
-                .select(new QTagCategoryQueryDto(c.value, t.value))
-                .from(c)
-                .join(t).on(t.categoryJpaEntity.eq(c))
-                .orderBy(c.categoryId.asc(), t.tagId.asc()) //Id 순 정렬
-                .fetch();
-    }
     private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
@@ -345,8 +331,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 feed.postId,
                 feed.userJpaEntity.userId,
                 user.nickname,
-                user.aliasForUserJpaEntity.imageUrl,
-                user.aliasForUserJpaEntity.value,
+                user.alias,
                 feed.createdAt,
                 book.isbn,
                 book.title,
@@ -419,8 +404,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 feed.postId,
                 feed.userJpaEntity.userId,
                 user.nickname,
-                user.aliasForUserJpaEntity.imageUrl,
-                user.aliasForUserJpaEntity.value,
+                user.alias,
                 feed.createdAt,
                 book.isbn,
                 book.title,

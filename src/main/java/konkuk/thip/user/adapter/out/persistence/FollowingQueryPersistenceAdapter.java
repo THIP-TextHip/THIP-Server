@@ -2,10 +2,12 @@ package konkuk.thip.user.adapter.out.persistence;
 
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.application.port.out.dto.FollowingQueryDto;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
+import konkuk.thip.user.domain.Alias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -44,7 +46,10 @@ public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {
 
     @Override
     public List<String> getLatestFollowerImageUrls(Long userId, int size) {
-        return followingJpaRepository.findLatestFollowerImageUrls(userId, size);
+        return followingJpaRepository.findLatestFollowers(userId, size).stream()
+                .map(UserJpaEntity::getAlias)
+                .map(Alias::getImageUrl)
+                .toList();
     }
 
     @Override

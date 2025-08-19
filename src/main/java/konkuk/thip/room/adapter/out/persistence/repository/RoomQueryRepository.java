@@ -21,7 +21,7 @@ public interface RoomQueryRepository {
     List<RoomQueryDto> findRecruitingRoomsOrderByMemberCountDesc(String keyword, Integer lastMemberCount, Long roomId, int pageSize);
     List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, Category category, Integer lastMemberCount, Long roomId, int pageSize);
 
-    List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, String category, int count);
+    List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, Category category, int count);
 
     Page<RoomGetHomeJoinedListResponse.JoinedRoomInfo> searchHomeJoinedRooms(Long userId, LocalDate today, Pageable pageable);
 
@@ -33,9 +33,9 @@ public interface RoomQueryRepository {
 
     List<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(Category category, int limit, Long userId);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit, Long userId);
 
     List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 }

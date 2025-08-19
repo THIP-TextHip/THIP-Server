@@ -32,10 +32,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         QCommentQueryDto proj = new QCommentQueryDto(
                 comment.commentId,
                 commentCreator.userId,
-                aliasOfCommentCreator.imageUrl,
+                commentCreator.alias,
                 commentCreator.nickname,
-                aliasOfCommentCreator.value,
-                aliasOfCommentCreator.color,
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
@@ -56,7 +54,6 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .select(proj)
                 .from(comment)
                 .leftJoin(comment.userJpaEntity, commentCreator)
-                .leftJoin(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
                 .where(whereClause)
                 .orderBy(comment.createdAt.desc())
                 .limit(size + 1)        // size + 1 개 조회
@@ -77,10 +74,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 comment.parent.commentId,
                 parentCommentCreator.nickname,
                 commentCreator.userId,
-                aliasOfCommentCreator.imageUrl,
+                commentCreator.alias,
                 commentCreator.nickname,
-                aliasOfCommentCreator.value,
-                aliasOfCommentCreator.color,
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
@@ -95,7 +90,6 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                     .leftJoin(comment.parent, parentComment)
                     .leftJoin(parentComment.userJpaEntity, parentCommentCreator)
                     .leftJoin(comment.userJpaEntity, commentCreator)
-                    .leftJoin(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
                     .where(
                             comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
                             comment.status.eq(StatusType.ACTIVE)        // 자식 댓글은 ACTIVE인 것만 조회
@@ -139,10 +133,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 comment.parent.commentId,
                 parentCommentCreator.nickname,
                 commentCreator.userId,
-                aliasOfCommentCreator.imageUrl,
+                commentCreator.alias,
                 commentCreator.nickname,
-                aliasOfCommentCreator.value,
-                aliasOfCommentCreator.color,
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
@@ -157,7 +149,6 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                     .leftJoin(comment.parent, parentComment)
                     .leftJoin(parentComment.userJpaEntity, parentCommentCreator)
                     .leftJoin(comment.userJpaEntity, commentCreator)
-                    .leftJoin(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
                     .where(
                             comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
                             comment.status.eq(StatusType.ACTIVE)        // 자식 댓글은 ACTIVE인 것만 조회
@@ -191,10 +182,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         QCommentQueryDto proj = new QCommentQueryDto(
                 comment.commentId,
                 commentCreator.userId,
-                aliasOfCommentCreator.imageUrl,
+                commentCreator.alias,
                 commentCreator.nickname,
-                aliasOfCommentCreator.value,
-                aliasOfCommentCreator.color,
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
@@ -205,7 +194,6 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .select(proj)
                 .from(comment)
                 .join(comment.userJpaEntity, commentCreator)
-                .join(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
                 .where(
                         comment.commentId.eq(rootCommentId),
                         comment.status.eq(StatusType.ACTIVE)
@@ -221,10 +209,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 comment.parent.commentId,
                 parentCommentCreator.nickname,
                 commentCreator.userId,
-                aliasOfCommentCreator.imageUrl,
+                commentCreator.alias,
                 commentCreator.nickname,
-                aliasOfCommentCreator.value,
-                aliasOfCommentCreator.color,
                 comment.createdAt,
                 comment.content,
                 comment.likeCount,
@@ -237,7 +223,6 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .join(comment.parent, parentComment)
                 .join(parentComment.userJpaEntity, parentCommentCreator)
                 .join(comment.userJpaEntity, commentCreator)
-                .join(commentCreator.aliasForUserJpaEntity, aliasOfCommentCreator)
                 .where(
                         comment.parent.commentId.eq(rootCommentId),
                         parentComment.status.eq(StatusType.ACTIVE),

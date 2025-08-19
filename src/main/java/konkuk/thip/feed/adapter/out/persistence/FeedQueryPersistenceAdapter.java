@@ -5,10 +5,8 @@ import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
-import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import java.util.Set;
 public class FeedQueryPersistenceAdapter implements FeedQueryPort {
 
     private final FeedJpaRepository feedJpaRepository;
-    private final FeedTagJpaRepository feedTagJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final SavedFeedJpaRepository savedFeedJpaRepository;
     private final FeedMapper feedMapper;
@@ -120,11 +117,6 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
             Cursor nextCursor = new Cursor(List.of(feedQueryDto.savedCreatedAt().toString()));
             return nextCursor.toEncodedString();
         });
-    }
-
-    @Override
-    public List<TagCategoryQueryDto> findAllTags() {
-        return feedJpaRepository.findAllTags();
     }
 
     @Override

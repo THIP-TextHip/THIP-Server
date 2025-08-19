@@ -4,13 +4,9 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.adapter.out.jpa.*;
-import konkuk.thip.feed.adapter.out.mapper.ContentMapper;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
@@ -19,7 +15,6 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import static konkuk.thip.common.entity.StatusType.ACTIVE;
@@ -60,7 +55,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 //        // Content가 존재하면 ContentJpaEntity 생성 및 Feed 연관관계 설정
 //        applyFeedContents(feed, savedFeed);
         // 태그가 존재하면 태그 피드 매핑 생성 및 저장
-        applyFeedTags(feed, savedFeed);
+//        applyFeedTags(feed, savedFeed);
 
         return savedFeed.getPostId();
     }
@@ -103,7 +98,6 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostIdAndStatus(feed.getId(),ACTIVE)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
 
-        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
         savedFeedJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
 
         feedJpaEntity.softDelete();

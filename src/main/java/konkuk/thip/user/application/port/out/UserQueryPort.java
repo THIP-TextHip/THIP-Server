@@ -18,8 +18,6 @@ public interface UserQueryPort {
 
     Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId);
 
-    UserViewAliasChoiceResult getAllAliasesAndCategories();
-
     List<UserQueryDto> findUsersByNicknameOrderByAccuracy(String keyword, Long userId, Integer size);
 
     CursorBasedList<ReactionQueryDto> findLikeReactionsByUserId(Long userId, Cursor cursor, String label);

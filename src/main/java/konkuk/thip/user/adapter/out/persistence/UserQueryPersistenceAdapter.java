@@ -5,7 +5,6 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.out.persistence.function.ReactionQueryFunction;
 import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +38,6 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
     @Override
     public Set<Long> findUserIdsParticipatedInRoomsByBookId(Long bookId) {
         return  userJpaRepository.findUserIdsByBookId(bookId);
-    }
-
-    @Override
-    public UserViewAliasChoiceResult getAllAliasesAndCategories() {
-        return aliasJpaRepository.getAllAliasesAndCategories();
     }
 
     @Override

@@ -1,7 +1,5 @@
 package konkuk.thip.room.adapter.out.persistence;
 
-import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.common.util.EnumMappings;
@@ -61,7 +59,7 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor) {
         return findRoomsByMemberCountCursor(cursor, (lastMemberCount, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsWithCategoryOrderByMemberCountDesc(
-                        keyword, category.getValue(), lastMemberCount, lastId, pageSize
+                        keyword, category, lastMemberCount, lastId, pageSize
                 )
         );
     }
@@ -69,7 +67,7 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     @Override
     public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Room currentRoom, int count) {
         return roomJpaRepository.findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(
-                currentRoom.getId(), currentRoom.getCategory().getValue(), count);
+                currentRoom.getId(), currentRoom.getCategory(), count);
     }
 
     @Override
@@ -141,12 +139,12 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
 
     @Override
     public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId) {
-        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category.getValue(), limit, userId);
+        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category, limit, userId);
     }
 
     @Override
     public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId) {
-        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category.getValue(), limit, userId);
+        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category, limit, userId);
     }
 
     @Override
