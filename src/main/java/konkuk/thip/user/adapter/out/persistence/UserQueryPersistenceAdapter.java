@@ -5,7 +5,6 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.out.persistence.function.ReactionQueryFunction;
 import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
@@ -21,7 +20,6 @@ import java.util.Set;
 public class UserQueryPersistenceAdapter implements UserQueryPort {
 
     private final UserJpaRepository userJpaRepository;
-    private final AliasJpaRepository aliasJpaRepository;
 
     @Override
     public boolean existsByNickname(String nickname) {

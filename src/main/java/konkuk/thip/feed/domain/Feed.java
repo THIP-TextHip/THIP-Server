@@ -40,7 +40,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     private Long targetBookId;
 
-    private List<Tag> tagList;
+    @Builder.Default
+    private TagList tagList = TagList.empty();
 
     @Builder.Default
     private List<Content> contentList = new ArrayList<>();
@@ -64,6 +65,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
         validateTags(tagValues);
         validateImageCount(imageUrls != null ? imageUrls.size() : 0);
 
+        List<Tag> tags = Tag.fromList(tagValues);
+
         return Feed.builder()
                 .id(null)
                 .content(content)
@@ -73,7 +76,7 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
                 .likeCount(0)
                 .commentCount(0)
                 .targetBookId(targetBookId)
-                .tagList(Tag.fromList(tagValues))
+                .tagList(TagList.of(tags))
                 .contentList(convertToContentList(imageUrls))
                 .build();
     }
@@ -150,7 +153,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     public void updateTags(Long userId, List<String> newTagValues) {
         validateCreator(userId);
         validateTags(newTagValues);
-        this.tagList = Tag.fromList(newTagValues); // Tag.from(...) 등으로 변환
+        List<Tag> tags = Tag.fromList(newTagValues);
+        this.tagList = TagList.of(tags);
     }
 
     public void updateImages(Long userId, List<String> newImageUrls) {

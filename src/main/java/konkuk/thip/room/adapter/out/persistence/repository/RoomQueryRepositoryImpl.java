@@ -14,11 +14,11 @@ import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
-import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
 import konkuk.thip.room.application.port.out.dto.QRoomQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
+import konkuk.thip.room.domain.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,7 +37,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     private final QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QRoomParticipantJpaEntity participant = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
-    private final QCategoryJpaEntity category = QCategoryJpaEntity.categoryJpaEntity;
 
     /** 모집중 + ACTIVE 공통 where */
     private BooleanBuilder recruitingActiveWhere(LocalDate today) {
@@ -48,9 +47,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     /** 카테고리 조건 추가 */
-    private void applyCategory(BooleanBuilder where, String categoryVal) {
-        if (categoryVal != null && !categoryVal.isBlank()) {
-            where.and(room.categoryJpaEntity.value.eq(categoryVal));
+    private void applyCategory(BooleanBuilder where, Category category) {
+        if (category != null) {
+            where.and(room.category.eq(category));
         }
     }
 
@@ -115,7 +114,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByStartDateAsc(String keyword, String categoryVal, LocalDate lastStartDate, Long roomId, int pageSize) {
+    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByStartDateAsc(String keyword, Category category, LocalDate lastStartDate, Long roomId, int pageSize) {
         final LocalDate today = LocalDate.now();
         DateExpression<LocalDate> cursorExpr = room.startDate;
 
@@ -154,7 +153,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, String categoryVal, Integer lastMemberCount, Long roomId, int pageSize) {
+    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, Category category, Integer lastMemberCount, Long roomId, int pageSize) {
         final LocalDate today = LocalDate.now();
 
         BooleanBuilder where = recruitingActiveWhere(today);

@@ -3,11 +3,9 @@ package konkuk.thip.room.adapter.out.persistence;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     private final RoomJpaRepository roomJpaRepository;
     private final BookJpaRepository bookJpaRepository;
-    private final CategoryJpaRepository categoryJpaRepository;
 
     private final RoomMapper roomMapper;
 
@@ -47,11 +44,7 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
                 () -> new EntityNotFoundException(BOOK_NOT_FOUND)
         );
 
-        CategoryJpaEntity categoryJpaEntity = categoryJpaRepository.findByValue(room.getCategory().getValue()).orElseThrow(
-                () -> new EntityNotFoundException(CATEGORY_NOT_FOUND)
-        );
-
-        RoomJpaEntity roomJpaEntity = roomMapper.toJpaEntity(room, bookJpaEntity, categoryJpaEntity);
+        RoomJpaEntity roomJpaEntity = roomMapper.toJpaEntity(room, bookJpaEntity);
         return roomJpaRepository.save(roomJpaEntity).getRoomId();
     }
 

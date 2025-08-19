@@ -1,10 +1,8 @@
 package konkuk.thip.user.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.mapper.UserMapper;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
@@ -24,16 +22,12 @@ import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     private final UserJpaRepository userJpaRepository;
-    private final AliasJpaRepository aliasJpaRepository;
 
     private final UserMapper userMapper;
 
     @Override
     public Long save(User user) {
-        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.findByValue(user.getAlias().getValue()).orElseThrow(
-                () -> new EntityNotFoundException(ALIAS_NOT_FOUND));
-
-        UserJpaEntity userJpaEntity = userMapper.toJpaEntity(user, aliasJpaEntity);
+        UserJpaEntity userJpaEntity = userMapper.toJpaEntity(user);
         return userJpaRepository.save(userJpaEntity).getUserId();
     }
 

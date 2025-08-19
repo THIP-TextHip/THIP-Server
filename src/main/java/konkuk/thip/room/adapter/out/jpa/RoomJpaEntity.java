@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
 import lombok.*;
 
@@ -53,9 +54,9 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryJpaEntity categoryJpaEntity;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
 
     public RoomJpaEntity updateFrom(Room room) {
         this.title = room.getTitle();

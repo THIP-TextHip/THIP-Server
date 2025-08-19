@@ -4,7 +4,10 @@ package konkuk.thip.feed.adapter.out.jpa;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.converter.TagListJsonConverter;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.TagList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.AccessLevel;
@@ -39,17 +42,18 @@ public class FeedJpaEntity extends PostJpaEntity {
     @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SavedFeedJpaEntity> savedFeeds = new ArrayList<>();
 
-    // 삭제용 피드 태그 양방향 매핑 관계
-    @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<FeedTagJpaEntity> feedTags = new ArrayList<>();
+    @Column(name = "tag_list", columnDefinition = "TEXT")
+    @Convert(converter = TagListJsonConverter.class)
+    private TagList tagList = TagList.of(List.of());
 
     @Builder
-    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, List<ContentJpaEntity> contentList) {
+    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, List<ContentJpaEntity> contentList, TagList tagList) {
         super(content, likeCount, commentCount, userJpaEntity);
         this.isPublic = isPublic;
         this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
         this.contentList = contentList;
+        this.tagList = tagList != null ? tagList : TagList.of(List.of());
     }
 
     public void updateFrom(Feed feed) {

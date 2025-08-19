@@ -8,9 +8,7 @@ import konkuk.thip.feed.adapter.out.mapper.ContentMapper;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
 import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
@@ -32,8 +30,6 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     private final FeedJpaRepository feedJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final BookJpaRepository bookJpaRepository;
-    private final TagJpaRepository tagJpaRepository;
-    private final FeedTagJpaRepository feedTagJpaRepository;
     private final ContentJpaRepository contentJpaRepository;
     private final SavedFeedJpaRepository savedFeedJpaRepository;
 
@@ -44,10 +40,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     @Override
     public Optional<Feed> findById(Long id) {
         return feedJpaRepository.findByPostIdAndStatus(id,ACTIVE)
-                .map(feedJpaEntity -> {
-                    List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
-                    return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
-                });
+                .map(feedMapper::toDomainEntity);
     }
 
 

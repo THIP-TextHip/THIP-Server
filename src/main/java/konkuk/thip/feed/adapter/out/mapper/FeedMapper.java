@@ -2,9 +2,9 @@ package konkuk.thip.feed.adapter.out.mapper;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.TagList;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,10 +28,11 @@ public class FeedMapper {
                 .commentCount(feed.getCommentCount())
                 .bookJpaEntity(bookJpaEntity)
                 .contentList(new ArrayList<>())
+                .tagList(feed.getTagList())
                 .build();
     }
 
-    public Feed toDomainEntity(FeedJpaEntity feedJpaEntity, List<TagJpaEntity> tagJpaEntityList) {
+    public Feed toDomainEntity(FeedJpaEntity feedJpaEntity) {
         return Feed.builder()
                 .id(feedJpaEntity.getPostId())
                 .content(feedJpaEntity.getContent())
@@ -41,10 +42,7 @@ public class FeedMapper {
                 .likeCount(feedJpaEntity.getLikeCount())
                 .commentCount(feedJpaEntity.getCommentCount())
                 .targetBookId(feedJpaEntity.getBookJpaEntity().getBookId())
-                .tagList(tagJpaEntityList.stream()
-                        .map(TagJpaEntity::getValue)
-                        .map(Tag::from)
-                        .toList())
+                .tagList(feedJpaEntity.getTagList())
                 .contentList(feedJpaEntity.getContentList().stream()
                                 .map(contentMapper::toDomainEntity)
                                 .toList())

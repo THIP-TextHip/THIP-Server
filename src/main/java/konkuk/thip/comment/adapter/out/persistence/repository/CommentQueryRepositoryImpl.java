@@ -7,7 +7,6 @@ import konkuk.thip.comment.adapter.out.jpa.QCommentJpaEntity;
 import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.comment.application.port.out.dto.QCommentQueryDto;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,7 +23,6 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
     private final QCommentJpaEntity comment = QCommentJpaEntity.commentJpaEntity;
     private final QUserJpaEntity commentCreator = QUserJpaEntity.userJpaEntity;
-    private final QAliasJpaEntity aliasOfCommentCreator = QAliasJpaEntity.aliasJpaEntity;
     private final QCommentJpaEntity parentComment = new QCommentJpaEntity("parentComment");
     private final QUserJpaEntity parentCommentCreator = new QUserJpaEntity("parentCommentCreator");
 
