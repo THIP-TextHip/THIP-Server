@@ -31,7 +31,7 @@ public record RoomRecruitingDetailViewResponse(
     @Builder
     public record RecommendRoom(
             Long roomId,
-            String roomImageUrl,
+            String bookImageUrl,
             String roomName,
             int memberCount,
             int recruitCount,

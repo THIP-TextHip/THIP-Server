@@ -178,8 +178,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, String category, int count) {
         NumberExpression<Long> memberCountExpr = participant.roomParticipantId.count();
         List<Tuple> tuples = queryFactory
-                .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate)
+                .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate, book.imageUrl)
                 .from(room)
+                .join(room.bookJpaEntity, book)
                 .leftJoin(participant).on(participant.roomJpaEntity.eq(room))
                 .where(
                         room.categoryJpaEntity.value.eq(category)
@@ -195,7 +196,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         return tuples.stream()
                 .map(t -> RoomRecruitingDetailViewResponse.RecommendRoom.builder()
                         .roomId(t.get(room.roomId))
-                        .roomImageUrl(null)     // roomImageUrl은 추후 구현
+                        .bookImageUrl(t.get(book.imageUrl))
                         .roomName(t.get(room.title))
                         .memberCount(t.get(memberCountExpr).intValue())
                         .recruitCount(t.get(room.recruitCount))

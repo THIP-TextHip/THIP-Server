@@ -46,6 +46,29 @@ public class DateUtil {
         return minutes + "분 뒤";
     }
 
+    public static String RecruitingRoomFormatAfterTime(LocalDate date) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dateTime = date.atStartOfDay();
+        Duration d = Duration.between(now, dateTime);
+
+        if (d.isNegative() || d.isZero()) {
+            return "??";
+        }
+
+        long days = d.toDays();
+        if (days > 0) {
+            return days + "일 남음";
+        }
+
+        long hours = d.toHours();
+        if (hours >= 1) {
+            return hours + "시간 남음";
+        }
+
+        return "마감 임박";
+    }
+
+
     public static String formatDate(LocalDate date) {
         return date.format(DATE_FORMATTER);
     }

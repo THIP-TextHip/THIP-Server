@@ -135,7 +135,7 @@ public class Room extends BaseDomainEntity {
         if (isRecruitmentPeriodExpired()) {
             String message = String.format("모집기간(%s까지)이 만료된 방에는 참여할 수 없습니다.", deadline);
             throw new InvalidStateException(
-                    ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, new IllegalArgumentException(message)
+                    ROOM_RECRUITMENT_PERIOD_EXPIRED, new IllegalArgumentException(message)
             );
         }
     }
