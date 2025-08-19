@@ -7,16 +7,11 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaReposito
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,40 +43,25 @@ class FeedDeleteApiTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private CommentJpaRepository commentJpaRepository;
     @Autowired private CommentLikeJpaRepository commentLikeJpaRepository;
-    @Autowired private TagJpaRepository tagJpaRepository;
-    @Autowired private FeedTagJpaRepository feedTagJpaRepository;
-    @Autowired private ContentJpaRepository contentJpaRepository;
     @Autowired private PostLikeJpaRepository postLikeJpaRepository;
     @Autowired private SavedFeedJpaRepository savedFeedJpaRepository;
 
 
-    private AliasJpaEntity alias;
     private UserJpaEntity user;
-    private CategoryJpaEntity category;
     private FeedJpaEntity feed;
     private BookJpaEntity book;
-    private TagJpaEntity tag1;
-    private TagJpaEntity tag2;
     private CommentJpaEntity comment;
 
     @BeforeEach
     void setUp() {
-        alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        tag1 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category, KOREAN_NOVEL.getValue()));
-        tag2 = tagJpaRepository.save(TestEntityFactory.createLiteratureTag(category, FOREIGN_NOVEL.getValue()));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true,1,1,List.of("url1", "url2", "url3")));
-        feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(feed, tag1));
-        feedTagJpaRepository.save(TestEntityFactory.createFeedTagMapping(feed, tag2));
         postLikeJpaRepository.save(TestEntityFactory.createPostLike(user,feed));
         comment = commentJpaRepository.save(TestEntityFactory.createComment(feed, user, FEED));
         commentLikeJpaRepository.save(TestEntityFactory.createCommentLike(comment,user));
@@ -106,9 +86,6 @@ class FeedDeleteApiTest {
 
         // 2) 피드 태그 관계 삭제
         assertTrue(feedTagJpaRepository.findAll().isEmpty());
-
-        // 3) 콘텐츠 삭제
-        assertTrue(contentJpaRepository.findAll().isEmpty());
 
         // 4) 댓글 삭제 soft delete
         assertThat(commentJpaRepository.findById(comment.getCommentId())).isPresent();

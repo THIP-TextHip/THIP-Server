@@ -4,7 +4,6 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
@@ -51,9 +50,6 @@ class FeedShowMineApiTest {
     private FeedJpaRepository feedJpaRepository;
 
     @Autowired
-    private ContentJpaRepository contentJpaRepository;
-
-    @Autowired
     private FollowingJpaRepository followingJpaRepository;
 
     @Autowired
@@ -72,7 +68,6 @@ class FeedShowMineApiTest {
     void tearDown() {
         postLikeJpaRepository.deleteAllInBatch();
         savedFeedJpaRepository.deleteAllInBatch();
-        contentJpaRepository.deleteAllInBatch();
         feedJpaRepository.deleteAllInBatch();
         followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();

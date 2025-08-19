@@ -4,12 +4,12 @@ import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.S3CommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class FeedCreateService implements FeedCreateUseCase {
 
         // 1. 피드 생성 비지니스 정책 검증
         Feed.validateTags(command.tagList());
-        Feed.validateImageCount(images != null ? images.size() : 0);
+        ContentList.validateImageCount(images != null ? images.size() : 0);
 
         // 2. Book 검증 및 조회
         Long targetBookId = findOrCreateBookByIsbn(command.isbn());

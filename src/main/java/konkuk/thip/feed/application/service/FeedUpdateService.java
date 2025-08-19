@@ -4,8 +4,8 @@ import konkuk.thip.feed.application.port.in.FeedUpdateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedUpdateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.S3CommandPort;
-import konkuk.thip.feed.domain.Content;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class FeedUpdateService implements FeedUpdateUseCase {
 
         //1. 유효성 검증
         Feed.validateTags(command.tagList());
-        Feed.validateImageCount(command.remainImageUrls() != null ? command.remainImageUrls().size() : 0);
+        ContentList.validateImageCount(command.remainImageUrls() != null ? command.remainImageUrls().size() : 0);
 
         // 2. 피드 조회
         Feed feed = feedCommandPort.getByIdOrThrow(command.feedId());
@@ -55,12 +55,7 @@ public class FeedUpdateService implements FeedUpdateUseCase {
 
     //TODO 추후 이벤트 기반으로 트랜잭션 커밋후 S3 삭제하도록 리펙토링 or 사용하지 않는 이미지 배치 삭제방식 논의
     private void handleFeedImageDelete(Feed feed, List<String> remainImageUrls) {
-        List<String> oldImageUrls = feed.getContentList().stream()
-                .map(Content::getContentUrl)
-                .filter(url -> url != null && !url.isBlank())
-                .toList();
-
-        List<String> toDelete = oldImageUrls.stream()
+        List<String> toDelete = feed.getContentList().stream()
                 .filter(url -> !remainImageUrls.contains(url))
                 .toList();
         if (!toDelete.isEmpty()) {

@@ -251,7 +251,6 @@ class FeedCreateApiTest {
         // Content 검증
         assertThat(feedJpaEntity.getContentList()).hasSize(3);
         assertThat(feedJpaEntity.getContentList())
-                .extracting("contentUrl")
                 .containsExactlyInAnyOrder(
                         "https://mock-s3-bucket/fake-image-url.jpg",
                         "https://mock-s3-bucket/fake-image-url.jpg",

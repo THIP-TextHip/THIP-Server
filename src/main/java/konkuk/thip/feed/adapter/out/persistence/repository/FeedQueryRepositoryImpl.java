@@ -1,19 +1,21 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.*;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.feed.adapter.out.jpa.*;
+import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QTagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
-import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +35,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     private final QFeedJpaEntity feed = QFeedJpaEntity.feedJpaEntity;
-    private final QContentJpaEntity content = QContentJpaEntity.contentJpaEntity;
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
-    private final QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
     private final QSavedFeedJpaEntity savedFeed = QSavedFeedJpaEntity.savedFeedJpaEntity;
@@ -170,9 +170,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         return jpaQueryFactory
                 .select(feed).distinct()
                 .from(feed)
-                .leftJoin(feed.contentList, content).fetchJoin()
                 .leftJoin(feed.userJpaEntity, user).fetchJoin()
-                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
                 .leftJoin(feed.bookJpaEntity, book).fetchJoin()
                 .where(feed.postId.in(ids))
                 .fetch();
@@ -259,27 +257,24 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .fetch();
     }
 
-    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority) {
-        String[] urls = e.getContentList().stream()
-                .map(ContentJpaEntity::getContentUrl)
-                .toArray(String[]::new);
+    private FeedQueryDto toDto(FeedJpaEntity f, Integer priority) {
         boolean isPriorityFeed = (priority != null && priority == 1);
 
         return FeedQueryDto.builder()
-                .feedId(e.getPostId())
-                .creatorId(e.getUserJpaEntity().getUserId())
-                .creatorNickname(e.getUserJpaEntity().getNickname())
-                .creatorProfileImageUrl(e.getUserJpaEntity().getAlias().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함 -> 오 이거 그냥 이렇게 하면 되네??
-                .alias(e.getUserJpaEntity().getAlias().getValue())
-                .createdAt(e.getCreatedAt())
-                .isbn(e.getBookJpaEntity().getIsbn())
-                .bookTitle(e.getBookJpaEntity().getTitle())
-                .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                .contentBody(e.getContent())
-                .contentUrls(urls)
-                .likeCount(e.getLikeCount())
-                .commentCount(e.getCommentCount())
-                .isPublic(e.getIsPublic())
+                .feedId(f.getPostId())
+                .creatorId(f.getUserJpaEntity().getUserId())
+                .creatorNickname(f.getUserJpaEntity().getNickname())
+                .creatorProfileImageUrl(f.getUserJpaEntity().getAlias().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
+                .alias(f.getUserJpaEntity().getAlias().getValue())
+                .createdAt(f.getCreatedAt())
+                .isbn(f.getBookJpaEntity().getIsbn())
+                .bookTitle(f.getBookJpaEntity().getTitle())
+                .bookAuthor(f.getBookJpaEntity().getAuthorName())
+                .contentBody(f.getContent())
+                .contentUrls(f.getContentList().toArray(String[]::new))
+                .likeCount(f.getLikeCount())
+                .commentCount(f.getCommentCount())
+                .isPublic(f.getIsPublic())
                 .isPriorityFeed(isPriorityFeed)
                 .build();
     }
@@ -357,24 +352,12 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 book.title,
                 book.authorName,
                 feed.content,
-                // 서브쿼리로 N:1 방지
-                JPAExpressions
-                        .select(contentUrlAggExpr())
-                        .from(content)
-                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.contentList,
                 feed.likeCount,
                 feed.commentCount,
                 feed.isPublic,
                 Expressions.nullExpression(),
                 Expressions.nullExpression()
-        );
-    }
-
-    // contentUrl을 GROUP_CONCAT으로 묶어서 반환하는 표현식
-    private StringExpression contentUrlAggExpr() {
-        return Expressions.stringTemplate(
-                "group_concat({0})",
-                content.contentUrl
         );
     }
 
@@ -443,11 +426,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 book.title,
                 book.authorName,
                 feed.content,
-                // Content는 N:1 방지 위해 서브쿼리 사용
-                JPAExpressions
-                        .select(contentUrlAggExpr())
-                        .from(content)
-                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.contentList,
                 feed.likeCount,
                 feed.commentCount,
                 feed.isPublic,

@@ -5,16 +5,11 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestS3MockConfig;
-import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
+import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +30,7 @@ import java.util.stream.Collectors;
 
 import static konkuk.thip.feed.domain.Tag.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -51,21 +46,13 @@ class FeedUpdateApiTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private TagJpaRepository tagJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
-    @Autowired private FeedTagJpaRepository feedTagJpaRepository;
-    @Autowired private ContentJpaRepository contentJpaRepository;
 
     private UserJpaEntity user;
     private BookJpaEntity book;
     private FeedJpaEntity feed;
-    private TagJpaEntity tag1;
-    private TagJpaEntity tag2;
-    private TagJpaEntity tag3;
 
     @BeforeEach
     void setUp() {
@@ -145,12 +132,7 @@ class FeedUpdateApiTest {
         result.andExpect(status().isOk());
         FeedJpaEntity updatedFeed = feedJpaRepository.findById(feedId).orElseThrow();
         assertThat(updatedFeed.getContentList()).hasSize(1);
-        assertThat(updatedFeed.getContentList().get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
-        List<ContentJpaEntity> contentRows = contentJpaRepository.findAll().stream()
-                .filter(c -> c.getPostJpaEntity().getPostId().equals(feedId))
-                .toList();
-        assertThat(contentRows).hasSize(1);
-        assertThat(contentRows.get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
+        assertThat(updatedFeed.getContentList().get(0)).isEqualTo("https://s3-mock/image-2.jpg");
     }
 
     @Test
@@ -197,12 +179,7 @@ class FeedUpdateApiTest {
         assertThat(updated.getIsPublic()).isFalse();
         // 3. 이미지
         assertThat(updated.getContentList()).hasSize(1);
-        assertThat(updated.getContentList().get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
-        List<ContentJpaEntity> contentRows = contentJpaRepository.findAll().stream()
-                .filter(c -> c.getPostJpaEntity().getPostId().equals(feedId))
-                .toList();
-        assertThat(contentRows).hasSize(1);
-        assertThat(contentRows.get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
+        assertThat(updated.getContentList().get(0)).isEqualTo("https://s3-mock/image-2.jpg");
         // 4. 태그 갯수
         long tagCount = feedTagJpaRepository.findAll().stream()
                 .filter(tag -> tag.getFeedJpaEntity().getPostId().equals(feedId))

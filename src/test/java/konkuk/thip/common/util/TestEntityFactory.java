@@ -4,14 +4,17 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.jpa.CommentLikeJpaEntity;
-import konkuk.thip.post.domain.PostType;
-import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
-import konkuk.thip.roompost.adapter.out.jpa.*;
-import konkuk.thip.room.adapter.out.jpa.*;
+import konkuk.thip.post.domain.PostType;
+import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.domain.Category;
+import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -19,7 +22,6 @@ import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.domain.Alias;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -280,7 +282,7 @@ public class TestEntityFactory {
                 .reportCount(0)
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
-                .contentList(new ArrayList<>())
+                .contentList(ContentList.empty())
                 .build();
     }
 
@@ -294,17 +296,9 @@ public class TestEntityFactory {
                 .reportCount(0)
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
-                .contentList(new ArrayList<>())
+                .contentList(ContentList.of(imageUrls))
                 .build();
 
-        List<ContentJpaEntity> contents = imageUrls.stream()
-                .map(url -> ContentJpaEntity.builder()
-                        .contentUrl(url)
-                        .postJpaEntity(feed)
-                        .build())
-                .toList();
-
-        feed.getContentList().addAll(contents);
         return feed;
     }
 
@@ -326,17 +320,8 @@ public class TestEntityFactory {
                 .reportCount(0)
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
-                .contentList(new ArrayList<>())
+                .contentList(ContentList.of(imageUrls))
                 .build();
-
-        // 2) 이미지 URL 리스트 → ContentJpaEntity 매핑
-        List<ContentJpaEntity> contents = imageUrls.stream()
-                .map(url -> ContentJpaEntity.builder()
-                        .contentUrl(url)
-                        .postJpaEntity(feed)
-                        .build())
-                .toList();
-        feed.getContentList().addAll(contents);
 
         return feed;
     }
