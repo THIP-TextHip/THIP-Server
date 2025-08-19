@@ -33,6 +33,8 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
     public RoomRecruitingDetailViewResponse getRecruitingRoomDetailView(Long userId, Long roomId) {
         // 1. Room 조회, Book 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
+        room.validateRoomRecruitExpired(); // 모집기간 지난 방 예외처리
+
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 2. Room과 연관된 UserRoom 조회, RoomParticipants 일급 컬렉션 생성
@@ -62,7 +64,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
                 .isPublic(room.isPublic())
                 .progressStartDate(DateUtil.formatDate(room.getStartDate()))
                 .progressEndDate(DateUtil.formatDate(room.getEndDate()))
-                .recruitEndDate(DateUtil.formatAfterTime(room.getStartDate()))
+                .recruitEndDate(DateUtil.RecruitingRoomFormatAfterTime(room.getStartDate()))
                 .category(room.getCategory().getValue())
                 .categoryColor(roomQueryPort.findAliasColorOfCategory(room.getCategory()))      // TODO : 리펙토링 대상
                 .roomDescription(room.getDescription())
