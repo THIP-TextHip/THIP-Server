@@ -202,7 +202,7 @@ class RoomPlayingDetailViewApiTest {
                 .andExpect(jsonPath("$.data.isbn", is("isbn1")))
                 .andExpect(jsonPath("$.data.bookTitle", is("과학-책")))
                 .andExpect(jsonPath("$.data.currentPage", is(50)))
-                .andExpect(jsonPath("$.data.userPercentage", is(10.6)))
+                .andExpect(jsonPath("$.data.userPercentage", is(10)))       // 내림
                 .andExpect(jsonPath("$.data.currentVotes", hasSize(2)))
                 /**
                  * currentVotes 검증 : 현재 모임방의 참여율이 높은 투표와 투표 항목들을 노출
@@ -250,7 +250,7 @@ class RoomPlayingDetailViewApiTest {
                 .andExpect(jsonPath("$.data.isbn", is("isbn1")))
                 .andExpect(jsonPath("$.data.bookTitle", is("과학-책")))
                 .andExpect(jsonPath("$.data.currentPage", is(50)))
-                .andExpect(jsonPath("$.data.userPercentage", is(10.6)))
+                .andExpect(jsonPath("$.data.userPercentage", is(10)))       // 내림
                 .andExpect(jsonPath("$.data.currentVotes", hasSize(2)))
                 /**
                  * currentVotes 검증 : 현재 모임방의 참여율이 높은 투표와 투표 항목들을 노출
@@ -324,7 +324,7 @@ class RoomPlayingDetailViewApiTest {
                 .andExpect(jsonPath("$.data.isbn", is("isbn1")))
                 .andExpect(jsonPath("$.data.bookTitle", is("과학-책")))
                 .andExpect(jsonPath("$.data.currentPage", is(50)))
-                .andExpect(jsonPath("$.data.userPercentage", is(10.6)))
+                .andExpect(jsonPath("$.data.userPercentage", is(10)))       // 내림
                 .andExpect(jsonPath("$.data.currentVotes", hasSize(3)))
                 /**
                  * currentVotes 검증 : 현재 모임방의 참여율이 높은 투표와 투표 항목들을 노출
@@ -376,7 +376,7 @@ class RoomPlayingDetailViewApiTest {
                 .andExpect(jsonPath("$.data.isbn", is("isbn1")))
                 .andExpect(jsonPath("$.data.bookTitle", is("과학-책")))
                 .andExpect(jsonPath("$.data.currentPage", is(50)))
-                .andExpect(jsonPath("$.data.userPercentage", is(10.6)))
+                .andExpect(jsonPath("$.data.userPercentage", is(10)))       // 내림
                 .andExpect(jsonPath("$.data.currentVotes", hasSize(0)));        // 투표 없음
     }
 }
