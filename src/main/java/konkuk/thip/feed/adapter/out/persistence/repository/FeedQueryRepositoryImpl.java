@@ -378,11 +378,11 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         );
     }
 
-    // 필터링 조건: 책 ISBN과 사용자 ID를 제외한 다른 사용자 공개 피드
+    // 필터링 조건: 책 ISBN & 공개 피드
     private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
         return feed.status.eq(StatusType.ACTIVE)
                 .and(feed.bookJpaEntity.isbn.eq(isbn))
-                .and(feed.userJpaEntity.userId.ne(userId))
+//                .and(feed.userJpaEntity.userId.ne(userId))
                 .and(feed.isPublic.eq(true));
     }
 
