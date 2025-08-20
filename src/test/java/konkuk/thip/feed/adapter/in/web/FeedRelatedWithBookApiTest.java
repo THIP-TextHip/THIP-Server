@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -255,7 +256,7 @@ class FeedRelatedWithBookApiTest {
     }
 
     @Test
-    @DisplayName("비공개 피드 제외 및 자기 자신 피드 제외 검증")
+    @DisplayName("비공개 피드 제외 검증 + 자기 자신 공개 피드는 포함 검증")
     void getFeedsByBook_visibility_and_self_filter() throws Exception {
         // given
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -273,8 +274,8 @@ class FeedRelatedWithBookApiTest {
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN(VALID_ISBN));
 
         // 자기 자신 글 두 개 생성
-        FeedJpaEntity myPublic = TestEntityFactory.createFeed(requester, book, true);
-        FeedJpaEntity myPrivate = TestEntityFactory.createFeed(requester, book, false);
+        FeedJpaEntity myPublic = TestEntityFactory.createFeed(requester, book, true);       // 내 공개 피드
+        FeedJpaEntity myPrivate = TestEntityFactory.createFeed(requester, book, false);     // 내 비공개 피드
         feedJpaRepository.saveAll(List.of(myPublic, myPrivate));
 
         // 다른 사람 공개 글 하나 생성
@@ -295,10 +296,17 @@ class FeedRelatedWithBookApiTest {
         JsonNode root = objectMapper.readTree(json);
         JsonNode feeds = root.path("data").path("feeds");
 
-        // 자기 자신 글 제외 비공개 제외로 인해 only othersPublic 만 남아야 함
-        assertThat(feeds.size()).isEqualTo(1);
-        assertThat(feeds.get(0).path("creatorId").asLong()).isEqualTo(other.getUserId());
-        assertThat(feeds.get(0).path("isWriter").asBoolean()).isFalse();
+        // 자기 자신 글은 포함 & 비공개 글은 제외 -> 자기 자신의 공개 피드 + othersPublic (= 2개)만 남아야 함
+        List<Long> feedIds = new ArrayList<>();
+        for (JsonNode f : feeds) {
+            feedIds.add(f.path("feedId").asLong());
+        }
+
+        assertThat(feedIds.size()).isEqualTo(2);
+        assertThat(feedIds).containsExactlyInAnyOrder(
+                myPublic.getPostId(),
+                othersPublic.getPostId()
+        );
     }
 
     private TestData prepareDataForFeeds() {
