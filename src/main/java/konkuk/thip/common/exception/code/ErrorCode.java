@@ -141,7 +141,7 @@ public enum ErrorCode implements ResponseCode {
     INVALID_MY_ROOM_TYPE(HttpStatus.BAD_REQUEST, 140009, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 MY ROOM type 이 있습니다."),
     INVALID_MY_ROOM_CURSOR(HttpStatus.BAD_REQUEST, 140010, "유저가 참가한 방 목록 검색 요청에 유효하지 않은 cursor 가 있습니다"),
     ROOM_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 140011, "방 접근 권한이 없습니다."),
-
+    ROOM_HOST_CANNOT_LEAVE(HttpStatus.BAD_REQUEST, 140012, "방장은 방을 나갈 수 없습니다."),
     /**
      * 150000 : Category error
      */
