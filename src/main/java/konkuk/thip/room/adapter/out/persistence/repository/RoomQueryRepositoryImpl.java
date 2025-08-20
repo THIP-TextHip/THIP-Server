@@ -250,11 +250,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         .bookImageUrl(t.get(book.imageUrl))
                         .roomTitle(t.get(room.title))
                         .memberCount(t.get(room.memberCount))
-                        .userPercentage(Optional.ofNullable(t.get(participant.userPercentage))
-                                        .map(val -> ((Number) val).doubleValue())
-                                                .map(Math::round)
-                                                .map(Long::intValue)
-                                                .orElse(0))
+                        .userPercentage(t.get(participant.userPercentage).intValue())
                         .build()
                 )
                 .toList();
