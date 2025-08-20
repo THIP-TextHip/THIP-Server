@@ -6,8 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_COMMAND;
-import static konkuk.thip.common.exception.code.ErrorCode.TAG_SHOULD_BE_UNIQUE;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 public final class TagList extends AbstractList<Tag> implements Serializable {
 
@@ -34,13 +33,12 @@ public final class TagList extends AbstractList<Tag> implements Serializable {
     // todo presignedURL 도입 전 임시 유효성 검증 메서드
     public static void validateTags(List<Tag> tags) {
         if (tags.size() > MAX_SIZE) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND,
+            throw new InvalidStateException(TAG_LIST_SIZE_OVERFLOW,
                     new IllegalArgumentException("태그는 최대 " + MAX_SIZE + "개까지 입력할 수 있습니다."));
         }
         long distinctCount = tags.stream().distinct().count();
         if (distinctCount != tags.size()) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND,
-                    new IllegalArgumentException(TAG_SHOULD_BE_UNIQUE.getMessage()));
+            throw new InvalidStateException(TAG_SHOULD_BE_UNIQUE);
         }
     }
 

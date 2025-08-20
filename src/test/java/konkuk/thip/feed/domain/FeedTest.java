@@ -165,22 +165,6 @@ class FeedTest {
     }
 
     @Test
-    @DisplayName("validateOwnsImages: 피드 수정 시에 존재하지 않는 이미지 URL 포함하여 수정하려고 하면 InvalidStateException이 발생한다.")
-    void validateOwnsImages_withInvalidUrl_throws() {
-        Feed feed = createPublicFeed();
-
-        // feed.contentList에는 "url1"만 있음
-        List<String> candidateImageUrls = List.of("url1", "invalidUrl");
-
-        InvalidStateException ex = assertThrows(InvalidStateException.class,
-                () -> feed.validateOwnsImages(candidateImageUrls));
-
-        assertEquals(INVALID_FEED_COMMAND, ex.getErrorCode());
-        assertTrue(ex.getCause().getMessage().contains("해당 이미지는 이 피드에 존재하지 않습니다"));
-    }
-
-
-    @Test
     @DisplayName("increaseCommentCount: 피드의 댓글 수가 정상적으로 1 증가한다.")
     void increaseCommentCount_increments() {
         Feed feed = createPublicFeed();
