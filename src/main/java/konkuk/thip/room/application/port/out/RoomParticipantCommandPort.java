@@ -1,11 +1,12 @@
 package konkuk.thip.room.application.port.out;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.domain.RoomParticipant;
 
 import java.util.List;
 import java.util.Optional;
+
+import static konkuk.thip.common.exception.code.ErrorCode.ROOM_PARTICIPANT_NOT_FOUND;
 
 public interface RoomParticipantCommandPort {
 
@@ -13,7 +14,7 @@ public interface RoomParticipantCommandPort {
 
     default RoomParticipant getByUserIdAndRoomIdOrThrow(Long userId, Long roomId) {
         return findByUserIdAndRoomIdOptional(userId, roomId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.ROOM_PARTICIPANT_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException(ROOM_PARTICIPANT_NOT_FOUND));
     }
 
     List<RoomParticipant> findAllByRoomId(Long roomId);
