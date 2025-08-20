@@ -22,6 +22,7 @@ public interface RoomQueryMapper {
 
     @Mapping(target = "endDate", expression = "java(DateUtil.formatAfterTime(dto.endDate()))")
     @Mapping(target = "type", expression = "java(myRoomType.getType())")
+    @Mapping(target = "isPublic", expression = "java(Boolean.TRUE.equals(dto.isPublic()))")
     RoomShowMineResponse.MyRoom toShowMyRoomResponse(RoomQueryDto dto, @Context MyRoomType myRoomType);
 
     @Mapping(
