@@ -6,6 +6,7 @@ import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.roompost.application.service.manager.RoomProgressManager;
 import konkuk.thip.roompost.application.port.in.VoteCreateUseCase;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteCreateCommand;
@@ -47,6 +48,7 @@ public class VoteCreateService implements VoteCreateUseCase {
                 command.roomId()
         );
 
+        RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(command.userId(), command.roomId());
         Room room = roomCommandPort.getByIdOrThrow(vote.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
         validateVote(vote, book);
@@ -64,7 +66,7 @@ public class VoteCreateService implements VoteCreateUseCase {
         voteCommandPort.saveAllVoteItems(voteItems);
 
         // 4. RoomParticipant, Room progress 정보 update
-        roomProgressManager.updateUserAndRoomProgress(vote.getCreatorId(), vote.getRoomId(), vote.getPage());
+        roomProgressManager.updateUserAndRoomProgress(roomParticipant, room, book, vote.getPage());
 
         return VoteCreateResult.of(savedVoteId, command.roomId());
     }

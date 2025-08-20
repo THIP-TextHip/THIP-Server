@@ -84,7 +84,9 @@ public enum SwaggerResponseDescription {
             ROOM_PASSWORD_NOT_REQUIRED
     ))),
     ROOM_RECRUITING_DETAIL_VIEW(new LinkedHashSet<>(Set.of(
-            ROOM_NOT_FOUND
+            ROOM_NOT_FOUND,
+            BOOK_NOT_FOUND,
+            ROOM_RECRUITMENT_PERIOD_EXPIRED
     ))),
     ROOM_GET_HOME_JOINED_LIST(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
@@ -114,6 +116,11 @@ public enum SwaggerResponseDescription {
             POST_LIKE_COUNT_UNDERFLOW,
             ROOM_ACCESS_FORBIDDEN,
             ROOM_POST_TYPE_NOT_MATCH
+    ))),
+    ROOM_LEAVE(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND,
+            ROOM_PARTICIPANT_NOT_FOUND,
+            ROOM_HOST_CANNOT_LEAVE
     ))),
 
 
@@ -292,7 +299,8 @@ public enum SwaggerResponseDescription {
             ROOM_ACCESS_FORBIDDEN,
             ROOM_NOT_FOUND,
             USER_NOT_FOUND,
-            ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED
+            ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED,
+            ATTENDANCE_CHECK_NOT_FOUND
     ))),
 
     ATTENDANCE_CHECK_SHOW(new LinkedHashSet<>(Set.of(

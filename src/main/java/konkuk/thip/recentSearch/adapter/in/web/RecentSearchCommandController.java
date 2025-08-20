@@ -1,6 +1,7 @@
 package konkuk.thip.recentSearch.adapter.in.web;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
@@ -25,7 +26,7 @@ public class RecentSearchCommandController {
     @DeleteMapping("/recent-searches/{recentSearchId}")
     public BaseResponse<Void> deleteRecentSearch(
             @PathVariable(value = "recentSearchId") final Long recentSearchId,
-            @UserId final Long userId
+            @Parameter(hidden = true) @UserId final Long userId
     ) {
         return BaseResponse.ok(recentSearchDeleteUseCase.deleteRecentSearch(recentSearchId, userId));
     }

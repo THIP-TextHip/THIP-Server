@@ -1,10 +1,8 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.*;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
@@ -370,7 +368,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
         return feed.status.eq(StatusType.ACTIVE)
                 .and(feed.bookJpaEntity.isbn.eq(isbn))
-                .and(feed.userJpaEntity.userId.ne(userId))
+//                .and(feed.userJpaEntity.userId.ne(userId))
                 .and(feed.isPublic.eq(true));
     }
 
