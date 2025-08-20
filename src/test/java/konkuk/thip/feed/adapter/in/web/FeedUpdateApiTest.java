@@ -5,11 +5,9 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestS3MockConfig;
-import konkuk.thip.feed.adapter.out.jpa.ContentJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedTagJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.TagJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
@@ -39,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static konkuk.thip.feed.domain.Tag.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -62,7 +60,6 @@ class FeedUpdateApiTest {
     @Autowired private TagJpaRepository tagJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private FeedTagJpaRepository feedTagJpaRepository;
-    @Autowired private ContentJpaRepository contentJpaRepository;
 
     private UserJpaEntity user;
     private BookJpaEntity book;
@@ -149,12 +146,7 @@ class FeedUpdateApiTest {
         result.andExpect(status().isOk());
         FeedJpaEntity updatedFeed = feedJpaRepository.findById(feedId).orElseThrow();
         assertThat(updatedFeed.getContentList()).hasSize(1);
-        assertThat(updatedFeed.getContentList().get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
-        List<ContentJpaEntity> contentRows = contentJpaRepository.findAll().stream()
-                .filter(c -> c.getPostJpaEntity().getPostId().equals(feedId))
-                .toList();
-        assertThat(contentRows).hasSize(1);
-        assertThat(contentRows.get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
+        assertThat(updatedFeed.getContentList().get(0)).isEqualTo("https://s3-mock/image-2.jpg");
     }
 
     @Test
@@ -201,12 +193,7 @@ class FeedUpdateApiTest {
         assertThat(updated.getIsPublic()).isFalse();
         // 3. 이미지
         assertThat(updated.getContentList()).hasSize(1);
-        assertThat(updated.getContentList().get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
-        List<ContentJpaEntity> contentRows = contentJpaRepository.findAll().stream()
-                .filter(c -> c.getPostJpaEntity().getPostId().equals(feedId))
-                .toList();
-        assertThat(contentRows).hasSize(1);
-        assertThat(contentRows.get(0).getContentUrl()).isEqualTo("https://s3-mock/image-2.jpg");
+        assertThat(updated.getContentList().get(0)).isEqualTo("https://s3-mock/image-2.jpg");
         // 4. 태그 갯수
         long tagCount = feedTagJpaRepository.findAll().stream()
                 .filter(tag -> tag.getFeedJpaEntity().getPostId().equals(feedId))

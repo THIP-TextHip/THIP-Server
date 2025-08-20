@@ -4,7 +4,9 @@ package konkuk.thip.feed.adapter.out.jpa;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.converter.ContentListJsonConverter;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.AccessLevel;
@@ -32,8 +34,10 @@ public class FeedJpaEntity extends PostJpaEntity {
     @JoinColumn(name = "book_id")
     private BookJpaEntity bookJpaEntity;
 
-    @OneToMany(mappedBy = "postJpaEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ContentJpaEntity> contentList;
+    // JSON 문자열로 저장되는 단일 컬럼
+    @Convert(converter = ContentListJsonConverter.class)
+    @Column(name = "content_list", columnDefinition = "TEXT", nullable = false)
+    private ContentList contentList = ContentList.empty();
 
     // 삭제용 피드 저장 양방향 매핑 관계
     @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -44,12 +48,12 @@ public class FeedJpaEntity extends PostJpaEntity {
     private List<FeedTagJpaEntity> feedTags = new ArrayList<>();
 
     @Builder
-    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, List<ContentJpaEntity> contentList) {
+    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, ContentList contentList) {
         super(content, likeCount, commentCount, userJpaEntity);
         this.isPublic = isPublic;
         this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
-        this.contentList = contentList;
+        if(contentList != null) this.contentList = contentList;
     }
 
     public void updateFrom(Feed feed) {
@@ -58,6 +62,7 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.reportCount = feed.getReportCount();
         this.likeCount = feed.getLikeCount();
         this.commentCount = feed.getCommentCount();
+        this.contentList = feed.getContentList();
     }
 
     @VisibleForTesting

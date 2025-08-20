@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
-import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FEED_COMMAND;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -155,8 +154,8 @@ class FeedCreateControllerTest {
             );
 
             result.andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(INVALID_FEED_COMMAND.getCode()))
-                    .andExpect(jsonPath("$.message",containsString("이미지는 최대 3개까지 업로드할 수 있습니다.")));
+                    .andExpect(jsonPath("$.code").value(CONTENT_LIST_SIZE_OVERFLOW.getCode()))
+                    .andExpect(jsonPath("$.message",containsString(CONTENT_LIST_SIZE_OVERFLOW.getMessage())));
 
         }
     }

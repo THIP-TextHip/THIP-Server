@@ -7,7 +7,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.feed.adapter.out.jpa.*;
+import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
+import konkuk.thip.feed.adapter.out.jpa.QTagJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QTagCategoryQueryDto;
@@ -33,7 +36,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     private final QFeedJpaEntity feed = QFeedJpaEntity.feedJpaEntity;
-    private final QContentJpaEntity content = QContentJpaEntity.contentJpaEntity;
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
     private final QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
@@ -170,7 +172,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         return jpaQueryFactory
                 .select(feed).distinct()
                 .from(feed)
-                .leftJoin(feed.contentList, content).fetchJoin()
                 .leftJoin(feed.userJpaEntity, user).fetchJoin()
                 .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
                 .leftJoin(feed.bookJpaEntity, book).fetchJoin()
@@ -259,27 +260,24 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .fetch();
     }
 
-    private FeedQueryDto toDto(FeedJpaEntity e, Integer priority) {
-        String[] urls = e.getContentList().stream()
-                .map(ContentJpaEntity::getContentUrl)
-                .toArray(String[]::new);
+    private FeedQueryDto toDto(FeedJpaEntity f, Integer priority) {
         boolean isPriorityFeed = (priority != null && priority == 1);
 
         return FeedQueryDto.builder()
-                .feedId(e.getPostId())
-                .creatorId(e.getUserJpaEntity().getUserId())
-                .creatorNickname(e.getUserJpaEntity().getNickname())
-                .creatorProfileImageUrl(e.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
-                .alias(e.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
-                .createdAt(e.getCreatedAt())
-                .isbn(e.getBookJpaEntity().getIsbn())
-                .bookTitle(e.getBookJpaEntity().getTitle())
-                .bookAuthor(e.getBookJpaEntity().getAuthorName())
-                .contentBody(e.getContent())
-                .contentUrls(urls)
-                .likeCount(e.getLikeCount())
-                .commentCount(e.getCommentCount())
-                .isPublic(e.getIsPublic())
+                .feedId(f.getPostId())
+                .creatorId(f.getUserJpaEntity().getUserId())
+                .creatorNickname(f.getUserJpaEntity().getNickname())
+                .creatorProfileImageUrl(f.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
+                .alias(f.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                .createdAt(f.getCreatedAt())
+                .isbn(f.getBookJpaEntity().getIsbn())
+                .bookTitle(f.getBookJpaEntity().getTitle())
+                .bookAuthor(f.getBookJpaEntity().getAuthorName())
+                .contentBody(f.getContent())
+                .contentUrls(f.getContentList().toArray(String[]::new))
+                .likeCount(f.getLikeCount())
+                .commentCount(f.getCommentCount())
+                .isPublic(f.getIsPublic())
                 .isPriorityFeed(isPriorityFeed)
                 .build();
     }
@@ -357,11 +355,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 book.title,
                 book.authorName,
                 feed.content,
-                // 서브쿼리로 N:1 방지
-                JPAExpressions
-                        .select(contentUrlAggExpr())
-                        .from(content)
-                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.contentList,
                 feed.likeCount,
                 feed.commentCount,
                 feed.isPublic,
@@ -370,15 +364,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         );
     }
 
-    // contentUrl을 GROUP_CONCAT으로 묶어서 반환하는 표현식
-    private StringExpression contentUrlAggExpr() {
-        return Expressions.stringTemplate(
-                "group_concat({0})",
-                content.contentUrl
-        );
-    }
-
-    // 필터링 조건: 책 ISBN & 공개 피드
+    // 필터링 조건: 책 ISBN과 사용자 ID를 제외한 다른 사용자 공개 피드
     private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
         return feed.status.eq(StatusType.ACTIVE)
                 .and(feed.bookJpaEntity.isbn.eq(isbn))
@@ -443,11 +429,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 book.title,
                 book.authorName,
                 feed.content,
-                // Content는 N:1 방지 위해 서브쿼리 사용
-                JPAExpressions
-                        .select(contentUrlAggExpr())
-                        .from(content)
-                        .where(content.postJpaEntity.postId.eq(feed.postId)),
+                feed.contentList,
                 feed.likeCount,
                 feed.commentCount,
                 feed.isPublic,
