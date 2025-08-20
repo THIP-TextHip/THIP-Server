@@ -85,4 +85,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
     public void updateIsPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
+
+    @VisibleForTesting
+    public void updateRoomPercentage(double roomPercentage) {this.roomPercentage = roomPercentage;}
 }
