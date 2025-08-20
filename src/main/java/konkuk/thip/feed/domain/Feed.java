@@ -12,8 +12,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -162,20 +160,10 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     public void updateImages(Long userId, List<String> newImageUrls) {
         validateCreator(userId);
 //        validateImageCount(newImageUrls.size());
-        validateOwnsImages(newImageUrls);
+//        validateOwnsImages(newImageUrls);
+        contentList.validateOwnImages(newImageUrls);
 
         this.contentList = convertToContentList(newImageUrls);
-    }
-
-    public void validateOwnsImages(List<String> candidateImageUrls) {
-        Set<String> myImageUrls = contentList.stream()
-                .filter(url -> url != null && !url.isBlank())
-                .collect(Collectors.toSet());
-        for (String url : candidateImageUrls) {
-            if (!myImageUrls.contains(url)) {
-                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("해당 이미지는 이 피드에 존재하지 않습니다: " + url));
-            }
-        }
     }
 
     @Override
