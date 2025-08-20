@@ -51,11 +51,16 @@ public class RoomShowMineService implements RoomShowMineUseCase {
                     }
 
                     // PLAYING_AND_RECRUITING: startDate 기준으로 진행중/모집중 구분
+                    // TODO : 방 상태 컬럼 도입되면 수정할 것
                     LocalDate now = LocalDate.now();
-                    if (dto.startDate() != null && dto.startDate().isBefore(now)) {
-                        return roomQueryMapper.toShowMyRoomResponse(dto, MyRoomType.PLAYING);   // 진행중인 방
-                    } else {
+
+                    System.out.println("dto.startDate() = " + dto.startDate());
+                    System.out.println("dto.endDate() = " + dto.endDate());
+
+                    if (dto.startDate() != null && dto.startDate().isAfter(now)) {
                         return roomQueryMapper.toShowMyRoomResponse(dto, MyRoomType.RECRUITING);    // 모집중인 방
+                    } else {
+                        return roomQueryMapper.toShowMyRoomResponse(dto, MyRoomType.PLAYING);   // 진행중인 방
                     }
                 })
                 .toList();

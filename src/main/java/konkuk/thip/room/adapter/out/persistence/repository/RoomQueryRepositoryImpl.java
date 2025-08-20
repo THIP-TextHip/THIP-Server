@@ -475,7 +475,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
-                        cursorExpr
+                        room.startDate,
+                        room.endDate,
+                        room.isPublic
                 ))
                 .from(participant)
                 .join(participant.roomJpaEntity, room)
