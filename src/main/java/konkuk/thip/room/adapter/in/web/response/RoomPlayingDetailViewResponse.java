@@ -22,7 +22,7 @@ public record RoomPlayingDetailViewResponse(
         String bookTitle,
         String authorName,
         int currentPage,
-        double userPercentage,
+        int userPercentage,
         List<CurrentVote> currentVotes
 ) {
     public record CurrentVote(

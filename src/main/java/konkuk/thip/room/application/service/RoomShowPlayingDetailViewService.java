@@ -66,7 +66,7 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
                 .bookTitle(book.getTitle())
                 .authorName(book.getAuthorName())
                 .currentPage(roomParticipants.getCurrentPageOfUser(userId))
-                .userPercentage(roomParticipants.getUserPercentageOfUser(userId))
+                .userPercentage((int) roomParticipants.getUserPercentageOfUser(userId))
                 .currentVotes(topParticipationVotes)
                 .categoryColor(roomQueryPort.findAliasColorOfCategory(room.getCategory()))      // TODO : 리펙토링 대상
                 .build();
