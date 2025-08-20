@@ -38,7 +38,7 @@ public class FeedJpaEntity extends PostJpaEntity {
 
     // JSON 문자열로 저장되는 단일 컬럼
     @Convert(converter = ContentListJsonConverter.class)
-    @Column(name = "content_list", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "content_list", columnDefinition = "TEXT")
     private ContentList contentList = ContentList.empty();
 
     // 삭제용 피드 저장 양방향 매핑 관계
@@ -47,7 +47,7 @@ public class FeedJpaEntity extends PostJpaEntity {
 
     @Column(name = "tag_list", columnDefinition = "TEXT")
     @Convert(converter = TagListJsonConverter.class)
-    private TagList tagList = TagList.of(List.of());
+    private TagList tagList = TagList.empty();
 
     @Builder
     public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, ContentList contentList, TagList tagList) {
@@ -55,9 +55,8 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.isPublic = isPublic;
         this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
-        if(contentList != null) this.contentList = contentList;
-        this.contentList = contentList;
-        this.tagList = tagList != null ? tagList : TagList.of(List.of());
+        this.contentList = contentList != null ? contentList : ContentList.empty();
+        this.tagList = tagList != null ? tagList : TagList.empty();
     }
 
     public void updateFrom(Feed feed) {
