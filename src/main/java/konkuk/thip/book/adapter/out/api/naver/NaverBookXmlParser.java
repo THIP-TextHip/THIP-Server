@@ -4,6 +4,7 @@ import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
 import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.ExternalApiException;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.StringReader;
@@ -62,12 +63,12 @@ public class NaverBookXmlParser {
                 List<Element> items = getItemElements(channel);
                 if (!items.isEmpty()) {
                     Element item = items.get(0);
-                    String title = getTagValue(item, "title");
+                    String title = StringEscapeUtils.unescapeHtml4(getTagValue(item, "title"));
                     String imageUrl = getTagValue(item, "image");
                     String author = getTagValue(item, "author");
                     String publisher = getTagValue(item, "publisher");
                     String isbn = getTagValue(item, "isbn");
-                    String description = getTagValue(item, "description");
+                    String description =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
 
                     return NaverDetailBookParseResult.builder()
                             .title(title)
