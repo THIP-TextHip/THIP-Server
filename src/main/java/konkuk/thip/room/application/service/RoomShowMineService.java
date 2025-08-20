@@ -54,8 +54,8 @@ public class RoomShowMineService implements RoomShowMineUseCase {
                     // TODO : 방 상태 컬럼 도입되면 수정할 것
                     LocalDate now = LocalDate.now();
 
-                    System.out.println("dto.startDate() = " + dto.startDate());
-                    System.out.println("dto.endDate() = " + dto.endDate());
+//                    System.out.println("dto.startDate() = " + dto.startDate());
+//                    System.out.println("dto.endDate() = " + dto.endDate());
 
                     if (dto.startDate() != null && dto.startDate().isAfter(now)) {
                         return roomQueryMapper.toShowMyRoomResponse(dto, MyRoomType.RECRUITING);    // 모집중인 방
