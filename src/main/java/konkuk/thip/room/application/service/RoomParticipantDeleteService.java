@@ -32,7 +32,7 @@ public class RoomParticipantDeleteService implements RoomParticipantDeleteUseCas
         roomParticipant.validateRoomLeavable();
 
         // 3. 방 멤버수 감소 / 방 진행률 업데이트
-        roomProgressManager.removeUserProgressAndUpdateRoomProgress(roomParticipant.getId(), room.getId());
+        roomProgressManager.removeUserProgressAndUpdateRoomProgress(roomParticipant.getId(), room);
 
         // 4. 방나가기
         roomParticipantCommandPort.deleteByUserIdAndRoomId(userId, room.getId());
