@@ -55,8 +55,6 @@ class FeedUpdateControllerTest {
 
         Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        Category category = TestEntityFactory.createLiteratureCategory();
-
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE))).getPostId();
         creatorUserId = user.getUserId();
@@ -142,7 +140,7 @@ class FeedUpdateControllerTest {
             Map<String, Object> req = buildValidUpdateRequest();
             req.put("tagList", List.of(PHYSICS.getValue(), CHEMISTRY.getValue(), KOREAN_NOVEL.getValue(),
                     FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue(), HISTORY.getValue()));
-            assertBadRequest(INVALID_FEED_COMMAND.getCode(), req, "태그는 최대 5개까지 입력할 수 있습니다.");
+            assertBadRequest(TAG_LIST_SIZE_OVERFLOW.getCode(), req, TAG_LIST_SIZE_OVERFLOW.getMessage());
         }
 
         @Test
@@ -150,7 +148,7 @@ class FeedUpdateControllerTest {
         void duplicatedTags() throws Exception {
             Map<String, Object> req = buildValidUpdateRequest();
             req.put("tagList", List.of(KOREAN_NOVEL.getValue(), KOREAN_NOVEL.getValue()));
-            assertBadRequest(INVALID_FEED_COMMAND.getCode(), req, TAG_SHOULD_BE_UNIQUE.getMessage());
+            assertBadRequest(TAG_SHOULD_BE_UNIQUE.getCode(), req, TAG_SHOULD_BE_UNIQUE.getMessage());
         }
 
     }
@@ -187,8 +185,8 @@ class FeedUpdateControllerTest {
                             .content(objectMapper.writeValueAsBytes(req))
                     )
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(INVALID_FEED_COMMAND.getCode()))
-                    .andExpect(jsonPath("$.message", containsString("해당 이미지는 이 피드에 존재하지 않습니다")));
+                    .andExpect(jsonPath("$.code").value(CONTENT_NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message", containsString(CONTENT_NOT_FOUND.getMessage())));
         }
     }
 }

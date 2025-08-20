@@ -46,7 +46,7 @@ class FeedCreateControllerTest {
         return request;
     }
 
-    private void assertBadRequest_InvalidFeedCreate(Map<String, Object> request, String message) throws Exception {
+    private void assertBadRequest_InvalidFeedCreate(Map<String, Object> request, String message, int errorCode) throws Exception {
         mockMvc.perform(multipart("/feeds")
                         .file(new MockMultipartFile(
                                 "request", "", MediaType.APPLICATION_JSON_VALUE,
@@ -54,7 +54,7 @@ class FeedCreateControllerTest {
                         .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(INVALID_FEED_COMMAND.getCode()))
+                .andExpect(jsonPath("$.code").value(errorCode))
                 .andExpect(jsonPath("$.message", containsString(message)));
     }
 
@@ -110,7 +110,7 @@ class FeedCreateControllerTest {
             Map<String, Object> req = buildValidRequest();
             req.put("tagList", List.of(Tag.PHYSICS.getValue(), Tag.CHEMISTRY.getValue(), Tag.BIOLOGY.getValue(),
                     Tag.ARCHITECTURE.getValue(), Tag.ARCHITECTURE.getValue(), Tag.DANCE.getValue()));
-            assertBadRequest_InvalidFeedCreate(req, "태그는 최대 5개까지 입력할 수 있습니다.");
+            assertBadRequest_InvalidFeedCreate(req, TAG_LIST_SIZE_OVERFLOW.getMessage(),TAG_LIST_SIZE_OVERFLOW.getCode());
         }
 
         @Test
@@ -118,7 +118,7 @@ class FeedCreateControllerTest {
         void duplicatedTags() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("tagList", List.of(Tag.PHYSICS.getValue(), Tag.PHYSICS.getValue()));
-            assertBadRequest_InvalidFeedCreate(req, TAG_SHOULD_BE_UNIQUE.getMessage());
+            assertBadRequest_InvalidFeedCreate(req, TAG_SHOULD_BE_UNIQUE.getMessage(),TAG_SHOULD_BE_UNIQUE.getCode());
         }
     }
 
