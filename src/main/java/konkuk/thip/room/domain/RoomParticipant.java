@@ -1,9 +1,12 @@
 package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
+
+import static konkuk.thip.common.exception.code.ErrorCode.ROOM_HOST_CANNOT_LEAVE;
 
 @Getter
 @SuperBuilder
@@ -68,5 +71,10 @@ public class RoomParticipant extends BaseDomainEntity {
         return this.roomParticipantRole.equals(roomParticipantRole.getType());
     }
 
+    public void validateRoomLeavable() {
+        if (isHost()) {
+            throw new InvalidStateException(ROOM_HOST_CANNOT_LEAVE);
+        }
+    }
 
 }

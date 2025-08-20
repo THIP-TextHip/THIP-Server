@@ -17,12 +17,10 @@ import konkuk.thip.room.adapter.in.web.response.RoomPostIsLikeResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitCloseResponse;
 import konkuk.thip.room.application.port.in.RoomCreateUseCase;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
+import konkuk.thip.room.application.port.in.RoomParticipantDeleteUseCase;
 import konkuk.thip.room.application.port.in.RoomRecruitCloseUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
@@ -34,6 +32,7 @@ public class RoomCommandController {
     private final RoomCreateUseCase roomCreateUseCase;
     private final RoomJoinUseCase roomJoinUsecase;
     private final RoomRecruitCloseUseCase roomRecruitCloseUsecase;
+    private final RoomParticipantDeleteUseCase roomParticipantDeleteUseCase;
     private final PostLikeUseCase postLikeUseCase;
 
     /**
@@ -101,5 +100,17 @@ public class RoomCommandController {
             @Parameter(description = "좋아요 상태를 변경하려는 방 게시물 ID", example = "1")@PathVariable("postId") final Long postId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(RoomPostIsLikeResponse.of(postLikeUseCase.changeLikeStatusPost(request.toCommand(userId, postId))));
+    }
+
+    @Operation(
+            summary = "방 나가기",
+            description = "방장을 제외한 방의 멤버들이 방에서 나갑니다."
+    )
+    @ExceptionDescription(ROOM_LEAVE)
+    @DeleteMapping("/rooms/{roomId}/leave")
+    public BaseResponse<Void> deleteRoomParticipant(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "나갈 방의 ID", example = "1") @PathVariable final Long roomId) {
+        return BaseResponse.ok(roomParticipantDeleteUseCase.leaveRoom(userId, roomId));
     }
 }
