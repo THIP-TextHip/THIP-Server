@@ -5,18 +5,16 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +44,7 @@ class RoomParticipantDeleteApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
 
     private RoomJpaEntity room;
     private UserJpaEntity host;
@@ -57,27 +53,27 @@ class RoomParticipantDeleteApiTest {
     private RoomParticipantJpaEntity memberParticipation;
 
     private void setUpWithOnlyHost() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         createUsers(alias);
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
         createRoom(book, category,1); // 방장만 포함
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
     }
 
     private void setUpWithParticipant() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         createUsers(alias);
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
         createRoom(book, category,2); // 방장과 참여자 포함
         hostParticipation = roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 50.0));
         memberParticipation = roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, participant, RoomParticipantRole.MEMBER, 30.0));
     }
 
-    private void createRoom(BookJpaEntity book, CategoryJpaEntity category, int memberCount) {
+    private void createRoom(BookJpaEntity book, Category category, int memberCount) {
         room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -86,18 +82,18 @@ class RoomParticipantDeleteApiTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(3)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .memberCount(memberCount) // 방장과 참여자 포함
                 .build());
     }
 
-    private void createUsers(AliasJpaEntity alias) {
+    private void createUsers(Alias alias) {
         host = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("user")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         participant = userJpaRepository.save(UserJpaEntity.builder()
@@ -105,7 +101,7 @@ class RoomParticipantDeleteApiTest {
                 .nickname("user123")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
     }
 
