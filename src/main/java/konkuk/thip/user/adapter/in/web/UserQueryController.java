@@ -75,10 +75,11 @@ public class UserQueryController {
     @GetMapping("/users/{userId}/followers")
     public BaseResponse<UserFollowersResponse> showFollowers(
             @Parameter(description = "조회할 사용자 ID") @PathVariable final Long userId,
+            @Parameter(hidden = true) @UserId final Long loginUserId,
             @Parameter(description = "커서") @RequestParam(required = false) final String cursor,
             @Parameter(description = "단일 요청 페이지 크기 (1~10)")
             @RequestParam(defaultValue = "10") @Max(value = 10) @Min(value = 1) final int size) {
-        return BaseResponse.ok(userGetFollowUsecase.getUserFollowers(userId, cursor, size));
+        return BaseResponse.ok(userGetFollowUsecase.getUserFollowers(loginUserId,userId, cursor, size));
     }
 
     @Operation(
