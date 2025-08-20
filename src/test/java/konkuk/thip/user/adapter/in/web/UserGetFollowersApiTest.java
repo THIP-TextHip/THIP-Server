@@ -2,11 +2,10 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,23 +39,22 @@ class UserGetFollowersApiTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
 
     @Autowired
     private FollowingJpaRepository followingJpaRepository;
 
     private UserJpaEntity targetUser; // 팔로워를 조회할 대상 사용자
+    private UserJpaEntity loginUser;
     private List<UserJpaEntity> followerUsers; // 팔로워 12명
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         // 대상 사용자
         targetUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        loginUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         // 팔로워 12명 생성 및 저장
         followerUsers = new ArrayList<>();
@@ -73,6 +71,7 @@ class UserGetFollowersApiTest {
         // 1. 첫 번째 요청 (cursor 없음)
         ResultActions firstPageResult = mockMvc.perform(
                 get("/users/{userId}/followers", targetUser.getUserId())
+                        .requestAttr("userId", loginUser.getUserId())
         );
 
         firstPageResult.andExpect(status().isOk())
@@ -91,6 +90,7 @@ class UserGetFollowersApiTest {
         ResultActions secondPageResult = mockMvc.perform(
                 get("/users/{userId}/followers", targetUser.getUserId())
                         .param("cursor", nextCursor)
+                        .requestAttr("userId", loginUser.getUserId())
         );
 
         secondPageResult.andExpect(status().isOk())

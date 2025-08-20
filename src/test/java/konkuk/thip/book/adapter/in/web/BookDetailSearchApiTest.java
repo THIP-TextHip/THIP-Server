@@ -6,20 +6,18 @@ import konkuk.thip.book.application.service.BookSearchService;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,21 +52,17 @@ class BookDetailSearchApiTest {
     private FeedJpaRepository feedJpaRepository;
     @Autowired
     private SavedBookJpaRepository savedBookJpaRepository;
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
 
     @BeforeEach
     void setup() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
@@ -82,7 +76,7 @@ class BookDetailSearchApiTest {
                 .description("한강의 소설")
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         RoomJpaEntity room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("한강 독서모임")
@@ -93,7 +87,7 @@ class BookDetailSearchApiTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(10)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
 
         roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
@@ -126,8 +120,6 @@ class BookDetailSearchApiTest {
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
@@ -166,7 +158,7 @@ class BookDetailSearchApiTest {
                 .endDate(LocalDate.now().minusDays(5))
                 .recruitCount(10)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(categoryJpaRepository.findAll().get(0))
+                .category(Category.LITERATURE)
                 .build();
         roomJpaRepository.save(pastRoom);
 

@@ -2,6 +2,7 @@ package konkuk.thip.user.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

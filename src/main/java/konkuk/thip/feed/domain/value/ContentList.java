@@ -5,8 +5,10 @@ import konkuk.thip.common.exception.InvalidStateException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.CONTENT_LIST_SIZE_OVERFLOW;
+import static konkuk.thip.common.exception.code.ErrorCode.CONTENT_NOT_FOUND;
 
 public final class ContentList extends AbstractList<String> implements Serializable {
 
@@ -46,6 +48,17 @@ public final class ContentList extends AbstractList<String> implements Serializa
     private void validate() {
         validateImageCount(contents.size());
         //todo 필요 시 URL 형식 검증 추가 가능
+    }
+
+    public void validateOwnImages(List<String> newImageUrls) {
+        Set<String> myImageUrls = contents.stream()
+                .filter(url -> url != null && !url.isBlank())
+                .collect(Collectors.toSet());
+        for (String url : newImageUrls) {
+            if (!myImageUrls.contains(url)) {
+                throw new InvalidStateException(CONTENT_NOT_FOUND, new IllegalArgumentException(url));
+            }
+        }
     }
 
     // AbstractList 구현 위임 구간

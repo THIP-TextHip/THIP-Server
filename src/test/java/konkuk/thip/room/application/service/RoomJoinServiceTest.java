@@ -115,5 +115,4 @@ class RoomJoinServiceTest {
             then(roomCommandPort).should().update(any(Room.class));
         }
     }
-
 }

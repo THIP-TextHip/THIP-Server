@@ -9,11 +9,10 @@ import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,9 +46,6 @@ class BookChangeSavedApiTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private BookJpaRepository bookJpaRepository;
 
     @Autowired
@@ -68,14 +64,14 @@ class BookChangeSavedApiTest {
     @BeforeEach
     void setUp() {
 
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         // 테스트책 미리 저장
@@ -99,7 +95,6 @@ class BookChangeSavedApiTest {
         savedBookJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test

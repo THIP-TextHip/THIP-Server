@@ -3,20 +3,18 @@ package konkuk.thip.roompost.application.service;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteCreateCommand;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,13 +35,7 @@ import static org.assertj.core.api.Assertions.within;
 class VoteCreateServiceTest {
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
 
     @Autowired
     private BookJpaRepository bookJpaRepository;
@@ -71,19 +63,17 @@ class VoteCreateServiceTest {
         roomJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
     }
 
     @Test
     @DisplayName("유저가 투표를 생성하면, 해당 유저의 [RoomParticipant의 currentPage, userPercentage]와 해당 방의 [Room의 roomPercentage] 값이 변경된다.")
     void vote_create_room_participant_and_room_percentage_update() throws Exception {
         //given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(alias, "me"));
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook(369));
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias));
+        Category category = TestEntityFactory.createScienceCategory();
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, me, RoomParticipantRole.MEMBER, 0.0));

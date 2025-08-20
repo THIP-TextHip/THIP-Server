@@ -24,7 +24,6 @@ import static com.querydsl.jpa.JPAExpressions.treat;
 import static konkuk.thip.post.domain.PostType.RECORD;
 import static konkuk.thip.post.domain.PostType.VOTE;
 
-
 @Repository
 @RequiredArgsConstructor
 public class RecordQueryRepositoryImpl implements RecordQueryRepository {
@@ -194,7 +193,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 pageExpr(),
                 user.userId,
                 user.nickname,
-                user.aliasForUserJpaEntity.imageUrl,
+                user.alias,
                 post.content,
                 post.likeCount,
                 post.commentCount,

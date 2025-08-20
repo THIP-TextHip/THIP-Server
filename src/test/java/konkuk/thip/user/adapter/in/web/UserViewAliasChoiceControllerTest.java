@@ -2,13 +2,10 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.in.web.response.UserViewAliasChoiceResponse;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
-import org.junit.jupiter.api.AfterEach;
+import konkuk.thip.common.util.EnumMappings;
+import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.user.domain.value.Alias;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -39,51 +35,60 @@ class UserViewAliasChoiceControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
-    }
-
     @Test
-    @DisplayName("현재 DB에 존재하는 모든 [칭호, 카테고리] 정보를 반환한다.")
+    @DisplayName("유저 칭호 선택 화면을 조회하면, enum으로 정의된 Alias/Category 매핑이 형식과 내용 모두 정확히 반환된다.")
     void show_alias_choice_view() throws Exception {
-        //given
-        saveAliasesAndCategories();
+        // given: EnumMappings을 기준으로 기대값 구성
+        var aliasToCategory = EnumMappings.getAliasToCategory();
+        int expectedCount = aliasToCategory.size();
 
-        //when
-        ResultActions result = mockMvc.perform(get("/users/alias")
-                .contentType(MediaType.APPLICATION_JSON));
+        // when
+        var mvcResult = mockMvc.perform(get("/users/alias")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.aliasChoices").isArray())
+                .andExpect(jsonPath("$.data.aliasChoices.length()").value(expectedCount))
+                .andReturn();
 
-        //then
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.aliasChoices").exists());
+        // then: 응답 파싱 후 형식 및 내용 검증
+        String body = mvcResult.getResponse().getContentAsString();
+        JsonNode root = objectMapper.readTree(body);
+        JsonNode choices = root.path("data").path("aliasChoices");
+        assertThat(choices.isArray()).isTrue();
+        assertThat(choices.size()).isEqualTo(expectedCount);
 
-        String json = result.andReturn().getResponse().getContentAsString();
-        JsonNode jsonNode = objectMapper.readTree(json);
-        UserViewAliasChoiceResponse showResponse = objectMapper.treeToValue(jsonNode.get("data"), UserViewAliasChoiceResponse.class);
-        List<UserViewAliasChoiceResponse.AliasChoice> choices = showResponse.aliasChoices();
+        // 실제 응답을 (aliasName, categoryName, imageUrl, aliasColor) 튜플로 수집
+        var actualTuples = new ArrayList<Tuple>();
+        for (JsonNode n : choices) {
+            String aliasName = n.path("aliasName").asText();
+            String categoryName = n.path("categoryName").asText();
+            String imageUrl = n.path("imageUrl").asText();
+            String aliasColor = n.path("aliasColor").asText();
 
-        assertThat(choices).hasSize(2);
-        assertThat(choices)
-                .extracting("aliasName", "categoryName")
-                .containsExactlyInAnyOrder(
-                        tuple("문학가", "문학"),
-                        tuple("과학자", "과학·IT")
-                );
-    }
+            // 스키마 기본 검증
+            assertThat(aliasName).isNotBlank();
+            assertThat(categoryName).isNotBlank();
+            assertThat(imageUrl).isNotBlank();
+            assertThat(aliasColor).isNotBlank();
 
-    private void saveAliasesAndCategories() {
-        AliasJpaEntity alias1 = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
-        CategoryJpaEntity category1 = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias1));
+            actualTuples.add(tuple(aliasName, categoryName, imageUrl, aliasColor));
+        }
 
-        AliasJpaEntity alias2 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
-        CategoryJpaEntity category2 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(alias2));
+        // 기대 튜플 구성: EnumMappings의 SSOT 기준
+        var expectedTuples = aliasToCategory.entrySet().stream()
+                .map(e -> {
+                    Alias alias = e.getKey();
+                    Category category = e.getValue();
+                    return tuple(
+                            alias.getValue(),      // aliasName
+                            category.getValue(),   // categoryName
+                            alias.getImageUrl(),   // imageUrl
+                            alias.getColor()       // aliasColor
+                    );
+                })
+                .toList();
+
+        assertThat(actualTuples)
+                .containsExactlyInAnyOrderElementsOf(expectedTuples);
     }
 }

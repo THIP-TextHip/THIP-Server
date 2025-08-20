@@ -3,8 +3,8 @@ package konkuk.thip.config;
 import jakarta.annotation.PostConstruct;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.config.properties.AwsS3Properties;
-import konkuk.thip.room.domain.Category;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.user.domain.value.Alias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -4,9 +4,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.application.port.out.dto.FollowingQueryDto;
 import konkuk.thip.user.application.port.out.dto.QFollowingQueryDto;
 import konkuk.thip.user.application.port.out.dto.QUserQueryDto;
@@ -61,7 +61,6 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     private List<UserQueryDto> findFollowDtos(Long userId, LocalDateTime cursor, int size, boolean isFollowerQuery) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
-        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
         BooleanBuilder condition = new BooleanBuilder()
                 .and((isFollowerQuery ? following.followingUserJpaEntity.userId.eq(userId) : following.userJpaEntity.userId.eq(userId)))
@@ -77,15 +76,12 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                 .select(new QUserQueryDto(
                         targetUser.userId,
                         targetUser.nickname,
-                        alias.imageUrl,
-                        alias.value,
-                        alias.color,
+                        targetUser.alias,
                         targetUser.followerCount,
                         following.createdAt
                 ))
                 .from(following)
                 .leftJoin(targetUser, user)
-                .leftJoin(user.aliasForUserJpaEntity, alias)
                 .where(condition)
                 .orderBy(following.createdAt.desc())
                 .limit(size + 1)
@@ -93,16 +89,14 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     }
 
     @Override
-    public List<String> findLatestFollowerImageUrls(Long userId, int size) {
+    public List<UserJpaEntity> findLatestFollowers(Long userId, int size) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity follower = QUserJpaEntity.userJpaEntity;     // userId 를 팔로우하는 사람들(= follower)
-        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
         return jpaQueryFactory
-                .select(alias.imageUrl)
+                .select(follower)
                 .from(following)
                 .join(following.userJpaEntity, follower)
-                .join(follower.aliasForUserJpaEntity, alias)
                 .where(following.followingUserJpaEntity.userId.eq(userId)
                         .and(following.status.eq(StatusType.ACTIVE)))
                 .orderBy(following.createdAt.desc())
@@ -114,18 +108,16 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     public List<FollowingQueryDto> findAllFollowingUsersOrderByFollowedAtDesc(Long userId) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity followingTargetUser = QUserJpaEntity.userJpaEntity;
-        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
         return jpaQueryFactory.select(new QFollowingQueryDto(
                 following.userJpaEntity.userId,
                 followingTargetUser.userId,
                 followingTargetUser.nickname,
-                alias.imageUrl,
+                followingTargetUser.alias,
                 following.createdAt
                 ))
                 .from(following)
                 .join(following.followingUserJpaEntity, followingTargetUser)
-                .join(followingTargetUser.aliasForUserJpaEntity, alias)
                 .where(
                         following.userJpaEntity.userId.eq(userId)
                                 .and(following.userJpaEntity.status.eq(StatusType.ACTIVE))

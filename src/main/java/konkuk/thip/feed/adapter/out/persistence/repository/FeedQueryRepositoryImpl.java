@@ -1,8 +1,10 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.*;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
@@ -10,13 +12,8 @@ import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
-import konkuk.thip.feed.adapter.out.jpa.QTagJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
-import konkuk.thip.feed.application.port.out.dto.QTagCategoryQueryDto;
-import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
-import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +34,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
     private final QFeedJpaEntity feed = QFeedJpaEntity.feedJpaEntity;
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
-    private final QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
     private final QSavedFeedJpaEntity savedFeed = QSavedFeedJpaEntity.savedFeedJpaEntity;
@@ -173,7 +169,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .select(feed).distinct()
                 .from(feed)
                 .leftJoin(feed.userJpaEntity, user).fetchJoin()
-                .leftJoin(user.aliasForUserJpaEntity, alias).fetchJoin()
                 .leftJoin(feed.bookJpaEntity, book).fetchJoin()
                 .where(feed.postId.in(ids))
                 .fetch();
@@ -217,18 +212,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .toList();
     }
 
-    @Override
-    public List<TagCategoryQueryDto> findAllTags() {
-        QCategoryJpaEntity c = QCategoryJpaEntity.categoryJpaEntity;
-        QTagJpaEntity t = QTagJpaEntity.tagJpaEntity;
-
-        return jpaQueryFactory
-                .select(new QTagCategoryQueryDto(c.value, t.value))
-                .from(c)
-                .join(t).on(t.categoryJpaEntity.eq(c))
-                .orderBy(c.categoryId.asc(), t.tagId.asc()) //Id 순 정렬
-                .fetch();
-    }
     private List<Long> fetchMyFeedIdsByCreatedAt(Long userId, LocalDateTime lastCreatedAt, int size) {
         return jpaQueryFactory
                 .select(feed.postId)
@@ -267,8 +250,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .feedId(f.getPostId())
                 .creatorId(f.getUserJpaEntity().getUserId())
                 .creatorNickname(f.getUserJpaEntity().getNickname())
-                .creatorProfileImageUrl(f.getUserJpaEntity().getAliasForUserJpaEntity().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
-                .alias(f.getUserJpaEntity().getAliasForUserJpaEntity().getValue())
+                .creatorProfileImageUrl(f.getUserJpaEntity().getAlias().getImageUrl())      // TODO : DB에 String alias 만 저장하면 수정해야함
+                .alias(f.getUserJpaEntity().getAlias().getValue())
                 .createdAt(f.getCreatedAt())
                 .isbn(f.getBookJpaEntity().getIsbn())
                 .bookTitle(f.getBookJpaEntity().getTitle())
@@ -348,8 +331,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 feed.postId,
                 feed.userJpaEntity.userId,
                 user.nickname,
-                user.aliasForUserJpaEntity.imageUrl,
-                user.aliasForUserJpaEntity.value,
+                user.alias,
                 feed.createdAt,
                 book.isbn,
                 book.title,
@@ -364,7 +346,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         );
     }
 
-    // 필터링 조건: 책 ISBN과 사용자 ID를 제외한 다른 사용자 공개 피드
+    // 필터링 조건: 책 ISBN & 공개 피드
     private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
         return feed.status.eq(StatusType.ACTIVE)
                 .and(feed.bookJpaEntity.isbn.eq(isbn))
@@ -422,8 +404,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 feed.postId,
                 feed.userJpaEntity.userId,
                 user.nickname,
-                user.aliasForUserJpaEntity.imageUrl,
-                user.aliasForUserJpaEntity.value,
+                user.alias,
                 feed.createdAt,
                 book.isbn,
                 book.title,

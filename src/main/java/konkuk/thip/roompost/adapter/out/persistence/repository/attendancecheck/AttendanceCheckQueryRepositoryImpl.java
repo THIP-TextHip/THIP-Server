@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.roompost.adapter.out.jpa.QAttendanceCheckJpaEntity;
 import konkuk.thip.roompost.application.port.out.dto.AttendanceCheckQueryDto;
 import konkuk.thip.roompost.application.port.out.dto.QAttendanceCheckQueryDto;
-import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -23,7 +22,6 @@ public class AttendanceCheckQueryRepositoryImpl implements AttendanceCheckQueryR
     public List<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, LocalDateTime lastCreatedAt, int size) {
         QAttendanceCheckJpaEntity attendanceCheck = QAttendanceCheckJpaEntity.attendanceCheckJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
-        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
         BooleanExpression roomPredicate = attendanceCheck.roomJpaEntity.roomId.eq(roomId);
         BooleanExpression cursorPredicate = (lastCreatedAt == null) ? null : attendanceCheck.createdAt.lt(lastCreatedAt);
@@ -33,13 +31,12 @@ public class AttendanceCheckQueryRepositoryImpl implements AttendanceCheckQueryR
                         attendanceCheck.attendanceCheckId,
                         user.userId,
                         user.nickname,
-                        alias.imageUrl,
+                        user.alias,
                         attendanceCheck.todayComment,
                         attendanceCheck.createdAt
                 ))
                 .from(attendanceCheck)
                 .join(attendanceCheck.userJpaEntity, user)
-                .join(user.aliasForUserJpaEntity, alias)
                 .where(roomPredicate, cursorPredicate)
                 .orderBy(
                         attendanceCheck.createdAt.desc()

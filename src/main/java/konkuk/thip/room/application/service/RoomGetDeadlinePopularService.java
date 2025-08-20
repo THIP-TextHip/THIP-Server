@@ -4,7 +4,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomGetDeadlinePopularResponse;
 import konkuk.thip.room.application.mapper.RoomQueryMapper;
 import konkuk.thip.room.application.port.in.RoomGetDeadlinePopularUseCase;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

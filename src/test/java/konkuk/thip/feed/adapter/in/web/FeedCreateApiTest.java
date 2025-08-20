@@ -8,14 +8,9 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestS3MockConfig;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,12 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static konkuk.thip.feed.domain.Tag.*;
+import static konkuk.thip.feed.domain.value.Tag.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -57,52 +51,29 @@ class FeedCreateApiTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
 
     @Autowired
     private BookJpaRepository bookJpaRepository;
 
     @Autowired
-    private TagJpaRepository tagJpaRepository;
-
-    @Autowired
     private FeedJpaRepository feedJpaRepository;
 
-    @Autowired
-    private FeedTagJpaRepository feedTagJpaRepository;
-
-    private AliasJpaEntity alias;
+    private Alias alias;
     private UserJpaEntity user;
-    private CategoryJpaEntity category;
 
     @BeforeEach
     void setUp() {
-        alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,CLASSIC_LITERATURE.getValue()));
-
     }
 
     @AfterEach
     void tearDown() {
-        feedTagJpaRepository.deleteAll();
         feedJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
-        tagJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
-
 
     @Test
     @DisplayName("isbn 에 해당하는 책이 DB에 존재할 때, 해당 책과 연관된 피드를 생성할 수 있다.")
@@ -115,7 +86,6 @@ class FeedCreateApiTest {
         request.put("isbn", "9788954682152"); // 책 ISBN
         request.put("contentBody", "이 책 정말 좋아요.");
         request.put("isPublic", true);
-        request.put("category", "문학"); //실제 카테고리 값
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
@@ -159,7 +129,6 @@ class FeedCreateApiTest {
         request.put("isbn", isbn);
         request.put("contentBody", "외부 API를 통해 등록된 책 피드입니다.");
         request.put("isPublic", true);
-        request.put("category", "문학"); //실제 카테고리 값
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
@@ -212,7 +181,6 @@ class FeedCreateApiTest {
         request.put("isbn", "9788954682152"); // 책 ISBN
         request.put("contentBody", "이미지 테스트 피드");
         request.put("isPublic", true);
-        request.put("category", "문학"); //실제 카테고리 값
         request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
@@ -271,7 +239,6 @@ class FeedCreateApiTest {
         request.put("isbn", "9788954682152");
         request.put("contentBody", "이미지 없는 피드");
         request.put("isPublic", true);
-        request.put("category", "문학");
         request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
@@ -301,7 +268,7 @@ class FeedCreateApiTest {
 
 
     @Test
-    @DisplayName("피드 생성시, 태그가 들어오면 feed_tags 매핑 테이블에 정상적으로 3개의 태그가 저장된된 후 관련 피드를 생성할 수 있다.")
+    @DisplayName("피드 생성시 태그가 들어오면, 태그를 포함한 피드가 DB에 저장된다.")
     void createFeedWithTags_createsFeedTagMappings() throws Exception {
 
         // given
@@ -311,7 +278,6 @@ class FeedCreateApiTest {
         request.put("isbn", "9788954682152");
         request.put("contentBody", "태그 매핑 테스트 중입니다.");
         request.put("isPublic", true);
-        request.put("category", "문학");
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
         MockMultipartFile requestPart = new MockMultipartFile(
@@ -343,15 +309,12 @@ class FeedCreateApiTest {
         assertThat(feedJpaEntity.getIsPublic()).isTrue();
         assertThat(feedJpaEntity.getPostId()).isEqualTo(postId);
 
-        // DB에 feed_tags 저장되었는지 확인
-        long mappingCount = feedTagJpaRepository.findAll().stream()
-                .filter(f -> f.getFeedJpaEntity().getPostId().equals(postId))
-                .count();
-        assertThat(mappingCount).isEqualTo(3);
+        // 저장된 피드가 3개의 태그를 가지는지 확인
+        assertThat(feedJpaEntity.getTagList().toUnmodifiableList().size()).isEqualTo(3);
     }
 
     @Test
-    @DisplayName("카테고리와 태그가 없는 피드는 feed_tags 매핑이 없어야 한다.")
+    @DisplayName("태그가 없는 피드는 태그가 없는 채로 DB에 저장된다.")
     void createFeedWithoutTags_shouldNotHaveFeedTags() throws Exception {
         // given
         bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
@@ -360,7 +323,6 @@ class FeedCreateApiTest {
         request.put("isbn", "9788954682152");
         request.put("contentBody", "태그 없는 피드");
         request.put("isPublic", true);
-        request.put("category", "");        // 카테고리 없이
         request.put("tagList", List.of());  // 태그 없음
 
         MockMultipartFile requestPart = new MockMultipartFile(
@@ -384,12 +346,7 @@ class FeedCreateApiTest {
         JsonNode root = objectMapper.readTree(json);
         Long postId = root.path("data").path("feedId").asLong();
 
-        long feedTagCount = feedTagJpaRepository.findAll().stream()
-                .filter(f -> f.getFeedJpaEntity().getPostId().equals(postId))
-                .count();
-
-        assertThat(feedTagCount).isEqualTo(0);              // feed_tags 매핑 없음
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(postId).orElse(null);
+        assertThat(feedJpaEntity.getTagList().toUnmodifiableList().size()).isEqualTo(0);
     }
-
-
 }

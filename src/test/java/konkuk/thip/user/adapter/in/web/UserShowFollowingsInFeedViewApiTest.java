@@ -5,12 +5,11 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserShowFollowingsInFeedViewApiTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private FollowingJpaRepository followingJpaRepository;
@@ -50,7 +48,6 @@ class UserShowFollowingsInFeedViewApiTest {
         feedJpaRepository.deleteAllInBatch();
         followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
     }
 
@@ -58,7 +55,7 @@ class UserShowFollowingsInFeedViewApiTest {
     @DisplayName("전체 피드 조회 화면에서, 내가 팔로잉 하는 사람들의 [userId, 닉네임, 프로필 이미지] 정보를 1.최근 공개 피드를 작성한 사람 -> 2.최근 팔로잉 맺은 사람 순으로 반환합니다.")
     void show_my_following_recent_writers_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
         UserJpaEntity user2 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user2"));
@@ -96,7 +93,7 @@ class UserShowFollowingsInFeedViewApiTest {
     @DisplayName("내가 팔로잉 하는 사람들 중, 공개 피드를 작성한 사람들이 많을 경우, 이들 중 가장 최근에 피드를 작성한 사람들 10명만을 조회합니다.")
     void show_my_following_recent_writers_private_feed_writer_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
 
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
@@ -207,7 +204,7 @@ class UserShowFollowingsInFeedViewApiTest {
     @DisplayName("내가 팔로잉 하는 사람들 중, 최근에 공개 피드를 작성한 사람이 적을 경우, 이 사람들 + 최근에 팔로잉 맺은 사람들을 10명 조회합니다.")
     void show_my_following_recent_writers_too_many_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
 
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
@@ -330,7 +327,7 @@ class UserShowFollowingsInFeedViewApiTest {
     @DisplayName("유저가 가장 최근에 작성한 피드의 작성 시각(= createdAt)을 기준으로 정렬하여 반환된다.")
     void show_my_following_recent_writers_latest_feed_check_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
         UserJpaEntity user2 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user2"));

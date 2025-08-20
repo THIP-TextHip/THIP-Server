@@ -159,11 +159,15 @@ public enum ErrorCode implements ResponseCode {
     FEED_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 160006, "사용자가 이미 저장한 피드입니다."),
     FEED_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 160007, "사용자가 저장하지 않은 피드는 저장삭제 할 수 없습니다."),
     FEED_CAN_NOT_SHOW_PRIVATE_ONE(HttpStatus.BAD_REQUEST, 160008, "비공개 피드는 피드 작성자 이외에는 조회할 수 없습니다."),
+    TAG_SHOULD_BE_UNIQUE(HttpStatus.BAD_REQUEST, 160009, "피드에 등록된 태그는 중복될 수 없습니다."),
+    TAG_LIST_SIZE_OVERFLOW(HttpStatus.BAD_REQUEST, 160010, "등록 가능한 태그 개수를 초과하였습니다."),
+
 
     /**
      * 165000: ContentList error
      */
     CONTENT_LIST_SIZE_OVERFLOW(HttpStatus.BAD_REQUEST, 165000, "컨텐츠 리스트의 크기가 초과되었습니다. 최대 3개까지 가능합니다."),
+    CONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, 165001, "해당 이미지는 이 피드에 존재하지 않습니다:"),
 
     /**
      * 170000 : Image File error

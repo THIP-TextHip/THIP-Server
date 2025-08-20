@@ -8,15 +8,12 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.in.web.request.FeedIsSavedRequest;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,11 +44,8 @@ class FeedChangeSavedApiTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private TagJpaRepository tagJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private SavedFeedJpaRepository savedFeedJpaRepository;
 
@@ -61,13 +55,10 @@ class FeedChangeSavedApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "소설추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "책추천"));
-        tagJpaRepository.save(TestEntityFactory.createTag(category, "오늘의책"));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
     }

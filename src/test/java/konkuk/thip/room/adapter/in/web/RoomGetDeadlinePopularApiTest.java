@@ -4,16 +4,14 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,31 +44,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class RoomGetDeadlinePopularApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository participantJpaRepository;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
 
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository participantJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    private AliasJpaEntity alias;
+    private Alias alias;
+    private Category category;
     private UserJpaEntity currentUser;
     private BookJpaEntity book;
-    private CategoryJpaEntity category;
     private final List<RoomJpaEntity> rooms = new ArrayList<>();
 
     private final int maxMemberCount = 30; // 인기 방의 최대 인원 수
@@ -81,8 +64,8 @@ class RoomGetDeadlinePopularApiTest {
 
     @BeforeEach
     void setUp() {
-        alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        alias = TestEntityFactory.createLiteratureAlias();
+        category = TestEntityFactory.createLiteratureCategory();
         currentUser = userJpaRepository.save(TestEntityFactory.createUser(alias, "현재유저"));
         book = bookJpaRepository.save(TestEntityFactory.createBook());
 

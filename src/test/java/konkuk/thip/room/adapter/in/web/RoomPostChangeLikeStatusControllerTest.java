@@ -4,18 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
@@ -48,10 +45,8 @@ class RoomPostChangeLikeStatusControllerTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private RecordJpaRepository recordJpaRepository;
@@ -59,7 +54,7 @@ class RoomPostChangeLikeStatusControllerTest {
     private UserJpaEntity user1;
     private UserJpaEntity user2;
     private BookJpaEntity book;
-    private CategoryJpaEntity category;
+    private Category category;
     private RoomJpaEntity room;
     private RecordJpaEntity record;
 
@@ -67,11 +62,11 @@ class RoomPostChangeLikeStatusControllerTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user1 = userJpaRepository.save(TestEntityFactory.createUser(alias));
         user2 = userJpaRepository.save(TestEntityFactory.createUser(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        category = TestEntityFactory.createLiteratureCategory();
         room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
         // 1번방에 유저 1이 호스트
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room,user1, RoomParticipantRole.HOST, 80.0));
@@ -117,6 +112,4 @@ class RoomPostChangeLikeStatusControllerTest {
                 .andExpect(jsonPath("$.code").value(ROOM_ACCESS_FORBIDDEN.getCode()))
                 .andExpect(jsonPath("$.message", containsString("사용자가 이 방의 참가자가 아닙니다.")));
     }
-
-
 }

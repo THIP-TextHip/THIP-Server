@@ -48,9 +48,4 @@ public interface FeedQueryPort {
     CursorBasedList<FeedQueryDto> findFeedsByBookIsbnOrderByLatest(String isbn, Long userId, Cursor cursor);
 
     List<Long> findLatestPublicFeedCreatorsIn(Set<Long> userIds, int size);
-
-    /**
-     * 모든 태그 조회
-     */
-    List<TagCategoryQueryDto> findAllTags();
 }

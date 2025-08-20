@@ -3,6 +3,7 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
 import lombok.*;
 
@@ -37,16 +38,16 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_alias_id", nullable = false)
-    private AliasJpaEntity aliasForUserJpaEntity;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Alias alias;
 
-    public void updateIncludeAliasFrom(User user, AliasJpaEntity aliasJpaEntity) {
+    public void updateIncludeAliasFrom(User user) {
         this.nickname = user.getNickname();
         this.nicknameUpdatedAt = user.getNicknameUpdatedAt();
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
-        this.aliasForUserJpaEntity = aliasJpaEntity;
+        this.alias = user.getAlias();
     }
 
     public void updateFrom(User user) {

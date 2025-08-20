@@ -5,24 +5,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +54,6 @@ class RoomPostSearchApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
 
     @Test
@@ -403,14 +399,14 @@ class RoomPostSearchApiTest {
     }
 
     private TestData createTestData() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_123")
                 .nickname("테스트사용자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
@@ -424,7 +420,7 @@ class RoomPostSearchApiTest {
                 .bestSeller(false)
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         RoomJpaEntity room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("방 제목")
@@ -435,7 +431,7 @@ class RoomPostSearchApiTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(5)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
 
         // 방 참가자 생성
@@ -521,14 +517,14 @@ class RoomPostSearchApiTest {
     }
 
     private TestData createTestDataWithLockedContent() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_123")
                 .nickname("테스트사용자")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
@@ -542,7 +538,7 @@ class RoomPostSearchApiTest {
                 .bestSeller(false)
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         RoomJpaEntity room = roomJpaRepository.save(RoomJpaEntity.builder()
                 .title("방 제목")
@@ -553,7 +549,7 @@ class RoomPostSearchApiTest {
                 .endDate(LocalDate.now().plusDays(30))
                 .recruitCount(5)
                 .bookJpaEntity(book)
-                .categoryJpaEntity(category)
+                .category(category)
                 .build());
 
         // 방 참가자 생성 (현재 페이지 10으로 설정)

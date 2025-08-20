@@ -1,13 +1,12 @@
 package konkuk.thip.user.adapter.in.web;
 
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,30 +38,26 @@ class UserFollowApiTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private FollowingJpaRepository followingJpaRepository;
 
     @AfterEach
     void tearDown() {
         followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
     @DisplayName("팔로우 요청 후 언팔로우 요청 시 엔티티가 삭제되었는지 확인한다.")
     void changeFollowingState_follow_then_unfollow() throws Exception {
         // 사용자 2명 저장
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias alias = TestEntityFactory.createScienceAlias();
 
         UserJpaEntity followingUser = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("user100")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("oauth2_user100")
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         UserJpaEntity target = userJpaRepository.save(UserJpaEntity.builder()
@@ -70,7 +65,7 @@ class UserFollowApiTest {
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("oauth2_user200")
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         // 팔로우 요청

@@ -3,6 +3,7 @@ package konkuk.thip.feed.application.port.out.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.annotation.Nullable;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.user.domain.value.Alias;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -31,8 +32,7 @@ public record FeedQueryDto(
             Long feedId,
             Long creatorId,
             String creatorNickname,
-            String creatorProfileImageUrl,
-            String alias,
+            Alias alias,
             LocalDateTime createdAt,
             String isbn,
             String bookTitle,
@@ -49,8 +49,8 @@ public record FeedQueryDto(
                 feedId,
                 creatorId,
                 creatorNickname,
-                creatorProfileImageUrl,
-                alias,
+                alias.getImageUrl(),
+                alias.getValue(),
                 createdAt,
                 isbn,
                 bookTitle,

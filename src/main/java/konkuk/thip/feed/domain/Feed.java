@@ -4,6 +4,8 @@ import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.service.PostCountService;
 import lombok.Builder;
@@ -12,8 +14,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -40,7 +40,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     private Long targetBookId;
 
-    private List<Tag> tagList;
+    @Builder.Default
+    private TagList tagList = TagList.empty();
 
     @Builder.Default
     private ContentList contentList = ContentList.empty();
@@ -61,7 +62,7 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
 
-        validateTags(tagValues);
+//        validateTags(tagValues);
 //        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
 
         return Feed.builder()
@@ -73,9 +74,17 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
                 .likeCount(0)
                 .commentCount(0)
                 .targetBookId(targetBookId)
-                .tagList(Tag.fromList(tagValues))
+                .tagList(convertToTagList(tagValues))
                 .contentList(convertToContentList(imageUrls))
                 .build();
+    }
+
+    private static TagList convertToTagList(List<String> tagValues) {
+        if (tagValues == null || tagValues.isEmpty()) {
+            return TagList.empty();
+        }
+        List<Tag> tags = Tag.fromList(tagValues);
+        return TagList.of(tags);
     }
 
     private static ContentList convertToContentList(List<String> imageUrls) {
@@ -83,22 +92,22 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
         return ContentList.of(imageUrls);
     }
 
-    public static void validateTags(List<String> tagList) {
-        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
-
-        // 태그가 있는 경우, 개수 최대 5개 제한
-        if (!tagListEmpty && tagList.size() > 5) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
-        }
-
-        // 태그 중복 체크
-        if (!tagListEmpty) {
-            long distinctCount = tagList.stream().distinct().count();
-            if (distinctCount != tagList.size()) {
-                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
-            }
-        }
-    }
+//    public static void validateTags(List<String> tagList) {
+//        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
+//
+//        // 태그가 있는 경우, 개수 최대 5개 제한
+//        if (!tagListEmpty && tagList.size() > 5) {
+//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
+//        }
+//
+//        // 태그 중복 체크
+//        if (!tagListEmpty) {
+//            long distinctCount = tagList.stream().distinct().count();
+//            if (distinctCount != tagList.size()) {
+//                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
+//            }
+//        }
+//    }
 //
 //    public static void validateImageCount(int imageSize) {
 //        if (imageSize > 3) {
@@ -146,27 +155,17 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     public void updateTags(Long userId, List<String> newTagValues) {
         validateCreator(userId);
-        validateTags(newTagValues);
-        this.tagList = Tag.fromList(newTagValues); // Tag.from(...) 등으로 변환
+        List<Tag> tags = Tag.fromList(newTagValues);
+        this.tagList = TagList.of(tags);
     }
 
     public void updateImages(Long userId, List<String> newImageUrls) {
         validateCreator(userId);
 //        validateImageCount(newImageUrls.size());
-        validateOwnsImages(newImageUrls);
+//        validateOwnsImages(newImageUrls);
+        contentList.validateOwnImages(newImageUrls);
 
         this.contentList = convertToContentList(newImageUrls);
-    }
-
-    public void validateOwnsImages(List<String> candidateImageUrls) {
-        Set<String> myImageUrls = contentList.stream()
-                .filter(url -> url != null && !url.isBlank())
-                .collect(Collectors.toSet());
-        for (String url : candidateImageUrls) {
-            if (!myImageUrls.contains(url)) {
-                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("해당 이미지는 이 피드에 존재하지 않습니다: " + url));
-            }
-        }
     }
 
     @Override

@@ -5,13 +5,10 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.feed.domain.Tag.*;
+import static konkuk.thip.feed.domain.value.Tag.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,11 +43,8 @@ class FeedUpdateControllerTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private TagJpaRepository tagJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
 
     private Long savedFeedId;
@@ -59,15 +53,10 @@ class FeedUpdateControllerTest {
     @BeforeEach
     void setUp() {
 
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
-
-        tagJpaRepository.save(TestEntityFactory.createTag(category,KOREAN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,FOREIGN_NOVEL.getValue()));
-        tagJpaRepository.save(TestEntityFactory.createTag(category,CLASSIC_LITERATURE.getValue()));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true)).getPostId();
+        savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE))).getPostId();
         creatorUserId = user.getUserId();
     }
 
@@ -149,16 +138,17 @@ class FeedUpdateControllerTest {
         @DisplayName("태그가 5개 초과일 경우 400 반환")
         void tooManyTags() throws Exception {
             Map<String, Object> req = buildValidUpdateRequest();
-            req.put("tagList", List.of("t1","t2","t3","t4","t5","t6"));
-            assertBadRequest(INVALID_FEED_COMMAND.getCode(), req, "태그는 최대 5개까지 입력할 수 있습니다.");
+            req.put("tagList", List.of(PHYSICS.getValue(), CHEMISTRY.getValue(), KOREAN_NOVEL.getValue(),
+                    FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue(), HISTORY.getValue()));
+            assertBadRequest(TAG_LIST_SIZE_OVERFLOW.getCode(), req, TAG_LIST_SIZE_OVERFLOW.getMessage());
         }
 
         @Test
         @DisplayName("태그가 중복되어 있을 경우 400 반환")
         void duplicatedTags() throws Exception {
             Map<String, Object> req = buildValidUpdateRequest();
-            req.put("tagList", List.of("중복", "중복"));
-            assertBadRequest(INVALID_FEED_COMMAND.getCode(), req, "태그는 중복 될 수 없습니다.");
+            req.put("tagList", List.of(KOREAN_NOVEL.getValue(), KOREAN_NOVEL.getValue()));
+            assertBadRequest(TAG_SHOULD_BE_UNIQUE.getCode(), req, TAG_SHOULD_BE_UNIQUE.getMessage());
         }
 
     }
@@ -195,9 +185,8 @@ class FeedUpdateControllerTest {
                             .content(objectMapper.writeValueAsBytes(req))
                     )
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.code").value(INVALID_FEED_COMMAND.getCode()))
-                    .andExpect(jsonPath("$.message", containsString("해당 이미지는 이 피드에 존재하지 않습니다")));
+                    .andExpect(jsonPath("$.code").value(CONTENT_NOT_FOUND.getCode()))
+                    .andExpect(jsonPath("$.message", containsString(CONTENT_NOT_FOUND.getMessage())));
         }
     }
-
 }

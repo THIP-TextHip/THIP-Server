@@ -3,15 +3,14 @@ package konkuk.thip.room.adapter.in.web;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,49 +36,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("[통합] 모임 홈 참여중인 내 모임방 조회 api 통합 테스트")
 class RoomGetHomeJoinedRoomsApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     private RoomJpaEntity room1;
     private RoomJpaEntity room2;
     private UserJpaEntity user1;
     private UserJpaEntity user2;
     private BookJpaEntity book;
-    private CategoryJpaEntity category;
+    private Category category;
 
     @BeforeEach
     void setUp() {
 
-        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
-        aliasJpaRepository.save(alias);
-
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user1 = userJpaRepository.save(TestEntityFactory.createUser(alias));
         user2 = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         book = TestEntityFactory.createBook();
         bookJpaRepository.save(book);
 
-        category = TestEntityFactory.createLiteratureCategory(alias);
-        categoryJpaRepository.save(category);
-
+        category = TestEntityFactory.createLiteratureCategory();
         room1 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
         room2 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
@@ -97,8 +77,6 @@ class RoomGetHomeJoinedRoomsApiTest {
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
@@ -132,9 +110,7 @@ class RoomGetHomeJoinedRoomsApiTest {
     void getHomeJoinedRooms_sortByStartDateWhenUserPercentageEquals() throws Exception {
 
         // given
-        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
-        aliasJpaRepository.save(alias);
-
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity newUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         // 방1: 시작일 오늘-2
@@ -180,9 +156,7 @@ class RoomGetHomeJoinedRoomsApiTest {
     void getHomeJoinedRooms_excludeRecruitingRooms() throws Exception {
 
         // given
-        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
-        aliasJpaRepository.save(alias);
-
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity newUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         // 모집중(시작일 미래)
@@ -216,8 +190,7 @@ class RoomGetHomeJoinedRoomsApiTest {
     void getHomeJoinedRooms_empty() throws Exception {
 
         //given
-        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
-        aliasJpaRepository.save(alias);
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity newUser = userJpaRepository.save(TestEntityFactory.createUser(alias));
 
         //when

@@ -7,7 +7,7 @@ public record UserViewAliasChoiceResult(List<AliasChoice> aliasChoices) {
     public record AliasChoice(
             String aliasName,
             String categoryName,
-            String imageUrl,
+            String imageUrl,        // 칭호 이미지 url
             String aliasColor
     ) {}
 }

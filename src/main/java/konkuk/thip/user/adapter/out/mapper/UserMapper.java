@@ -1,23 +1,21 @@
 package konkuk.thip.user.adapter.out.mapper;
 
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
-import konkuk.thip.user.domain.Alias;
 import konkuk.thip.user.domain.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
 
-    public UserJpaEntity toJpaEntity(User user, AliasJpaEntity aliasJpaEntity) {
+    public UserJpaEntity toJpaEntity(User user) {
         return UserJpaEntity.builder()
                 .nickname(user.getNickname())
                 .nicknameUpdatedAt(user.getNicknameUpdatedAt())
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
                 .followerCount(user.getFollowerCount())
-                .aliasForUserJpaEntity(aliasJpaEntity)
+                .alias(user.getAlias())
                 .build();
     }
 
@@ -29,7 +27,7 @@ public class UserMapper {
                 .userRole(userJpaEntity.getRole().getType())
                 .oauth2Id(userJpaEntity.getOauth2Id())
                 .followerCount(userJpaEntity.getFollowerCount())
-                .alias(Alias.from(userJpaEntity.getAliasForUserJpaEntity().getValue()))
+                .alias(userJpaEntity.getAlias())
                 .createdAt(userJpaEntity.getCreatedAt())
                 .modifiedAt(userJpaEntity.getModifiedAt())
                 .status(userJpaEntity.getStatus())

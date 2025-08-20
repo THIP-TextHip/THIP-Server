@@ -9,6 +9,8 @@ import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.S3CommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,8 @@ public class FeedCreateService implements FeedCreateUseCase {
     public Long createFeed(FeedCreateCommand command, List<MultipartFile> images) {
 
         // 1. 피드 생성 비지니스 정책 검증
-        Feed.validateTags(command.tagList());
+        TagList.validateTags(Tag.fromList(command.tagList()));
+        // todo 나중에 presignedURL로 바꾸면 ContentList.of로 변경
         ContentList.validateImageCount(images != null ? images.size() : 0);
 
         // 2. Book 검증 및 조회

@@ -1,4 +1,4 @@
-package konkuk.thip.user.domain;
+package konkuk.thip.user.domain.value;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;

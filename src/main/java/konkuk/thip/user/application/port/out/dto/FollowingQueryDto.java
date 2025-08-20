@@ -1,6 +1,7 @@
 package konkuk.thip.user.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import konkuk.thip.user.domain.value.Alias;
 
 import java.time.LocalDateTime;
 
@@ -12,5 +13,19 @@ public record FollowingQueryDto(
         LocalDateTime followedAt
 ) {
     @QueryProjection
-    public FollowingQueryDto {}
+    public FollowingQueryDto (
+        Long userId,
+        Long followingTargetUserId,
+        String followingUserNickname,
+        Alias followingUserAlias,
+        LocalDateTime followedAt
+    ){
+        this(
+                userId,
+                followingTargetUserId,
+                followingUserNickname,
+                followingUserAlias.getImageUrl(),
+                followedAt
+        );
+    }
 }

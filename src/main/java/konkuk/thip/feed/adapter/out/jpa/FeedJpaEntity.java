@@ -5,7 +5,9 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.converter.ContentListJsonConverter;
+import konkuk.thip.feed.adapter.out.jpa.converter.TagListJsonConverter;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -36,24 +38,25 @@ public class FeedJpaEntity extends PostJpaEntity {
 
     // JSON 문자열로 저장되는 단일 컬럼
     @Convert(converter = ContentListJsonConverter.class)
-    @Column(name = "content_list", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "content_list", columnDefinition = "TEXT")
     private ContentList contentList = ContentList.empty();
 
     // 삭제용 피드 저장 양방향 매핑 관계
     @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SavedFeedJpaEntity> savedFeeds = new ArrayList<>();
 
-    // 삭제용 피드 태그 양방향 매핑 관계
-    @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<FeedTagJpaEntity> feedTags = new ArrayList<>();
+    @Column(name = "tag_list", columnDefinition = "TEXT")
+    @Convert(converter = TagListJsonConverter.class)
+    private TagList tagList = TagList.empty();
 
     @Builder
-    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, ContentList contentList) {
+    public FeedJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Boolean isPublic, int reportCount, BookJpaEntity bookJpaEntity, ContentList contentList, TagList tagList) {
         super(content, likeCount, commentCount, userJpaEntity);
         this.isPublic = isPublic;
         this.reportCount = reportCount;
         this.bookJpaEntity = bookJpaEntity;
-        if(contentList != null) this.contentList = contentList;
+        this.contentList = contentList != null ? contentList : ContentList.empty();
+        this.tagList = tagList != null ? tagList : TagList.empty();
     }
 
     public void updateFrom(Feed feed) {
@@ -63,6 +66,7 @@ public class FeedJpaEntity extends PostJpaEntity {
         this.likeCount = feed.getLikeCount();
         this.commentCount = feed.getCommentCount();
         this.contentList = feed.getContentList();
+        this.tagList = feed.getTagList();
     }
 
     @VisibleForTesting

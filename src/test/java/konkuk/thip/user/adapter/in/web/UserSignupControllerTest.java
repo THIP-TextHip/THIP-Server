@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,9 +40,6 @@ class UserSignupControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
 
     @Autowired
@@ -52,17 +48,16 @@ class UserSignupControllerTest {
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
     @DisplayName("[칭호id, 닉네임] 정보를 바탕으로 회원가입을 진행한다.")
     void signup_success() throws Exception {
         //given : alias 생성, 회원가입 request 생성
-        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserSignupRequest request = new UserSignupRequest(
-                aliasJpaEntity.getValue(),
+                alias.getValue(),
                 "테스트유저"
         );
 
@@ -82,10 +77,8 @@ class UserSignupControllerTest {
         Long userId = jsonNode.path("data").path("userId").asLong();
 
         UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElse(null);
-        AliasJpaEntity userAliasJpaEntity = aliasJpaRepository.findByValue(request.aliasName()).orElse(null);
-
-        assertThat(userAliasJpaEntity.getValue()).isEqualTo(request.aliasName());
         assertThat(userJpaEntity.getNickname()).isEqualTo(request.nickname());
+        assertThat(userJpaEntity.getAlias().getValue()).isEqualTo(request.aliasName());
     }
 
     @Test
@@ -192,11 +185,11 @@ class UserSignupControllerTest {
     @DisplayName("임시 토큰을 통해 @Oauth2Id로 oauth2Id를 정확히 추출하여 회원가입에 성공한다.")
     void signup_whenValidSignupToken_thenExtractOauth2IdCorrectly() throws Exception {
         //given : alias 데이터 저장
-        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         //회원가입 request 생성
         UserSignupRequest request = new UserSignupRequest(
-                aliasJpaEntity.getValue(),
+                alias.getValue(),
                 "테스트유저"
         );
 
@@ -242,6 +235,4 @@ class UserSignupControllerTest {
                 .andExpect(jsonPath("$.code").value(AUTH_TOKEN_NOT_FOUND.getCode()))
                 .andExpect(jsonPath("$.message", containsString(AUTH_TOKEN_NOT_FOUND.getMessage())));
     }
-
-
 }

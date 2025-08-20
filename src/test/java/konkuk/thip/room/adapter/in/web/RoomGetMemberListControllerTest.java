@@ -26,11 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("[단위] 독서메이트(방 멤버) 조회 api controller 테스트")
 class RoomGetMemberListControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
     private Map<String, Object> buildValidRequest() {
         Map<String, Object> request = new HashMap<>();

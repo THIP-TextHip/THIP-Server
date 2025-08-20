@@ -1,16 +1,14 @@
 package konkuk.thip.room.adapter.out.mapper;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.domain.Category;
 import konkuk.thip.room.domain.Room;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RoomMapper {
 
-    public RoomJpaEntity toJpaEntity(Room room, BookJpaEntity bookJpaEntity, CategoryJpaEntity categoryJpaEntity) {
+    public RoomJpaEntity toJpaEntity(Room room, BookJpaEntity bookJpaEntity) {
         return RoomJpaEntity.builder()
                 .title(room.getTitle())
                 .description(room.getDescription())
@@ -22,7 +20,7 @@ public class RoomMapper {
                 .recruitCount(room.getRecruitCount())
                 .memberCount(room.getMemberCount())
                 .bookJpaEntity(bookJpaEntity)
-                .categoryJpaEntity(categoryJpaEntity)
+                .category(room.getCategory())
                 .build();
     }
 
@@ -39,7 +37,7 @@ public class RoomMapper {
                 .recruitCount(roomJpaEntity.getRecruitCount())
                 .memberCount(roomJpaEntity.getMemberCount())
                 .bookId(roomJpaEntity.getBookJpaEntity().getBookId())
-                .category(Category.from(roomJpaEntity.getCategoryJpaEntity().getValue()))
+                .category(roomJpaEntity.getCategory())
                 .createdAt(roomJpaEntity.getCreatedAt())
                 .modifiedAt(roomJpaEntity.getModifiedAt())
                 .status(roomJpaEntity.getStatus())

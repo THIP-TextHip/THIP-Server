@@ -4,10 +4,9 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,14 +42,11 @@ class UserSearchApiTest {
     @Autowired
     private RecentSearchJpaRepository recentSearchJpaRepository;
 
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
     private Long currentUserId;
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         // 검색 요청을 하는 사용자
         UserJpaEntity currentUser = userJpaRepository.save(TestEntityFactory.createUser(alias, "검색자"));

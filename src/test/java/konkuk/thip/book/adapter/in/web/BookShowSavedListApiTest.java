@@ -4,10 +4,9 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,6 @@ class BookShowSavedListApiTest {
     @Autowired private MockMvc mockMvc;
 
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private SavedBookJpaRepository savedBookJpaRepository;
 
@@ -41,7 +39,7 @@ class BookShowSavedListApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         savedBook = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("1111111111111"));
         savedBookJpaRepository.save(TestEntityFactory.createSavedBook(user, savedBook));
@@ -57,5 +55,4 @@ class BookShowSavedListApiTest {
                 .andExpect(jsonPath("$.data.bookList.length()").value(1))
                 .andExpect(jsonPath("$.data.bookList[0].isbn").value(savedBook.getIsbn()));
     }
-
 }
