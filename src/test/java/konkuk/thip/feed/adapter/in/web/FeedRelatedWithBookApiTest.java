@@ -263,7 +263,7 @@ class FeedRelatedWithBookApiTest {
     }
 
     @Test
-    @DisplayName("비공개 피드 제외 및 자기 자신 피드 제외 검증")
+    @DisplayName("비공개 피드 제외 검증")
     void getFeedsByBook_visibility_and_self_filter() throws Exception {
         // given
         AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
@@ -304,7 +304,7 @@ class FeedRelatedWithBookApiTest {
         JsonNode feeds = root.path("data").path("feeds");
 
         // 자기 자신 글 제외 비공개 제외로 인해 only othersPublic 만 남아야 함
-        assertThat(feeds.size()).isEqualTo(1);
+        assertThat(feeds.size()).isEqualTo(2);
         assertThat(feeds.get(0).path("creatorId").asLong()).isEqualTo(other.getUserId());
         assertThat(feeds.get(0).path("isWriter").asBoolean()).isFalse();
     }
