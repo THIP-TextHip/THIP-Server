@@ -1,6 +1,5 @@
 package konkuk.thip.roompost.application.service.manager;
 
-import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.annotation.HelperService;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
@@ -17,19 +16,14 @@ public class RoomProgressManager {
 
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final RoomCommandPort roomCommandPort;
-    private final BookCommandPort bookCommandPort;
 
-    public void updateUserAndRoomProgress(Long userId, Long roomId, int currentPage) {
-        RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(userId, roomId);
-        Room room = roomCommandPort.getByIdOrThrow(roomId);
-        Book book = bookCommandPort.findById(room.getBookId());
-
+    public void updateUserAndRoomProgress(RoomParticipant roomParticipant, Room room, Book book, int currentPage) {
         // 1. 유저 진행률 update
         boolean updated = roomParticipant.updateUserProgress(currentPage, book.getPageCount());
         if (!updated) return;     // update 되지 않았으면 종료
 
         // 2. 방 평균 진행률 update
-        List<RoomParticipant> all = roomParticipantCommandPort.findAllByRoomId(roomId);
+        List<RoomParticipant> all = roomParticipantCommandPort.findAllByRoomId(room.getId());
         double total = all.stream()
                 .filter(p -> !roomParticipant.getId().equals(p.getId()))    // 현재 유저 제외
                 .mapToDouble(RoomParticipant::getUserPercentage)
@@ -42,12 +36,10 @@ public class RoomProgressManager {
         roomParticipantCommandPort.update(roomParticipant);
     }
 
-    public void removeUserProgressAndUpdateRoomProgress(Long removeRoomParticipantId, Long roomId) {
-
-        Room room = roomCommandPort.getByIdOrThrow(roomId);
+    public void removeUserProgressAndUpdateRoomProgress(Long removeRoomParticipantId, Room room) {
 
         // 나간 유저를 제외한 방 평균 진행률 update
-        List<RoomParticipant> remainingParticipants = roomParticipantCommandPort.findAllByRoomId(roomId);
+        List<RoomParticipant> remainingParticipants = roomParticipantCommandPort.findAllByRoomId(room.getId());
         double total = remainingParticipants.stream()
                 .filter(p -> !p.getId().equals(removeRoomParticipantId)) // 나간 유저 제외
                 .mapToDouble(RoomParticipant::getUserPercentage)
