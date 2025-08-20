@@ -18,6 +18,8 @@ public record FeedShowMineResponse(
             int likeCount,
             int commentCount,
             boolean isPublic,
+            boolean isSaved,
+            boolean isLiked,
             boolean isWriter
     ) { }
 }

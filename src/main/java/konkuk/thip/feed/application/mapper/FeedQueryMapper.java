@@ -46,11 +46,17 @@ public interface FeedQueryMapper {
      * 내 피드 조회 응답 DTO 변환
      */
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(dto.createdAt()))")
+    @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
+    @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isWriter", source = "dto.creatorId", qualifiedByName = "isWriter")
-    FeedShowMineResponse.FeedShowMineDto toFeedShowMineDto(FeedQueryDto dto, @Context Long userId);
+    FeedShowMineResponse.FeedShowMineDto toFeedShowMineResponse(FeedQueryDto dto,
+                                                                Set<Long> savedFeedIds,
+                                                                Set<Long> likedFeedIds,
+                                                                @Context Long userId);
 
-    List<FeedShowMineResponse.FeedShowMineDto> toFeedShowMineResponse(List<FeedQueryDto> dtos, @Context Long userId);
-
+    /**
+     * 특정 유저의 공개 피드 조회 응답 DTO 변환
+     */
     @Mapping(target = "isSaved", expression = "java(savedFeedIds.contains(dto.feedId()))")
     @Mapping(target = "isLiked", expression = "java(likedFeedIds.contains(dto.feedId()))")
     @Mapping(
