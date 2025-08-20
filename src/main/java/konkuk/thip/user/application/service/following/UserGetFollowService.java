@@ -36,7 +36,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
         );
 
         var followers = result.contents().stream()
-                .map(followQueryMapper::toFollowerDto)
+                .map(dto -> followQueryMapper.toFollowerDto(dto, userId))
                 .toList();
 
         return UserFollowersResponse.builder()
