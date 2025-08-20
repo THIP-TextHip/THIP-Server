@@ -26,7 +26,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
 
     @Override
     @Transactional(readOnly = true)
-    public UserFollowersResponse getUserFollowers(Long userId, String cursor, int size) {
+    public UserFollowersResponse getUserFollowers(Long loginUserId, Long userId, String cursor, int size) {
         User user = userCommandPort.findById(userId);
         Integer totalFollowerCount = (cursor == null || cursor.isBlank()) ?
                 user.getFollowerCount() : null;
@@ -36,7 +36,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
         );
 
         var followers = result.contents().stream()
-                .map(dto -> followQueryMapper.toFollowerDto(dto, userId))
+                .map(dto -> followQueryMapper.toFollowerDto(dto, loginUserId))
                 .toList();
 
         return UserFollowersResponse.builder()
