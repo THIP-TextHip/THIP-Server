@@ -18,7 +18,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.POST_ALREADY_DELETED;
 @Entity
 @Table(name = "posts")
 @Getter
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PostJpaEntity extends BaseJpaEntity {

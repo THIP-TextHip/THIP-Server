@@ -12,16 +12,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "records")
+//@Table(name = "records")
 @DiscriminatorValue("RECORD")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecordJpaEntity extends PostJpaEntity {
 
+    @Column(name = "page")
     private Integer page;
 
-    @Column(name = "is_overview",nullable = false)
-    private boolean isOverview;
+    @Column(name = "is_overview")
+    private Boolean isOverview;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
