@@ -5,6 +5,7 @@ import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.roompost.application.port.in.RecordDeleteUseCase;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordDeleteCommand;
 import konkuk.thip.roompost.application.port.out.RecordCommandPort;
+import konkuk.thip.roompost.application.service.manager.RoomProgressManager;
 import konkuk.thip.roompost.domain.Record;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class RecordDeleteService implements RecordDeleteUseCase {
     private final PostLikeCommandPort postLikeCommandPort;
 
     private final RoomParticipantValidator roomParticipantValidator;
+    private final RoomProgressManager roomProgressManager;
 
     @Override
     @Transactional
@@ -41,6 +43,7 @@ public class RecordDeleteService implements RecordDeleteUseCase {
         // 3-3. 기록 삭제
         recordCommandPort.delete(record);
 
+        //TODO// 4. 유저 방 진행도 업데이트
         return command.roomId();
     }
 }
