@@ -117,6 +117,11 @@ public enum SwaggerResponseDescription {
             ROOM_ACCESS_FORBIDDEN,
             ROOM_POST_TYPE_NOT_MATCH
     ))),
+    ROOM_LEAVE(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND,
+            ROOM_PARTICIPANT_NOT_FOUND,
+            ROOM_HOST_CANNOT_LEAVE
+    ))),
 
 
     // Record
