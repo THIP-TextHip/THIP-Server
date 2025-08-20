@@ -38,7 +38,7 @@ public record FeedQueryDto(
             String bookTitle,
             String bookAuthor,
             String contentBody,
-            ContentList contentList, // GROUP_CONCAT 결과
+            ContentList contentList,
             Integer likeCount,
             Integer commentCount,
             Boolean isPublic,

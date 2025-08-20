@@ -20,20 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "feeds")
+//@Table(name = "feeds")
 @DiscriminatorValue("FEED")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FeedJpaEntity extends PostJpaEntity {
 
-    @Column(name = "is_public", nullable = false)
+    @Column(name = "is_public")
     private Boolean isPublic;
 
-    @Column(name = "report_count", nullable = false)
+    @Column(name = "report_count")
     private int reportCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "book_id")
     private BookJpaEntity bookJpaEntity;
 
     // JSON 문자열로 저장되는 단일 컬럼

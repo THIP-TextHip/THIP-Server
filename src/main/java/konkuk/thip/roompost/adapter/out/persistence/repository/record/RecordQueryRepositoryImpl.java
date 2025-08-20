@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.querydsl.jpa.JPAExpressions.treat;
 import static konkuk.thip.post.domain.PostType.RECORD;
 import static konkuk.thip.post.domain.PostType.VOTE;
 
@@ -30,8 +31,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     private final QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
-    private final QRecordJpaEntity record = QRecordJpaEntity.recordJpaEntity;
-    private final QVoteJpaEntity vote = QVoteJpaEntity.voteJpaEntity;
     private final QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
     @Override
@@ -46,8 +45,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         return queryFactory
                 .select(selectPostQueryDto())
                 .from(post)
-                .leftJoin(record).on(post.postId.eq(record.postId))
-                .leftJoin(vote).on(post.postId.eq(vote.postId))
                 .join(post.userJpaEntity, user)
                 .where(where)
                 .orderBy(getOrderSpecifiers(roomPostSortType))
@@ -58,13 +55,13 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     private BooleanBuilder buildMyRecordCondition(Long roomId, Long userId) {
         BooleanBuilder where = new BooleanBuilder();
 
-        BooleanBuilder voteCondition = new BooleanBuilder();
-        voteCondition.and(post.dtype.eq(VOTE.getType()))
-                .and(vote.roomJpaEntity.roomId.eq(roomId));
+        BooleanBuilder voteCondition = new BooleanBuilder()
+                .and(post.dtype.eq(VOTE.getType()))
+                .and(treat(post, QVoteJpaEntity.class).roomJpaEntity.roomId.eq(roomId));
 
-        BooleanBuilder recordCondition = new BooleanBuilder();
-        recordCondition.and(post.dtype.eq(RECORD.getType()))
-                .and(record.roomJpaEntity.roomId.eq(roomId));
+        BooleanBuilder recordCondition = new BooleanBuilder()
+                .and(post.dtype.eq(RECORD.getType()))
+                .and(treat(post, QRecordJpaEntity.class).roomJpaEntity.roomId.eq(roomId));
 
         where.and(voteCondition.or(recordCondition))
                 .and(post.userJpaEntity.userId.eq(userId))
@@ -83,8 +80,6 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
         return queryFactory
                 .select(selectPostQueryDto())
                 .from(post)
-                .leftJoin(record).on(post.postId.eq(record.postId))
-                .leftJoin(vote).on(post.postId.eq(vote.postId))
                 .join(post.userJpaEntity, user)
                 .where(where)
                 .orderBy(getOrderSpecifiers(roomPostSortType))
@@ -95,26 +90,28 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     private BooleanBuilder buildRecordVoteCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview) {
         BooleanBuilder where = new BooleanBuilder();
 
-        BooleanBuilder voteCondition = new BooleanBuilder();
-        voteCondition.and(post.dtype.eq(VOTE.getType()))
-                .and(vote.roomJpaEntity.roomId.eq(roomId));
+        // VOTE
+        BooleanBuilder voteCondition = new BooleanBuilder()
+                .and(post.dtype.eq(VOTE.getType()))
+                .and(treat(post, QVoteJpaEntity.class).roomJpaEntity.roomId.eq(roomId));
 
         if (isOverview) {
-            voteCondition.and(vote.isOverview.isTrue());
+            voteCondition.and(treat(post, QVoteJpaEntity.class).isOverview.isTrue());
         } else {
-            voteCondition.and(vote.isOverview.isFalse())
-                    .and(vote.page.between(pageStart, pageEnd));
+            voteCondition.and(treat(post, QVoteJpaEntity.class).isOverview.isFalse())
+                    .and(treat(post, QVoteJpaEntity.class).page.between(pageStart, pageEnd));
         }
 
-        BooleanBuilder recordCondition = new BooleanBuilder();
-        recordCondition.and(post.dtype.eq(RECORD.getType()))
-                .and(record.roomJpaEntity.roomId.eq(roomId));
+        // RECORD
+        BooleanBuilder recordCondition = new BooleanBuilder()
+                .and(post.dtype.eq(RECORD.getType()))
+                .and(treat(post, QRecordJpaEntity.class).roomJpaEntity.roomId.eq(roomId));
 
         if (isOverview) {
-            recordCondition.and(record.isOverview.isTrue());
+            recordCondition.and(treat(post, QRecordJpaEntity.class).isOverview.isTrue());
         } else {
-            recordCondition.and(record.isOverview.isFalse())
-                    .and(record.page.between(pageStart, pageEnd));
+            recordCondition.and(treat(post, QRecordJpaEntity.class).isOverview.isFalse())
+                    .and(treat(post, QRecordJpaEntity.class).page.between(pageStart, pageEnd));
         }
 
         where.and(voteCondition.or(recordCondition))
@@ -125,16 +122,20 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
     // Case: pageExpr (Record, Vote 분기)
     private NumberExpression<Integer> pageExpr() {
         return new CaseBuilder()
-                .when(post.dtype.eq(RECORD.getType())).then(record.page)
-                .when(post.dtype.eq(VOTE.getType())).then(vote.page)
+                .when(post.dtype.eq(RECORD.getType()))
+                .then(treat(post, QRecordJpaEntity.class).page)
+                .when(post.dtype.eq(VOTE.getType()))
+                .then(treat(post, QVoteJpaEntity.class).page)
                 .otherwise(0);
     }
 
     // Case: isOverviewExpr (총평 여부를 정렬 기준으로 사용)
     private NumberExpression<Integer> isOverviewExpr() {
         return new CaseBuilder()
-                .when(post.dtype.eq(RECORD.getType())).then(record.isOverview.castToNum(Integer.class))
-                .when(post.dtype.eq(VOTE.getType())).then(vote.isOverview.castToNum(Integer.class))
+                .when(post.dtype.eq(RECORD.getType()))
+                .then(treat(post, QRecordJpaEntity.class).isOverview.castToNum(Integer.class))
+                .when(post.dtype.eq(VOTE.getType()))
+                .then(treat(post, QVoteJpaEntity.class).isOverview.castToNum(Integer.class))
                 .otherwise(0);
     }
 
