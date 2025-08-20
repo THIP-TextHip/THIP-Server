@@ -256,7 +256,7 @@ class FeedRelatedWithBookApiTest {
     }
 
     @Test
-    @DisplayName("비공개 피드 제외 검증 + 자기 자신 공개 피드는 포함 검증")
+    @DisplayName("비공개 피드 제외 검증")
     void getFeedsByBook_visibility_and_self_filter() throws Exception {
         // given
         Alias alias = TestEntityFactory.createLiteratureAlias();
