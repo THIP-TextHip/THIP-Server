@@ -18,7 +18,8 @@ public record UserFollowersResponse(
             String profileImageUrl,
             String aliasName,
             String aliasColor,
-            Integer followerCount
+            Integer followerCount,
+            boolean isMyself
     ){
 
     }
