@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import konkuk.thip.feed.domain.Tag;
-import konkuk.thip.feed.domain.TagList;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 
 import java.io.IOException;
 import java.util.List;

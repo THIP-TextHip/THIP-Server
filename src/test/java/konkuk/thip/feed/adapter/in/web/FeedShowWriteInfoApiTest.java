@@ -4,9 +4,9 @@ import com.jayway.jsonpath.JsonPath;
 import konkuk.thip.common.util.EnumMappings;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestS3MockConfig;
-import konkuk.thip.feed.domain.Tag;
-import konkuk.thip.room.domain.Category;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static konkuk.thip.feed.domain.Tag.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -90,7 +89,7 @@ class FeedShowWriteInfoApiTest {
         for (var entry : categoryToTags.entrySet()) {
             String categoryName = entry.getKey().getValue();
             Set<String> tagValues = entry.getValue().stream()
-                    .map(konkuk.thip.feed.domain.Tag::getValue)
+                    .map(Tag::getValue)
                     .collect(Collectors.toSet());
             expectedMap.put(categoryName, tagValues);
         }

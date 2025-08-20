@@ -2,7 +2,7 @@ package konkuk.thip.comment.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.annotation.Nullable;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 
 import java.time.LocalDateTime;
 

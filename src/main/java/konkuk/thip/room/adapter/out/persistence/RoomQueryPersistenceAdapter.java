@@ -10,7 +10,7 @@ import konkuk.thip.room.adapter.out.persistence.function.LocalDateCursorRoomQuer
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

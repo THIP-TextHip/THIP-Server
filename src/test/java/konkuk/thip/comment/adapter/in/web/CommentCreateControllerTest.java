@@ -7,7 +7,7 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaReposito
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
@@ -18,7 +18,7 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

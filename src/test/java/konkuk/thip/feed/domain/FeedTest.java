@@ -3,6 +3,8 @@ package konkuk.thip.feed.domain;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.post.domain.service.PostCountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.feed.domain.Tag.KOREAN_NOVEL;
+import static konkuk.thip.feed.domain.value.Tag.KOREAN_NOVEL;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 

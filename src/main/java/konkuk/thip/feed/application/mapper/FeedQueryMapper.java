@@ -6,11 +6,11 @@ import konkuk.thip.feed.adapter.in.web.response.*;
 import konkuk.thip.feed.application.port.in.dto.TagsWithCategoryResult;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.feed.domain.Tag;
-import konkuk.thip.feed.domain.TagList;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
-import konkuk.thip.room.domain.Category;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
 import org.mapstruct.*;
 

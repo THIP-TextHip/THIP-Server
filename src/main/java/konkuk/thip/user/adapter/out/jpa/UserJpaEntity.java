@@ -3,7 +3,7 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
 import lombok.*;
 

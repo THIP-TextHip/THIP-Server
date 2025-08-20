@@ -4,7 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
 import lombok.*;
 

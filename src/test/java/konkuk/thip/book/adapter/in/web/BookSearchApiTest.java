@@ -9,7 +9,7 @@ import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJ
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

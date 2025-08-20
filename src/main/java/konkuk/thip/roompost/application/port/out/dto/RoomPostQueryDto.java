@@ -1,7 +1,7 @@
 package konkuk.thip.roompost.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;

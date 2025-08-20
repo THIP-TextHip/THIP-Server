@@ -1,10 +1,10 @@
 package konkuk.thip.user.application.service;
 
 import konkuk.thip.common.util.EnumMappings;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.application.port.in.UserViewAliasChoiceUseCase;
 import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

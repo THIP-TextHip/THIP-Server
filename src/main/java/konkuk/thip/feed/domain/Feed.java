@@ -4,6 +4,8 @@ import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.service.PostCountService;
 import lombok.Builder;

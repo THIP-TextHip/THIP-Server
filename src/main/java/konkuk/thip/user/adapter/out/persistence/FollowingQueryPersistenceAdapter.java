@@ -7,7 +7,7 @@ import konkuk.thip.user.application.port.out.dto.FollowingQueryDto;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

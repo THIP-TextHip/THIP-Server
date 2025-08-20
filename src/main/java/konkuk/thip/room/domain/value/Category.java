@@ -1,4 +1,4 @@
-package konkuk.thip.room.domain;
+package konkuk.thip.room.domain.value;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Getter;

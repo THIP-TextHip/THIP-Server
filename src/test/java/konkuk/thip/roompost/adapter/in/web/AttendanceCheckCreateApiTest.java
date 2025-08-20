@@ -2,7 +2,7 @@ package konkuk.thip.roompost.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.AttendanceCheckJpaRepository;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
@@ -13,7 +13,7 @@ import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

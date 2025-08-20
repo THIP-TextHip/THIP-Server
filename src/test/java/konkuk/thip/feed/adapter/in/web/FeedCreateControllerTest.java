@@ -1,7 +1,7 @@
 package konkuk.thip.feed.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import konkuk.thip.feed.domain.Tag;
+import konkuk.thip.feed.domain.value.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

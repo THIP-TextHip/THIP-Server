@@ -3,7 +3,7 @@ package konkuk.thip.feed.adapter.out.mapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.feed.domain.TagList;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;

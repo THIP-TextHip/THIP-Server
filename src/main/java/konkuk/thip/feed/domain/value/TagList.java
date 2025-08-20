@@ -1,4 +1,4 @@
-package konkuk.thip.feed.domain;
+package konkuk.thip.feed.domain.value;
 
 import konkuk.thip.common.exception.InvalidStateException;
 

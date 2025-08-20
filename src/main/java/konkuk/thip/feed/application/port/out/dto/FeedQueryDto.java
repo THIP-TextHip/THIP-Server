@@ -3,7 +3,7 @@ package konkuk.thip.feed.application.port.out.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.annotation.Nullable;
 import konkuk.thip.feed.domain.value.ContentList;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

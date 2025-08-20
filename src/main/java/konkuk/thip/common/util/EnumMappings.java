@@ -1,8 +1,8 @@
 package konkuk.thip.common.util;
 
-import konkuk.thip.feed.domain.Tag;
-import konkuk.thip.room.domain.Category;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.user.domain.value.Alias;
 
 import java.util.Collections;
 import java.util.EnumMap;

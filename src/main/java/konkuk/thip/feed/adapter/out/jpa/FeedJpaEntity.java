@@ -7,7 +7,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.converter.ContentListJsonConverter;
 import konkuk.thip.feed.adapter.out.jpa.converter.TagListJsonConverter;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.feed.domain.TagList;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;

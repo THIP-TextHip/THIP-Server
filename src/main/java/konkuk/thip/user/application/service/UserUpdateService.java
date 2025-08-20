@@ -6,7 +6,7 @@ import konkuk.thip.user.application.port.in.UserUpdateUseCase;
 import konkuk.thip.user.application.port.in.dto.UserUpdateCommand;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
-import konkuk.thip.user.domain.Alias;
+import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
