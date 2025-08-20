@@ -173,19 +173,16 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     @Override
     public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, Category category, int count) {
-        NumberExpression<Long> memberCountExpr = participant.roomParticipantId.count();
         List<Tuple> tuples = queryFactory
-                .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate, book.imageUrl)
+                .select(room.roomId, room.title, room.memberCount, room.recruitCount, room.startDate, book.imageUrl)
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .leftJoin(participant).on(participant.roomJpaEntity.eq(room))
                 .where(
                         room.category.eq(category)
                                 .and(room.startDate.after(LocalDate.now()))     // 모집 마감 시각 > 현재 시각
                                 .and(room.roomId.ne(roomId))// 현재 방 제외
                                 .and(room.isPublic.isTrue()) // 공개방 만
                 )
-                .groupBy(room.roomId, room.title, room.recruitCount, room.startDate)
                 .orderBy(room.startDate.asc())
                 .limit(count)
                 .fetch();
@@ -195,7 +192,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         .roomId(t.get(room.roomId))
                         .bookImageUrl(t.get(book.imageUrl))
                         .roomName(t.get(room.title))
-                        .memberCount(t.get(memberCountExpr).intValue())
+                        .memberCount(t.get(room.memberCount))
                         .recruitCount(t.get(room.recruitCount))
                         .recruitEndDate(DateUtil.formatAfterTime(t.get(room.startDate)))
                         .build())
