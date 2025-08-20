@@ -41,4 +41,23 @@ public class RoomProgressManager {
         roomCommandPort.update(room);
         roomParticipantCommandPort.update(roomParticipant);
     }
+
+    public void removeUserProgressAndUpdateRoomProgress(Long removeRoomParticipantId, Long roomId) {
+
+        Room room = roomCommandPort.getByIdOrThrow(roomId);
+
+        // 나간 유저를 제외한 방 평균 진행률 update
+        List<RoomParticipant> remainingParticipants = roomParticipantCommandPort.findAllByRoomId(roomId);
+        double total = remainingParticipants.stream()
+                .filter(p -> !p.getId().equals(removeRoomParticipantId)) // 나간 유저 제외
+                .mapToDouble(RoomParticipant::getUserPercentage)
+                .sum();
+        room.updateRoomPercentage(total / (remainingParticipants.size() - 1));
+
+        // 방 멤버 수 감소
+        room.decreaseMemberCount();
+        // 영속화
+        roomCommandPort.update(room);
+    }
+
 }
