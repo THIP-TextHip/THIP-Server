@@ -99,8 +99,9 @@ public class RoomQueryController {
     @ExceptionDescription(ROOM_GET_MEMBER_LIST)
     @GetMapping("/rooms/{roomId}/users")
     public BaseResponse<RoomGetMemberListResponse> getRoomMemberList(
+            @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "방 참여자 목록을 조회하려는 방의 ID", example = "1") @PathVariable("roomId") final Long roomId){
-        return BaseResponse.ok(roomGetMemberListUseCase.getRoomMemberList(roomId));
+        return BaseResponse.ok(roomGetMemberListUseCase.getRoomMemberList(userId, roomId));
     }
 
     // 진행중인 방 상세보기

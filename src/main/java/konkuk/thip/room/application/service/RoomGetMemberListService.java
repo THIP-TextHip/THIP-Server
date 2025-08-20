@@ -25,7 +25,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public RoomGetMemberListResponse getRoomMemberList(Long roomId) {
+    public RoomGetMemberListResponse getRoomMemberList(Long userId, Long roomId) {
 
         // 1. 방 검증 및 방 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
@@ -44,16 +44,17 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         // 5. 각 roomParticipant에 대해 DTO 조립
         List<RoomGetMemberListResponse.MemberSearchResult> userList = roomParticipants.stream()
                 .map(roomParticipant -> {
-                    Long userId = roomParticipant.getUserId();
-                    User user = userMap.get(userId);
+                    Long userIdOfRoomParticipant = roomParticipant.getUserId();
+                    User user = userMap.get(userIdOfRoomParticipant);
 
                     return RoomGetMemberListResponse.MemberSearchResult.builder()
-                            .userId(userId)
+                            .userId(userIdOfRoomParticipant)
                             .nickname(user.getNickname())
                             .imageUrl(user.getAlias().getImageUrl())
                             .aliasName(user.getAlias().getValue())
                             .aliasColor(user.getAlias().getColor())
                             .followerCount(user.getFollowerCount())
+                            .isMyself(userIdOfRoomParticipant.equals(userId))
                             .build();
                 })
                 .toList();
