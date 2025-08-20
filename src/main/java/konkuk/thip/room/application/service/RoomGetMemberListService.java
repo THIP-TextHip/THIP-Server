@@ -4,6 +4,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -23,11 +24,15 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final UserCommandPort userCommandPort;
 
+    private final RoomParticipantValidator roomParticipantValidator;
+
     @Override
     @Transactional(readOnly = true)
     public RoomGetMemberListResponse getRoomMemberList(Long userId, Long roomId) {
 
-        // 1. 방 검증 및 방 조회
+        // 1. 해당 방의 참여자인지 조회
+        roomParticipantValidator.validateUserIsRoomMember(roomId, userId);
+        // 1-1. 방 검증 및 방 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
 
         // 2. 방 참여자(UserRoom) 전체 조회
