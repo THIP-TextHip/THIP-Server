@@ -7,6 +7,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
 import konkuk.thip.room.application.port.in.RoomShowPlayingDetailViewUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
+import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipants;
@@ -30,10 +31,16 @@ public class RoomShowPlayingDetailViewService implements RoomShowPlayingDetailVi
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final VoteQueryPort voteQueryPort;
 
+    private final RoomParticipantValidator roomParticipantValidator;
+
     @Override
     @Transactional(readOnly = true)
     public RoomPlayingDetailViewResponse getPlayingRoomDetailView(Long userId, Long roomId) {
-        // 1. Room 조회, Book 조회, Category와 연관된 Alias 조회
+
+        // 1. 해당 방의 참여자인지 조회
+        roomParticipantValidator.validateUserIsRoomMember(roomId, userId);
+
+        // 1-1. Room 조회, Book 조회, Category와 연관된 Alias 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
         Book book = bookCommandPort.findById(room.getBookId());
 
