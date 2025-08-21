@@ -268,6 +268,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
+                .and(participant.status.eq(StatusType.ACTIVE))
                 .and(room.startDate.after(today))
                 .and(room.status.eq(StatusType.ACTIVE));      // 유저가 참여한 방 && 모집중인 방
         DateExpression<LocalDate> cursorExpr = room.startDate;      // 커서 비교는 startDate(= 모집 마감일 - 1일)
@@ -285,6 +286,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
+                .and(participant.status.eq(StatusType.ACTIVE))
                 .and(room.startDate.loe(today))
                 .and(room.endDate.goe(today))
                 .and(room.status.eq(StatusType.ACTIVE));      // 유저가 참여한 방 && 현재 진행중인 방
@@ -305,6 +307,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         BooleanExpression playing   = room.startDate.loe(today).and(room.endDate.goe(today));
         BooleanExpression recruiting = room.startDate.after(today);
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
+                .and(participant.status.eq(StatusType.ACTIVE))
                 .and(playing.or(recruiting))
                 .and(room.status.eq(StatusType.ACTIVE));     // 유저가 참여한 방 && 현재 진행중인 방 + 모집중인 방
 
@@ -334,6 +337,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
+                .and(participant.status.eq(StatusType.ACTIVE))
                 .and(room.endDate.before(today))
                 .and(room.status.eq(StatusType.ACTIVE));       // 유저가 참여한 방 && 만료된 방
 
