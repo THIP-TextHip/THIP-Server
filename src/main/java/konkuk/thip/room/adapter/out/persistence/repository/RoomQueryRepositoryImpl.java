@@ -27,7 +27,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -244,11 +243,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         .bookImageUrl(t.get(book.imageUrl))
                         .roomTitle(t.get(room.title))
                         .memberCount(t.get(room.memberCount))
-                        .userPercentage(Optional.ofNullable(t.get(participant.userPercentage))
-                                        .map(val -> ((Number) val).doubleValue())
-                                                .map(Math::round)
-                                                .map(Long::intValue)
-                                                .orElse(0))
+                        .userPercentage(t.get(participant.userPercentage).intValue())
                         .build()
                 )
                 .toList();
@@ -471,7 +466,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
-                        cursorExpr
+                        room.startDate,
+                        room.endDate,
+                        room.isPublic
                 ))
                 .from(participant)
                 .join(participant.roomJpaEntity, room)

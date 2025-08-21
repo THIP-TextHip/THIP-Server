@@ -14,10 +14,11 @@ public record RoomQueryDto(
         String roomName,
         Integer recruitCount, // 방 최대 인원 수
         Integer memberCount,
-        @Nullable LocalDate startDate,    // 방 진행 시작일
+        LocalDate startDate,    // 방 진행 시작일
         LocalDate endDate,       // 방 진행 마감일 or 방 모집 마감일
         Boolean isPublic        // 공개방 여부
 ) {
+    // 내가 참여한 모임방(모집중, 진행중, 모집+진행중z, 완료된) 조회 시 활용
     @QueryProjection
     public RoomQueryDto {
         Assert.notNull(roomId, "roomId must not be null");
@@ -28,7 +29,6 @@ public record RoomQueryDto(
         Assert.notNull(memberCount, "memberCount must not be null");
     }
 
-    // 내가 참여한 모임방(모집중, 진행중, 모집+진행중, 완료된) 조회 시 활용
     @QueryProjection
     public RoomQueryDto(
             Long roomId,

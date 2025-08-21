@@ -34,9 +34,21 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
 
         // 2. [최신순으로] 피드 조회 with 페이징 처리
         CursorBasedList<FeedQueryDto> result = feedQueryPort.findMyFeedsByCreatedAt(userId, nextCursor);
+        Set<Long> feedIds = result.contents().stream()
+                .map(FeedQueryDto::feedId)
+                .collect(Collectors.toUnmodifiableSet());
+
+        // 3. 유저가 저장한 피드들, 좋아한 피드들 조회
+        Set<Long> savedFeedIdsByUser = feedQueryPort.findSavedFeedIdsByUserIdAndFeedIds(feedIds, userId);
+        Set<Long> likedFeedIdsByUser = postLikeQueryPort.findPostIdsLikedByUser(feedIds, userId);
+
+        // 4. response 로의 매핑
+        List<FeedShowMineResponse.FeedShowMineDto> feedList = result.contents().stream()
+                .map(dto -> feedQueryMapper.toFeedShowMineResponse(dto, savedFeedIdsByUser, likedFeedIdsByUser, userId))
+                .toList();
 
         return new FeedShowMineResponse(
-                feedQueryMapper.toFeedShowMineResponse(result.contents(), userId),
+                feedList,
                 result.nextCursor(),
                 !result.hasNext()
         );

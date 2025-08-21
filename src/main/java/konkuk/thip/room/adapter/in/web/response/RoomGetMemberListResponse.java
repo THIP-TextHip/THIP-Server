@@ -11,11 +11,12 @@ public record RoomGetMemberListResponse(
 ){
         @Builder
         public record MemberSearchResult(
-                Long userId,
+                Long userId,        // 이거 반환안해도 될텐데??
                 String nickname,
                 String imageUrl,
                 String aliasName,
                 String aliasColor,
-                int followerCount
+                int followerCount,
+                boolean isMyself
         ) {}
 }

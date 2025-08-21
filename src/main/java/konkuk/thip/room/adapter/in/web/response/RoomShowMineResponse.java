@@ -25,6 +25,8 @@ public record RoomShowMineResponse(
             String endDate,     // 방 진행 마감일 or 방 모집 마감일 (~ 뒤 형식)
 
             @Schema(description = "방 상태 : [모집중(=recruiting), 진행중(=playing), 완료된(=expired)] 중 하나")
-            String type
+            String type,
+
+            boolean isPublic
     ) {}
 }

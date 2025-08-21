@@ -4,6 +4,7 @@ import konkuk.thip.room.adapter.in.web.response.RoomGetMemberListResponse;
 import konkuk.thip.room.application.port.in.RoomGetMemberListUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -23,11 +24,15 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final UserCommandPort userCommandPort;
 
+    private final RoomParticipantValidator roomParticipantValidator;
+
     @Override
     @Transactional(readOnly = true)
-    public RoomGetMemberListResponse getRoomMemberList(Long roomId) {
+    public RoomGetMemberListResponse getRoomMemberList(Long userId, Long roomId) {
 
-        // 1. 방 검증 및 방 조회
+        // 1. 해당 방의 참여자인지 조회
+        roomParticipantValidator.validateUserIsRoomMember(roomId, userId);
+        // 1-1. 방 검증 및 방 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
 
         // 2. 방 참여자(UserRoom) 전체 조회
@@ -44,16 +49,17 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         // 5. 각 roomParticipant에 대해 DTO 조립
         List<RoomGetMemberListResponse.MemberSearchResult> userList = roomParticipants.stream()
                 .map(roomParticipant -> {
-                    Long userId = roomParticipant.getUserId();
-                    User user = userMap.get(userId);
+                    Long userIdOfRoomParticipant = roomParticipant.getUserId();
+                    User user = userMap.get(userIdOfRoomParticipant);
 
                     return RoomGetMemberListResponse.MemberSearchResult.builder()
-                            .userId(userId)
+                            .userId(userIdOfRoomParticipant)
                             .nickname(user.getNickname())
                             .imageUrl(user.getAlias().getImageUrl())
                             .aliasName(user.getAlias().getValue())
                             .aliasColor(user.getAlias().getColor())
                             .followerCount(user.getFollowerCount())
+                            .isMyself(userIdOfRoomParticipant.equals(userId))
                             .build();
                 })
                 .toList();
