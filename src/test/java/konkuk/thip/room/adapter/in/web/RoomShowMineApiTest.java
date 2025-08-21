@@ -2,6 +2,7 @@ package konkuk.thip.room.adapter.in.web;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
+import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
@@ -18,10 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_MY_ROOM_TYPE;
@@ -41,6 +44,7 @@ class RoomShowMineApiTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @AfterEach
     void tearDown() {
@@ -84,16 +88,18 @@ class RoomShowMineApiTest {
         roomJpaRepository.save(roomJpaEntity);
     }
 
-    private void saveSingleUserToRoom(RoomJpaEntity roomJpaEntity, UserJpaEntity userJpaEntity) {
+    private RoomParticipantJpaEntity saveSingleUserToRoom(RoomJpaEntity roomJpaEntity, UserJpaEntity userJpaEntity) {
         RoomParticipantJpaEntity roomParticipantJpaEntity = RoomParticipantJpaEntity.builder()
                 .userJpaEntity(userJpaEntity)
                 .roomJpaEntity(roomJpaEntity)
                 .roomParticipantRole(RoomParticipantRole.MEMBER)
                 .build();
-        roomParticipantJpaRepository.save(roomParticipantJpaEntity);
+        RoomParticipantJpaEntity saved = roomParticipantJpaRepository.save(roomParticipantJpaEntity);
 
         roomJpaEntity.updateMemberCount(roomJpaEntity.getMemberCount() + 1);
         roomJpaRepository.save(roomJpaEntity);      // room의 memberCount 값도 업데이트 해줘야 한다
+
+        return saved;
     }
 
     @Test
@@ -439,5 +445,51 @@ class RoomShowMineApiTest {
                 .andExpect(jsonPath("$.data.roomList", hasSize(2)))
                 .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-11일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-12일뒤-활동시작")));
+    }
+
+    @Test
+    @DisplayName("유저가 나간 방(= 모집기간 중 참여 취소한 경우, 진행기간 중 방 나간 경우) 은 조회되지 않는다.")
+    void get_my_rooms_about_exit_rooms() throws Exception {
+        //given
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruitingRoom1, 5);
+
+        RoomJpaEntity exitRecruitingRoom = saveScienceRoom("모집중인방-책-2", "isbn2", "참여신청하고-나간-모집중인-과학-방", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(exitRecruitingRoom, 8);
+
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        changeRoomMemberCount(playingRoom1, 6);
+
+        RoomJpaEntity exitPlayingRoom = saveScienceRoom("진행중인방-책-2", "isbn4", "모임진행중-나간-진행중인-과학-방", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        changeRoomMemberCount(exitPlayingRoom, 6);
+
+        Alias scienceAlias = TestEntityFactory.createScienceAlias();
+        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(scienceAlias));
+
+        // user가 생성한 방에 참여한 상황 가정
+        saveSingleUserToRoom(recruitingRoom1, user);
+        RoomParticipantJpaEntity exit1 = saveSingleUserToRoom(exitRecruitingRoom, user);
+        saveSingleUserToRoom(playingRoom1, user);
+        RoomParticipantJpaEntity exit2 = saveSingleUserToRoom(exitPlayingRoom, user);
+
+        // user가 exitRecruitingRoom, exitPlayingRoom 방에서 나간 상황 가정
+        jdbcTemplate.update(
+                "UPDATE room_participants SET status = ? WHERE room_participant_id = ?",
+                StatusType.INACTIVE.name(), exit1.getRoomParticipantId());
+        jdbcTemplate.update(
+                "UPDATE room_participants SET status = ? WHERE room_participant_id = ?",
+                StatusType.INACTIVE.name(), exit2.getRoomParticipantId());
+
+        //when
+        ResultActions result = mockMvc.perform(get("/rooms/my")
+                .requestAttr("userId", user.getUserId()));      // type request param 없는 경우
+
+        //then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.roomList", hasSize(2)))     // 나간방 제외하고 2개만 보임
+                .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-5일뒤-활동마감")))
+                .andExpect(jsonPath("$.data.roomList[0].memberCount", is(7)))       // 기존 6명 + user
+                .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-1일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[1].memberCount", is(6)));       // 기존 5명 + user
     }
 }
