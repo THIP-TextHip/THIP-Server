@@ -120,7 +120,8 @@ class RoomGetMemberListApiTest {
         Long roomId = room1.getRoomId();
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId)
+                .requestAttr("userId", user1.getUserId()));
 
         //then
         result.andExpect(status().isOk())
@@ -143,17 +144,20 @@ class RoomGetMemberListApiTest {
     }
 
     @Test
-    @DisplayName("방에 멤버가 없으면 빈 리스트를 반환한다.")
-    void getRoomMemberList_empty() throws Exception {
-        //given
-        RoomJpaEntity emptyRoom = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+    @DisplayName("방에 본인을 제외한 다른 멤버가 없으면, 반환되는 독서메이트는 1명(= 본인 혼자) 이다.")
+    void getRoomMemberList_just_me_alone_participant() throws Exception {
+        //given : me 가 방에 혼자 있는 상황
+        RoomJpaEntity userAloneRoom = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(userAloneRoom, me, RoomParticipantRole.HOST, 0.0));
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", emptyRoom.getRoomId()));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", userAloneRoom.getRoomId())
+                .requestAttr("userId", me.getUserId()));
 
         //then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userList", hasSize(0)));
+                .andExpect(jsonPath("$.data.userList", hasSize(1)));    // me
     }
 
     @Test
@@ -163,7 +167,8 @@ class RoomGetMemberListApiTest {
         Long roomId = room1.getRoomId();
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId)
+                .requestAttr("userId", user1.getUserId()));
 
         //then
         // user1이 팔로우하는 사람: user2, user3 (2명)
@@ -184,7 +189,8 @@ class RoomGetMemberListApiTest {
         Long roomId = room1.getRoomId();
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId)
+                .requestAttr("userId", user1.getUserId()));
 
         //then
         result.andExpect(status().isOk())
