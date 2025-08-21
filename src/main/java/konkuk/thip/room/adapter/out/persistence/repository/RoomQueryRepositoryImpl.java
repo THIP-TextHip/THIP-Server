@@ -208,6 +208,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         // 활동 기간 중인 방만: startDate ≤ today ≤ endDate
         BooleanBuilder where = new BooleanBuilder();
         where.and(participant.userJpaEntity.userId.eq(userId));
+        where.and(participant.status.eq(StatusType.ACTIVE));
         where.and(room.startDate.loe(date));
         where.and(room.endDate.goe(date));
 
