@@ -12,15 +12,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "votes")
+//@Table(name = "votes")
 @DiscriminatorValue("VOTE")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VoteJpaEntity extends PostJpaEntity {
 
+    @Column(name = "page")
     private Integer page;
 
-    @Column(name = "is_overview",nullable = false)
+    @Column(name = "is_overview")
     private boolean isOverview;
 
     @ManyToOne(fetch = FetchType.LAZY)

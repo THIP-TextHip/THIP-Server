@@ -8,10 +8,9 @@ import konkuk.thip.feed.adapter.in.web.request.FeedIsLikeRequest;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
@@ -43,7 +40,6 @@ class FeedChangeLikeStatusApiTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
@@ -57,7 +53,7 @@ class FeedChangeLikeStatusApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));

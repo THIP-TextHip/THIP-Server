@@ -2,6 +2,7 @@ package konkuk.thip.room.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.room.domain.value.Category;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -288,5 +289,4 @@ class RoomTest {
         InvalidStateException ex = assertThrows(InvalidStateException.class, room::startRoomProgress);
         assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());
     }
-
 }

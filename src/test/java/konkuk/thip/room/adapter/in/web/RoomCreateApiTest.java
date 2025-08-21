@@ -5,17 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,29 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("[통합] 방 생성 api 통합 테스트")
 class RoomCreateApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @AfterEach
     void tearDown() {
@@ -75,22 +56,20 @@ class RoomCreateApiTest {
         roomJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
     }
 
-    private void saveUserAndCategory() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+    private void saveUserAndLiteratureCategory() {
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
     }
 
     private void saveBookWithPageCount() {
@@ -137,12 +116,11 @@ class RoomCreateApiTest {
     @DisplayName("isbn 에 해당하는 책(with pageCount)이 DB에 존재할 때, 해당 책과 연관된 방을 생성할 수 있다.")
     void room_create_book_with_page_exist() throws Exception {
         //given : user, category, pageCount값이 있는 book 생성, request 생성
-        saveUserAndCategory();
+        saveUserAndLiteratureCategory();
         saveBookWithPageCount();
 
         Long userId = userJpaRepository.findAll().get(0).getUserId();
         Long bookId = bookJpaRepository.findAll().get(0).getBookId();
-        Long categoryId = categoryJpaRepository.findAll().get(0).getCategoryId();
 
         Map<String, Object> request = buildRoomCreateRequest();
 
@@ -170,11 +148,11 @@ class RoomCreateApiTest {
         assertThat(roomJpaEntity).isNotNull()
                 .extracting(
                         "title", "description", "public", "password", "roomPercentage",
-                        "startDate", "endDate", "recruitCount", "bookJpaEntity.bookId", "categoryJpaEntity.categoryId"
+                        "startDate", "endDate", "recruitCount", "bookJpaEntity.bookId", "category"
                 )
                 .containsExactly(
                         request.get("roomName"), request.get("description"), request.get("isPublic"), request.get("password"), 0.0,
-                        startDate, endDate, request.get("recruitCount"), bookId, categoryId
+                        startDate, endDate, request.get("recruitCount"), bookId, Category.LITERATURE
                 );
     }
 
@@ -182,12 +160,11 @@ class RoomCreateApiTest {
     @DisplayName("isbn 에 해당하는 책(without pageCount)이 DB에 존재할 때, 해당 책의 page 정보를 update 한 후 연관된 방을 생성할 수 있다.")
     void room_create_book_without_page_exist() throws Exception {
         //given : user, category, pageCount값이 없는 book 생성, request 생성
-        saveUserAndCategory();
+        saveUserAndLiteratureCategory();
         saveBookWithoutPageCount();
 
         Long userId = userJpaRepository.findAll().get(0).getUserId();
         Long bookId = bookJpaRepository.findAll().get(0).getBookId();
-        Long categoryId = categoryJpaRepository.findAll().get(0).getCategoryId();
 
         Map<String, Object> request = buildRoomCreateRequest();
 
@@ -215,11 +192,11 @@ class RoomCreateApiTest {
         assertThat(roomJpaEntity).isNotNull()
                 .extracting(
                         "title", "description", "public", "password", "roomPercentage",
-                        "startDate", "endDate", "recruitCount", "bookJpaEntity.bookId", "categoryJpaEntity.categoryId"
+                        "startDate", "endDate", "recruitCount", "bookJpaEntity.bookId", "category"
                 )
                 .containsExactly(
                         request.get("roomName"), request.get("description"), request.get("isPublic"), request.get("password"), 0.0,
-                        startDate, endDate, request.get("recruitCount"), bookId, categoryId
+                        startDate, endDate, request.get("recruitCount"), bookId, Category.LITERATURE
                 );
 
         // update 된 책 검증
@@ -231,10 +208,9 @@ class RoomCreateApiTest {
     @DisplayName("isbn 에 해당하는 책이 존재하지 않을 경우, page 정보를 포함하는 책을 save 한 후 연관된 방을 생성할 수 있다.")
     void room_create_book_not_exist() throws Exception {
         //given : user, category 생성, request 생성 (book 생성 X)
-        saveUserAndCategory();
+        saveUserAndLiteratureCategory();
 
         Long userId = userJpaRepository.findAll().get(0).getUserId();
-        Long categoryId = categoryJpaRepository.findAll().get(0).getCategoryId();
 
         Map<String, Object> request = buildRoomCreateRequest();
 
@@ -262,11 +238,11 @@ class RoomCreateApiTest {
         assertThat(roomJpaEntity).isNotNull()
                 .extracting(
                         "title", "description", "public", "password", "roomPercentage",
-                        "startDate", "endDate", "recruitCount", "categoryJpaEntity.categoryId"
+                        "startDate", "endDate", "recruitCount", "category"
                 )
                 .containsExactly(
                         request.get("roomName"), request.get("description"), request.get("isPublic"), request.get("password"), 0.0,
-                        startDate, endDate, request.get("recruitCount"), categoryId
+                        startDate, endDate, request.get("recruitCount"), Category.LITERATURE
                 );
 
         // 새로 DB에 저장된 책 검증
@@ -285,12 +261,11 @@ class RoomCreateApiTest {
     @Transactional      // RoomParticipant -> Room, User 의 manyToOne 지연로딩을 위해 추가
     void room_create_room_participant_save_success() throws Exception {
         //given : user, category, pageCount값이 있는 book 생성, request 생성
-        saveUserAndCategory();
+        saveUserAndLiteratureCategory();
         saveBookWithPageCount();
 
         Long userId = userJpaRepository.findAll().get(0).getUserId();
         Long bookId = bookJpaRepository.findAll().get(0).getBookId();
-        Long categoryId = categoryJpaRepository.findAll().get(0).getCategoryId();
 
         Map<String, Object> request = buildRoomCreateRequest();
 

@@ -27,7 +27,7 @@ public class RecordMapper {
                 .content(recordJpaEntity.getContent())
                 .creatorId(recordJpaEntity.getUserJpaEntity().getUserId())
                 .page(recordJpaEntity.getPage())
-                .isOverview(recordJpaEntity.isOverview())
+                .isOverview(recordJpaEntity.getIsOverview())
                 .roomId(recordJpaEntity.getRoomJpaEntity().getRoomId())
                 .likeCount(recordJpaEntity.getLikeCount())
                 .commentCount(recordJpaEntity.getCommentCount())

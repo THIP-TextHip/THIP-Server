@@ -3,8 +3,8 @@ package konkuk.thip.user.adapter.out.jpa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,11 @@ class UserJpaEntityTest {
     @Autowired
     private UserJpaRepository userRepository;
 
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
     @Test
     @DisplayName("UserJpaEntity 저장 및 조회 테스트")
     void saveAndFindUser() {
         // given
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
 
         // when
@@ -44,7 +41,7 @@ class UserJpaEntityTest {
 
         // then
         assertThat(foundUser.getNickname()).isEqualTo("테스터");
-        assertThat(foundUser.getAliasForUserJpaEntity().getValue()).isEqualTo("문학가");
+        assertThat(foundUser.getAlias().getValue()).isEqualTo("문학가");
         assertThat(foundUser.getRole()).isEqualTo(UserRole.USER);
     }
 }

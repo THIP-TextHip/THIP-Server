@@ -26,7 +26,6 @@ class RoomGetHomeJoinedRoomsControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     private Map<String, Object> buildValidRequest() {
         Map<String, Object> request = new HashMap<>();
         request.put("userId", 1L);

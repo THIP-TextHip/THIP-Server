@@ -5,10 +5,9 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +30,6 @@ class FeedJpaEntityTest {
     private UserJpaRepository userRepository;
 
     @Autowired
-    private AliasJpaRepository aliasRepository;
-
-    @Autowired
     private BookJpaRepository bookRepository;
 
     @Autowired
@@ -43,7 +39,7 @@ class FeedJpaEntityTest {
     @DisplayName("FeedJpaEntity 저장 및 조회 테스트")
     void saveAndFindFeed() {
         // given
-        AliasJpaEntity alias = aliasRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userRepository.save(TestEntityFactory.createUser(alias));
         BookJpaEntity book = bookRepository.save(TestEntityFactory.createBook());
 

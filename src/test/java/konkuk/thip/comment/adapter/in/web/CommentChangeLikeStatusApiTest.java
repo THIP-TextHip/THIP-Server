@@ -12,14 +12,12 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,9 +48,7 @@ class CommentChangeLikeStatusApiTest {
     private MockMvc mockMvc;
 
     @Autowired private ObjectMapper objectMapper;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private CommentJpaRepository commentJpaRepository;
@@ -60,9 +56,9 @@ class CommentChangeLikeStatusApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
 
 
-    private AliasJpaEntity alias;
+    private Alias alias;
     private UserJpaEntity user;
-    private CategoryJpaEntity category;
+    private Category category;
     private FeedJpaEntity feed;
     private BookJpaEntity book;
     private RoomJpaEntity room;
@@ -70,9 +66,9 @@ class CommentChangeLikeStatusApiTest {
 
     @BeforeEach
     void setUp() {
-        alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        category = TestEntityFactory.createLiteratureCategory();
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         room = roomJpaRepository.save(TestEntityFactory.createRoom(book,category));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));

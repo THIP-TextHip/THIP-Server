@@ -3,18 +3,16 @@ package konkuk.thip.room.adapter.in.web;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,47 +38,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("[통합] 독서 메이트(방 멤버) 조회 api 통합 테스트")
 class RoomGetMemberListApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private RoomParticipantJpaRepository roomParticipantJpaRepository;
-
-    @Autowired
-    private FollowingJpaRepository followingJpaRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @Autowired private FollowingJpaRepository followingJpaRepository;
 
     private RoomJpaEntity room1;
     private UserJpaEntity user1;
     private UserJpaEntity user2;
     private UserJpaEntity user3;
     private BookJpaEntity book;
-    private CategoryJpaEntity category;
+    private Category category;
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = TestEntityFactory.createLiteratureAlias();
-        aliasJpaRepository.save(alias);
-
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user1 = userJpaRepository.save(UserJpaEntity.builder()
                 .nickname("테스터1")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_1")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .followerCount(2) // user1이 user2, user3를 팔로우
                 .build());
@@ -89,7 +68,7 @@ class RoomGetMemberListApiTest {
                 .nickname("테스터2")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_2")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .followerCount(1) // user2가 user3를 팔로우
                 .build());
@@ -98,13 +77,13 @@ class RoomGetMemberListApiTest {
                 .nickname("테스터3")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .oauth2Id("kakao_3")
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .role(UserRole.USER)
                 .followerCount(1) // user3가 user1을 팔로우
                 .build());
 
         book = bookJpaRepository.save(TestEntityFactory.createBook());
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        category = TestEntityFactory.createLiteratureCategory();
 
         room1 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
 
@@ -131,8 +110,6 @@ class RoomGetMemberListApiTest {
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
@@ -143,7 +120,8 @@ class RoomGetMemberListApiTest {
         Long roomId = room1.getRoomId();
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId)
+                .requestAttr("userId", user1.getUserId()));
 
         //then
         result.andExpect(status().isOk())
@@ -166,17 +144,20 @@ class RoomGetMemberListApiTest {
     }
 
     @Test
-    @DisplayName("방에 멤버가 없으면 빈 리스트를 반환한다.")
-    void getRoomMemberList_empty() throws Exception {
-        //given
-        RoomJpaEntity emptyRoom = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+    @DisplayName("방에 본인을 제외한 다른 멤버가 없으면, 반환되는 독서메이트는 1명(= 본인 혼자) 이다.")
+    void getRoomMemberList_just_me_alone_participant() throws Exception {
+        //given : me 가 방에 혼자 있는 상황
+        RoomJpaEntity userAloneRoom = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER));
+        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(userAloneRoom, me, RoomParticipantRole.HOST, 0.0));
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", emptyRoom.getRoomId()));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", userAloneRoom.getRoomId())
+                .requestAttr("userId", me.getUserId()));
 
         //then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.userList", hasSize(0)));
+                .andExpect(jsonPath("$.data.userList", hasSize(1)));    // me
     }
 
     @Test
@@ -186,7 +167,8 @@ class RoomGetMemberListApiTest {
         Long roomId = room1.getRoomId();
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId)
+                .requestAttr("userId", user1.getUserId()));
 
         //then
         // user1이 팔로우하는 사람: user2, user3 (2명)
@@ -202,12 +184,13 @@ class RoomGetMemberListApiTest {
     @DisplayName("팔로워가 한 명도 없는 사용자는 followerCount가 0으로 조회된다.")
     void getRoomMemberList_noSubscriber() throws Exception {
         //given
-        UserJpaEntity userNoFollower = userJpaRepository.save(TestEntityFactory.createUser(aliasJpaRepository.findAll().get(0)));
+        UserJpaEntity userNoFollower = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER));
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room1, userNoFollower, RoomParticipantRole.MEMBER, 10.0));
         Long roomId = room1.getRoomId();
 
         //when
-        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId));
+        ResultActions result = mockMvc.perform(get("/rooms/{roomId}/users", roomId)
+                .requestAttr("userId", user1.getUserId()));
 
         //then
         result.andExpect(status().isOk())

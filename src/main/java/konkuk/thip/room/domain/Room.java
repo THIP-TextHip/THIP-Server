@@ -4,6 +4,7 @@ import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.room.domain.value.Category;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

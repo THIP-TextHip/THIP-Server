@@ -6,11 +6,10 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,9 +42,6 @@ class BookSearchApiTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private RecentSearchJpaRepository recentSearchJpaRepository;
 
     @Autowired
@@ -55,14 +51,14 @@ class BookSearchApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity user = userJpaRepository.save(UserJpaEntity.builder()
                 .oauth2Id("kakao_432708231")
                 .nickname("User1")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(UserRole.USER)
-                .aliasForUserJpaEntity(alias)
+                .alias(alias)
                 .build());
 
         RecentSearchJpaEntity recentSearch = recentSearchJpaRepository.save(RecentSearchJpaEntity.builder()
@@ -78,7 +74,6 @@ class BookSearchApiTest {
     void tearDown() {
         recentSearchJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test

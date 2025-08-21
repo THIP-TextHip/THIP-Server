@@ -2,6 +2,7 @@ package konkuk.thip.comment.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.annotation.Nullable;
+import konkuk.thip.user.domain.value.Alias;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +24,22 @@ public record CommentQueryDto(
      * child comment
      */
     @QueryProjection
-    public CommentQueryDto {}
+    public CommentQueryDto (
+            Long commentId,
+            Long parentCommentId,
+            String parentCommentCreatorNickname,
+            Long creatorId,
+            Alias creatorAlias,
+            String creatorNickname,
+            LocalDateTime createdAt,    // 댓글 작성 시각
+            String content,
+            int likeCount,
+            Boolean isDeleted
+    ) {
+        this(commentId, parentCommentId, parentCommentCreatorNickname, creatorId, creatorAlias.getImageUrl(),
+                creatorNickname, creatorAlias.getValue(), creatorAlias.getColor(),
+                createdAt, content, likeCount, isDeleted);
+    }
 
     /**
      * root comment
@@ -32,16 +48,15 @@ public record CommentQueryDto(
     public CommentQueryDto (
             Long commentId,
             Long creatorId,
-            String creatorProfileImageUrl,
+            Alias creatorAlias,
             String creatorNickname,
-            String alias,
-            String aliasColor,
             LocalDateTime createdAt,    // 댓글 작성 시각
             String content,
             int likeCount,
             boolean isDeleted
     ) {
-        this(commentId, null, null, creatorId, creatorProfileImageUrl, creatorNickname,
-                alias, aliasColor, createdAt, content, likeCount, isDeleted);
+        this(commentId, null, null, creatorId, creatorAlias.getImageUrl(),
+                creatorNickname, creatorAlias.getValue(), creatorAlias.getColor(),
+                createdAt, content, likeCount, isDeleted);
     }
 }

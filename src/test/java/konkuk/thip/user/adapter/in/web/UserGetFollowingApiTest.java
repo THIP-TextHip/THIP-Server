@@ -2,11 +2,10 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,9 +39,6 @@ class UserGetFollowingApiTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
 
     @Autowired
@@ -53,7 +49,7 @@ class UserGetFollowingApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         // 로그인 사용자
         loginUser = userJpaRepository.save(TestEntityFactory.createUser(alias));

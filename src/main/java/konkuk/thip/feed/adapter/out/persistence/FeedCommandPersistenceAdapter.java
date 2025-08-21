@@ -4,22 +4,16 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.adapter.out.jpa.*;
-import konkuk.thip.feed.adapter.out.mapper.ContentMapper;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedTag.FeedTagJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.Tag.TagJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.feed.domain.Tag;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import static konkuk.thip.common.entity.StatusType.ACTIVE;
@@ -32,22 +26,14 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     private final FeedJpaRepository feedJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final BookJpaRepository bookJpaRepository;
-    private final TagJpaRepository tagJpaRepository;
-    private final FeedTagJpaRepository feedTagJpaRepository;
-    private final ContentJpaRepository contentJpaRepository;
     private final SavedFeedJpaRepository savedFeedJpaRepository;
 
     private final FeedMapper feedMapper;
-    private final ContentMapper contentMapper;
-
 
     @Override
     public Optional<Feed> findById(Long id) {
         return feedJpaRepository.findByPostIdAndStatus(id,ACTIVE)
-                .map(feedJpaEntity -> {
-                    List<TagJpaEntity> tagJpaEntityList = tagJpaRepository.findAllByFeedId(feedJpaEntity.getPostId());
-                    return feedMapper.toDomainEntity(feedJpaEntity, tagJpaEntityList);
-                });
+                .map(feedMapper::toDomainEntity);
     }
 
 
@@ -65,10 +51,10 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         // Feed 먼저 영속화 → ID 생성
         FeedJpaEntity savedFeed = feedJpaRepository.save(feedJpaEntity);
 
-        // Content가 존재하면 ContentJpaEntity 생성 및 Feed 연관관계 설정
-        applyFeedContents(feed, savedFeed);
+//        // Content가 존재하면 ContentJpaEntity 생성 및 Feed 연관관계 설정
+//        applyFeedContents(feed, savedFeed);
         // 태그가 존재하면 태그 피드 매핑 생성 및 저장
-        applyFeedTags(feed, savedFeed);
+//        applyFeedTags(feed, savedFeed);
 
         return savedFeed.getPostId();
     }
@@ -79,36 +65,13 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
         feedJpaEntity.updateFrom(feed);
 
-        feedJpaEntity.getContentList().clear(); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
-        applyFeedContents(feed, feedJpaEntity);
-
-        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId()); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
-        applyFeedTags(feed, feedJpaEntity);
+//        feedJpaEntity.replaceContentList(feed.getContentList()); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
+//        applyFeedContents(feed, feedJpaEntity);
+//
+//        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId()); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
+//        applyFeedTags(feed, feedJpaEntity);
 
         return feedJpaEntity.getPostId();
-    }
-
-    private void applyFeedContents(Feed feed, FeedJpaEntity feedJpaEntity) {
-        if (feed.getContentList().isEmpty()) return;
-        List<ContentJpaEntity> contents = feed.getContentList().stream()
-                .map(content -> contentMapper.toJpaEntity(content, feedJpaEntity))
-                .toList();
-        feedJpaEntity.getContentList().addAll(contents);
-    }
-
-    private void applyFeedTags(Feed feed, FeedJpaEntity feedJpaEntity) {
-        if (feed.getTagList().isEmpty()) return;
-        for (Tag tag : feed.getTagList()) {
-            TagJpaEntity tagJpaEntity = tagJpaRepository.findByValue(tag.getValue())
-                    .orElseThrow(() -> new EntityNotFoundException(TAG_NOT_FOUND));
-
-            FeedTagJpaEntity feedTagJpaEntity = FeedTagJpaEntity.builder()
-                    .feedJpaEntity(feedJpaEntity)
-                    .tagJpaEntity(tagJpaEntity)
-                    .build();
-
-            feedTagJpaRepository.save(feedTagJpaEntity);
-        }
     }
 
     @Override
@@ -134,8 +97,6 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostIdAndStatus(feed.getId(),ACTIVE)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
 
-        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
-        contentJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
         savedFeedJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());
 
         feedJpaEntity.softDelete();

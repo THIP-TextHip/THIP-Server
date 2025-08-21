@@ -2,6 +2,8 @@ package konkuk.thip.feed.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import jakarta.annotation.Nullable;
+import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.user.domain.value.Alias;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -30,14 +32,13 @@ public record FeedQueryDto(
             Long feedId,
             Long creatorId,
             String creatorNickname,
-            String creatorProfileImageUrl,
-            String alias,
+            Alias alias,
             LocalDateTime createdAt,
             String isbn,
             String bookTitle,
             String bookAuthor,
             String contentBody,
-            String concatenatedContentUrls, // GROUP_CONCAT 결과
+            ContentList contentList,
             Integer likeCount,
             Integer commentCount,
             Boolean isPublic,
@@ -48,14 +49,14 @@ public record FeedQueryDto(
                 feedId,
                 creatorId,
                 creatorNickname,
-                creatorProfileImageUrl,
-                alias,
+                alias.getImageUrl(),
+                alias.getValue(),
                 createdAt,
                 isbn,
                 bookTitle,
                 bookAuthor,
                 contentBody,
-                splitToArray(concatenatedContentUrls),
+                convertToArray(contentList),
                 likeCount == null ? 0 : likeCount,
                 commentCount == null ? 0 : commentCount,
                 isPublic,
@@ -64,12 +65,11 @@ public record FeedQueryDto(
         );
     }
 
-    // Attribute convertor로 바꾸기 전에 임시 메서드
-    private static String[] splitToArray(String concatenated) {
-        if (concatenated == null || concatenated.isEmpty()) return new String[0];
-        String[] parts = concatenated.split(",");
-        for (int i = 0; i < parts.length; i++) parts[i] = parts[i].trim();
-        return parts;
+    private static String[] convertToArray(ContentList contentList) {
+        if (contentList == null || contentList.isEmpty()) {
+            return new String[0];
+        }
+        return contentList.toArray(String[]::new);
     }
 
 }

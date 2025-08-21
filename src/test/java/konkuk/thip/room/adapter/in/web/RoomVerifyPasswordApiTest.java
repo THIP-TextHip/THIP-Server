@@ -5,14 +5,12 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +23,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 
 import java.time.LocalDate;
 
@@ -40,26 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("[통합] 비공개 방 비밀번호 입력 검증 api 통합 테스트")
 class RoomVerifyPasswordApiTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
-    private BookJpaRepository bookJpaRepository;
-
-    @Autowired
-    private CategoryJpaRepository categoryJpaRepository;
-
-    @Autowired
-    private RoomJpaRepository roomJpaRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private BookJpaRepository bookJpaRepository;
+    @Autowired private RoomJpaRepository roomJpaRepository;
+    @Autowired private ObjectMapper objectMapper;
 
     private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
@@ -69,8 +51,7 @@ class RoomVerifyPasswordApiTest {
 
     @BeforeEach
     void setUp() {
-
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias, "User1"));
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .isbn("1234567890123")
@@ -83,13 +64,13 @@ class RoomVerifyPasswordApiTest {
                 .build());
         userId = user.getUserId();
 
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
 
         // 비공개 방 저장 (비밀번호: 1234)
         RoomJpaEntity privateRoom = roomJpaRepository.save(
                 RoomJpaEntity.builder()
                         .bookJpaEntity(book)
-                        .categoryJpaEntity(category)
+                        .category(category)
                         .title("비공개방")
                         .description("비공개방입니다")
                         .isPublic(false)
@@ -105,7 +86,7 @@ class RoomVerifyPasswordApiTest {
         RoomJpaEntity publicRoom = roomJpaRepository.save(
                 RoomJpaEntity.builder()
                         .bookJpaEntity(book)
-                        .categoryJpaEntity(category)
+                        .category(category)
                         .title("공개방")
                         .description("공개방입니다")
                         .isPublic(true)
@@ -123,8 +104,6 @@ class RoomVerifyPasswordApiTest {
         roomJpaRepository.deleteAll();
         bookJpaRepository.deleteAll();
         userJpaRepository.deleteAll();
-        categoryJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
@@ -175,7 +154,7 @@ class RoomVerifyPasswordApiTest {
         RoomJpaEntity expiredRoom = roomJpaRepository.save(
                 RoomJpaEntity.builder()
                         .bookJpaEntity(bookJpaRepository.findAll().get(0))
-                        .categoryJpaEntity(categoryJpaRepository.findAll().get(0))
+                        .category(Category.LITERATURE)
                         .title("모집만료방")
                         .description("모집기간이 만료된 방입니다")
                         .isPublic(false)

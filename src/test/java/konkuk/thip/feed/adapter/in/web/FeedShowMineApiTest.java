@@ -4,15 +4,13 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.Content.ContentJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,16 +41,10 @@ class FeedShowMineApiTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
-    @Autowired
     private UserJpaRepository userJpaRepository;
 
     @Autowired
     private FeedJpaRepository feedJpaRepository;
-
-    @Autowired
-    private ContentJpaRepository contentJpaRepository;
 
     @Autowired
     private FollowingJpaRepository followingJpaRepository;
@@ -73,11 +65,9 @@ class FeedShowMineApiTest {
     void tearDown() {
         postLikeJpaRepository.deleteAllInBatch();
         savedFeedJpaRepository.deleteAllInBatch();
-        contentJpaRepository.deleteAllInBatch();
         feedJpaRepository.deleteAllInBatch();
         followingJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
     }
 
@@ -85,7 +75,7 @@ class FeedShowMineApiTest {
     @DisplayName("내 피드 조회를 요청할 경우, [feedId, 작성일, 책정보, ,,] 의 피드 정보를 최신순으로 정렬해서 반환한다.")
     void feed_show_mine_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity otherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "otherUser"));
 
@@ -135,7 +125,7 @@ class FeedShowMineApiTest {
     @DisplayName("내 피드는 [유저 본인이 작성한 글을 최신순] 으로 반환한다.")
     void feed_show_mine_order_latest() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity otherUser = userJpaRepository.save(TestEntityFactory.createUser(a0, "otherUser"));
 
@@ -199,7 +189,7 @@ class FeedShowMineApiTest {
     @DisplayName("request parameter의 cursor 값이 null일 경우, 첫번째 페이지에 해당하는 피드 10개와, nextCursor, last 값을 반환한다.")
     void feed_show_mine_first_page() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
@@ -286,7 +276,7 @@ class FeedShowMineApiTest {
     @DisplayName("request parameter의 cursor 값이 존재할 경우, 해당 페이지에 해당하는 피드 10개와, nextCursor, last 값을 반환한다.")
     void feed_show_mine_with_cursor() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book

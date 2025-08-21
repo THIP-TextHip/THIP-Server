@@ -4,18 +4,16 @@ import com.jayway.jsonpath.JsonPath;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.AttendanceCheckJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.AttendanceCheckJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,9 +43,7 @@ class AttendanceCheckShowApiTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
@@ -60,20 +56,18 @@ class AttendanceCheckShowApiTest {
         roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
-        categoryJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
     }
 
     @Test
     @DisplayName("방의 출석체크(= 오늘의 한마디) 조회 요청하면, [오늘의 한마디 작성자 정보, 오늘의 한마디 정보] 등을 최신순으로 반환한다.")
     void attendance_check_show_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 
@@ -116,11 +110,11 @@ class AttendanceCheckShowApiTest {
     @DisplayName("방의 멤버가 아닌 사람이 오늘의 한마디 조회 요청을 보낼 경우, 403 error가 발생한다.")
     void attendance_check_show_no_room_member() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 
@@ -141,10 +135,10 @@ class AttendanceCheckShowApiTest {
     @DisplayName("오늘의 한마디 조회는 작성 시각 기준 최신순 정렬 & 커서 기반 페이지네이션으로 동작한다.")
     void attendance_check_show_page_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
 
-        CategoryJpaEntity c0 = categoryJpaRepository.save(TestEntityFactory.createScienceCategory(a0));
+        Category c0 = TestEntityFactory.createScienceCategory();
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, c0));
 

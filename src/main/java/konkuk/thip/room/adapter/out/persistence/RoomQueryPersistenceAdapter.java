@@ -1,18 +1,16 @@
 package konkuk.thip.room.adapter.out.persistence;
 
-import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.common.util.EnumMappings;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.out.persistence.function.IntegerCursorRoomQueryFunction;
 import konkuk.thip.room.adapter.out.persistence.function.LocalDateCursorRoomQueryFunction;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +25,6 @@ import java.util.List;
 public class RoomQueryPersistenceAdapter implements RoomQueryPort {
 
     private final RoomJpaRepository roomJpaRepository;
-    private final CategoryJpaRepository categoryJpaRepository;
 
     @Override
     public int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate) {
@@ -44,7 +41,7 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByDeadline(String keyword, Category category, Cursor cursor) {
         return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsWithCategoryOrderByStartDateAsc(
-                        keyword, category.getValue(), lastLocalDate, lastId, pageSize
+                        keyword, category, lastLocalDate, lastId, pageSize
                 )
         );
     }
@@ -62,7 +59,7 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor) {
         return findRoomsByMemberCountCursor(cursor, (lastMemberCount, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsWithCategoryOrderByMemberCountDesc(
-                        keyword, category.getValue(), lastMemberCount, lastId, pageSize
+                        keyword, category, lastMemberCount, lastId, pageSize
                 )
         );
     }
@@ -70,7 +67,7 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     @Override
     public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Room currentRoom, int count) {
         return roomJpaRepository.findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(
-                currentRoom.getId(), currentRoom.getCategory().getValue(), count);
+                currentRoom.getId(), currentRoom.getCategory(), count);
     }
 
     @Override
@@ -142,19 +139,16 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
 
     @Override
     public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId) {
-        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category.getValue(), limit, userId);
+        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category, limit, userId);
     }
 
     @Override
     public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId) {
-        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category.getValue(), limit, userId);
+        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category, limit, userId);
     }
 
-    // TODO : 리펙토링 대상
     @Override
     public String findAliasColorOfCategory(Category category) {
-        return categoryJpaRepository.findAliasColorByValue(category.getValue()).orElseThrow(
-                () -> new EntityNotFoundException(ErrorCode.CATEGORY_NOT_FOUND)
-        );
+        return EnumMappings.aliasFrom(category).getColor();
     }
 }

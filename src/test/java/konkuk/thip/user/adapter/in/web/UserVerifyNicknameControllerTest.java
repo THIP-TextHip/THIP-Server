@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,13 +43,9 @@ class UserVerifyNicknameControllerTest {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
-    @Autowired
-    private AliasJpaRepository aliasJpaRepository;
-
     @AfterEach
     void tearDown() {
         userJpaRepository.deleteAll();
-        aliasJpaRepository.deleteAll();
     }
 
     @Test
@@ -79,14 +74,14 @@ class UserVerifyNicknameControllerTest {
     @DisplayName("[닉네임]값이 이미 DB에 존재하는 경우, false를 반환한다.")
     void verify_nickname_false() throws Exception {
         //given: DB에 "테스트유저" 생성
-        AliasJpaEntity aliasJpaEntity = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
 
         UserJpaEntity userJpaEntity = UserJpaEntity.builder()
                 .nickname("테스트유저")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
                 .role(USER)
                 .oauth2Id("kakao_12345678")
-                .aliasForUserJpaEntity(aliasJpaEntity)
+                .alias(alias)
                 .build();
         userJpaRepository.save(userJpaEntity);
 

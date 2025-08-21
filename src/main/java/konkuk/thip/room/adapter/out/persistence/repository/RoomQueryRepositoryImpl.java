@@ -14,11 +14,11 @@ import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
-import konkuk.thip.room.adapter.out.jpa.QCategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
 import konkuk.thip.room.application.port.out.dto.QRoomQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
+import konkuk.thip.room.domain.value.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     private final QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QRoomParticipantJpaEntity participant = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
-    private final QCategoryJpaEntity category = QCategoryJpaEntity.categoryJpaEntity;
 
     /** 모집중 + ACTIVE 공통 where */
     private BooleanBuilder recruitingActiveWhere(LocalDate today) {
@@ -48,9 +46,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     /** 카테고리 조건 추가 */
-    private void applyCategory(BooleanBuilder where, String categoryVal) {
-        if (categoryVal != null && !categoryVal.isBlank()) {
-            where.and(room.categoryJpaEntity.value.eq(categoryVal));
+    private void applyCategory(BooleanBuilder where, Category category) {
+        if (category != null) {
+            where.and(room.category.eq(category));
         }
     }
 
@@ -115,12 +113,12 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByStartDateAsc(String keyword, String categoryVal, LocalDate lastStartDate, Long roomId, int pageSize) {
+    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByStartDateAsc(String keyword, Category category, LocalDate lastStartDate, Long roomId, int pageSize) {
         final LocalDate today = LocalDate.now();
         DateExpression<LocalDate> cursorExpr = room.startDate;
 
         BooleanBuilder where = recruitingActiveWhere(today);
-        applyCategory(where, categoryVal);
+        applyCategory(where, category);
         applyKeyword(where, keyword);
         applyCursorStartDateAsc(where, cursorExpr, lastStartDate, roomId);
 
@@ -128,7 +126,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .select(projectionForRecruitingRoomSearch())
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .join(room.categoryJpaEntity, category)
                 .where(where)
                 .orderBy(cursorExpr.asc(), room.roomId.asc())
                 .limit(pageSize + 1)
@@ -154,11 +151,11 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, String categoryVal, Integer lastMemberCount, Long roomId, int pageSize) {
+    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, Category category, Integer lastMemberCount, Long roomId, int pageSize) {
         final LocalDate today = LocalDate.now();
 
         BooleanBuilder where = recruitingActiveWhere(today);
-        applyCategory(where, categoryVal);
+        applyCategory(where, category);
         applyKeyword(where, keyword);
         applyCursorMemberCountDesc(where, lastMemberCount, roomId);
 
@@ -166,7 +163,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .select(projectionForRecruitingRoomSearch())
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .join(room.categoryJpaEntity, category)
                 .where(where)
                 .orderBy(room.memberCount.desc(), room.roomId.asc())
                 .limit(pageSize + 1)
@@ -175,20 +171,17 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 //  -----------------------------------------------------------------------------------------------------------------------
 
     @Override
-    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, String category, int count) {
-        NumberExpression<Long> memberCountExpr = participant.roomParticipantId.count();
+    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, Category category, int count) {
         List<Tuple> tuples = queryFactory
-                .select(room.roomId, room.title, memberCountExpr, room.recruitCount, room.startDate, book.imageUrl)
+                .select(room.roomId, room.title, room.memberCount, room.recruitCount, room.startDate, book.imageUrl)
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .leftJoin(participant).on(participant.roomJpaEntity.eq(room))
                 .where(
-                        room.categoryJpaEntity.value.eq(category)
+                        room.category.eq(category)
                                 .and(room.startDate.after(LocalDate.now()))     // 모집 마감 시각 > 현재 시각
                                 .and(room.roomId.ne(roomId))// 현재 방 제외
                                 .and(room.isPublic.isTrue()) // 공개방 만
                 )
-                .groupBy(room.roomId, room.title, room.recruitCount, room.startDate, book.imageUrl)
                 .orderBy(room.startDate.asc())
                 .limit(count)
                 .fetch();
@@ -198,7 +191,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         .roomId(t.get(room.roomId))
                         .bookImageUrl(t.get(book.imageUrl))
                         .roomName(t.get(room.title))
-                        .memberCount(t.get(memberCountExpr).intValue())
+                        .memberCount(t.get(room.memberCount))
                         .recruitCount(t.get(room.recruitCount))
                         .recruitEndDate(DateUtil.formatAfterTime(t.get(room.startDate)))
                         .build())
@@ -353,7 +346,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(String categoryVal, int limit, Long userId) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(Category category, int limit, Long userId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -365,15 +358,14 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .join(room.categoryJpaEntity, category)
-                .where(findDeadlinePopularRoomCondition(categoryVal, userId))
+                .where(findDeadlinePopularRoomCondition(category, userId))
                 .orderBy(room.startDate.asc(), room.memberCount.desc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(String categoryVal, int limit, Long userId) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit, Long userId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -385,8 +377,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .join(room.categoryJpaEntity, category)
-                .where(findDeadlinePopularRoomCondition(categoryVal, userId))
+                .where(findDeadlinePopularRoomCondition(category, userId))
                 .orderBy(room.memberCount.desc(), room.startDate.asc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
@@ -422,8 +413,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .fetch();
     }
 
-    private BooleanExpression findDeadlinePopularRoomCondition(String categoryVal, Long userId) {
-        return room.categoryJpaEntity.value.eq(categoryVal)
+    private BooleanExpression findDeadlinePopularRoomCondition(Category category, Long userId) {
+        return room.category.eq(category)
                 .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
                 .and(room.isPublic.isTrue()) // 공개 방만 조회
                 .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회

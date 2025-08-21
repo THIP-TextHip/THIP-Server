@@ -10,10 +10,9 @@ import konkuk.thip.post.domain.PostType;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CommentShowAllApiTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
@@ -57,7 +55,6 @@ class CommentShowAllApiTest {
         commentJpaRepository.deleteAllInBatch();
         feedJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
-        aliasJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
     }
 
@@ -65,7 +62,7 @@ class CommentShowAllApiTest {
     @DisplayName("댓글 조회 요청에 대하여, 특정 게시글(= 피드, 기록, 투표)의 루트 댓글, 루트 댓글의 모든 자식 댓글의 데이터를 구분하여 반환한다.")
     void comment_show_all_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
 
@@ -121,7 +118,7 @@ class CommentShowAllApiTest {
     @DisplayName("루트 댓글은 최신순, 루트 댓글의 모든 자식 댓글은 작성 시각순으로 정렬하여 반환한다.")
     void comment_show_all_ordering_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
         UserJpaEntity user2 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user2"));
@@ -193,7 +190,7 @@ class CommentShowAllApiTest {
     @DisplayName("삭제된 루트 댓글의 경우, 자식 댓글이 있으면 반환하고, 없으면 반환하지 않는다.")
     void comment_show_all_deleted_root_comment_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
 
@@ -255,7 +252,7 @@ class CommentShowAllApiTest {
     @DisplayName("게시글에 달린 댓글이 많을 경우, 루트 댓글을 기준으로 페이징 처리 한다.")
     void comment_show_all_page_test() throws Exception {
         //given
-        AliasJpaEntity a0 = aliasJpaRepository.save(TestEntityFactory.createScienceAlias());
+        Alias a0 = TestEntityFactory.createScienceAlias();
         UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
         UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
 

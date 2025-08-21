@@ -4,16 +4,14 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,10 +36,8 @@ class BookGetSelectableListApiTest {
     @Autowired private MockMvc mockMvc;
 
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private SavedBookJpaRepository savedBookJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
@@ -51,7 +47,7 @@ class BookGetSelectableListApiTest {
 
     @BeforeEach
     void setUp() {
-        AliasJpaEntity alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         savedBook = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("1111111111111"));
         joiningBook = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("2222222222222"));
@@ -60,7 +56,7 @@ class BookGetSelectableListApiTest {
         savedBookJpaRepository.save(TestEntityFactory.createSavedBook(user, savedBook));
 
         // JOINING 책용 방 생성
-        CategoryJpaEntity category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        Category category = TestEntityFactory.createLiteratureCategory();
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(joiningBook, category));
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
     }

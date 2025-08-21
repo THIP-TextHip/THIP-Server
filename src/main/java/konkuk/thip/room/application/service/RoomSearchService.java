@@ -11,7 +11,7 @@ import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomSearchQuery;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

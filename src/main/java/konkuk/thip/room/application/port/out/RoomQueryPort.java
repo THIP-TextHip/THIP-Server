@@ -5,7 +5,7 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.Category;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

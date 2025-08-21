@@ -7,13 +7,10 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.comment.adapter.out.jpa.QCommentJpaEntity;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.QPostLikeJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QAliasJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import konkuk.thip.user.application.port.out.dto.QReactionQueryDto;
 import konkuk.thip.user.application.port.out.dto.QUserQueryDto;
@@ -54,7 +51,6 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     @Override
     public List<UserQueryDto> findUsersByNicknameOrderByAccuracy(String keyword, Long userId, Integer size) {
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
-        QAliasJpaEntity alias = QAliasJpaEntity.aliasJpaEntity;
 
         String pattern = "%" + keyword + "%";
 
@@ -68,14 +64,11 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 .select(new QUserQueryDto(
                         user.userId,
                         user.nickname,
-                        alias.imageUrl,
-                        alias.value,
-                        alias.color,
+                        user.alias,
                         user.followerCount,
                         user.createdAt
                 ))
                 .from(user)
-                .leftJoin(user.aliasForUserJpaEntity, alias)
                 .where(user.nickname.like(pattern)
                         .and(user.userId.ne(userId))
                         .and(user.status.eq(StatusType.ACTIVE)))

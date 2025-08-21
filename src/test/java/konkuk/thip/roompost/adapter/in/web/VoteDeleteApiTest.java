@@ -7,21 +7,19 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaReposito
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
-import konkuk.thip.room.adapter.out.jpa.CategoryJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.adapter.out.persistence.repository.category.CategoryJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.AliasJpaEntity;
+import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.alias.AliasJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteParticipantJpaRepository;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,9 +46,7 @@ class VoteDeleteApiTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired private AliasJpaRepository aliasJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private CategoryJpaRepository categoryJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private CommentJpaRepository commentJpaRepository;
     @Autowired private CommentLikeJpaRepository commentLikeJpaRepository;
@@ -61,10 +57,10 @@ class VoteDeleteApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
-    private AliasJpaEntity alias;
+    private Alias alias;
     private UserJpaEntity user1;
     private UserJpaEntity user2;
-    private CategoryJpaEntity category;
+    private Category category;
     private BookJpaEntity book;
     private CommentJpaEntity comment;
     private RoomJpaEntity room;
@@ -74,10 +70,10 @@ class VoteDeleteApiTest {
 
     @BeforeEach
     void setUp() {
-        alias = aliasJpaRepository.save(TestEntityFactory.createLiteratureAlias());
+        alias = TestEntityFactory.createLiteratureAlias();
         user1 = userJpaRepository.save(TestEntityFactory.createUser(alias));
         user2 = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        category = categoryJpaRepository.save(TestEntityFactory.createLiteratureCategory(alias));
+        category = TestEntityFactory.createLiteratureCategory();
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         room = roomJpaRepository.save(TestEntityFactory.createRoom(book,category));
         // 유저 1이 호스트, 유저 2가 멤버로 방 참여

@@ -3,17 +3,17 @@ package konkuk.thip.feed.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.feed.domain.value.Tag;
+import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.service.PostCountService;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -40,10 +40,11 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     private Long targetBookId;
 
-    private List<Tag> tagList;
+    @Builder.Default
+    private TagList tagList = TagList.empty();
 
     @Builder.Default
-    private List<Content> contentList = new ArrayList<>();
+    private ContentList contentList = ContentList.empty();
 
     @Override
     public boolean equals(Object o) {
@@ -61,8 +62,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
 
-        validateTags(tagValues);
-        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
+//        validateTags(tagValues);
+//        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
 
         return Feed.builder()
                 .id(null)
@@ -73,41 +74,46 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
                 .likeCount(0)
                 .commentCount(0)
                 .targetBookId(targetBookId)
-                .tagList(Tag.fromList(tagValues))
+                .tagList(convertToTagList(tagValues))
                 .contentList(convertToContentList(imageUrls))
                 .build();
     }
 
-    private static List<Content> convertToContentList(List<String> imageUrls) {
-        if (imageUrls == null) return new ArrayList<>();
-        return imageUrls.stream()
-                .filter(url -> url != null && !url.isBlank())
-                .map(url -> Content.builder().contentUrl(url).build())
-                .collect(Collectors.toList());
+    private static TagList convertToTagList(List<String> tagValues) {
+        if (tagValues == null || tagValues.isEmpty()) {
+            return TagList.empty();
+        }
+        List<Tag> tags = Tag.fromList(tagValues);
+        return TagList.of(tags);
     }
 
-    public static void validateTags(List<String> tagList) {
-        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
-
-        // 태그가 있는 경우, 개수 최대 5개 제한
-        if (!tagListEmpty && tagList.size() > 5) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
-        }
-
-        // 태그 중복 체크
-        if (!tagListEmpty) {
-            long distinctCount = tagList.stream().distinct().count();
-            if (distinctCount != tagList.size()) {
-                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
-            }
-        }
+    private static ContentList convertToContentList(List<String> imageUrls) {
+        if (imageUrls == null) return ContentList.empty();
+        return ContentList.of(imageUrls);
     }
 
-    public static void validateImageCount(int imageSize) {
-        if (imageSize > 3) {
-            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
-        }
-    }
+//    public static void validateTags(List<String> tagList) {
+//        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
+//
+//        // 태그가 있는 경우, 개수 최대 5개 제한
+//        if (!tagListEmpty && tagList.size() > 5) {
+//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
+//        }
+//
+//        // 태그 중복 체크
+//        if (!tagListEmpty) {
+//            long distinctCount = tagList.stream().distinct().count();
+//            if (distinctCount != tagList.size()) {
+//                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
+//            }
+//        }
+//    }
+//
+//    public static void validateImageCount(int imageSize) {
+//        if (imageSize > 3) {
+//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
+//        }
+//    }
 
     // 공통된 비공개 접근 권한 검증 로직
     private void validatePrivateAccessPermission(Long userId, String action) {
@@ -149,28 +155,17 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
 
     public void updateTags(Long userId, List<String> newTagValues) {
         validateCreator(userId);
-        validateTags(newTagValues);
-        this.tagList = Tag.fromList(newTagValues); // Tag.from(...) 등으로 변환
+        List<Tag> tags = Tag.fromList(newTagValues);
+        this.tagList = TagList.of(tags);
     }
 
     public void updateImages(Long userId, List<String> newImageUrls) {
         validateCreator(userId);
-        validateImageCount(newImageUrls.size());
-        validateOwnsImages(newImageUrls);
+//        validateImageCount(newImageUrls.size());
+//        validateOwnsImages(newImageUrls);
+        contentList.validateOwnImages(newImageUrls);
 
         this.contentList = convertToContentList(newImageUrls);
-    }
-
-    public void validateOwnsImages(List<String> candidateImageUrls) {
-        Set<String> myImageUrls = this.getContentList().stream()
-                .map(Content::getContentUrl)
-                .filter(url -> url != null && !url.isBlank())
-                .collect(Collectors.toSet());
-        for (String url : candidateImageUrls) {
-            if (!myImageUrls.contains(url)) {
-                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("해당 이미지는 이 피드에 존재하지 않습니다: " + url));
-            }
-        }
     }
 
     @Override
