@@ -10,7 +10,7 @@ import static konkuk.thip.common.exception.code.ErrorCode.RECORD_NOT_FOUND;
 
 public interface RecordCommandPort {
 
-    Long saveRecord(Record record);
+    Long save(Record record);
 
     void update(Record record);
 

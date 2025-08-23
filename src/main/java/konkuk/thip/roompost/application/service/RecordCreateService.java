@@ -58,7 +58,7 @@ public class RecordCreateService implements RecordCreateUseCase {
         validateRecord(record, book);
 
         // 4. 문제없는 경우 Record 저장
-        Long newRecordId = recordCommandPort.saveRecord(record);
+        Long newRecordId = recordCommandPort.save(record);
 
         // 5. RoomParticipant, Room progress 정보 update
         roomProgressManager.updateUserAndRoomProgress(roomParticipant, room, book, record.getPage());

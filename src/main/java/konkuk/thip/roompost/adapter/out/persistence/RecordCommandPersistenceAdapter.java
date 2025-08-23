@@ -28,7 +28,7 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
     private final RecordMapper recordMapper;
 
     @Override
-    public Long saveRecord(Record record) {
+    public Long save(Record record) {
         UserJpaEntity userJpaEntity = userJpaRepository.findById(record.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
