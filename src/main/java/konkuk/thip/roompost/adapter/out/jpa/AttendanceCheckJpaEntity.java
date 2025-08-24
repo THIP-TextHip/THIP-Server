@@ -5,6 +5,7 @@ import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Table(name = "attendance_checks")
@@ -12,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE attendance_checks SET status = 'INACTIVE' WHERE attendancecheck_id = ?")
 public class AttendanceCheckJpaEntity extends BaseJpaEntity {
 
     @Id

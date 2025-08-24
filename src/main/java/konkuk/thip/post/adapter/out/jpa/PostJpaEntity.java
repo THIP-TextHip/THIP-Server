@@ -58,6 +58,7 @@ public abstract class PostJpaEntity extends BaseJpaEntity {
         this.userJpaEntity = userJpaEntity;
     }
 
+    // TODO : Base Entity 의 status를 private 로 변경 & 상태변경을 위한 protected method 추가 후 수정
     public void softDelete() {
         if(this.status.equals(INACTIVE)){
             throw new InvalidStateException(POST_ALREADY_DELETED);

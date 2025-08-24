@@ -35,6 +35,7 @@ public class RoomPostCommandController {
     private final VoteUseCase voteUseCase;
 
     private final AttendanceCheckCreateUseCase attendanceCheckCreateUseCase;
+    private final AttendanceCheckDeleteUseCase attendanceCheckDeleteUseCase;
 
     /**
      * 기록 관련
@@ -117,7 +118,7 @@ public class RoomPostCommandController {
     }
 
     /**
-     * 오늘의 한마디 작성
+     * 오늘의 한마디 관련
      */
     @Operation(
             summary = "오늘의 한마디 작성",
@@ -125,12 +126,27 @@ public class RoomPostCommandController {
     )
     @ExceptionDescription(ATTENDANCE_CHECK_CREATE)
     @PostMapping("/rooms/{roomId}/daily-greeting")
-    public BaseResponse<AttendanceCheckCreateResponse> createFeed(
+    public BaseResponse<AttendanceCheckCreateResponse> createAttendanceCheck(
             @RequestBody @Valid final AttendanceCheckCreateRequest request,
             @Parameter(description = "오늘의 한마디를 작성할 방 id값") @PathVariable("roomId") final Long roomId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(AttendanceCheckCreateResponse.of(
                 attendanceCheckCreateUseCase.create(request.toCommand(userId, roomId))
+        ));
+    }
+
+    @Operation(
+            summary = "오늘의 한마디 삭제",
+            description = "오늘의 한마디 작성자가 본인이 작성한 오늘의 한마디를 삭제합니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_DELETE)
+    @DeleteMapping("/rooms/{roomId}/daily-greeting/{attendanceCheckId}")
+    public BaseResponse<AttendanceCheckDeleteResponse> deleteAttendanceCheck(
+            @Parameter(description = "오늘의 한마디를 삭제할 방 id값") @PathVariable("roomId") final Long roomId,
+            @Parameter(description = "삭제할 오늘의 한마디 id값") @PathVariable("attendanceCheckId") final Long attendanceCheckId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(AttendanceCheckDeleteResponse.of(
+                attendanceCheckDeleteUseCase.delete(userId, roomId, attendanceCheckId)
         ));
     }
 }

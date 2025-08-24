@@ -4,6 +4,8 @@ import konkuk.thip.common.exception.InvalidStateException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static konkuk.thip.common.exception.code.ErrorCode.ATTENDANCE_CHECK_CAN_NOT_DELETE;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[단위] AttendanceCheck 도메인 테스트")
@@ -43,5 +45,37 @@ class AttendanceCheckTest {
         // when // then
         assertThrows(InvalidStateException.class,
                 () -> AttendanceCheck.withoutId(roomId, userId, todayComment, alreadyWrittenCountTodayOfUser));
+    }
+
+    @Test
+    @DisplayName("오늘의 한마디 작성자가 맞을 경우, 예외를 터뜨리지 않는다.")
+    void validate_creator_success() throws Exception {
+        //given
+        AttendanceCheck ac = AttendanceCheck.builder()
+                .id(1L)
+                .creatorId(1L)
+                .todayComment("오늘의 한마디!!!")
+                .roomId(1L)
+                .build();
+
+        //when //then
+        assertDoesNotThrow(() -> ac.validateCreator(1L));
+    }
+
+    @Test
+    @DisplayName("오늘의 한마디 작성자가 아닐 경우, InvalidStateException 을 터뜨린다.")
+    void validate_creator_fail() throws Exception {
+        //given
+        AttendanceCheck ac = AttendanceCheck.builder()
+                .id(1L)
+                .creatorId(1L)
+                .todayComment("오늘의 한마디!!!")
+                .roomId(1L)
+                .build();
+
+        //when //then
+        assertThatThrownBy(() -> ac.validateCreator(2L))
+                .isInstanceOf(InvalidStateException.class)
+                .hasMessage(ATTENDANCE_CHECK_CAN_NOT_DELETE.getMessage());
     }
 }
