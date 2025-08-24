@@ -311,6 +311,12 @@ public enum SwaggerResponseDescription {
             ROOM_ACCESS_FORBIDDEN
     ))),
 
+    ATTENDANCE_CHECK_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            ATTENDANCE_CHECK_NOT_FOUND,
+            ATTENDANCE_CHECK_CAN_NOT_DELETE
+    ))),
+
   ;
     private final Set<ErrorCode> errorCodeList;
     SwaggerResponseDescription(Set<ErrorCode> errorCodeList) {
