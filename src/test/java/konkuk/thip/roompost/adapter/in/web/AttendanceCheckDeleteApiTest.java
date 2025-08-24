@@ -134,7 +134,7 @@ class AttendanceCheckDeleteApiTest {
         //when //then : me가 user1이 작성한 오늘의 한마디를 삭제 요청
         mockMvc.perform(delete("/rooms/{roomId}/daily-greeting/{attendanceCheckId}", room.getRoomId().intValue(), ac2.getAttendanceCheckId().intValue())
                         .requestAttr("userId", me.getUserId()))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message", containsString(ATTENDANCE_CHECK_CAN_NOT_DELETE.getMessage())));
     }
 }
