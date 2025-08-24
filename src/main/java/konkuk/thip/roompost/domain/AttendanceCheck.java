@@ -5,6 +5,7 @@ import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+import static konkuk.thip.common.exception.code.ErrorCode.ATTENDANCE_CHECK_CAN_NOT_DELETE;
 import static konkuk.thip.common.exception.code.ErrorCode.ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED;
 
 @Getter
@@ -34,6 +35,12 @@ public class AttendanceCheck extends BaseDomainEntity {
     private static void validateWriteCount(int alreadyWrittenCountTodayOfUser) {
         if (alreadyWrittenCountTodayOfUser >= LIMIT_WRITE_COUNT_PER_DAY) {
             throw new InvalidStateException(ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED);
+        }
+    }
+
+    public void validateCreator(Long userId) {
+        if (!creatorId.equals(userId)) {
+            throw new InvalidStateException(ATTENDANCE_CHECK_CAN_NOT_DELETE);
         }
     }
 }
