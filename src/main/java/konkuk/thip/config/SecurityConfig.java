@@ -54,6 +54,8 @@ public class SecurityConfig {
             "/login/oauth2/code/**", "/actuator/health",
             "/auth/users", "/auth/token",
 
+            "/api/test/**",  // for test
+
             "/auth/exchange-temp-token", "/auth/set-cookie", // deprecated
     };
 
