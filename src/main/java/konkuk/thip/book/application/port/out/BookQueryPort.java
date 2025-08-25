@@ -3,6 +3,7 @@ package konkuk.thip.book.application.port.out;
 import konkuk.thip.book.domain.Book;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BookQueryPort {
 
@@ -13,4 +14,6 @@ public interface BookQueryPort {
     List<Book> findSavedBooksByUserId(Long userId);
 
     List<Book> findJoiningRoomsBooksByUserId(Long userId);
+
+    Set<Long> findUnusedBookIds();
 }
