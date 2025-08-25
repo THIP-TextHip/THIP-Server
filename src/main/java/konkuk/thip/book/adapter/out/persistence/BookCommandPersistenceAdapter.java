@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
@@ -85,5 +86,10 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     @Override
     public void deleteSavedBook(Long userId, Long bookId) {
         savedBookJpaRepository.deleteByUserIdAndBookId(userId, bookId);
+    }
+
+    @Override
+    public void deleteAllByIdInBatch(Set<Long> unusedBookIds) {
+        bookJpaRepository.deleteAllByIdInBatch(unusedBookIds);
     }
 }

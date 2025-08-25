@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -54,5 +55,10 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
                 .stream()
                 .map(bookMapper::toDomainEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Set<Long> findUnusedBookIds() {
+        return bookJpaRepository.findUnusedBookIds();
     }
 }
