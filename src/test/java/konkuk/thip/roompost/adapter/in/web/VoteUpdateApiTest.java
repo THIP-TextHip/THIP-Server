@@ -126,9 +126,9 @@ class VoteUpdateApiTest {
     }
 
     @Test
-    @DisplayName("[실패-검증] content가 500자 초과면 400 Bad Request")
+    @DisplayName("[실패-검증] content가 20자 초과면 400 Bad Request")
     void update_vote_validation_too_long() throws Exception {
-        String tooLong = "가".repeat(501);
+        String tooLong = "가".repeat(21);
         Map<String, Object> body = Map.of("content", tooLong);
 
         mockMvc.perform(patch("/rooms/{roomId}/votes/{voteId}", room.getRoomId(), vote.getPostId())
