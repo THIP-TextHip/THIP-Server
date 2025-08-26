@@ -150,6 +150,11 @@ public enum SwaggerResponseDescription {
             RECORD_NOT_FOUND,
             RECORD_ACCESS_FORBIDDEN
     ))),
+    RECORD_UPDATE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            RECORD_NOT_FOUND,
+            RECORD_ACCESS_FORBIDDEN
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(
@@ -168,6 +173,11 @@ public enum SwaggerResponseDescription {
             VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE
     ))),
     VOTE_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            VOTE_NOT_FOUND,
+            VOTE_ACCESS_FORBIDDEN
+    ))),
+    VOTE_UPDATE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             VOTE_NOT_FOUND,
             VOTE_ACCESS_FORBIDDEN
