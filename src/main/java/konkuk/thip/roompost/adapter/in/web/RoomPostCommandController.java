@@ -6,11 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.common.swagger.SwaggerResponseDescription;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.roompost.adapter.in.web.request.*;
-import konkuk.thip.roompost.adapter.in.web.response.AttendanceCheckCreateResponse;
-import konkuk.thip.roompost.application.port.in.AttendanceCheckCreateUseCase;
 import konkuk.thip.roompost.adapter.in.web.response.*;
 import konkuk.thip.roompost.application.port.in.*;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordDeleteCommand;
@@ -138,11 +135,11 @@ public class RoomPostCommandController {
             description = "사용자가 방 기록을 수정합니다. (기록 내용만 수정 가능)"
     )
     @PatchMapping("/rooms/{roomId}/records/{recordId}")
-    @ExceptionDescription(SwaggerResponseDescription.RECORD_UPDATE)
+    @ExceptionDescription(RECORD_UPDATE)
     public BaseResponse<RecordUpdateResponse> updateRecord(
             @Parameter(hidden = true) @UserId Long userId,
             @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
-            @Parameter(description = "수정할 게시글 ID", example = "1") @PathVariable Long recordId,
+            @Parameter(description = "수정할 기록 ID", example = "1") @PathVariable Long recordId,
             @RequestBody @Valid final RecordUpdateRequest request
     ) {
         return BaseResponse.ok(RecordUpdateResponse.of(
@@ -155,11 +152,11 @@ public class RoomPostCommandController {
             description = "사용자가 방 투표를 수정합니다. (투표 내용만 수정 가능)"
     )
     @PatchMapping("/rooms/{roomId}/votes/{voteId}")
-    @ExceptionDescription(SwaggerResponseDescription.VOTE_UPDATE)
+    @ExceptionDescription(VOTE_UPDATE)
     public BaseResponse<VoteUpdateResponse> updateVote(
             @Parameter(hidden = true) @UserId Long userId,
             @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
-            @Parameter(description = "수정할 게시글 ID", example = "1") @PathVariable Long voteId,
+            @Parameter(description = "수정할 투표 ID", example = "1") @PathVariable Long voteId,
             @RequestBody @Valid final VoteUpdateRequest request
     ) {
         return BaseResponse.ok(VoteUpdateResponse.of(
