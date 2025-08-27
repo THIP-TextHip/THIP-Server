@@ -66,6 +66,23 @@ public class RoomPostCommandController {
         return BaseResponse.ok(RecordDeleteResponse.of(recordDeleteUseCase.deleteRecord(new RecordDeleteCommand(roomId, recordId, userId))));
     }
 
+    @Operation(
+            summary = "기록 수정",
+            description = "사용자가 방 기록을 수정합니다. (기록 내용만 수정 가능)"
+    )
+    @PatchMapping("/rooms/{roomId}/records/{recordId}")
+    @ExceptionDescription(RECORD_UPDATE)
+    public BaseResponse<RecordUpdateResponse> updateRecord(
+            @Parameter(hidden = true) @UserId Long userId,
+            @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
+            @Parameter(description = "수정할 기록 ID", example = "1") @PathVariable Long recordId,
+            @RequestBody @Valid final RecordUpdateRequest request
+    ) {
+        return BaseResponse.ok(RecordUpdateResponse.of(
+                roomPostUpdateUseCase.updateRecord(request.toCommand(userId, roomId, recordId))
+        ));
+    }
+
     /**
      * 투표 관련
      */
@@ -113,6 +130,23 @@ public class RoomPostCommandController {
         return BaseResponse.ok(VoteDeleteResponse.of(voteDeleteUseCase.deleteVote(new VoteDeleteCommand(roomId, voteId, userId))));
     }
 
+    @Operation(
+            summary = "투표 수정",
+            description = "사용자가 방 투표를 수정합니다. (투표 내용만 수정 가능)"
+    )
+    @PatchMapping("/rooms/{roomId}/votes/{voteId}")
+    @ExceptionDescription(VOTE_UPDATE)
+    public BaseResponse<VoteUpdateResponse> updateVote(
+            @Parameter(hidden = true) @UserId Long userId,
+            @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
+            @Parameter(description = "수정할 투표 ID", example = "1") @PathVariable Long voteId,
+            @RequestBody @Valid final VoteUpdateRequest request
+    ) {
+        return BaseResponse.ok(VoteUpdateResponse.of(
+                roomPostUpdateUseCase.updateVote(request.toCommand(userId, roomId, voteId))
+        ));
+    }
+
     /**
      * 오늘의 한마디 관련
      */
@@ -128,40 +162,6 @@ public class RoomPostCommandController {
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(AttendanceCheckCreateResponse.of(
                 attendanceCheckCreateUseCase.create(request.toCommand(userId, roomId))
-        ));
-    }
-
-    @Operation(
-            summary = "기록 수정",
-            description = "사용자가 방 기록을 수정합니다. (기록 내용만 수정 가능)"
-    )
-    @PatchMapping("/rooms/{roomId}/records/{recordId}")
-    @ExceptionDescription(RECORD_UPDATE)
-    public BaseResponse<RecordUpdateResponse> updateRecord(
-            @Parameter(hidden = true) @UserId Long userId,
-            @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
-            @Parameter(description = "수정할 기록 ID", example = "1") @PathVariable Long recordId,
-            @RequestBody @Valid final RecordUpdateRequest request
-    ) {
-        return BaseResponse.ok(RecordUpdateResponse.of(
-                roomPostUpdateUseCase.updateRecord(request.toCommand(userId, roomId, recordId))
-        ));
-    }
-
-    @Operation(
-            summary = "투표 수정",
-            description = "사용자가 방 투표를 수정합니다. (투표 내용만 수정 가능)"
-    )
-    @PatchMapping("/rooms/{roomId}/votes/{voteId}")
-    @ExceptionDescription(VOTE_UPDATE)
-    public BaseResponse<VoteUpdateResponse> updateVote(
-            @Parameter(hidden = true) @UserId Long userId,
-            @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
-            @Parameter(description = "수정할 투표 ID", example = "1") @PathVariable Long voteId,
-            @RequestBody @Valid final VoteUpdateRequest request
-    ) {
-        return BaseResponse.ok(VoteUpdateResponse.of(
-                roomPostUpdateUseCase.updateVote(request.toCommand(userId, roomId, voteId))
         ));
     }
 
