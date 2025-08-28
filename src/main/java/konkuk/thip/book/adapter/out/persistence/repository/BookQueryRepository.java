@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookQueryRepository {
-    List<BookQueryDto> findSavedBooksBySavedAt(Long userId, LocalDateTime lastSavedAt, int size);
+    List<BookQueryDto> findSavedBooksBySavedAt(Long userId, LocalDateTime lastSavedAt, int pageSize);
 
     List<BookQueryDto> findJoiningRoomsBooksByRoomPercentage(Long userId, Double lastRoomPercentage, Long lastBookId, int pageSize);
 }
