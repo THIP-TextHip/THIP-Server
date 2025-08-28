@@ -1,6 +1,6 @@
 package konkuk.thip.roompost.adapter.in.web.response;
 
-import konkuk.thip.book.application.port.in.dto.BookSelectableResult;
+import konkuk.thip.book.application.port.in.dto.BookPinResult;
 
 public record RecordPinResponse(
         String bookTitle,
@@ -8,11 +8,12 @@ public record RecordPinResponse(
         String bookImageUrl,
         String isbn
 ) {
-    static public RecordPinResponse of(BookSelectableResult bookSelectableResult) {
+    static public RecordPinResponse of(BookPinResult book) {
         return new RecordPinResponse(
-                bookSelectableResult.bookTitle(),
-                bookSelectableResult.authorName(),
-                bookSelectableResult.bookImageUrl(),
-                bookSelectableResult.isbn());
+                book.bookTitle(),
+                book.authorName(),
+                book.bookImageUrl(),
+                book.isbn()
+        );
     }
 }
