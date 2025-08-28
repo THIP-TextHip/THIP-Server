@@ -85,11 +85,12 @@ public class RoomQueryController {
     @GetMapping("/rooms/home/joined")
     public BaseResponse<RoomGetHomeJoinedListResponse> getHomeJoinedRooms(
             @Parameter(hidden = true) @UserId final Long userId,
-            @Parameter(description = "페이지 번호", example = "1") @RequestParam("page") final int page) {
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(value = "cursor", required = false) final String cursor) {
         return BaseResponse.ok(roomGetHomeJoinedListUseCase.getHomeJoinedRoomList(
                 RoomGetHomeJoinedListQuery.builder()
                         .userId(userId)
-                        .page(page).build()));
+                        .cursorStr(cursor).build()));
     }
 
     @Operation(
