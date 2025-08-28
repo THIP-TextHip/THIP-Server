@@ -32,7 +32,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
     private final QSavedBookJpaEntity savedBook = QSavedBookJpaEntity.savedBookJpaEntity;
 
     @Override
-    public List<BookQueryDto> findSavedBooksBySavedAt(Long userId, LocalDateTime savedAtCursor, int size) {
+    public List<BookQueryDto> findSavedBooksBySavedAt(Long userId, LocalDateTime savedAtCursor, int pageSize) {
 
         // 검색 조건(where) 조립
         // 유저가 저장한 책만: userId 조건
@@ -59,7 +59,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
                 .join(savedBook.bookJpaEntity, book)
                 .where(where)
                 .orderBy(savedBook.createdAt.desc()) // 저장한 시간 최신순 (내림차순)
-                .limit(size + 1)
+                .limit(pageSize + 1)
                 .fetch();
     }
 
