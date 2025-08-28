@@ -94,10 +94,12 @@ public class BookQueryController {
     @GetMapping("/books/selectable-list")
     public BaseResponse<BookSelectableListResponse> showSelectableBookList(
             @Parameter(description = "저장한 책 또는 참여 중인 모임의 책을 구분하는 필드 (SAVED : 저장한 책 / JOINING : 모임 방의 책)", example = "SAVED") @RequestParam final String type,
-            @Parameter(hidden = true) @UserId final Long userId
-    ) {
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(required = false) final String cursor)
+    {
         return BaseResponse.ok(
-                BookSelectableListResponse.of(bookSelectableListUseCase.getSelectableBookList(BookSelectableType.from(type), userId))
+                bookSelectableListUseCase.getSelectableBookList(BookSelectableType.from(type), userId, cursor)
         );
     }
 
@@ -106,8 +108,11 @@ public class BookQueryController {
             description = "사용자가 저장한 책을 조회 합니다."
     )
     @GetMapping("/books/saved")
-    public BaseResponse<BookShowSavedListResponse> showSavedBookList(@Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(BookShowSavedListResponse.of(bookShowSavedListUseCase.getSavedBookList(userId)));
+    public BaseResponse<BookShowSavedListResponse> showSavedBookList(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(required = false) final String cursor) {
+        return BaseResponse.ok(bookShowSavedListUseCase.getSavedBookList(userId, cursor));
     }
 
 }
