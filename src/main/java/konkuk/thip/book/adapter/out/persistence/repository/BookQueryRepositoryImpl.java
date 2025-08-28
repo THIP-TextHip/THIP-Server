@@ -56,6 +56,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
                         savedBook.createdAt
                 ))
                 .from(savedBook)
+                .join(savedBook.userJpaEntity, user)
                 .join(savedBook.bookJpaEntity, book)
                 .where(where)
                 .orderBy(savedBook.createdAt.desc()) // 저장한 시간 최신순 (내림차순)
