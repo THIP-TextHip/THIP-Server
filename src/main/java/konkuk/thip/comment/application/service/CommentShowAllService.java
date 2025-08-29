@@ -11,6 +11,7 @@ import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
     private final CommentQueryMapper commentQueryMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public CommentForSinglePostResponse showAllCommentsOfPost(CommentShowAllQuery query) {
         Cursor cursor = Cursor.from(query.cursorStr(), PAGE_SIZE);
 
