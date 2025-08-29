@@ -6,7 +6,7 @@ ALTER TABLE rooms
 -- 2) start_date가 현재 날짜보다 "이후"이면 IN_PROGRESS로 업데이트
 UPDATE rooms
 SET room_status = 'IN_PROGRESS'
-WHERE start_date >= CURDATE();
+WHERE start_date <= CURDATE();
 
 -- 3) end_date가 현재 날짜보다 "이전"이면 EXPIRED로 업데이트
 UPDATE rooms
