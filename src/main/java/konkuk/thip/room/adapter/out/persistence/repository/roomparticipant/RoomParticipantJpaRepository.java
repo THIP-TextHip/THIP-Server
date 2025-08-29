@@ -10,6 +10,11 @@ import java.util.Optional;
 
 public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticipantJpaEntity, Long>, RoomParticipantQueryRepository{
 
+    /**
+     * 소프트 딜리트 적용 대상 entity 단건 조회 메서드
+     */
+    Optional<RoomParticipantJpaEntity> findByRoomParticipantId(Long roomParticipantId);
+
     @Query("SELECT rp FROM RoomParticipantJpaEntity rp " +
             "WHERE rp.userJpaEntity.userId = :userId " +
             "AND rp.roomJpaEntity.roomId = :roomId " +
