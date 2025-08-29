@@ -18,10 +18,10 @@ public class SavedFeedJpaEntity extends BaseJpaEntity {
     private Long savedId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = false)
     private FeedJpaEntity feedJpaEntity;
 }
