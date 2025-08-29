@@ -13,14 +13,35 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 public class StatusFilterTestConfig {
 
+    // jpa repository PK 조회 메서드 테스트
+    @Component
+    @RequiredArgsConstructor
+    public static class TestUserIdFindService {
+
+        private final UserJpaRepository userJpaRepository;
+
+        /** jpa repository 기본 findById 메서드 */
+        @Transactional(readOnly = true)
+        public Optional<UserJpaEntity> defaultFindById(Long userId) {
+            return userJpaRepository.findById(userId);
+        }
+
+        /** jpa repository custom 메서드 */
+        @Transactional(readOnly = true)
+        public Optional<UserJpaEntity> customFindById(Long userId) {
+            return userJpaRepository.findByUserId(userId);
+        }
+    }
+
     // jpa query 메서드
     @Component
     @RequiredArgsConstructor
-    public static class TestUserService {
+    public static class TestUserQueryService {
 
         private final UserJpaRepository userJpaRepository;
 

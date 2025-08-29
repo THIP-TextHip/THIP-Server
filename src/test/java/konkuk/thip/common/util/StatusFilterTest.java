@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +29,8 @@ public class StatusFilterTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private SavedBookJpaRepository savedBookJpaRepository;
 
-    @Autowired private StatusFilterTestConfig.TestUserService testUserService;
+    @Autowired private StatusFilterTestConfig.TestUserIdFindService testUserIdFindService;
+    @Autowired private StatusFilterTestConfig.TestUserQueryService testUserQueryService;
     @Autowired private StatusFilterTestConfig.TestUserJpqlService testUserJpqlService;
     @Autowired private StatusFilterTestConfig.TestUserQuerydslService testUserQuerydslService;
 
@@ -60,6 +63,48 @@ public class StatusFilterTest {
     }
 
     @Test
+    @DisplayName("spring data jpa의 기본 findById 메서드는 PK를 기준으로만 조회하므로 status 필터링이 적용되지 않는다.")
+    @Transactional  // filter를 활성화 하기 위한 트랜잭션 어노테이션
+    void default_find_by_id_method_does_not_execute_filtering() throws Exception {
+        //given
+        UserJpaEntity activeUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "activeUser"));
+        UserJpaEntity inactiveUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "inactiveUser"));
+        jdbcTemplate.update(
+                "UPDATE users SET status = 'INACTIVE' WHERE user_id = ?",
+                inactiveUser.getUserId()
+        );
+
+        //when
+        Optional<UserJpaEntity> findActiveUser = testUserIdFindService.defaultFindById(activeUser.getUserId());
+        Optional<UserJpaEntity> findInactiveUser = testUserIdFindService.defaultFindById(inactiveUser.getUserId());
+
+        //then
+        assertThat(findActiveUser).isPresent();
+        assertThat(findInactiveUser).isPresent();   // status 필터링이 적용되지 않아서 INACTIVE 엔티티도 조회됨
+    }
+
+    @Test
+    @DisplayName("jpa repository에 정의한 custom 메서드는 status 필터링이 적용된다.")
+    @Transactional  // filter를 활성화 하기 위한 트랜잭션 어노테이션
+    void custom_find_active_by_id_method_does_execute_filtering() throws Exception {
+        //given
+        UserJpaEntity activeUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "activeUser"));
+        UserJpaEntity inactiveUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "inactiveUser"));
+        jdbcTemplate.update(
+                "UPDATE users SET status = 'INACTIVE' WHERE user_id = ?",
+                inactiveUser.getUserId()
+        );
+
+        //when
+        Optional<UserJpaEntity> findActiveUser = testUserIdFindService.customFindById(activeUser.getUserId());
+        Optional<UserJpaEntity> findInactiveUser = testUserIdFindService.customFindById(inactiveUser.getUserId());
+
+        //then
+        assertThat(findActiveUser).isPresent();
+        assertThat(findInactiveUser).isNotPresent();   // status 필터링이 적용되어 INACTIVE 엔티티는 조회되지 않음
+    }
+
+    @Test
     @DisplayName("[jpa 쿼리 메서드] active 상태인 엔티티만 조회하는 것이 기본 동작이다.")
     void jpa_query_method_default_find_active_entities() throws Exception {
         //given
@@ -67,7 +112,7 @@ public class StatusFilterTest {
         saveInactiveUser(2);
 
         //when
-        List<UserJpaEntity> userJpaEntities = testUserService.findAllActiveOnly();
+        List<UserJpaEntity> userJpaEntities = testUserQueryService.findAllActiveOnly();
 
         //then
         assertThat(userJpaEntities).hasSize(3)
@@ -85,7 +130,7 @@ public class StatusFilterTest {
         saveInactiveUser(2);
 
         //when
-        List<UserJpaEntity> userJpaEntities = testUserService.findAllIncludingInactive();
+        List<UserJpaEntity> userJpaEntities = testUserQueryService.findAllIncludingInactive();
 
         //then
         assertThat(userJpaEntities).hasSize(5)
@@ -191,40 +236,4 @@ public class StatusFilterTest {
         assertThat(defCount).isEqualTo(1);  // active user만 카운트
         assertThat(incCount).isEqualTo(2);  // active + inactive user 모두 카운트
     }
-
-//    @Test
-//    @DisplayName("LEFT JOIN + 글로벌 필터 ON: 자식이 INACTIVE뿐이면 부모가 사라져 count=0, 우회 방법은 count=1")
-//    void leftJoinBehavesInnerWhenAllChildrenInactive_thenBypassKeepsParent() {
-//        // given: Book 1권, SavedBook 1건(자식) — 자식은 INACTIVE로 강제
-//        UserJpaEntity u = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "u1"));
-//        BookJpaEntity b = bookJpaRepository.save(TestEntityFactory.createBook());
-//        var sb = savedBookJpaRepository.save(TestEntityFactory.createSavedBook(u, b));
-//        jdbcTemplate.update("UPDATE saved_books SET status = 'INACTIVE' WHERE saved_id = ?", sb.getSavedId());
-//
-//        // when
-//        long defaultCount = testLeftJoinQuerydslService.countBooksWithLeftJoinDefault(b.getBookId());          // 글로벌 필터 ON (WHERE에 sb.status 조건 주입)
-//        long onClauseCount = testLeftJoinQuerydslService.countBooksWithLeftJoinOnActive(b.getBookId());        // 필터 OFF + ON절로 ACTIVE 조건
-//
-//        // then
-//        assertThat(defaultCount).isZero(); // 부모(Book)는 있지만, WHERE에 sb 조건이 들어가면서 행이 사라짐 → 0
-//        assertThat(onClauseCount).isEqualTo(1L); // 부모 보존(LEFT 의미 유지) → 1
-//    }
-//
-//    @Test
-//    @DisplayName("LEFT JOIN + 글로벌 필터 ON: ACTIVE 자식 2개면 count=2(중복), 우회 방법은 부모 기준으로 count=1")
-//    void leftJoinDuplicatesWithMultipleActiveChildren_thenBypassDedupToParent() {
-//        // given: Book 1권 + ACTIVE SavedBook 2건
-//        UserJpaEntity u = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "u1"));
-//        BookJpaEntity b = bookJpaRepository.save(TestEntityFactory.createBook());
-//        savedBookJpaRepository.save(TestEntityFactory.createSavedBook(u, b));
-//        savedBookJpaRepository.save(TestEntityFactory.createSavedBook(u, b));
-//
-//        // when
-//        long defaultCount = testLeftJoinQuerydslService.countBooksWithLeftJoinDefault(b.getBookId());   // WHERE에 sb.status=ACTIVE → 부모 중복 발생 → 2
-//        long onClauseCount = testLeftJoinQuerydslService.countBooksWithLeftJoinOnActive(b.getBookId()); // ON절에 ACTIVE 조건, 부모 보존 관점에서 → 1
-//
-//        // then
-//        assertThat(defaultCount).isEqualTo(2L); // 자식 2건으로 인해 조인 곱 2건
-//        assertThat(onClauseCount).isEqualTo(1L); // 부모 기준 1건
-//    }
 }
