@@ -121,7 +121,7 @@ public class RoomPostCommandController {
             summary = "투표 삭제",
             description = "사용자가 투표를 삭제합니다."
     )
-    @ExceptionDescription(RECORD_DELETE)
+    @ExceptionDescription(VOTE_DELETE)
     @DeleteMapping("/rooms/{roomId}/vote/{voteId}")
     public BaseResponse<VoteDeleteResponse> deleteVote(
             @Parameter(description = "삭제하려는 투표 ID", example = "1") @PathVariable("voteId") final Long voteId,
