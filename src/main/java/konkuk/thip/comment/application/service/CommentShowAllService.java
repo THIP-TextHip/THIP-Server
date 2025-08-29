@@ -7,6 +7,7 @@ import konkuk.thip.comment.application.port.in.dto.CommentShowAllQuery;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.comment.application.port.out.CommentQueryPort;
 import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
+import konkuk.thip.common.annotation.persistence.Unfiltered;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class CommentShowAllService implements CommentShowAllUseCase {
 
     @Override
     @Transactional(readOnly = true)
+    @Unfiltered
     public CommentForSinglePostResponse showAllCommentsOfPost(CommentShowAllQuery query) {
         Cursor cursor = Cursor.from(query.cursorStr(), PAGE_SIZE);
 
