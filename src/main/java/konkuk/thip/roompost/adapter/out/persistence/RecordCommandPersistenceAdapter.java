@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -29,11 +28,11 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
     @Override
     public Long saveRecord(Record record) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(record.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(record.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(record.getRoomId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(record.getRoomId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
@@ -44,13 +43,13 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
     @Override
     public Optional<Record> findById(Long id) {
-        return recordJpaRepository.findByPostIdAndStatus(id, ACTIVE)
+        return recordJpaRepository.findByPostId(id)
                 .map(recordMapper::toDomainEntity);
     }
 
     @Override
     public void delete(Record record) {
-        RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostIdAndStatus(record.getId(),ACTIVE).orElseThrow(
+        RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostId(record.getId()).orElseThrow(
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
         );
 
@@ -60,7 +59,7 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
     @Override
     public void update(Record record) {
-        RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostIdAndStatus(record.getId(),ACTIVE).orElseThrow(
+        RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostId(record.getId()).orElseThrow(
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
         );
 
