@@ -10,6 +10,7 @@ import konkuk.thip.roompost.domain.Record;
 import konkuk.thip.roompost.domain.Vote;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class RoomPostUpdateService implements RoomPostUpdateUseCase {
     private final VoteCommandPort voteCommandPort;
 
     @Override
+    @Transactional
     public Long updateRecord(RecordUpdateCommand command) {
         // 1. 사용자가 방의 참가자인지 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
@@ -36,6 +38,7 @@ public class RoomPostUpdateService implements RoomPostUpdateUseCase {
     }
 
     @Override
+    @Transactional
     public Long updateVote(VoteUpdateCommand command) {
         // 1. 사용자가 방의 참가자인지 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());

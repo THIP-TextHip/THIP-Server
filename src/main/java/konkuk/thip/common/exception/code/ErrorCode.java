@@ -207,6 +207,8 @@ public enum ErrorCode implements ResponseCode {
      */
     ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, 195000, "오늘의 한마디 작성 가능 횟수를 초과하였습니다."),
     ATTENDANCE_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND, 195001, "존재하지 않는 ATTENDANCE CHECK 입니다."),
+    ATTENDANCE_CHECK_CAN_NOT_DELETE(HttpStatus.FORBIDDEN, 195002, "오늘의 한마디는 본인만 삭제할 수 있습니다."),
+
 
     ;
 
