@@ -112,7 +112,7 @@ class AttendanceCheckDeleteApiTest {
     }
 
     @Test
-    @DisplayName("다른 사람이 작성한 오늘의 한마디의 삭제 요청을 할 경우, 400 error 를 반환한다.")
+    @DisplayName("다른 사람이 작성한 오늘의 한마디의 삭제 요청을 할 경우, 403 error 를 반환한다.")
     void attendance_check_delete_not_creator_test() throws Exception {
         //given
         Alias a0 = TestEntityFactory.createScienceAlias();
