@@ -37,7 +37,7 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
 
     @Override
     public List<Book> findSavedBooksByUserId(Long userId) {
-        UserJpaEntity user = userJpaRepository.findById(userId)
+        UserJpaEntity user = userJpaRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return bookJpaRepository.findSavedBooksByUserId(user.getUserId()).stream()
@@ -47,7 +47,7 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
 
     @Override
     public List<Book> findJoiningRoomsBooksByUserId(Long userId) {
-        UserJpaEntity user = userJpaRepository.findById(userId)
+        UserJpaEntity user = userJpaRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return bookJpaRepository.findJoiningRoomsBooksByUserId(user.getUserId())
