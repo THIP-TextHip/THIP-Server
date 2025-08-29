@@ -4,6 +4,7 @@ import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.room.adapter.out.jpa.RoomStatus;
 import konkuk.thip.room.domain.value.Category;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -40,6 +41,8 @@ public class Room extends BaseDomainEntity {
 
     private int memberCount;
 
+    private RoomStatus roomStatus;
+
     private Long bookId;
 
     private Category category;
@@ -62,6 +65,7 @@ public class Room extends BaseDomainEntity {
                 .endDate(endDate)
                 .recruitCount(recruitCount)
                 .memberCount(1) // 처음 Room 생성 시 방장 1명
+                .roomStatus(RoomStatus.RECRUITING) // 처음 Room 생성 시 -> 모집중
                 .bookId(bookId)
                 .category(category)
                 .build();

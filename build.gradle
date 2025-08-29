@@ -78,6 +78,10 @@ dependencies {
 
 	// Spring Boot Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// Flyway
+	implementation "org.flywaydb:flyway-core"
+	implementation "org.flywaydb:flyway-mysql"
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
