@@ -1,6 +1,5 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +14,9 @@ public interface FeedJpaRepository extends JpaRepository<FeedJpaEntity, Long>, F
      */
     Optional<FeedJpaEntity> findByPostId(Long postId);
 
-    @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.status = :status")
-    long countAllFeedsByUserId(@Param("userId") Long userId, @Param("status") StatusType status);
+    @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId")
+    long countAllFeedsByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.isPublic = TRUE AND f.status = :status")
-    long countPublicFeedsByUserId(@Param("userId") Long userId, @Param("status") StatusType status);
+    @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.isPublic = TRUE")
+    long countPublicFeedsByUserId(@Param("userId") Long userId);
 }
