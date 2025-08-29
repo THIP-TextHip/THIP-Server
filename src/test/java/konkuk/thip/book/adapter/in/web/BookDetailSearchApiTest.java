@@ -31,11 +31,10 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@DisplayName("[통합] 방 상세보기 api 통합 테스트")
+@DisplayName("[통합] 책 상세보기 api 통합 테스트")
 class BookDetailSearchApiTest {
 
     @Autowired
@@ -114,12 +113,12 @@ class BookDetailSearchApiTest {
 
     @AfterEach
     void tearDown() {
-        savedBookJpaRepository.deleteAll();
+        savedBookJpaRepository.deleteAllInBatch();
         feedJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test
