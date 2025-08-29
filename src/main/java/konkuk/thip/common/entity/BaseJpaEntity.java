@@ -46,4 +46,6 @@ public abstract class BaseJpaEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     protected StatusType status = StatusType.ACTIVE;
+
+    // TODO : status를 private로 변경, status를 변경하는 protected 메서드 추가
 }

@@ -1,5 +1,6 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
+import konkuk.thip.roompost.adapter.out.jpa.AttendanceCheckJpaEntity;
 import konkuk.thip.roompost.adapter.out.mapper.AttendanceCheckMapper;
 import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.AttendanceCheckJpaRepository;
 import konkuk.thip.roompost.application.port.out.AttendanceCheckCommandPort;
@@ -14,8 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static konkuk.thip.common.exception.code.ErrorCode.ROOM_NOT_FOUND;
-import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -45,5 +45,14 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
     public Optional<AttendanceCheck> findById(Long id) {
         return attendanceCheckJpaRepository.findByAttendanceCheckId(id)
                 .map(attendanceCheckMapper::toDomainEntity);
+    }
+
+    @Override
+    public void delete(AttendanceCheck attendanceCheck) {
+        AttendanceCheckJpaEntity attendanceCheckJpaEntity = attendanceCheckJpaRepository.findByAttendanceCheckId(attendanceCheck.getId()).orElseThrow(
+                () -> new EntityNotFoundException(ATTENDANCE_CHECK_NOT_FOUND)
+        );
+
+        attendanceCheckJpaRepository.delete(attendanceCheckJpaEntity);
     }
 }
