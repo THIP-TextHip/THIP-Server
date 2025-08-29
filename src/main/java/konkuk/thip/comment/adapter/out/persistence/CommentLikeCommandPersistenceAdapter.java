@@ -24,7 +24,7 @@ public class CommentLikeCommandPersistenceAdapter implements CommentLikeCommandP
     @Override
     public void save(Long userId, Long commentId) {
 
-        UserJpaEntity user = userJpaRepository.findById(userId)
+        UserJpaEntity user = userJpaRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
         CommentJpaEntity comment = commentJpaRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException(COMMENT_NOT_FOUND));
