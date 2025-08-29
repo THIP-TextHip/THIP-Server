@@ -50,6 +50,11 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(name = "member_count",nullable = false)
     private int memberCount = 1;
 
+    @Builder.Default
+    @Column(name = "room_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomStatus roomStatus = RoomStatus.RECRUITING;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
@@ -68,6 +73,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
         this.endDate = room.getEndDate();
         this.recruitCount = room.getRecruitCount();
         this.memberCount = room.getMemberCount();
+        this.roomStatus = room.getRoomStatus();
         return this;
     }
 
