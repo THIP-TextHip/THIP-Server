@@ -28,11 +28,11 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
 
     @Override
     public Long save(AttendanceCheck attendanceCheck) {
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(attendanceCheck.getRoomId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(attendanceCheck.getRoomId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(attendanceCheck.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(attendanceCheck.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
@@ -43,7 +43,7 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
 
     @Override
     public Optional<AttendanceCheck> findById(Long id) {
-        return attendanceCheckJpaRepository.findById(id)
+        return attendanceCheckJpaRepository.findByAttendanceCheckId(id)
                 .map(attendanceCheckMapper::toDomainEntity);
     }
 }
