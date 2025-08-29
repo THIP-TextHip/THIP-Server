@@ -109,7 +109,7 @@ public class BookQueryRepositoryImpl implements BookQueryRepository {
                     .where(where)
                     .groupBy(book.bookId)
                     .having(having)  // 집계 함수 조건은 having 절에 넣기
-                    .orderBy(maxRoomPercentage.desc(), book.bookId.asc()) // 방 진행도 높은 순 (내림차순), 같으면 방 아이디 작은 순 (오름차순)
+                    .orderBy(maxRoomPercentage.desc(), book.bookId.asc()) // 방 진행도 높은 순 (내림차순), 같으면 책 아이디 작은 순 (오름차순)
                     .limit(pageSize + 1)
                     .fetch();
     }
