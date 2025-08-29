@@ -13,6 +13,7 @@ import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -28,6 +29,7 @@ public class FeedShowSingleService implements FeedShowSingleUseCase {
     private final FeedQueryMapper feedQueryMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public FeedShowSingleResponse showSingleFeed(Long feedId, Long userId) {
         // 1. 단일 피드 조회 및 피드 조회 유효성 검증
         Feed feed = feedCommandPort.getByIdOrThrow(feedId);

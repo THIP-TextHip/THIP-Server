@@ -1,4 +1,4 @@
-package konkuk.thip.common.annotation;
+package konkuk.thip.common.annotation.application;
 
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;

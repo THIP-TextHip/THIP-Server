@@ -24,7 +24,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -43,11 +42,11 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public Long saveVote(Vote vote) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(vote.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(vote.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(vote.getRoomId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(vote.getRoomId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
@@ -59,7 +58,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         if (voteItems.isEmpty()) return;
 
         Long voteId = voteItems.get(0).getVoteId();
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(voteId,ACTIVE).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostId(voteId).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 
@@ -72,7 +71,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public Optional<Vote> findById(Long id) {
-        return voteJpaRepository.findByPostIdAndStatus(id,ACTIVE)
+        return voteJpaRepository.findByPostId(id)
                 .map(voteMapper::toDomainEntity);
     }
 
@@ -109,7 +108,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void saveVoteParticipant(VoteParticipant voteParticipant) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(voteParticipant.getUserId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(voteParticipant.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
@@ -138,7 +137,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void delete(Vote vote) {
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(vote.getId(),ACTIVE).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostId(vote.getId()).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 
@@ -152,7 +151,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void updateVote(Vote vote) {
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(vote.getId(),ACTIVE).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostId(vote.getId()).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 

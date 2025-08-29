@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-//@Table(name = "votes")
 @DiscriminatorValue("VOTE")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,7 +24,7 @@ public class VoteJpaEntity extends PostJpaEntity {
     private boolean isOverview;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "room_id")   // FEED 로 인해 nullable = true로 설정
     private RoomJpaEntity roomJpaEntity;
 
     @Builder

@@ -2,7 +2,6 @@ package konkuk.thip.user.adapter.out.persistence.repository.following;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
@@ -31,8 +30,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         FollowingJpaEntity followingJpaEntity = jpaQueryFactory
                 .selectFrom(following)
                 .where(following.userJpaEntity.userId.eq(userId)
-                        .and(following.followingUserJpaEntity.userId.eq(targetUserId))
-                        .and(following.status.eq(StatusType.ACTIVE)))
+                        .and(following.followingUserJpaEntity.userId.eq(targetUserId)))
                 .fetchOne();
 
         return Optional.ofNullable(followingJpaEntity);
@@ -63,8 +61,9 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
         BooleanBuilder condition = new BooleanBuilder()
-                .and((isFollowerQuery ? following.followingUserJpaEntity.userId.eq(userId) : following.userJpaEntity.userId.eq(userId)))
-                .and(following.status.eq(StatusType.ACTIVE));
+                .and((isFollowerQuery
+                        ? following.followingUserJpaEntity.userId.eq(userId)    // 나를 팔로우한 사람들
+                        : following.userJpaEntity.userId.eq(userId)));  // 내가 팔로우하는 사람들
 
         if (cursor != null) {
             condition.and(following.createdAt.lt(cursor));
@@ -81,7 +80,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                         following.createdAt
                 ))
                 .from(following)
-                .leftJoin(targetUser, user)
+                .join(targetUser, user)
                 .where(condition)
                 .orderBy(following.createdAt.desc())
                 .limit(size + 1)
@@ -97,8 +96,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                 .select(follower)
                 .from(following)
                 .join(following.userJpaEntity, follower)
-                .where(following.followingUserJpaEntity.userId.eq(userId)
-                        .and(following.status.eq(StatusType.ACTIVE)))
+                .where(following.followingUserJpaEntity.userId.eq(userId))
                 .orderBy(following.createdAt.desc())
                 .limit(size)
                 .fetch();
@@ -118,11 +116,7 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
                 ))
                 .from(following)
                 .join(following.followingUserJpaEntity, followingTargetUser)
-                .where(
-                        following.userJpaEntity.userId.eq(userId)
-                                .and(following.userJpaEntity.status.eq(StatusType.ACTIVE))
-                                .and(followingTargetUser.status.eq(StatusType.ACTIVE))
-                )
+                .where(following.userJpaEntity.userId.eq(userId))
                 .orderBy(following.createdAt.desc())
                 .fetch();
     }

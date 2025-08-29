@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.room.application.port.in.dto.RoomJoinType.CANCEL;
 import static konkuk.thip.room.application.port.in.dto.RoomJoinType.JOIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -51,6 +52,7 @@ class RoomJoinApiTest {
     private RoomJpaEntity room;
     private UserJpaEntity host;
     private UserJpaEntity participant;
+    private RoomParticipantJpaEntity memberParticipation;
 
     private void setUpWithOnlyHost() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -70,7 +72,7 @@ class RoomJoinApiTest {
         Category category = TestEntityFactory.createLiteratureCategory();
         createRoom(book, category,2); // 방장과 참여자 포함
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
-        roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, participant, RoomParticipantRole.MEMBER, 0.0));
+        memberParticipation = roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, participant, RoomParticipantRole.MEMBER, 0.0));
     }
 
     private void createRoom(BookJpaEntity book, Category category, int memberCount) {
@@ -171,9 +173,8 @@ class RoomJoinApiTest {
                 .andExpect(status().isOk());
 
         // 참여자 삭제 확인
-        boolean exists = roomParticipantJpaRepository
-                .existsByUserIdAndRoomId(participant.getUserId(), room.getRoomId());
-        assertThat(exists).isFalse();
+        RoomParticipantJpaEntity member = roomParticipantJpaRepository.findById(memberParticipation.getRoomParticipantId()).orElse(null);
+        assertThat(member.getStatus()).isEqualTo(INACTIVE);
 
         // 인원수 감소 확인
         room = roomJpaRepository.findById(room.getRoomId()).orElseThrow();

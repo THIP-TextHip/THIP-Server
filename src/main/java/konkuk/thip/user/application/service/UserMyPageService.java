@@ -13,6 +13,7 @@ import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class UserMyPageService implements UserMyPageUseCase {
     private final ReactionQueryMapper reactionQueryMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public UserReactionResponse getUserReaction(Long userId, UserReactionType userReactionType, int size, String cursorStr) {
 
         Cursor cursor = Cursor.from(cursorStr, size);
@@ -45,6 +47,7 @@ public class UserMyPageService implements UserMyPageUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserProfileResponse getUserProfile(Long userId) {
         User user = userCommandPort.findById(userId);
 

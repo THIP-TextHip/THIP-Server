@@ -21,6 +21,7 @@ public class RecentSearchGetService implements RecentSearchGetUseCase {
 
     private static final int MAX_RECENT_SEARCHES = 5;
 
+    @Override
     @Transactional(readOnly = true)
     public RecentSearchGetResponse getRecentSearches(String typeParam, Long userId) {
         RecentSearchType type = RecentSearchType.from(typeParam);

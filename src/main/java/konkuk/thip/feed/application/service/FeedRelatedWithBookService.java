@@ -12,6 +12,7 @@ import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ public class FeedRelatedWithBookService implements FeedRelatedWithBookUseCase {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     @Override
+    @Transactional(readOnly = true)
     public FeedRelatedWithBookResponse getFeedsByBook(FeedRelatedWithBookQuery query) {
 
         // 책이 DB에 존재하는지 확인

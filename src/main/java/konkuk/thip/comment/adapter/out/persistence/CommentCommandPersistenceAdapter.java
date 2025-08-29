@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -39,7 +38,7 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
     public Long save(Comment comment) {
 
         // 1. 작성자(User) 조회 및 존재 검증
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(comment.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(comment.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
@@ -49,7 +48,7 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
         // 3. 부모 댓글 조회 (있을 경우)
         CommentJpaEntity parentCommentJpaEntity = null;
         if (comment.getParentCommentId() != null) {
-            parentCommentJpaEntity = commentJpaRepository.findById(comment.getParentCommentId())
+            parentCommentJpaEntity = commentJpaRepository.findByCommentId(comment.getParentCommentId())
                     .orElseThrow(() -> new EntityNotFoundException(COMMENT_NOT_FOUND));
         }
 
@@ -60,24 +59,24 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
 
     private PostJpaEntity findPostJpaEntity(PostType postType, Long postId) {
         return switch (postType) {
-            case FEED -> feedJpaRepository.findById(postId)
+            case FEED -> feedJpaRepository.findByPostId(postId)
                     .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
-            case RECORD -> recordJpaRepository.findById(postId)
+            case RECORD -> recordJpaRepository.findByPostId(postId)
                     .orElseThrow(() -> new EntityNotFoundException(RECORD_NOT_FOUND));
-            case VOTE -> voteJpaRepository.findById(postId)
+            case VOTE -> voteJpaRepository.findByPostId(postId)
                     .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
         };
     }
 
     @Override
     public Optional<Comment> findById(Long id) {
-        return commentJpaRepository.findByCommentIdAndStatus(id, ACTIVE)
+        return commentJpaRepository.findByCommentId(id)
                 .map(commentMapper::toDomainEntity);
     }
 
     @Override
     public void update(Comment comment) {
-        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getId()).orElseThrow(
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findByCommentId(comment.getId()).orElseThrow(
                 () -> new EntityNotFoundException(COMMENT_NOT_FOUND)
         );
 
@@ -86,7 +85,7 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
 
     @Override
     public void delete(Comment comment) {
-        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getId()).orElseThrow(
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findByCommentId(comment.getId()).orElseThrow(
                 () -> new EntityNotFoundException(COMMENT_NOT_FOUND)
         );
         commentJpaRepository.delete(commentJpaEntity);

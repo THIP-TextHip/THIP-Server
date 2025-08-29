@@ -89,11 +89,13 @@ class RecordDeleteApiTest {
                 .andExpect(status().isOk());
 
 
-        // then: 1) 기록 soft delete (status=INACTIVE)
-        assertThat(recordJpaRepository.findByPostIdAndStatus(record.getPostId(), INACTIVE)).isPresent();
+        // then: 1) 기록 soft delete (status=INACTIVE -> findByPostId() 조회 안됨)
+        RecordJpaEntity deletedRecord = recordJpaRepository.findById(record.getPostId()).orElse(null);
+        assertThat(deletedRecord.getStatus()).isEqualTo(INACTIVE);
 
         // 2) 댓글 삭제 soft delete
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(comment.getCommentId(),INACTIVE)).isPresent();
+        CommentJpaEntity deleteComment = commentJpaRepository.findById(comment.getCommentId()).orElse(null);
+        assertThat(deleteComment.getStatus()).isEqualTo(INACTIVE);
 
         // 3) 댓글 좋아요 삭제
         assertThat(commentLikeJpaRepository.count()).isEqualTo(0);

@@ -26,7 +26,7 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     @Override
     public Room getByIdOrThrow(Long id) {
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(id).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(id).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
         return roomMapper.toDomainEntity(roomJpaEntity);
@@ -34,7 +34,7 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     @Override
     public Optional<Room> findById(Long id) {
-        return roomJpaRepository.findById(id)
+        return roomJpaRepository.findByRoomId(id)
                 .map(roomMapper::toDomainEntity);
     }
 
@@ -50,7 +50,7 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     @Override
     public void update(Room room) {
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(room.getId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(room.getId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 

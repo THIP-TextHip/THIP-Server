@@ -6,7 +6,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.comment.adapter.out.jpa.QCommentJpaEntity;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.QPostLikeJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
@@ -34,15 +33,15 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
     @Override
     public Set<Long> findUserIdsByBookId(Long bookId) {
-        QRoomParticipantJpaEntity userRoom = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
+        QRoomParticipantJpaEntity roomParticipant = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
         QRoomJpaEntity room = QRoomJpaEntity.roomJpaEntity;
 
         return new HashSet<>(
                 queryFactory
-                        .select(userRoom.userJpaEntity.userId)
+                        .select(roomParticipant.userJpaEntity.userId)
                         .distinct()
-                        .from(userRoom)
-                        .join(userRoom.roomJpaEntity, room)
+                        .from(roomParticipant)
+                        .join(roomParticipant.roomJpaEntity, room)
                         .where(room.bookJpaEntity.bookId.eq(bookId))
                         .fetch()
         );
@@ -70,8 +69,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 ))
                 .from(user)
                 .where(user.nickname.like(pattern)
-                        .and(user.userId.ne(userId))
-                        .and(user.status.eq(StatusType.ACTIVE)))
+                        .and(user.userId.ne(userId)))
                 .orderBy(priority.desc(), user.nickname.asc())
                 .limit(size)
                 .fetch();
@@ -84,9 +82,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         QPostJpaEntity post = QPostJpaEntity.postJpaEntity;
 
         BooleanBuilder where = new BooleanBuilder();
-        where.and(user.userId.eq(userId))
-                .and(post.status.eq(StatusType.ACTIVE))
-                .and(postLike.status.eq(StatusType.ACTIVE));
+        where.and(user.userId.eq(userId));
+
         if (cursorLocalDateTime != null) {
             where.and(postLike.createdAt.lt(cursorLocalDateTime));
         }
@@ -117,9 +114,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         QCommentJpaEntity comment = QCommentJpaEntity.commentJpaEntity;
 
         BooleanBuilder where = new BooleanBuilder();
-        where.and(user.userId.eq(userId))
-                .and(post.status.eq(StatusType.ACTIVE))
-                .and(comment.status.eq(StatusType.ACTIVE));
+        where.and(user.userId.eq(userId));
+
         if (cursorLocalDateTime != null) {
             where.and(comment.createdAt.lt(cursorLocalDateTime));
         }

@@ -15,6 +15,7 @@ public class RecentSearchDeleteService implements RecentSearchDeleteUseCase {
 
     private final RecentSearchCommandPort recentSearchCommandPort;
 
+    @Override
     @Transactional
     public Void deleteRecentSearch(Long recentSearchId, Long userId) {
         RecentSearch recentSearch = recentSearchCommandPort.getByIdOrThrow(recentSearchId);

@@ -5,7 +5,6 @@ import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
-
 @Entity
 @Table(name = "vote_participants")
 @Getter
@@ -20,11 +19,11 @@ public class VoteParticipantJpaEntity extends BaseJpaEntity {
     private Long voteParticipantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vote_item_id")
+    @JoinColumn(name = "vote_item_id", nullable = false)
     private VoteItemJpaEntity voteItemJpaEntity;
 
     public VoteParticipantJpaEntity updateVoteItem(VoteItemJpaEntity voteItemJpaEntity) {

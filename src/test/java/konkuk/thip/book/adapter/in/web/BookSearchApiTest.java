@@ -72,8 +72,8 @@ class BookSearchApiTest {
 
     @AfterEach
     void tearDown() {
-        recentSearchJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
+        recentSearchJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

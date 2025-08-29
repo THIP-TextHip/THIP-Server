@@ -88,12 +88,12 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
 
     @Override
     public int countAllFeedsByUserId(Long userId) {
-        return (int) feedJpaRepository.countAllFeedsByUserId(userId, StatusType.ACTIVE);
+        return (int) feedJpaRepository.countAllFeedsByUserId(userId);
     }
 
     @Override
     public int countPublicFeedsByUserId(Long userId) {
-        return (int) feedJpaRepository.countPublicFeedsByUserId(userId, StatusType.ACTIVE);
+        return (int) feedJpaRepository.countPublicFeedsByUserId(userId);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package konkuk.thip.roompost.application.service.validator;
 
-import konkuk.thip.common.annotation.HelperService;
+import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 

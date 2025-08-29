@@ -74,7 +74,7 @@ class BookMostSearchedBooksApiTest {
 
     @AfterEach
     void tearDown() {
-        userJpaRepository.deleteAll();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

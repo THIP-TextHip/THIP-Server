@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -131,8 +132,11 @@ class RoomParticipantDeleteApiTest {
                 .andExpect(status().isOk());
 
         // 방에서 참여자 정보가 사라졌는지 확인
-        boolean exists = roomParticipantJpaRepository.existsByUserIdAndRoomId(participant.getUserId(), room.getRoomId());
-        assertThat(exists).isFalse();
+        em.flush();
+        em.clear();     // 영속성 컨텍스트 초기화 -> 테스트 코드에 트랜잭션이 있으므로
+
+        RoomParticipantJpaEntity member = roomParticipantJpaRepository.findById(memberParticipation.getRoomParticipantId()).orElse(null);
+        assertThat(member.getStatus()).isEqualTo(INACTIVE);
 
         // 인원수 감소 확인
         RoomJpaEntity updateRoom = roomJpaRepository.findById(room.getRoomId()).orElseThrow();

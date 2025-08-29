@@ -6,6 +6,7 @@ import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE users SET status = 'INACTIVE' WHERE user_id = ?")
 public class UserJpaEntity extends BaseJpaEntity {
 
     @Id

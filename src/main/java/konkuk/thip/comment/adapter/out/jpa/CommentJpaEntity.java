@@ -51,6 +51,9 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
+    /**
+     * nullable = true : 최상위 댓글인 경우 null
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;

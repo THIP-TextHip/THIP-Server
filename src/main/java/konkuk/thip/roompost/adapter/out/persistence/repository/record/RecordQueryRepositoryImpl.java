@@ -5,7 +5,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.QRecordJpaEntity;
@@ -64,8 +63,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 .and(treat(post, QRecordJpaEntity.class).roomJpaEntity.roomId.eq(roomId));
 
         where.and(voteCondition.or(recordCondition))
-                .and(post.userJpaEntity.userId.eq(userId))
-                .and(post.status.eq(StatusType.ACTIVE));
+                .and(post.userJpaEntity.userId.eq(userId));
+
         return where;
     }
 
@@ -114,8 +113,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                     .and(treat(post, QRecordJpaEntity.class).page.between(pageStart, pageEnd));
         }
 
-        where.and(voteCondition.or(recordCondition))
-                .and(post.status.eq(StatusType.ACTIVE));
+        where.and(voteCondition.or(recordCondition));
+
         return where;
     }
 

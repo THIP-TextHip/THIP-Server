@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -32,7 +31,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
     @Override
     public Optional<Feed> findById(Long id) {
-        return feedJpaRepository.findByPostIdAndStatus(id,ACTIVE)
+        return feedJpaRepository.findByPostId(id)
                 .map(feedMapper::toDomainEntity);
     }
 
@@ -40,7 +39,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     @Override
     public Long save(Feed feed) {
 
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(feed.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(feed.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
         BookJpaEntity bookJpaEntity = bookJpaRepository.findById(feed.getTargetBookId()).orElseThrow(
@@ -51,34 +50,23 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         // Feed 먼저 영속화 → ID 생성
         FeedJpaEntity savedFeed = feedJpaRepository.save(feedJpaEntity);
 
-//        // Content가 존재하면 ContentJpaEntity 생성 및 Feed 연관관계 설정
-//        applyFeedContents(feed, savedFeed);
-        // 태그가 존재하면 태그 피드 매핑 생성 및 저장
-//        applyFeedTags(feed, savedFeed);
-
         return savedFeed.getPostId();
     }
 
     @Override
     public Long update(Feed feed) {
-        FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostIdAndStatus(feed.getId(),ACTIVE)
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostId(feed.getId())
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
         feedJpaEntity.updateFrom(feed);
-
-//        feedJpaEntity.replaceContentList(feed.getContentList()); // 피드 수정시 기존 영속성 컨텍스트 내 엔티티 연결 제거
-//        applyFeedContents(feed, feedJpaEntity);
-//
-//        feedTagJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId()); // 피드 수정시 기존 피드의 모든 FeedTag 매핑 row 삭제
-//        applyFeedTags(feed, feedJpaEntity);
 
         return feedJpaEntity.getPostId();
     }
 
     @Override
     public void saveSavedFeed(Long userId, Long feedId) {
-        UserJpaEntity user = userJpaRepository.findById(userId)
+        UserJpaEntity user = userJpaRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
-        FeedJpaEntity feed = feedJpaRepository.findByPostIdAndStatus(feedId,ACTIVE)
+        FeedJpaEntity feed = feedJpaRepository.findByPostId(feedId)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
         SavedFeedJpaEntity entity = SavedFeedJpaEntity.builder()
                 .userJpaEntity(user)
@@ -94,7 +82,7 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
 
     @Override
     public void delete(Feed feed) {
-        FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostIdAndStatus(feed.getId(),ACTIVE)
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostId(feed.getId())
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
 
         savedFeedJpaRepository.deleteAllByFeedId(feedJpaEntity.getPostId());

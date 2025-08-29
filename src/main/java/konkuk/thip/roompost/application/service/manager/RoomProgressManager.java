@@ -1,7 +1,7 @@
 package konkuk.thip.roompost.application.service.manager;
 
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.common.annotation.HelperService;
+import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;

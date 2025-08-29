@@ -33,7 +33,7 @@ public class FeedJpaEntity extends PostJpaEntity {
     private int reportCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id")   // RECORD, VOTE 로 인해 nullable = true로 설정
     private BookJpaEntity bookJpaEntity;
 
     // JSON 문자열로 저장되는 단일 컬럼

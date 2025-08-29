@@ -113,10 +113,12 @@ class VoteDeleteApiTest {
 
 
         // then: 1) 투표 soft delete (status=INACTIVE)
-        assertThat(voteJpaRepository.findByPostIdAndStatus(vote.getPostId(), INACTIVE)).isPresent();
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(vote.getPostId()).orElse(null);
+        assertThat(voteJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // 2) 댓글 삭제 soft delete
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(comment.getCommentId(),INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getCommentId()).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // 3) 댓글 좋아요 물리 삭제
         assertThat(commentLikeJpaRepository.count()).isEqualTo(0);

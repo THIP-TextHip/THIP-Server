@@ -36,7 +36,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
 
     @Override
     public void save(Following following, User targetUser) { // insert용
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(following.getUserId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(following.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
         UserJpaEntity targetUserJpaEntity = updateUserFollowerCount(targetUser);
@@ -55,7 +55,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
     }
 
     private UserJpaEntity updateUserFollowerCount(User targetUser) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(targetUser.getId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(targetUser.getId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 

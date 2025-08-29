@@ -1,6 +1,6 @@
 package konkuk.thip.post.application.service.handler;
 
-import konkuk.thip.common.annotation.HelperService;
+import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
