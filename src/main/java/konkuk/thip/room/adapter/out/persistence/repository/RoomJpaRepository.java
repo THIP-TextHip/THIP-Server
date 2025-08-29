@@ -17,8 +17,7 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
 
     @Query("SELECT COUNT(r) FROM RoomJpaEntity r " +
             "WHERE r.bookJpaEntity.isbn = :isbn " +
-            "AND r.startDate > :currentDate " +
-            "AND r.status = 'ACTIVE'")
+            "AND r.startDate > :currentDate")
     int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
 
 }
