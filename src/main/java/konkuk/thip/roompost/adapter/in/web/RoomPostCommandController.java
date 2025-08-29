@@ -31,6 +31,7 @@ public class RoomPostCommandController {
     private final VoteUseCase voteUseCase;
 
     private final AttendanceCheckCreateUseCase attendanceCheckCreateUseCase;
+    private final AttendanceCheckDeleteUseCase attendanceCheckDeleteUseCase;
 
     /**
      * 기록 관련
@@ -63,6 +64,23 @@ public class RoomPostCommandController {
             @Parameter(description = "삭제하려는 기록이 작성된 모임 ID", example = "1") @PathVariable("roomId") final Long roomId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(RecordDeleteResponse.of(recordDeleteUseCase.deleteRecord(new RecordDeleteCommand(roomId, recordId, userId))));
+    }
+
+    @Operation(
+            summary = "기록 수정",
+            description = "사용자가 방 기록을 수정합니다. (기록 내용만 수정 가능)"
+    )
+    @PatchMapping("/rooms/{roomId}/records/{recordId}")
+    @ExceptionDescription(RECORD_UPDATE)
+    public BaseResponse<RecordUpdateResponse> updateRecord(
+            @Parameter(hidden = true) @UserId Long userId,
+            @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
+            @Parameter(description = "수정할 기록 ID", example = "1") @PathVariable Long recordId,
+            @RequestBody @Valid final RecordUpdateRequest request
+    ) {
+        return BaseResponse.ok(RecordUpdateResponse.of(
+                roomPostUpdateUseCase.updateRecord(request.toCommand(userId, roomId, recordId))
+        ));
     }
 
     /**
@@ -103,48 +121,13 @@ public class RoomPostCommandController {
             summary = "투표 삭제",
             description = "사용자가 투표를 삭제합니다."
     )
-    @ExceptionDescription(RECORD_DELETE)
+    @ExceptionDescription(VOTE_DELETE)
     @DeleteMapping("/rooms/{roomId}/vote/{voteId}")
     public BaseResponse<VoteDeleteResponse> deleteVote(
             @Parameter(description = "삭제하려는 투표 ID", example = "1") @PathVariable("voteId") final Long voteId,
             @Parameter(description = "삭제하려는 투표가 작성된 모임 ID", example = "1") @PathVariable("roomId") final Long roomId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(VoteDeleteResponse.of(voteDeleteUseCase.deleteVote(new VoteDeleteCommand(roomId, voteId, userId))));
-    }
-
-    /**
-     * 오늘의 한마디 작성
-     */
-    @Operation(
-            summary = "오늘의 한마디 작성",
-            description = "방 참여자가 오늘의 한마디를 작성합니다."
-    )
-    @ExceptionDescription(ATTENDANCE_CHECK_CREATE)
-    @PostMapping("/rooms/{roomId}/daily-greeting")
-    public BaseResponse<AttendanceCheckCreateResponse> createFeed(
-            @RequestBody @Valid final AttendanceCheckCreateRequest request,
-            @Parameter(description = "오늘의 한마디를 작성할 방 id값") @PathVariable("roomId") final Long roomId,
-            @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(AttendanceCheckCreateResponse.of(
-                attendanceCheckCreateUseCase.create(request.toCommand(userId, roomId))
-        ));
-    }
-
-    @Operation(
-            summary = "기록 수정",
-            description = "사용자가 방 기록을 수정합니다. (기록 내용만 수정 가능)"
-    )
-    @PatchMapping("/rooms/{roomId}/records/{recordId}")
-    @ExceptionDescription(RECORD_UPDATE)
-    public BaseResponse<RecordUpdateResponse> updateRecord(
-            @Parameter(hidden = true) @UserId Long userId,
-            @Parameter(description = "수정할 방 ID", example = "1") @PathVariable Long roomId,
-            @Parameter(description = "수정할 기록 ID", example = "1") @PathVariable Long recordId,
-            @RequestBody @Valid final RecordUpdateRequest request
-    ) {
-        return BaseResponse.ok(RecordUpdateResponse.of(
-                roomPostUpdateUseCase.updateRecord(request.toCommand(userId, roomId, recordId))
-        ));
     }
 
     @Operation(
@@ -161,6 +144,39 @@ public class RoomPostCommandController {
     ) {
         return BaseResponse.ok(VoteUpdateResponse.of(
                 roomPostUpdateUseCase.updateVote(request.toCommand(userId, roomId, voteId))
+        ));
+    }
+
+    /**
+     * 오늘의 한마디 관련
+     */
+    @Operation(
+            summary = "오늘의 한마디 작성",
+            description = "방 참여자가 오늘의 한마디를 작성합니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_CREATE)
+    @PostMapping("/rooms/{roomId}/daily-greeting")
+    public BaseResponse<AttendanceCheckCreateResponse> createAttendanceCheck(
+            @RequestBody @Valid final AttendanceCheckCreateRequest request,
+            @Parameter(description = "오늘의 한마디를 작성할 방 id값") @PathVariable("roomId") final Long roomId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(AttendanceCheckCreateResponse.of(
+                attendanceCheckCreateUseCase.create(request.toCommand(userId, roomId))
+        ));
+    }
+
+    @Operation(
+            summary = "오늘의 한마디 삭제",
+            description = "오늘의 한마디 작성자가 본인이 작성한 오늘의 한마디를 삭제합니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_DELETE)
+    @DeleteMapping("/rooms/{roomId}/daily-greeting/{attendanceCheckId}")
+    public BaseResponse<AttendanceCheckDeleteResponse> deleteAttendanceCheck(
+            @Parameter(description = "오늘의 한마디를 삭제할 방 id값") @PathVariable("roomId") final Long roomId,
+            @Parameter(description = "삭제할 오늘의 한마디 id값") @PathVariable("attendanceCheckId") final Long attendanceCheckId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(AttendanceCheckDeleteResponse.of(
+                attendanceCheckDeleteUseCase.delete(userId, roomId, attendanceCheckId)
         ));
     }
 }

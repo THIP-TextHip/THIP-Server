@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface AttendanceCheckJpaRepository extends JpaRepository<AttendanceCheckJpaEntity, Long>, AttendanceCheckQueryRepository {
 
@@ -18,4 +19,6 @@ public interface AttendanceCheckJpaRepository extends JpaRepository<AttendanceCh
             "AND a.createdAt >= :startOfDay " +
             "AND a.createdAt < :endOfDay")
     int countByUserIdAndRoomIdAndCreatedAtBetween(@Param("userId") Long userId, @Param("roomId") Long roomId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay, @Param("status")StatusType status);
+
+    Optional<AttendanceCheckJpaEntity> findByAttendanceCheckIdAndStatus(Long attendanceCheckId, StatusType status);
 }
