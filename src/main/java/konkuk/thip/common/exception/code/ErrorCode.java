@@ -172,10 +172,8 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 170000 : Image File error
      */
-    EMPTY_FILE_EXCEPTION(HttpStatus.BAD_REQUEST, 170001, "업로드하려는 이미지가 비어있습니다."),
-    EXCEPTION_ON_IMAGE_UPLOAD(HttpStatus.BAD_REQUEST, 170002, "이미지 업로드에 실패하였습니다."),
-    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170003, "올바르지 않은 파일 형식입니다."),
-    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다."),
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170001, "허용하지 않는 파일 확장자입니다."),
+    FILE_SIZE_OVERFLOW(HttpStatus.BAD_REQUEST, 170002, "파일 크기가 허용 범위를 초과했습니다."),
 
     /**
      * 180000 : Post error
