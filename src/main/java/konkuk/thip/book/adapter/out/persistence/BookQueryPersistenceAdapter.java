@@ -63,4 +63,9 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
         });
     }
 
+    @Override
+    public Set<Long> findUnusedBookIds() {
+        return bookJpaRepository.findUnusedBookIds();
+    }
+
 }

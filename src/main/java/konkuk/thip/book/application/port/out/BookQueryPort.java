@@ -4,6 +4,8 @@ import konkuk.thip.book.application.port.out.dto.BookQueryDto;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 
+import java.util.Set;
+
 public interface BookQueryPort {
 
     boolean existsSavedBookByUserIdAndBookId(Long userId, Long bookId);
@@ -13,4 +15,6 @@ public interface BookQueryPort {
     CursorBasedList<BookQueryDto> findSavedBooksBySavedAt(Long userId, Cursor cursor);
 
     CursorBasedList<BookQueryDto> findJoiningRoomsBooksByRoomPercentage(Long userId, Cursor cursor);
+
+    Set<Long> findUnusedBookIds();
 }
