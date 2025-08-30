@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,8 +30,8 @@ public class FeedShowSavedListService implements FeedSavedListUseCase {
         // 1. 커서 생성
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
-        // 2. 유저가 저장한 책 최신순으로 (페이징 처리 포함)
-        CursorBasedList<FeedQueryDto> result = feedQueryPort.findSavedFeedsByCreatedAt(userId, nextCursor);
+        // 2. 유저가 저장한 피드 최신순으로 (페이징 처리 포함)
+        CursorBasedList<FeedQueryDto> result = feedQueryPort.findSavedFeedsBySavedAt(userId, nextCursor);
         Set<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
                 .collect(Collectors.toUnmodifiableSet());
