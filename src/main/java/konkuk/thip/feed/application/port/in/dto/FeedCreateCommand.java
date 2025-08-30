@@ -12,6 +12,8 @@ public record FeedCreateCommand(
 
         List<String> tagList,
 
+        List<String> imageUrls,
+
         Long userId
 )
 {

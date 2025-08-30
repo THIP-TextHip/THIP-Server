@@ -3,7 +3,6 @@ package konkuk.thip.feed.adapter.in.web;
 import com.jayway.jsonpath.JsonPath;
 import konkuk.thip.common.util.EnumMappings;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.config.TestS3MockConfig;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.domain.value.Alias;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-@Import(TestS3MockConfig.class)
 @DisplayName("[통합] 피드 작성을 위한 화면 조회 api 통합 테스트")
 class FeedShowWriteInfoApiTest {
 

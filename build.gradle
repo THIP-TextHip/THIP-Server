@@ -78,6 +78,10 @@ dependencies {
 
 	// Spring Boot Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Transliterator
+    implementation 'com.ibm.icu:icu4j:73.1'
+
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

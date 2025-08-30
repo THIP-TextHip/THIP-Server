@@ -23,7 +23,10 @@ public record FeedCreateRequest(
         Boolean isPublic,
 
         @Schema(description = "피드에 추가할 태그들", example = "[\"한국소설\", \"외국소설\", \"시\"]")
-        List<String> tagList
+        List<String> tagList,
+
+        @Schema(description = "피드에 추가할 이미지들", example = "[\"https://img.domain.com/1.jpg\", \"https://img.domain.com/2.jpg\"]")
+        List<String> imageUrls
 ) {
         public FeedCreateCommand toCommand(Long userId) {
                 return new FeedCreateCommand(
@@ -31,6 +34,7 @@ public record FeedCreateRequest(
                         contentBody,
                         isPublic,
                         tagList,
+                        imageUrls,
                         userId
                 );
         }
