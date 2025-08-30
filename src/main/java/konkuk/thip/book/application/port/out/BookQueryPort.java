@@ -13,4 +13,6 @@ public interface BookQueryPort {
     CursorBasedList<BookQueryDto> findSavedBooksBySavedAt(Long userId, Cursor cursor);
 
     CursorBasedList<BookQueryDto> findJoiningRoomsBooksByRoomPercentage(Long userId, Cursor cursor);
+
+    Set<Long> findUnusedBookIds();
 }
