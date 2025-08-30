@@ -5,22 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.config.TestS3MockConfig;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,7 +28,7 @@ import java.util.Map;
 
 import static konkuk.thip.feed.domain.value.Tag.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-@Import(TestS3MockConfig.class)
 @DisplayName("[통합] 피드 생성 api 통합 테스트")
 class FeedCreateApiTest {
 
@@ -68,13 +63,6 @@ class FeedCreateApiTest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
     }
 
-    @AfterEach
-    void tearDown() {
-        feedJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("isbn 에 해당하는 책이 DB에 존재할 때, 해당 책과 연관된 피드를 생성할 수 있다.")
     void createFeedWithBookExistsInDB() throws Exception {
@@ -87,19 +75,17 @@ class FeedCreateApiTest {
         request.put("contentBody", "이 책 정말 좋아요.");
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
-
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request",                     // requestPart name
-                "",                            // 빈 파일명
-                MediaType.APPLICATION_JSON_VALUE,  // Content type
-                objectMapper.writeValueAsBytes(request) // 우릴 JSON 바이트로
-        );
+        request.put("imageUrls", List.of(
+                "https://mock-s3-bucket/fake-image-url1.jpg",
+                "https://mock-s3-bucket/fake-image-url2.jpg"
+        ));
 
         // when
-        ResultActions result = mockMvc.perform(multipart("/feeds")
-                        .file(requestPart)
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                        .requestAttr("userId", user.getUserId()));
+        ResultActions result = mockMvc.perform(post("/feeds")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .requestAttr("userId", user.getUserId())
+                       .content(objectMapper.writeValueAsString(request)));
+
 
         // then
         result.andExpect(status().isOk())
@@ -131,18 +117,11 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request",                     // requestPart name
-                "",                            // 빈 파일명
-                MediaType.APPLICATION_JSON_VALUE,  // Content type
-                objectMapper.writeValueAsBytes(request) // 우릴 JSON 바이트로
-        );
-
         // when
-        ResultActions result = mockMvc.perform(multipart("/feeds")
-                .file(requestPart)
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                .requestAttr("userId", user.getUserId()));
+        ResultActions result = mockMvc.perform(post("/feeds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .requestAttr("userId", user.getUserId())
+                .content(objectMapper.writeValueAsString(request)));
 
         // then
         result.andExpect(status().isOk())
@@ -182,25 +161,16 @@ class FeedCreateApiTest {
         request.put("contentBody", "이미지 테스트 피드");
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
-
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request", "", MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
-
-        MockMultipartFile image1 = new MockMultipartFile("images", "img1.png", "image/png", "data1".getBytes());
-        MockMultipartFile image2 = new MockMultipartFile("images", "img2.jpg", "image/jpeg", "data2".getBytes());
-        MockMultipartFile image3 = new MockMultipartFile("images", "img3.jpeg", "image/jpeg", "data3".getBytes());
+        request.put("imageUrls", List.of(
+                "https://mock-s3-bucket/fake-image-url1.jpg",
+                "https://mock-s3-bucket/fake-image-url2.jpg"
+        ));
 
         // when
-        ResultActions result = mockMvc.perform(multipart("/feeds")
-                .file(requestPart)
-                .file(image1)
-                .file(image2)
-                .file(image3)
+        ResultActions result = mockMvc.perform(post("/feeds")
+                .contentType(MediaType.APPLICATION_JSON)
                 .requestAttr("userId", user.getUserId())
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-        );
+                .content(objectMapper.writeValueAsString(request)));
 
         // then
         result.andExpect(status().isOk())
@@ -219,12 +189,11 @@ class FeedCreateApiTest {
         assertThat(feedJpaEntity.getPostId()).isEqualTo(postId);
 
         // Content 검증
-        assertThat(feedJpaEntity.getContentList()).hasSize(3);
+        assertThat(feedJpaEntity.getContentList()).hasSize(2);
         assertThat(feedJpaEntity.getContentList())
                 .containsExactlyInAnyOrder(
-                        "https://mock-s3-bucket/fake-image-url.jpg",
-                        "https://mock-s3-bucket/fake-image-url.jpg",
-                        "https://mock-s3-bucket/fake-image-url.jpg"
+                        "https://mock-s3-bucket/fake-image-url1.jpg",
+                        "https://mock-s3-bucket/fake-image-url2.jpg"
                 );
 
     }
@@ -241,18 +210,12 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
 
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request", "",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
-
         // when
-        ResultActions result = mockMvc.perform(multipart("/feeds")
-                .file(requestPart)
+        ResultActions result = mockMvc.perform(post("/feeds")
+                .contentType(MediaType.APPLICATION_JSON)
                 .requestAttr("userId", user.getUserId())
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-        );
+                .content(objectMapper.writeValueAsString(request)));
+
 
         // then
         result.andExpect(status().isOk())
@@ -280,17 +243,12 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
 
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request", "", MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
-
         // when
-        ResultActions result = mockMvc.perform(multipart("/feeds")
-                .file(requestPart)
+        ResultActions result = mockMvc.perform(post("/feeds")
+                .contentType(MediaType.APPLICATION_JSON)
                 .requestAttr("userId", user.getUserId())
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-        );
+                .content(objectMapper.writeValueAsString(request)));
+
 
         // then
         result.andExpect(status().isOk())
@@ -325,18 +283,12 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of());  // 태그 없음
 
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request", "",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request)
-        );
-
         // when
-        ResultActions result = mockMvc.perform(multipart("/feeds")
-                .file(requestPart)
+        ResultActions result = mockMvc.perform(post("/feeds")
+                .contentType(MediaType.APPLICATION_JSON)
                 .requestAttr("userId", user.getUserId())
-                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-        );
+                .content(objectMapper.writeValueAsString(request)));
+
 
         // then
         result.andExpect(status().isOk())
