@@ -55,10 +55,10 @@ class BookGetSelectableListApiTest {
     @AfterEach
     void tearDown() {
         roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
+        roomJpaRepository.deleteAllInBatch();
         savedBookJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     private RoomJpaEntity saveScienceRoomWithBookIsbn(String isbn, String roomName, double roomPercentage) {
