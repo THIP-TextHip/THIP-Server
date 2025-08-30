@@ -6,5 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface FeedCreateUseCase {
-    Long createFeed(FeedCreateCommand command, List<MultipartFile> images);
+    Long createFeed(FeedCreateCommand command);
 }
