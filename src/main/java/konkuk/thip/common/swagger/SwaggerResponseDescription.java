@@ -193,11 +193,11 @@ public enum SwaggerResponseDescription {
             CONTENT_LIST_SIZE_OVERFLOW,
             TAG_SHOULD_BE_UNIQUE,
             TAG_LIST_SIZE_OVERFLOW,
-            BOOK_NAVER_API_PARSING_ERROR,
-            BOOK_NAVER_API_ISBN_NOT_FOUND,
-            EMPTY_FILE_EXCEPTION,
-            EXCEPTION_ON_IMAGE_UPLOAD,
-            INVALID_FILE_EXTENSION
+            BOOK_NAVER_API_PARSING_ERROR
+    ))),
+    FEED_IMAGE_UPLOAD(new LinkedHashSet<>(Set.of(
+            INVALID_FILE_EXTENSION,
+            FILE_SIZE_OVERFLOW
     ))),
     FEED_UPDATE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
