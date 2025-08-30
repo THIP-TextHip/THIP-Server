@@ -21,6 +21,7 @@ import java.util.Map;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,11 +48,9 @@ class FeedCreateControllerTest {
     }
 
     private void assertBadRequest_InvalidFeedCreate(Map<String, Object> request, String message, int errorCode) throws Exception {
-        mockMvc.perform(multipart("/feeds")
-                        .file(new MockMultipartFile(
-                                "request", "", MediaType.APPLICATION_JSON_VALUE,
-                                objectMapper.writeValueAsBytes(request)))
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        mockMvc.perform(post("/feeds")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(request))
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(errorCode))
@@ -59,16 +58,15 @@ class FeedCreateControllerTest {
     }
 
     private void assertBadRequest_InvalidParam(Map<String, Object> request, String message) throws Exception {
-        mockMvc.perform(multipart("/feeds")
-                        .file(new MockMultipartFile(
-                                "request", "", MediaType.APPLICATION_JSON_VALUE,
-                                objectMapper.writeValueAsBytes(request)))
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        mockMvc.perform(post("/feeds")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(request))
                         .requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString(message)));
     }
+
 
     @Nested
     @DisplayName("기본 필드 검증")
@@ -130,27 +128,17 @@ class FeedCreateControllerTest {
         @DisplayName("이미지가 3개 초과되면 400 반환")
         void tooManyImages() throws Exception {
             Map<String, Object> req = buildValidRequest();
-            MockMultipartFile requestPart = new MockMultipartFile(
-                    "request", "", MediaType.APPLICATION_JSON_VALUE,
-                    objectMapper.writeValueAsBytes(req)
-            );
-
-            // 이미지 4개 세팅
-            List<MockMultipartFile> images = List.of(
-                    new MockMultipartFile("images", "img1.jpg", MediaType.IMAGE_JPEG_VALUE, "1".getBytes()),
-                    new MockMultipartFile("images", "img2.jpg", MediaType.IMAGE_JPEG_VALUE, "2".getBytes()),
-                    new MockMultipartFile("images", "img3.jpg", MediaType.IMAGE_JPEG_VALUE, "3".getBytes()),
-                    new MockMultipartFile("images", "img4.jpg", MediaType.IMAGE_JPEG_VALUE, "4".getBytes())
-            );
+            req.put("imageUrls", List.of(
+                    "https://mock-s3-bucket/fake-image-url1.jpg",
+                    "https://mock-s3-bucket/fake-image-url2.jpg",
+                    "https://mock-s3-bucket/fake-image-url3.jpg",
+                    "https://mock-s3-bucket/fake-image-url4.jpg"
+            ));
 
             ResultActions result = mockMvc.perform(multipart("/feeds")
-                    .file(requestPart)
-                    .file(images.get(0))
-                    .file(images.get(1))
-                    .file(images.get(2))
-                    .file(images.get(3))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(req))
                     .requestAttr("userId", 1L)
-                    .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
             );
 
             result.andExpect(status().isBadRequest())
