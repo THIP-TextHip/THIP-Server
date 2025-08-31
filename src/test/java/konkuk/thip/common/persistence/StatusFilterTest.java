@@ -65,7 +65,6 @@ public class StatusFilterTest {
 
     @Test
     @DisplayName("spring data jpa의 기본 findById 메서드는 PK를 기준으로만 조회하므로 status 필터링이 적용되지 않는다.")
-    @Transactional  // filter를 활성화 하기 위한 트랜잭션 어노테이션
     void default_find_by_id_method_does_not_execute_filtering() throws Exception {
         //given
         UserJpaEntity activeUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "activeUser"));
@@ -86,7 +85,6 @@ public class StatusFilterTest {
 
     @Test
     @DisplayName("jpa repository에 정의한 custom 메서드는 status 필터링이 적용된다.")
-    @Transactional  // filter를 활성화 하기 위한 트랜잭션 어노테이션
     void custom_find_active_by_id_method_does_execute_filtering() throws Exception {
         //given
         UserJpaEntity activeUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "activeUser"));
