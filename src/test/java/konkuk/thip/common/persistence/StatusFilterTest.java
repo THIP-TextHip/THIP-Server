@@ -1,8 +1,9 @@
-package konkuk.thip.common.util;
+package konkuk.thip.common.persistence;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
+import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.StatusFilterTestConfig;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
