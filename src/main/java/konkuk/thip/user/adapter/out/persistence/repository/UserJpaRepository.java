@@ -13,6 +13,7 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long>, U
     Optional<UserJpaEntity> findByUserId(Long userId);
 
     Optional<UserJpaEntity> findByOauth2Id(String oauth2Id);
+
     boolean existsByNickname(String nickname);
 
     boolean existsByNicknameAndUserIdNot(String nickname, Long userId);

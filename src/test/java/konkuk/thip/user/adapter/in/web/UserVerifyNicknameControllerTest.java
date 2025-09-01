@@ -2,6 +2,7 @@ package konkuk.thip.user.adapter.in.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -40,12 +42,12 @@ class UserVerifyNicknameControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private UserJpaRepository userJpaRepository;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @AfterEach
     void tearDown() {
-        userJpaRepository.deleteAll();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test
@@ -146,5 +148,32 @@ class UserVerifyNicknameControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(API_INVALID_PARAM.getCode()))
                 .andExpect(jsonPath("$.message", containsString("닉네임은 최대 10자 입니다.")));
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴한(= soft delete 처리된) 유저의 닉네임 정보를 포함해서 중복 검증을 수행한다.")
+    void verify_nickname_with_soft_delete_users() throws Exception {
+        //given
+        UserJpaEntity deleteUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "노성준"));
+        jdbcTemplate.update(
+                "UPDATE users SET status = ? WHERE user_id = ?",
+                StatusType.INACTIVE.name(), deleteUser.getUserId());
+
+        UserVerifyNicknameRequest request = new UserVerifyNicknameRequest("노성준");
+
+        //when
+        ResultActions result = mockMvc.perform(post("/users/nickname")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        //then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isVerified").exists());
+
+        String json = result.andReturn().getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(json);
+        boolean isVerified = jsonNode.path("data").path("isVerified").asBoolean();
+
+        assertThat(isVerified).isFalse();       // 닉네임 중복으로 인해 isVerified == false
     }
 }
