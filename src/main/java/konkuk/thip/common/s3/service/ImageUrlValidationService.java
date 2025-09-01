@@ -31,6 +31,9 @@ public class ImageUrlValidationService {
             // 2. 도메인 이후의 key 추출
             String key = url.substring(cloudFrontBaseUrl.length());
             // 3. key를 '/'로 분리
+            if (key.startsWith("/")) {
+                key = key.substring(1);  // 맨 앞 슬래시 제거
+            }
             String[] parts = key.split("/");
 
             // 4. 경로 구조 확인

@@ -131,10 +131,10 @@ class FeedCreateControllerTest {
         void tooManyImages() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("imageUrls", List.of(
-                    cloudFrontBaseUrl + "feed/1/250901/uuid-file1.jpg",
-                    cloudFrontBaseUrl + "feed/1/250901/uuid-file2.jpg",
-                    cloudFrontBaseUrl + "feed/1/250901/uuid-file3.jpg",
-                    cloudFrontBaseUrl + "feed/1/250901/uuid-file4.jpg"
+                    cloudFrontBaseUrl + "/feed/1/250901/uuid-file1.jpg",
+                    cloudFrontBaseUrl + "/feed/1/250901/uuid-file2.jpg",
+                    cloudFrontBaseUrl + "/feed/1/250901/uuid-file3.jpg",
+                    cloudFrontBaseUrl + "/feed/1/250901/uuid-file4.jpg"
             ));
 
             ResultActions result = mockMvc.perform(post("/feeds")
@@ -189,7 +189,7 @@ class FeedCreateControllerTest {
         void userIdMismatch() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("imageUrls", List.of(
-                    cloudFrontBaseUrl + "feed/999/250901/uuid-file.jpg" // userId 999는 요청 userId 1과 불일치
+                    cloudFrontBaseUrl + "/feed/999/250901/uuid-file.jpg" // userId 999는 요청 userId 1과 불일치
             ));
 
             mockMvc.perform(post("/feeds")

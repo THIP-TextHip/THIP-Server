@@ -80,8 +80,8 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
         request.put("imageUrls", List.of(
-                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
-                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
+                cloudFrontBaseUrl + "/feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
+                cloudFrontBaseUrl + "/feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
         ));
 
         // when
@@ -166,8 +166,8 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
         request.put("imageUrls", List.of(
-                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
-                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
+                cloudFrontBaseUrl + "/feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
+                cloudFrontBaseUrl + "/feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
         ));
 
         // when
@@ -196,8 +196,8 @@ class FeedCreateApiTest {
         assertThat(feedJpaEntity.getContentList()).hasSize(2);
         assertThat(feedJpaEntity.getContentList())
                 .containsExactlyInAnyOrder(
-                        cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
-                        cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
+                        cloudFrontBaseUrl + "/feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
+                        cloudFrontBaseUrl + "/feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
                 );
 
     }
