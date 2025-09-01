@@ -3,16 +3,18 @@ package konkuk.thip.feed.adapter.out.s3;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.ibm.icu.text.Transliterator;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.feed.adapter.in.web.request.FeedUploadImagePresignedUrlRequest;
 import konkuk.thip.feed.adapter.in.web.response.FeedUploadImagePresignedUrlResponse;
+import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,10 +36,13 @@ public class S3Service {
     private final AmazonS3 amazonS3;
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; //5MB
-    private static final long URL_EXPIRED_TIME = 5 * 60 * 1000; //5분
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long URL_EXPIRED_TIME = 5 * 60 * 1000; // 5분
 
-    public FeedUploadImagePresignedUrlResponse getPresignedUrl(List<FeedUploadImagePresignedUrlRequest> images) {
+    public FeedUploadImagePresignedUrlResponse getPresignedUrl(List<FeedUploadImagePresignedUrlRequest> images, Long userId) {
+
+        // 이미지 업로드 개수 검증
+        ContentList.validateImageCount(images.size());
 
         List<FeedUploadImagePresignedUrlResponse.PresignedUrlInfo> result = new ArrayList<>();
 
@@ -54,13 +59,12 @@ public class S3Service {
                 throw new BusinessException(FILE_SIZE_OVERFLOW);
             }
 
-            // 한글 파일명일 경우 영문자로 변환
-            String sanitizedFilename = Transliterator.getInstance("Hangul-Latin").transliterate(image.filename());
+            // 현재 날짜를 yyMMdd 형식으로 포맷팅
+            String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+            // 객체 key 생성 (일단 피드 생성시에만 이미지를 업로드하기때문에 나중에 더 추가되면 분기처리)
+            String key = "feed/" + userId + "/" + datePath + "/" + UUID.randomUUID() + image.filename();
 
-            // UUID 앞 10자리 + 정리된 파일명으로 객체 key 생성
-            String key = UUID.randomUUID().toString().substring(0, 10) + sanitizedFilename;
-
-            // url 유효기간 설정하기(1시간)
+            // url 유효기간 설정하기(5분)
             Date expiration = getExpiration();
 
             // presigned url 생성하기
@@ -83,7 +87,8 @@ public class S3Service {
         return new GeneratePresignedUrlRequest(bucket, fileName)
                 .withMethod(HttpMethod.PUT)
                 .withKey(fileName)
-                .withExpiration(expiration);
+                .withExpiration(expiration)
+                .withContentType(determineMimeTypeFromExtension(fileName));
     }
 
     private static Date getExpiration() {
@@ -93,4 +98,16 @@ public class S3Service {
         expiration.setTime(expTimeMillis);
         return expiration;
     }
+
+    private String determineMimeTypeFromExtension(String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+        return switch (extension) {
+            case "png" -> "image/png";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "gif" -> "image/gif";
+            default ->  throw new BusinessException(INVALID_FILE_EXTENSION);
+        };
+    }
+
+
 }
