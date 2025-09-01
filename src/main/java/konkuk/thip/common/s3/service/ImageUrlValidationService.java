@@ -44,8 +44,12 @@ public class ImageUrlValidationService {
 
             // 5. userId와 비교
             String userIdInUrl = parts[1];
-            Long userIdFromUrl = Long.parseLong(userIdInUrl);
-            if (!userIdFromUrl.equals(currentUserId)) {
+            try {
+                Long userIdFromUrl = Long.parseLong(userIdInUrl);
+                if (!userIdFromUrl.equals(currentUserId)) {
+                    throw new BusinessException(URL_USER_ID_MISMATCH);
+                }
+            } catch (NumberFormatException e) {
                 throw new BusinessException(URL_USER_ID_MISMATCH);
             }
         }
