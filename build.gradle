@@ -83,9 +83,6 @@ dependencies {
 	implementation "org.flywaydb:flyway-core"
 	implementation "org.flywaydb:flyway-mysql"
 
-    // Transliterator
-    implementation 'com.ibm.icu:icu4j:73.1'
-
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
