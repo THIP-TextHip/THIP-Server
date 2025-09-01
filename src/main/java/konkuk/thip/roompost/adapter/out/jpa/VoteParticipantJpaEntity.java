@@ -18,11 +18,11 @@ public class VoteParticipantJpaEntity extends BaseJpaEntity {
     @Column(name = "vote_participant_id")
     private Long voteParticipantId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vote_item_id", nullable = false)
     private VoteItemJpaEntity voteItemJpaEntity;
 

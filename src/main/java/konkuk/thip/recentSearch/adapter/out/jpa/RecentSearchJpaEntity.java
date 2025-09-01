@@ -26,7 +26,7 @@ public class RecentSearchJpaEntity extends BaseJpaEntity {
     @Column(nullable = false)
     private RecentSearchType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 }

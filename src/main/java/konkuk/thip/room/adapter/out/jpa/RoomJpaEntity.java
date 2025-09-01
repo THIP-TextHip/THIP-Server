@@ -50,7 +50,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(name = "member_count",nullable = false)
     private int memberCount = 1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
 

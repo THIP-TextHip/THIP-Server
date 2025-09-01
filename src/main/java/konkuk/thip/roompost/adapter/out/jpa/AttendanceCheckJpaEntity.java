@@ -24,11 +24,11 @@ public class AttendanceCheckJpaEntity extends BaseJpaEntity {
     @Column(name = "today_comment",length = 100, nullable = false)
     private String todayComment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
     private RoomJpaEntity roomJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 

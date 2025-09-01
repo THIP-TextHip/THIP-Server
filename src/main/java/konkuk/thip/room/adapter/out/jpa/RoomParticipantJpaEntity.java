@@ -31,14 +31,14 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
     private double userPercentage = 0.0;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "room_participant_role",nullable = false)
+    @Column(name = "room_participant_role", nullable = false)
     private RoomParticipantRole roomParticipantRole;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
     private RoomJpaEntity roomJpaEntity;
 
