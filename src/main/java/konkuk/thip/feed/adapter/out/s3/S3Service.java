@@ -74,7 +74,7 @@ public class S3Service {
             URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
 
             // 업로드 후 접근 가능한 파일 URL
-            String fileUrl = cloudFrontBaseUrl + key;
+            String fileUrl = cloudFrontBaseUrl + "/" + key;
 
             result.add(new FeedUploadImagePresignedUrlResponse.PresignedUrlInfo(url.toExternalForm(), fileUrl));
         }
