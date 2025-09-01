@@ -53,8 +53,10 @@ public class FeedCommandController {
     )
     @ExceptionDescription(FEED_IMAGE_UPLOAD)
     @PostMapping("/feeds/images/presigned-url")
-    public BaseResponse<FeedUploadImagePresignedUrlResponse> getPresignedUrls(@RequestBody List<FeedUploadImagePresignedUrlRequest> request) {
-        return BaseResponse.ok(s3Service.getPresignedUrl(request));
+    public BaseResponse<FeedUploadImagePresignedUrlResponse> getPresignedUrls(
+            @RequestBody @Valid final List<FeedUploadImagePresignedUrlRequest> request,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(s3Service.getPresignedUrl(request,userId));
     }
 
     @Operation(
