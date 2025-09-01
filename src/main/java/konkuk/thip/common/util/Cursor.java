@@ -75,6 +75,10 @@ public class Cursor {
         return getAs(index, Integer::parseInt, "Integer");
     }
 
+    public Double getDouble(int index) {
+        return getAs(index, Double::parseDouble, "Double");
+    }
+
     public String getString(int index) {
         return get(index);
     }

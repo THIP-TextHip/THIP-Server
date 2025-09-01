@@ -84,6 +84,10 @@ dependencies {
 
     // AOP
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// Flyway
+	implementation "org.flywaydb:flyway-core"
+	implementation "org.flywaydb:flyway-mysql"
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

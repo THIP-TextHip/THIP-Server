@@ -11,17 +11,15 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
+import konkuk.thip.room.application.port.out.dto.QRoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.QRoomQueryDto;
+import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.value.Category;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -197,66 +195,54 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public Page<RoomGetHomeJoinedListResponse.JoinedRoomInfo> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
+    public List<RoomParticipantQueryDto> findHomeJoinedRoomsByUserPercentage(
+            Long userId,
+            Double userPercentageCursor,
+            LocalDate startDateCursor,
+            Long roomIdCursor,
+            int pageSize) {
 
-        QRoomParticipantJpaEntity userRoomSub = new QRoomParticipantJpaEntity("userRoomSub");
-
-        // 1. 검색 조건(where) 조립
+        // 검색 조건(where) 조립
         // 유저가 참여한 방만: userId 조건
         // 활동 기간 중인 방만: startDate ≤ today ≤ endDate
         BooleanBuilder where = new BooleanBuilder();
         where.and(participant.userJpaEntity.userId.eq(userId));
-        where.and(room.startDate.loe(date));
-        where.and(room.endDate.goe(date));
+        where.and(room.startDate.loe(LocalDate.now()));
+        where.and(room.endDate.goe(LocalDate.now()));
 
-        // 2. 페이징된 목록 조회
-        List<Tuple> tuples = queryFactory
-                .select(
+        // 커서 기반 추가 조건
+        if (userPercentageCursor != null && startDateCursor != null && roomIdCursor != null) {
+            where.and(participant.userPercentage.lt(userPercentageCursor)
+                            .or(participant.userPercentage.eq(userPercentageCursor)
+                                            .and(room.startDate.gt(startDateCursor))
+                                            .or(participant.userPercentage.eq(userPercentageCursor)
+                                                    .and(room.startDate.eq(startDateCursor))
+                                                    .and(room.roomId.gt(roomIdCursor))
+                                            )
+                            )
+            );
+        }
+
+        return queryFactory
+                .select(new QRoomParticipantQueryDto(
                         room.roomId,
                         book.imageUrl,
                         room.title,
                         room.memberCount,
-                        room.recruitCount,
-                        room.startDate,
-                        book.title,
-                        participant.userPercentage
-                )
+                        participant.userPercentage,
+                        room.startDate
+                ))
                 .from(participant)
                 .join(participant.roomJpaEntity, room)
                 .join(room.bookJpaEntity, book)
                 .where(where)
                 .orderBy(
                         participant.userPercentage.desc(), // 진행률 높은 순(내림차순)
-                        room.startDate.asc() // 진행률 같으면 활동 시작일 빠른 순 (오름차순)
+                        room.startDate.asc(), // 진행률 같으면 활동 시작일 빠른 순 (오름차순)
+                        room.roomId.asc() // 둘 다 같으면 방 아이디 작은 순 (오름차순)
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .limit(pageSize + 1)
                 .fetch();
-        // TODO : 추후에 오프셋 페이징이 아니라, 키셋 페이징 기법 도입 검토
-
-        // 3. Tuple → DTO 매핑
-        List<RoomGetHomeJoinedListResponse.JoinedRoomInfo> content = tuples.stream()
-                .map(t -> RoomGetHomeJoinedListResponse.JoinedRoomInfo.builder()
-                        .roomId(t.get(room.roomId))
-                        .bookImageUrl(t.get(book.imageUrl))
-                        .roomTitle(t.get(room.title))
-                        .memberCount(t.get(room.memberCount))
-                        .userPercentage(t.get(participant.userPercentage).intValue())
-                        .build()
-                )
-                .toList();
-
-        // 4. 전체 개수 조회 (페이징 정보 계산용)
-        Long totalCount = queryFactory
-                .select(participant.count())
-                .from(participant)
-                .join(participant.roomJpaEntity, room)
-                .where(where)
-                .fetchOne();
-        long total = (totalCount != null) ? totalCount : 0L;
-
-        // 5. PageImpl 생성하여 반환
-        return new PageImpl<>(content, pageable, total);
     }
 
     // 1) 모집중인 방

@@ -1,8 +1,10 @@
 package konkuk.thip.book.application.mapper;
 
 import konkuk.thip.book.adapter.in.web.response.BookRecruitingRoomsResponse;
-import konkuk.thip.book.application.port.in.dto.BookSelectableResult;
-import konkuk.thip.book.application.port.in.dto.BookShowSavedInfoResult;
+import konkuk.thip.book.adapter.in.web.response.BookSelectableListResponse;
+import konkuk.thip.book.adapter.in.web.response.BookShowSavedListResponse;
+import konkuk.thip.book.application.port.in.dto.BookPinResult;
+import konkuk.thip.book.application.port.out.dto.BookQueryDto;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
@@ -27,25 +29,18 @@ public interface BookQueryMapper {
 
     List<BookRecruitingRoomsResponse.BookRecruitingRoomDto> toRecruitingRoomDtoList(List<RoomQueryDto> roomDtos);
 
-    @Mapping(target = "bookId", source = "book.id")
     @Mapping(target = "bookTitle", source = "book.title")
     @Mapping(target = "authorName", source = "book.authorName")
-    @Mapping(target = "publisher", source = "book.publisher")
     @Mapping(target = "bookImageUrl", source = "book.imageUrl")
     @Mapping(target = "isbn", source = "book.isbn")
-    BookSelectableResult toBookSelectableResult(Book book);
+    BookPinResult toBookPinResult(Book book);
 
-    List<BookSelectableResult> toBookSelectableResultList(List<Book> books);
-
-
-    @Mapping(target = "bookId", source = "book.id")
-    @Mapping(target = "bookTitle", source = "book.title")
-    @Mapping(target = "authorName", source = "book.authorName")
-    @Mapping(target = "publisher", source = "book.publisher")
-    @Mapping(target = "bookImageUrl", source = "book.imageUrl")
-    @Mapping(target = "isbn", source = "book.isbn")
     @Mapping(target = "isSaved", constant = "true")
-    BookShowSavedInfoResult toBookShowSavedInfoResult(Book book);
+    BookShowSavedListResponse.BookShowSavedDto toBookShowSavedDto(BookQueryDto dto);
 
-    List<BookShowSavedInfoResult> toBookShowSavedInfoResultList(List<Book> savedBookList);
+    List<BookShowSavedListResponse.BookShowSavedDto> toBookShowSavedListResponse(List<BookQueryDto> dtos);
+
+    BookSelectableListResponse.BookSelectableDto  toBookSelectableDto(BookQueryDto dto);
+
+    List<BookSelectableListResponse.BookSelectableDto> toBookSelectableListResponse(List<BookQueryDto> contents);
 }

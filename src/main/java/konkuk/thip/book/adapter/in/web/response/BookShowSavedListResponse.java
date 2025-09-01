@@ -1,13 +1,23 @@
 package konkuk.thip.book.adapter.in.web.response;
 
-import konkuk.thip.book.application.port.in.dto.BookShowSavedInfoResult;
-
 import java.util.List;
 
 public record BookShowSavedListResponse(
-        List<BookShowSavedInfoResult> bookList
+        List<BookShowSavedDto> bookList,
+        String nextCursor,
+        boolean isLast
 ) {
-    public static BookShowSavedListResponse of(List<BookShowSavedInfoResult> bookSavedInfoResultList) {
-        return new BookShowSavedListResponse(bookSavedInfoResultList);
+    public record BookShowSavedDto(
+            Long bookId,
+            String bookTitle,
+            String authorName,
+            String publisher,
+            String bookImageUrl,
+            String isbn,
+            boolean isSaved
+    ) {
+    }
+    public static BookShowSavedListResponse of(List<BookShowSavedDto> bookList, String nextCursor, boolean isLast) {
+        return new BookShowSavedListResponse(bookList, nextCursor, isLast);
     }
 }

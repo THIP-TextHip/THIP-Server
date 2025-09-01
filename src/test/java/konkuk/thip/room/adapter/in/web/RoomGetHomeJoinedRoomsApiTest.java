@@ -4,6 +4,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.domain.value.Category;
@@ -11,6 +12,7 @@ import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -79,6 +81,52 @@ class RoomGetHomeJoinedRoomsApiTest {
         userJpaRepository.deleteAll();
     }
 
+    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, LocalDate endDate, int recruitCount) {
+        BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
+                .title(bookTitle)
+                .isbn(isbn)
+                .authorName("한강")
+                .bestSeller(false)
+                .publisher("문학동네")
+                .imageUrl("https://image1.jpg")
+                .pageCount(300)
+                .description("한강의 소설")
+                .build());
+
+        Category category = TestEntityFactory.createScienceCategory();
+
+        return roomJpaRepository.save(RoomJpaEntity.builder()
+                .title(roomName)
+                .description("한강 작품 읽기 모임")
+                .isPublic(true)
+                .roomPercentage(0.0)
+                .startDate(startDate)
+                .endDate(endDate)
+                .recruitCount(recruitCount)
+                .bookJpaEntity(book)
+                .category(category)
+                .build());
+    }
+
+    private void changeRoomMemberCount(RoomJpaEntity roomJpaEntity, int count) {
+        roomJpaEntity.updateMemberCount(count);
+        roomJpaRepository.save(roomJpaEntity);
+    }
+
+    private void saveSingleUserToRoom(RoomJpaEntity roomJpaEntity, UserJpaEntity userJpaEntity, Double userPercentage) {
+        RoomParticipantJpaEntity roomParticipantJpaEntity = RoomParticipantJpaEntity.builder()
+                .userJpaEntity(userJpaEntity)
+                .roomJpaEntity(roomJpaEntity)
+                .roomParticipantRole(RoomParticipantRole.HOST)
+                .userPercentage(userPercentage)
+                .build();
+        roomParticipantJpaRepository.save(roomParticipantJpaEntity);
+
+        roomJpaEntity.updateMemberCount(roomJpaEntity.getMemberCount() + 1);
+        roomJpaRepository.save(roomJpaEntity);
+
+    }
+
     @Test
     @DisplayName("사용자가 참여중인 방 목록이 현재 진행되고 있는 방 중에서 진행률 내림차순, 시작일 오름차순으로 조회된다.")
     void getHomeJoinedRooms_success() throws Exception {
@@ -88,16 +136,14 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/home/joined")
-                .requestAttr("userId", userId)
-                .param("page", "1"));
+                .requestAttr("userId", userId));
 
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(2)))
                 .andExpect(jsonPath("$.data.nickname").exists())
-                .andExpect(jsonPath("$.data.page", is(1)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)))
+                .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 // 진행률 내림차순, 시작일 오름차순 정렬 검증
                 .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(80)))
                 .andExpect(jsonPath("$.data.roomList[1].userPercentage", is(60)))
@@ -135,12 +181,13 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // when
         ResultActions result = mockMvc.perform(get("/rooms/home/joined")
-                .requestAttr("userId", userId)
-                .param("page", "1"));
+                .requestAttr("userId", userId));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(3)))
+                .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 // 모두 진행률 70%
                 .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(70)))
                 .andExpect(jsonPath("$.data.roomList[1].userPercentage", is(70)))
@@ -174,12 +221,13 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // when
         ResultActions result = mockMvc.perform(get("/rooms/home/joined")
-                .requestAttr("userId", newUser.getUserId())
-                .param("page", "1"));
+                .requestAttr("userId", newUser.getUserId()));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(1)))
+                .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
                 .andExpect(jsonPath("$.data.roomList[0].roomId", is(activeRoom.getRoomId().intValue())))
                 .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(50)));
     }
@@ -195,15 +243,76 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/home/joined")
-                .requestAttr("userId", newUser.getUserId())
-                .param("page", "1"));
+                .requestAttr("userId", newUser.getUserId()));
 
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomList", hasSize(0)))
-                .andExpect(jsonPath("$.data.page", is(1)))
-                .andExpect(jsonPath("$.data.first", is(true)))
-                .andExpect(jsonPath("$.data.last", is(true)));
+                .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(true)));
     }
+
+    @Test
+    @DisplayName("한번에 최대 10개의 데이터만을 반환한다. 다음 페이지에 해당하는 데이터가 있을 경우, 다음 페이지의 cursor 값을 반환한다. 또한 cursor 값을 기준으로 해당 페이지의 데이터를 반환한다.")
+    void getHomeJoinedRooms_page_1() throws Exception {
+
+        //given
+        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(TestEntityFactory.createScienceAlias()));
+
+        // 방 생성 + 멤버 카운트 + 유저 참여 및 진행률 세팅
+        for (int i = 1; i < 13; i++) {
+            String isbn = "isbn" + (i + 1);
+            String title = "과학-방-" + i + "일전-활동시작";
+            LocalDate start = LocalDate.now().minusDays(i);
+            LocalDate end = LocalDate.now().plusDays(30);
+
+            RoomJpaEntity room = saveScienceRoom("모집중인방-책-" + (i + 1), isbn, title, start, end, 10);
+            changeRoomMemberCount(room, 8);
+
+            double userPercentage = 89.6 - i; // 진행률은 방번호가 작을수록 높음
+
+            saveSingleUserToRoom(room, user, userPercentage);
+        }
+
+        //when 첫 페이지 조회
+        ResultActions firstPage = mockMvc.perform(get("/rooms/home/joined")
+                .requestAttr("userId", user.getUserId()));
+
+        //then
+        firstPage.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isLast", is(false)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(10)))
+                .andExpect(jsonPath("$.data.nextCursor").exists())
+                // 정렬 조건 : 유저 진행도 순
+                .andExpect(jsonPath("$.data.roomList[0].roomTitle", is("과학-방-1일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[1].roomTitle", is("과학-방-2일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[2].roomTitle", is("과학-방-3일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[3].roomTitle", is("과학-방-4일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[4].roomTitle", is("과학-방-5일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[5].roomTitle", is("과학-방-6일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[6].roomTitle", is("과학-방-7일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[7].roomTitle", is("과학-방-8일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[8].roomTitle", is("과학-방-9일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[9].roomTitle", is("과학-방-10일전-활동시작")));
+
+        String responseBody = firstPage.andReturn().getResponse().getContentAsString();
+        String nextCursor = com.jayway.jsonpath.JsonPath.read(responseBody, "$.data.nextCursor");
+
+        //when 두번째 페이지 조회
+        ResultActions secondPage = mockMvc.perform(get("/rooms/home/joined")
+                .requestAttr("userId", user.getUserId())
+                .param("size", "10")
+                .param("cursor", nextCursor)
+        );
+
+        secondPage.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.roomList", hasSize(2)))
+                .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
+                .andExpect(jsonPath("$.data.isLast", is(true)))
+                .andExpect(jsonPath("$.data.roomList[0].roomTitle", is("과학-방-11일전-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[1].roomTitle", is("과학-방-12일전-활동시작")));
+
+    }
+
 
 }

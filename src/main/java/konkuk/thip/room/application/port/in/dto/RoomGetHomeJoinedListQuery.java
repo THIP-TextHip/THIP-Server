@@ -5,6 +5,6 @@ import lombok.Builder;
 @Builder
 public record RoomGetHomeJoinedListQuery(
         Long userId,
-        int page
+        String cursorStr
 ) {
 }
