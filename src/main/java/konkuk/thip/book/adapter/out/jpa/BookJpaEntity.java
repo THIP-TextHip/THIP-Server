@@ -22,7 +22,7 @@ public class BookJpaEntity extends BaseJpaEntity {
     @Column(length = 13, nullable = false, unique = true)
     private String isbn;
 
-    @Column(name = "author_name",length = 50, nullable = false)
+    @Column(name = "author_name", nullable = false)
     private String authorName;
 
     @Column(name = "best_seller",nullable = false)
