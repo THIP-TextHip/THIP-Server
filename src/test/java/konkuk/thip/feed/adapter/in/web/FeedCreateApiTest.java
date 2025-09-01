@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -41,6 +42,9 @@ class FeedCreateApiTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Value("${cloud.aws.s3.cloud-front-base-url}")
+    private String cloudFrontBaseUrl;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -76,8 +80,8 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue(), FOREIGN_NOVEL.getValue(), CLASSIC_LITERATURE.getValue())); //실제 태그 값
         request.put("imageUrls", List.of(
-                "https://mock-s3-bucket/fake-image-url1.jpg",
-                "https://mock-s3-bucket/fake-image-url2.jpg"
+                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
+                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
         ));
 
         // when
@@ -162,8 +166,8 @@ class FeedCreateApiTest {
         request.put("isPublic", true);
         request.put("tagList", List.of(KOREAN_NOVEL.getValue())); //실제 태그 값
         request.put("imageUrls", List.of(
-                "https://mock-s3-bucket/fake-image-url1.jpg",
-                "https://mock-s3-bucket/fake-image-url2.jpg"
+                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
+                cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
         ));
 
         // when
@@ -192,8 +196,8 @@ class FeedCreateApiTest {
         assertThat(feedJpaEntity.getContentList()).hasSize(2);
         assertThat(feedJpaEntity.getContentList())
                 .containsExactlyInAnyOrder(
-                        "https://mock-s3-bucket/fake-image-url1.jpg",
-                        "https://mock-s3-bucket/fake-image-url2.jpg"
+                        cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file1.jpg",
+                        cloudFrontBaseUrl + "feed/" + user.getUserId()+ "/250901/uuid-file2.jpg"
                 );
 
     }
