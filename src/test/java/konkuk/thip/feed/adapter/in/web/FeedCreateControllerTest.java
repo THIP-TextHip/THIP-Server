@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -31,6 +32,9 @@ class FeedCreateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Value("${cloud.aws.s3.cloud-front-base-url}")
+    private String cloudFrontBaseUrl;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -144,5 +148,58 @@ class FeedCreateControllerTest {
                     .andExpect(jsonPath("$.message",containsString(CONTENT_LIST_SIZE_OVERFLOW.getMessage())));
 
         }
+
+        @Test
+        @DisplayName("도메인 불일치 시 400 반환")
+        void invalidDomain() throws Exception {
+            Map<String, Object> req = buildValidRequest();
+            req.put("imageUrls", List.of(
+                    "https://invalid-domain.com/feed/1/250901/uuid-file.jpg" // 허용되지 않은 도메인
+            ));
+
+            mockMvc.perform(post("/feeds")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(req))
+                            .requestAttr("userId", 1L))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(URL_INVALID_DOMAIN.getCode()))
+                    .andExpect(jsonPath("$.message", containsString(URL_INVALID_DOMAIN.getMessage())));
+        }
+
+
+        @Test
+        @DisplayName("이미지 url 불일치 시 400 반환")
+        void invalidUrlForm() throws Exception {
+            Map<String, Object> req = buildValidRequest();
+            req.put("imageUrls", List.of(
+                    cloudFrontBaseUrl + "1/250901/uuid-file.jpg" // url형식이 알맞지 않음 (feed/ 생략)
+            ));
+
+            mockMvc.perform(post("/feeds")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(req))
+                            .requestAttr("userId", 1L))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(URL_INVALID_DOMAIN.getCode()))
+                    .andExpect(jsonPath("$.message", containsString(URL_INVALID_DOMAIN.getMessage())));
+        }
+
+        @Test
+        @DisplayName("userId 불일치 시 400 반환")
+        void userIdMismatch() throws Exception {
+            Map<String, Object> req = buildValidRequest();
+            req.put("imageUrls", List.of(
+                    cloudFrontBaseUrl + "feed/999/250901/uuid-file.jpg" // userId 999는 요청 userId 1과 불일치
+            ));
+
+            mockMvc.perform(post("/feeds")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsBytes(req))
+                            .requestAttr("userId", 1L))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(URL_USER_ID_MISMATCH.getCode()))
+                    .andExpect(jsonPath("$.message", containsString(URL_USER_ID_MISMATCH.getMessage())));
+        }
     }
+
 }
