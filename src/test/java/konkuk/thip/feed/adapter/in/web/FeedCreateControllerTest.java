@@ -131,10 +131,10 @@ class FeedCreateControllerTest {
         void tooManyImages() throws Exception {
             Map<String, Object> req = buildValidRequest();
             req.put("imageUrls", List.of(
-                    "https://mock-s3-bucket/fake-image-url1.jpg",
-                    "https://mock-s3-bucket/fake-image-url2.jpg",
-                    "https://mock-s3-bucket/fake-image-url3.jpg",
-                    "https://mock-s3-bucket/fake-image-url4.jpg"
+                    cloudFrontBaseUrl + "feed/1/250901/uuid-file1.jpg",
+                    cloudFrontBaseUrl + "feed/1/250901/uuid-file2.jpg",
+                    cloudFrontBaseUrl + "feed/1/250901/uuid-file3.jpg",
+                    cloudFrontBaseUrl + "feed/1/250901/uuid-file4.jpg"
             ));
 
             ResultActions result = mockMvc.perform(post("/feeds")
