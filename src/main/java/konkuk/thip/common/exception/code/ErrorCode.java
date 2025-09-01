@@ -174,6 +174,8 @@ public enum ErrorCode implements ResponseCode {
      */
     INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170001, "허용하지 않는 파일 확장자입니다."),
     FILE_SIZE_OVERFLOW(HttpStatus.BAD_REQUEST, 170002, "파일 크기가 허용 범위를 초과했습니다."),
+    URL_INVALID_DOMAIN(HttpStatus.BAD_REQUEST, 170003, "잘못된 이미지 URL 형식입니다."),
+    URL_USER_ID_MISMATCH(HttpStatus.BAD_REQUEST, 170004, "URL의 사용자 ID가 요청 사용자와 일치하지 않습니다."),
 
     /**
      * 180000 : Post error
