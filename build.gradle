@@ -79,6 +79,10 @@ dependencies {
 	// Spring Boot Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+	// Flyway
+	implementation "org.flywaydb:flyway-core"
+	implementation "org.flywaydb:flyway-mysql"
+
     // Transliterator
     implementation 'com.ibm.icu:icu4j:73.1'
 
