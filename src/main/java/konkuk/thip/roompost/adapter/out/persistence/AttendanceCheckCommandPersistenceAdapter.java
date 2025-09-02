@@ -1,6 +1,5 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.roompost.adapter.out.jpa.AttendanceCheckJpaEntity;
 import konkuk.thip.roompost.adapter.out.mapper.AttendanceCheckMapper;
 import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.AttendanceCheckJpaRepository;
@@ -29,11 +28,11 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
 
     @Override
     public Long save(AttendanceCheck attendanceCheck) {
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(attendanceCheck.getRoomId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(attendanceCheck.getRoomId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(attendanceCheck.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(attendanceCheck.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
@@ -44,13 +43,13 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
 
     @Override
     public Optional<AttendanceCheck> findById(Long id) {
-        return attendanceCheckJpaRepository.findByAttendanceCheckIdAndStatus(id, StatusType.ACTIVE)
+        return attendanceCheckJpaRepository.findByAttendanceCheckId(id)
                 .map(attendanceCheckMapper::toDomainEntity);
     }
 
     @Override
     public void delete(AttendanceCheck attendanceCheck) {
-        AttendanceCheckJpaEntity attendanceCheckJpaEntity = attendanceCheckJpaRepository.findByAttendanceCheckIdAndStatus(attendanceCheck.getId(), StatusType.ACTIVE).orElseThrow(
+        AttendanceCheckJpaEntity attendanceCheckJpaEntity = attendanceCheckJpaRepository.findByAttendanceCheckId(attendanceCheck.getId()).orElseThrow(
                 () -> new EntityNotFoundException(ATTENDANCE_CHECK_NOT_FOUND)
         );
 

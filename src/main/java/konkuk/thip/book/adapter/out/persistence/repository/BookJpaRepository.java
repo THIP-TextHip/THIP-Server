@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.Set;
 
-public interface BookJpaRepository extends JpaRepository<BookJpaEntity, Long>,BookQueryRepository {
+public interface BookJpaRepository extends JpaRepository<BookJpaEntity, Long>, BookQueryRepository {
     Optional<BookJpaEntity> findByIsbn(String isbn);
 
     boolean existsByIsbn(String isbn);

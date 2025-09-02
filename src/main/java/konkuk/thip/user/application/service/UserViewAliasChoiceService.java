@@ -7,6 +7,7 @@ import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.domain.value.Alias;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import java.util.Map;
 public class UserViewAliasChoiceService implements UserViewAliasChoiceUseCase {
 
     @Override
+    @Transactional(readOnly = true)
     public UserViewAliasChoiceResult getAllAliasesAndCategories() {
         Map<Alias, Category> aliasToCategory = EnumMappings.getAliasToCategory();
 

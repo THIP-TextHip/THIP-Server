@@ -39,7 +39,7 @@ public class CommentJpaEntity extends BaseJpaEntity {
     private int likeCount = 0;
 
     //TODO 상속구조 해지하면서 postType만 가질지, postId + postType가질지 논의 필요
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
 
@@ -47,10 +47,13 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @Column(name = "post_type", nullable = false, length = 10)
     private PostType postType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
+    /**
+     * nullable = true : 최상위 댓글인 경우 null
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;
@@ -71,5 +74,4 @@ public class CommentJpaEntity extends BaseJpaEntity {
     public void updateLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
-
 }
