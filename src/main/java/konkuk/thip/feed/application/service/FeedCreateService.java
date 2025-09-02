@@ -4,10 +4,10 @@ import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
+import konkuk.thip.common.s3.service.ImageUrlValidationService;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
-import konkuk.thip.feed.application.port.out.S3CommandPort;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
@@ -15,56 +15,40 @@ import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class FeedCreateService implements FeedCreateUseCase {
 
-    private final S3CommandPort s3CommandPort;
     private final BookCommandPort bookCommandPort;
     private final FeedCommandPort feedCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
 
+    private final ImageUrlValidationService imageUrlValidationService;
+
     @Override
     @Transactional
-    //TODO 추후 예외 발생시 이미 s3에 업로드된 이미지 삭제 방식 논의
-    public Long createFeed(FeedCreateCommand command, List<MultipartFile> images) {
+    public Long createFeed(FeedCreateCommand command) {
 
         // 1. 피드 생성 비지니스 정책 검증
         TagList.validateTags(Tag.fromList(command.tagList()));
-        // todo 나중에 presignedURL로 바꾸면 ContentList.of로 변경
-        ContentList.validateImageCount(images != null ? images.size() : 0);
+        ContentList.validateImageCount(ContentList.of(command.imageUrls()).size());
+        // 1-1. 서명된 url 검증
+        imageUrlValidationService.validateUrlDomainAndUser(command.imageUrls(),command.userId());
 
         // 2. Book 검증 및 조회
         Long targetBookId = findOrCreateBookByIsbn(command.isbn());
 
-        // 3. 이미지 업로드
-        List<String> imageUrls = null;
-        try {
-            imageUrls = (images == null || images.isEmpty())
-                    ? List.of()
-                    : s3CommandPort.uploadImages(images);
-
-            // 4. Feed 생성 및 저장 (Content도 함께 생성 및 저장 애그리거트 루트인 Feed가 생성책임 가지고있음)
-            Feed feed = Feed.withoutId(
-                    command.contentBody(),
-                    command.userId(),
-                    command.isPublic(),
-                    targetBookId,
-                    command.tagList(),
-                    imageUrls
-            );
-            return feedCommandPort.save(feed);
-
-        } catch (Exception e) {
-            if (imageUrls != null && !imageUrls.isEmpty()) {
-                s3CommandPort.deleteImages(imageUrls);
-            }
-            throw e;
-        }
+        // 3. Feed 생성 및 저장
+        Feed feed = Feed.withoutId(
+                command.contentBody(),
+                command.userId(),
+                command.isPublic(),
+                targetBookId,
+                command.tagList(),
+                command.imageUrls()
+        );
+        return feedCommandPort.save(feed);
     }
 
     /**

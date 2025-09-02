@@ -1,147 +1,113 @@
 package konkuk.thip.feed.adapter.out.s3;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.util.IOUtils;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.feed.adapter.in.web.request.FeedUploadImagePresignedUrlRequest;
+import konkuk.thip.feed.adapter.in.web.response.FeedUploadImagePresignedUrlResponse;
+import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
 
-    private final AmazonS3 amazonS3; // AWS S3 클라이언트
-
-    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
-
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    /**
-     * 유저가 업로드한 이미지 파일을 받아 S3에 저장한 후, public URL을 반환합니다.
-     * @param image 업로드할 이미지 파일
-     * @return S3의 public 이미지 URL
-     */
-    public String uploadUserImageAndGetUrl(MultipartFile image) {
-        //입력받은 이미지 파일이 빈 파일인지 검증
-        if(image.isEmpty() || Objects.isNull(image.getOriginalFilename())){
-            throw new BusinessException(EMPTY_FILE_EXCEPTION);
+    @Value("${cloud.aws.s3.cloud-front-base-url}")
+    private String cloudFrontBaseUrl;
+
+    private final AmazonS3 amazonS3;
+
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long URL_EXPIRED_TIME = 5 * 60 * 1000; // 5분
+
+    public FeedUploadImagePresignedUrlResponse getPresignedUrl(List<FeedUploadImagePresignedUrlRequest> images, Long userId) {
+
+        // 이미지 업로드 개수 검증
+        ContentList.validateImageCount(images.size());
+
+        List<FeedUploadImagePresignedUrlResponse.PresignedUrlInfo> result = new ArrayList<>();
+
+        for (FeedUploadImagePresignedUrlRequest image : images) {
+
+            // 확장자 검증
+            String ext = image.extension() == null ? "" : image.extension().toLowerCase();
+            if (!ALLOWED_EXTENSIONS.contains(ext)) {
+                throw new BusinessException(INVALID_FILE_EXTENSION);
+            }
+
+            // 파일 크기 검증
+            if (image.size() > MAX_FILE_SIZE) {
+                throw new BusinessException(FILE_SIZE_OVERFLOW);
+            }
+
+            // 현재 날짜를 yyMMdd 형식으로 포맷팅
+            String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
+            // 객체 key 생성 (일단 피드 생성시에만 이미지를 업로드하기때문에 나중에 더 추가되면 분기처리)
+            String key = "feed/" + userId + "/" + datePath + "/" + UUID.randomUUID() + image.filename();
+
+            // url 유효기간 설정하기(5분)
+            Date expiration = getExpiration();
+
+            // presigned url 생성하기
+            GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                    getPutGeneratePresignedUrlRequest(key, expiration);
+
+            URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+
+            // 업로드 후 접근 가능한 파일 URL
+            String fileUrl = cloudFrontBaseUrl + "/" + key;
+
+            result.add(new FeedUploadImagePresignedUrlResponse.PresignedUrlInfo(url.toExternalForm(), fileUrl));
         }
-        return uploadAndReturnUrl(image);
+
+        return FeedUploadImagePresignedUrlResponse.of(result);
     }
 
-    /**
-     * 이미지 파일 확장자 검증 후 S3 업로드 (실제 업로드는 내부 메서드에서 처리)
-     */
-    private String uploadAndReturnUrl(MultipartFile image) {
-        this.validateImageFileExtension(image.getOriginalFilename());
-        try {
-            return uploadImageToS3(image);
-        } catch (IOException e) {
-            throw new BusinessException(EXCEPTION_ON_IMAGE_UPLOAD);
-        }
+    // put 용 URL 생성
+    private GeneratePresignedUrlRequest getPutGeneratePresignedUrlRequest(String fileName, Date expiration) {
+        return new GeneratePresignedUrlRequest(bucket, fileName)
+                .withMethod(HttpMethod.PUT)
+                .withKey(fileName)
+                .withExpiration(expiration)
+                .withContentType(determineMimeTypeFromExtension(fileName));
     }
 
-    /**
-     * 이미지 파일 확장자가 jpg, jpeg, png, gif 중 하나인지 검증
-     */
-    private void validateImageFileExtension(String filename) {
-        int lastDotIndex = filename.lastIndexOf(".");
-        if (lastDotIndex == -1) {
-            throw new InvalidStateException(INVALID_FILE_EXTENSION);
-        }
-
-        String extension = filename.substring(lastDotIndex + 1).toLowerCase();
-
-        if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new InvalidStateException(INVALID_FILE_EXTENSION);
-        }
+    private static Date getExpiration() {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += URL_EXPIRED_TIME;
+        expiration.setTime(expTimeMillis);
+        return expiration;
     }
 
-    /**
-     * 실제 이미지를 S3에 업로드하고 public URL을 반환
-     */
-    private String uploadImageToS3(MultipartFile image) throws IOException {
-        String originalFilename = image.getOriginalFilename(); //원본 파일 명
-        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1); //확장자 명
-
-        // UUID + 원본 파일명을 합쳐 S3에 저장 (중복 방지)
-        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename;
-
-        // 이미지 파일을 바이트 배열로 변환
-        InputStream is = image.getInputStream();
-        byte[] bytes = IOUtils.toByteArray(is);
-
-        // S3 메타데이터 생성(컨텐츠타입, 길이 등)
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("image/" + extension);
-        metadata.setContentLength(bytes.length);
-
-        // 바이트 배열로부터 InputStream 생성
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-
-        try {
-            // S3에 업로드
-            amazonS3.putObject(bucket, s3FileName, byteArrayInputStream, metadata);
-
-        } catch (Exception e) {
-            throw new BusinessException(EXCEPTION_ON_IMAGE_UPLOAD);
-        } finally {
-            byteArrayInputStream.close();
-            is.close();
-        }
-
-        // 업로드 성공시에 S3 파일의 public URL 반환
-        return amazonS3.getUrl(bucket, s3FileName).toString();
+    private String determineMimeTypeFromExtension(String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+        return switch (extension) {
+            case "png" -> "image/png";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "gif" -> "image/gif";
+            default ->  throw new BusinessException(INVALID_FILE_EXTENSION);
+        };
     }
 
 
-    /**
-     * S3에 저장된 이미지를 삭제
-     * @param imageAddress 이미지 public URL (S3 경로)
-     */
-    @Async
-    public void deleteImageFromS3(String imageAddress){
-        String key = getKeyFromImageAddress(imageAddress);
-        try{
-            amazonS3.deleteObject(new DeleteObjectRequest(bucket, key));
-        }catch (Exception e){
-            log.error("Failed to delete image from S3. Key: {}, Error: {}", key, e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 이미지 public URL에서 S3 key(파일 경로) 추출
-     */
-    private String getKeyFromImageAddress(String imageAddress){
-        try{
-            URL url = new URL(imageAddress);
-            String decodingKey = URLDecoder.decode(url.getPath(), "UTF-8");
-            return decodingKey.substring(1); // 맨 앞의 '/' 제거
-        }catch (MalformedURLException | UnsupportedEncodingException e){
-            throw new BusinessException(IO_EXCEPTION_ON_IMAGE_DELETE);
-        }
-    }
 }

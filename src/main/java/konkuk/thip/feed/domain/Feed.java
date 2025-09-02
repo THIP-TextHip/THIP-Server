@@ -62,9 +62,6 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     public static Feed withoutId(String content, Long creatorId, Boolean isPublic, Long targetBookId,
                                  List<String> tagValues, List<String> imageUrls) {
 
-//        validateTags(tagValues);
-//        validateImageCount(imageUrls != null ? imageUrls.size() : 0);
-
         return Feed.builder()
                 .id(null)
                 .content(content)
@@ -92,28 +89,6 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
         return ContentList.of(imageUrls);
     }
 
-//    public static void validateTags(List<String> tagList) {
-//        boolean tagListEmpty = (tagList == null || tagList.isEmpty());
-//
-//        // 태그가 있는 경우, 개수 최대 5개 제한
-//        if (!tagListEmpty && tagList.size() > 5) {
-//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 최대 5개까지 입력할 수 있습니다."));
-//        }
-//
-//        // 태그 중복 체크
-//        if (!tagListEmpty) {
-//            long distinctCount = tagList.stream().distinct().count();
-//            if (distinctCount != tagList.size()) {
-//                throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("태그는 중복 될 수 없습니다."));
-//            }
-//        }
-//    }
-//
-//    public static void validateImageCount(int imageSize) {
-//        if (imageSize > 3) {
-//            throw new InvalidStateException(INVALID_FEED_COMMAND, new IllegalArgumentException("이미지는 최대 3개까지 업로드할 수 있습니다."));
-//        }
-//    }
 
     // 공통된 비공개 접근 권한 검증 로직
     private void validatePrivateAccessPermission(Long userId, String action) {
