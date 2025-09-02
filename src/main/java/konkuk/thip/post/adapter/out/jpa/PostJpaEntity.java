@@ -43,14 +43,6 @@ public abstract class PostJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    // 삭제용 게시물 댓글 양방향 매핑 관계
-    @OneToMany(mappedBy = "postJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<CommentJpaEntity> commentList = new ArrayList<>();
-
-    // 삭제용 게시물 좋아요 양방향 매핑 관계
-    @OneToMany(mappedBy = "postJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<PostLikeJpaEntity> postLikeList = new ArrayList<>();
-
     public PostJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity) {
         this.content = content;
         this.likeCount = likeCount;
