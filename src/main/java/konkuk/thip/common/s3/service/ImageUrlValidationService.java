@@ -1,6 +1,6 @@
 package konkuk.thip.common.s3.service;
 
-import konkuk.thip.common.annotation.HelperService;
+import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
