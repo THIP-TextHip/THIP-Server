@@ -39,10 +39,10 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
 
     @Override
     public void save(RoomParticipant roomParticipant) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(roomParticipant.getUserId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(roomParticipant.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(roomParticipant.getRoomId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(roomParticipant.getRoomId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
@@ -62,7 +62,7 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
 
     @Override
     public void update(RoomParticipant roomParticipant) {
-        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findById(roomParticipant.getId()).orElseThrow(
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findByRoomParticipantId(roomParticipant.getId()).orElseThrow(
                 () -> new EntityNotFoundException(ErrorCode.ROOM_PARTICIPANT_NOT_FOUND)
         );
 

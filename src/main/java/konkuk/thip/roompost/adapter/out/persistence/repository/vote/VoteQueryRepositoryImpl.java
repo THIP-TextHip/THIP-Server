@@ -33,7 +33,7 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
         return jpaQueryFactory
                 .select(vote)
                 .from(vote)
-                .leftJoin(vote.userJpaEntity, user).fetchJoin()
+                .join(vote.userJpaEntity, user).fetchJoin()     // vote <-> user (not null)
                 .where(
                         vote.roomJpaEntity.roomId.eq(roomId),
                         filterByType(type, vote, userId),
@@ -59,7 +59,7 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
         List<VoteJpaEntity> topVotes = jpaQueryFactory
                 .select(vote)
                 .from(vote)
-                .leftJoin(voteItem).on(voteItem.voteJpaEntity.eq(vote))
+                .join(voteItem).on(voteItem.voteJpaEntity.eq(vote))     // vote item이 없는 경우 포함 X
                 .where(vote.roomJpaEntity.roomId.eq(roomId))
                 .groupBy(vote)
                 .orderBy(voteItem.count.sum().desc())       // 해당 투표에 참여한 총 참여자 수 기준 내림차순 정렬

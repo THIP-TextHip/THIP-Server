@@ -35,6 +35,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
 	//Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
@@ -78,6 +81,9 @@ dependencies {
 
 	// Spring Boot Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 	// Flyway
 	implementation "org.flywaydb:flyway-core"

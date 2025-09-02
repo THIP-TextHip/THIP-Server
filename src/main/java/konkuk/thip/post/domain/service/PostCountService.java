@@ -1,6 +1,6 @@
 package konkuk.thip.post.domain.service;
 
-import konkuk.thip.common.annotation.DomainService;
+import konkuk.thip.common.annotation.application.DomainService;
 import konkuk.thip.common.exception.InvalidStateException;
 
 import static konkuk.thip.common.exception.code.ErrorCode.POST_LIKE_COUNT_UNDERFLOW;

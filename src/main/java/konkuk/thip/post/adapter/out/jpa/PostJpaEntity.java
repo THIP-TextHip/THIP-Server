@@ -39,7 +39,7 @@ public abstract class PostJpaEntity extends BaseJpaEntity {
     @Column(name = "dtype", insertable = false, updatable = false)
     private String dtype;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 

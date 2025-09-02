@@ -15,9 +15,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static konkuk.thip.common.entity.StatusType.ACTIVE;
+
 @Repository
 @RequiredArgsConstructor
 public class CommentQueryRepositoryImpl implements CommentQueryRepository {
+
+    /**
+     * 댓글 관련 queryDsl 코드에서는 status 값 명시해야함 (서비스 메서드에서 status filter off가 전제)
+     */
 
     private final JPAQueryFactory queryFactory;
 
@@ -26,6 +32,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     private final QCommentJpaEntity parentComment = new QCommentJpaEntity("parentComment");
     private final QUserJpaEntity parentCommentCreator = new QUserJpaEntity("parentCommentCreator");
 
+    // 최상위 댓글 조회 (삭제된 댓글 포함, 최신순, 페이징)
     @Override
     public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size) {
         // 최상위 댓글(size+1) 프로젝션 생성
@@ -44,6 +51,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         BooleanExpression whereClause = comment.postJpaEntity.postId.eq(postId)
                 .and(comment.postJpaEntity.dtype.eq(postTypeStr))       // dType 필터링 추가
                 .and(comment.parent.isNull())       // 게시글의 최상위 댓글 조회
+                .and(commentCreator.status.eq(ACTIVE))  // 댓글 작성자 ACTIVE
                 .and(lastCreatedAt != null      // 최신순 정렬
                         ? comment.createdAt.lt(lastCreatedAt)
                         : Expressions.TRUE
@@ -53,7 +61,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         return queryFactory
                 .select(proj)
                 .from(comment)
-                .leftJoin(comment.userJpaEntity, commentCreator)
+                .join(comment.userJpaEntity, commentCreator)
                 .where(whereClause)
                 .orderBy(comment.createdAt.desc())
                 .limit(size + 1)        // size + 1 개 조회
@@ -89,10 +97,11 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                     .from(comment)
                     .leftJoin(comment.parent, parentComment)
                     .leftJoin(parentComment.userJpaEntity, parentCommentCreator)
-                    .leftJoin(comment.userJpaEntity, commentCreator)
+                    .join(comment.userJpaEntity, commentCreator)
                     .where(
                             comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
-                            comment.status.eq(StatusType.ACTIVE)        // 자식 댓글은 ACTIVE인 것만 조회
+                            comment.status.eq(ACTIVE),        // 자식 댓글은 ACTIVE인 것만 조회
+                            commentCreator.status.eq(ACTIVE)    // 자식 댓글 작성자 ACTIVE
                     )
                     .fetch();
 
@@ -148,10 +157,11 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                     .from(comment)
                     .leftJoin(comment.parent, parentComment)
                     .leftJoin(parentComment.userJpaEntity, parentCommentCreator)
-                    .leftJoin(comment.userJpaEntity, commentCreator)
+                    .join(comment.userJpaEntity, commentCreator)
                     .where(
                             comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
-                            comment.status.eq(StatusType.ACTIVE)        // 자식 댓글은 ACTIVE인 것만 조회
+                            comment.status.eq(ACTIVE),        // 자식 댓글은 ACTIVE인 것만 조회
+                            commentCreator.status.eq(ACTIVE)    // 자식 댓글 작성자 ACTIVE
                     )
                     .fetch();
 
@@ -196,7 +206,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .join(comment.userJpaEntity, commentCreator)
                 .where(
                         comment.commentId.eq(rootCommentId),
-                        comment.status.eq(StatusType.ACTIVE)
+                        comment.status.eq(ACTIVE)
                 )
                 .fetchOne();
     }
@@ -225,8 +235,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .join(comment.userJpaEntity, commentCreator)
                 .where(
                         comment.parent.commentId.eq(rootCommentId),
-                        parentComment.status.eq(StatusType.ACTIVE),
-                        comment.status.eq(StatusType.ACTIVE),
+                        parentComment.status.eq(ACTIVE),
+                        comment.status.eq(ACTIVE),
                         comment.commentId.eq(replyCommentId)
                 )
                 .fetchOne();

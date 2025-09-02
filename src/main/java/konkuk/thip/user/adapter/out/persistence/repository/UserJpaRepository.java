@@ -6,9 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long>, UserQueryRepository {
+
+    /**
+     * 소프트 딜리트 적용 대상 entity 단건 조회 메서드
+     */
+    Optional<UserJpaEntity> findByUserId(Long userId);
+
     Optional<UserJpaEntity> findByOauth2Id(String oauth2Id);
+
     boolean existsByNickname(String nickname);
-    Optional<UserJpaEntity> findById(Long userId);
 
     boolean existsByNicknameAndUserIdNot(String nickname, Long userId);
 

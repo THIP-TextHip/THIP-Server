@@ -106,7 +106,8 @@ class CommentDeleteApiTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(commentId,INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(commentId).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
     }
 
     @Test
@@ -126,7 +127,8 @@ class CommentDeleteApiTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(replyId,INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(replyId).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
     }
 
     @Test
@@ -148,7 +150,8 @@ class CommentDeleteApiTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(commentId,INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(commentId).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // Feed 댓글수 감소 확인
         FeedJpaEntity updatedFeed = feedJpaRepository.findById(feed.getPostId()).get();

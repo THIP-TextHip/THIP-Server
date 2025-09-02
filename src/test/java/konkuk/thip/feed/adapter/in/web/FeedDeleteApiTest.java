@@ -81,7 +81,8 @@ class FeedDeleteApiTest {
 
 
         // then: 1) 피드 soft delete (status=INACTIVE)
-        assertThat(feedJpaRepository.findByPostIdAndStatus(feed.getPostId(), INACTIVE)).isPresent();
+        FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(feed.getPostId()).orElse(null);
+        assertThat(feedJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // 4) 댓글 삭제 soft delete
         assertThat(commentJpaRepository.findById(comment.getCommentId())).isPresent();

@@ -1,6 +1,6 @@
 package konkuk.thip.post.application.service.validator;
 
-import konkuk.thip.common.annotation.HelperService;
+import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.post.application.service.policy.PostLikeAccessPolicy;
 import konkuk.thip.post.domain.CountUpdatable;

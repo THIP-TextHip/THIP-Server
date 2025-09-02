@@ -26,7 +26,7 @@ public class AttendanceCheckQueryPersistenceAdapter implements AttendanceCheckQu
         LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        return attendanceCheckJpaRepository.countByUserIdAndRoomIdAndCreatedAtBetween(userId, roomId, startOfDay, endOfDay, ACTIVE);
+        return attendanceCheckJpaRepository.countByUserIdAndRoomIdAndCreatedAtBetween(userId, roomId, startOfDay, endOfDay);
     }
 
     @Override

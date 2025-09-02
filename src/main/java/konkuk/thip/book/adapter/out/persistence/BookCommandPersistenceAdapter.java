@@ -62,7 +62,7 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
 
     @Override
     public Book findBookByRoomId(Long roomId) {
-        BookJpaEntity bookJpaEntity = roomJpaRepository.findById(roomId).orElseThrow(
+        BookJpaEntity bookJpaEntity = roomJpaRepository.findByRoomId(roomId).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         ).getBookJpaEntity();
         return bookMapper.toDomainEntity(bookJpaEntity);
@@ -71,7 +71,7 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     // 사용자가 책을 저장
     @Override
     public void saveSavedBook(Long userId, Long bookId) {
-        UserJpaEntity user = userJpaRepository.findById(userId)
+        UserJpaEntity user = userJpaRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
         BookJpaEntity book = bookJpaRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException(BOOK_NOT_FOUND));

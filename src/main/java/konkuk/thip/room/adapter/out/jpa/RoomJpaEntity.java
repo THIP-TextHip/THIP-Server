@@ -55,7 +55,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Enumerated(EnumType.STRING)
     private RoomStatus roomStatus = RoomStatus.RECRUITING;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
 
