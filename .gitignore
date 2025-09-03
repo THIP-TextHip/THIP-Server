@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 *.yml
 deploy.sh
+serviceAccountKey.json
 
 ### STS ###
 .apt_generated
