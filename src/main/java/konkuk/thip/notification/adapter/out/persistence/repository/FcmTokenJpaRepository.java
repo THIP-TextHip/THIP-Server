@@ -2,6 +2,7 @@ package konkuk.thip.notification.adapter.out.persistence.repository;
 
 import konkuk.thip.notification.adapter.out.jpa.FcmTokenJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -16,4 +17,8 @@ public interface FcmTokenJpaRepository extends JpaRepository<FcmTokenJpaEntity, 
     List<FcmTokenJpaEntity> findByUserIdAndIsEnabledTrue(Long userId);
 
     Optional<FcmTokenJpaEntity> findByFcmTokenId(Long id);
+
+    @Modifying
+    @Query("DELETE FROM FcmTokenJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.deviceId = :deviceId")
+    void deleteByUserIdAndDeviceId(Long userId, String deviceId);
 }
