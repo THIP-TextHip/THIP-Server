@@ -103,8 +103,25 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
 
     @Override
     public CursorBasedList<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Cursor cursor) {
-        return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
-                roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(userId, lastLocalDate, lastId, pageSize));
+        Integer lastPriority = cursor.isFirstRequest() ? null : cursor.getInteger(0);
+        LocalDate lastLocalDate = cursor.isFirstRequest() ? null : cursor.getLocalDate(1);
+        Long lastId = cursor.isFirstRequest() ? null : cursor.getLong(2);
+        int pageSize = cursor.getPageSize();
+
+        List<RoomQueryDto> dtos = roomJpaRepository.findPlayingAndRecruitingRoomsUserParticipated(
+                userId, lastPriority, lastLocalDate, lastId, pageSize
+        );
+
+        return CursorBasedList.of(dtos, pageSize, dto -> {
+            int priority = dto.startDate().isAfter(LocalDate.now()) ? 1 : 0;   // 0 : 진행중인 방, 1 : 모집중인 방    // TODO : dto에 RoomStatus 도입되면 수정해야함
+
+            Cursor nextCursor = new Cursor(List.of(
+                    String.valueOf(priority),
+                    dto.endDate().toString(),
+                    dto.roomId().toString()
+            ));
+            return nextCursor.toEncodedString();
+        });
     }
 
     @Override
