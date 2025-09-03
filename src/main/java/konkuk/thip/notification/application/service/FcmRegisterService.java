@@ -6,6 +6,7 @@ import konkuk.thip.notification.application.port.out.FcmTokenLoadPort;
 import konkuk.thip.notification.domain.FcmToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,7 @@ public class FcmRegisterService implements FcmRegisterUseCase {
     private final FcmTokenLoadPort fcmTokenLoadPort;
 
     @Override
+    @Transactional
     public void registerToken(FcmTokenRegisterCommand command) {
         // 같은 디바이스로 등록된 토큰이 있는지 확인
         fcmTokenLoadPort.findByDeviceId(command.deviceId()).ifPresentOrElse(

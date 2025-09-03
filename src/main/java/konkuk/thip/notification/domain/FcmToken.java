@@ -1,6 +1,8 @@
 package konkuk.thip.notification.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.adapter.out.jpa.PlatformType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -49,5 +51,17 @@ public class FcmToken extends BaseDomainEntity {
         this.platformType = platformType;
         this.lastUsedTime = lastUsedTime;
         this.userId = userId;
+    }
+
+    public void changeEnableState(boolean enable) {
+        validateChangeEnableState(enable);
+        this.isEnabled = enable;
+    }
+
+    private void validateChangeEnableState(boolean enable) {
+        if (this.isEnabled == enable) {
+            throw new InvalidStateException(ErrorCode.FCM_TOKEN_ENABLED_STATE_ALREADY,
+                    new IllegalArgumentException("이미 " + (enable ? "활성화" : "비활성화") + "된 상태입니다."));
+        }
     }
 }
