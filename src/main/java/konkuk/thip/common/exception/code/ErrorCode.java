@@ -211,6 +211,11 @@ public enum ErrorCode implements ResponseCode {
     ATTENDANCE_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND, 195001, "존재하지 않는 ATTENDANCE CHECK 입니다."),
     ATTENDANCE_CHECK_CAN_NOT_DELETE(HttpStatus.FORBIDDEN, 195002, "오늘의 한마디는 본인만 삭제할 수 있습니다."),
 
+    /**
+     * 200000 : Fcm error
+     */
+    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 200000, "존재하지 않는 FCM TOKEN 입니다."),
+    FCM_TOKEN_ENABLED_STATE_ALREADY(HttpStatus.BAD_REQUEST, 200001, "요청한 상태로 이미 푸쉬알림 여부가 설정되어 있습니다."),
 
     ;
 
