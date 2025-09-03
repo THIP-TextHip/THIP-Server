@@ -11,6 +11,7 @@ permissions:
 env:
   RESOURCE_PATH: src/main/resources
   COMPOSE_PATH: /home/ec2-user/compose
+  FIREBASE_KEY_PATH: src/main/resources/firebase
   APP_PORT: 8000
 
 jobs:
@@ -31,6 +32,12 @@ jobs:
         run: |
           mkdir -p ${{ env.RESOURCE_PATH }}
           echo "${{ secrets.APPLICATION_YML_PROD }}" | base64 --decode > ${{ env.RESOURCE_PATH }}/application.yml
+        shell: bash
+
+      - name: 🔐 Create Firebase Key from secret (base64)
+        run: |
+          mkdir -p ${{ env.FIREBASE_KEY_PATH }}
+          echo "${{ secrets.FIREBASE_KEY }}" | base64 --decode > ${{ env.FIREBASE_KEY_PATH }}/serviceAccountKey.json
         shell: bash
 
       - name: 🐘 Cache Gradle dependencies
