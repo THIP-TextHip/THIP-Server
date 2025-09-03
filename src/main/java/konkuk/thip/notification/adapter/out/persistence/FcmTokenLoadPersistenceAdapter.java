@@ -32,7 +32,7 @@ public class FcmTokenLoadPersistenceAdapter implements FcmTokenLoadPort {
 
     @Override
     public FcmToken save(FcmToken token) {
-        UserJpaEntity user = userJpaRepository.findById(token.getUserId())
+        UserJpaEntity user = userJpaRepository.findByUserId(token.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         var saved = fcmTokenJpaRepository.save(fcmTokenMapper.toJpaEntity(token, user));
@@ -41,7 +41,7 @@ public class FcmTokenLoadPersistenceAdapter implements FcmTokenLoadPort {
 
     @Override
     public void update(FcmToken fcmToken) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(fcmToken.getUserId())
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(fcmToken.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         FcmTokenJpaEntity fcmTokenJpaEntity = fcmTokenJpaRepository.findByFcmTokenId(fcmToken.getId())
@@ -58,18 +58,7 @@ public class FcmTokenLoadPersistenceAdapter implements FcmTokenLoadPort {
     }
 
     @Override
-    public void disableById(Long id, String reason) {
-        var entity = fcmTokenJpaRepository.findById(id).orElse(null);
-        if (entity == null) return;
-        var disabled = FcmTokenJpaEntity.builder()
-                .fcmTokenId(entity.getFcmTokenId())
-                .fcmToken(entity.getFcmToken())
-                .deviceId(entity.getDeviceId())
-                .platformType(entity.getPlatformType())
-                .lastUsedTime(entity.getLastUsedTime())
-                .isEnabled(false)
-                .userJpaEntity(entity.getUserJpaEntity())
-                .build();
-        fcmTokenJpaRepository.save(disabled);
+    public void deleteByUserIdAndDeviceId(Long userId, String deviceId) {
+        fcmTokenJpaRepository.deleteByUserIdAndDeviceId(userId, deviceId);
     }
 }

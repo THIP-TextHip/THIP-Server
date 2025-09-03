@@ -5,7 +5,7 @@ import konkuk.thip.notification.adapter.out.jpa.PlatformType;
 import konkuk.thip.notification.application.port.in.dto.FcmTokenRegisterCommand;
 
 @Schema(description = "FCM 토큰 등록 요청 DTO")
-public record FcmTokenRequest(
+public record FcmTokenRegisterRequest(
         @Schema(description = "디바이스 고유 ID", example = "device12345")
         String deviceId,
 
@@ -15,11 +15,11 @@ public record FcmTokenRequest(
         @Schema(description = "플랫폼 타입 (ANDROID 또는 WEB)", example = "ANDROID")
         PlatformType platformType
 ) {
-    public static FcmTokenRegisterCommand toCommand(FcmTokenRequest request, Long userId) {
+    public FcmTokenRegisterCommand toCommand(Long userId) {
         return FcmTokenRegisterCommand.builder()
-                .deviceId(request.deviceId)
-                .fcmToken(request.fcmToken)
-                .platformType(request.platformType)
+                .deviceId(this.deviceId)
+                .fcmToken(this.fcmToken)
+                .platformType(this.platformType)
                 .userId(userId)
                 .build();
     }
