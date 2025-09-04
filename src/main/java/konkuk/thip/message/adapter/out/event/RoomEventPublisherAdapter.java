@@ -71,14 +71,14 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomJoinEventToHost(Long ownerUserId, Long roomId, String roomTitle,
-                                           Long applicantUserId, String applicantUsername) {
+    public void publishRoomJoinEventToHost(Long hostUserId, Long roomId, String roomTitle,
+                                           Long actorUserId, String actorUsername) {
         publisher.publishEvent(RoomEvents.RoomJoinRequestedToOwnerEvent.builder()
-                .ownerUserId(ownerUserId)
+                .ownerUserId(hostUserId)
                 .roomId(roomId)
                 .roomTitle(roomTitle)
-                .applicantUserId(applicantUserId)
-                .applicantUsername(applicantUsername)
+                .applicantUserId(actorUserId)
+                .applicantUsername(actorUsername)
                 .build());
     }
 

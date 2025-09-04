@@ -21,8 +21,8 @@ public interface RoomEventCommandPort {
     void publishRoomActivityStartedEvent(Long targetUserId, Long roomId, String roomTitle);
 
     // 내가 방장일 때, 새로운 사용자가 모임방 참여를 한 경우
-    void publishRoomJoinEventToHost(Long ownerUserId, Long roomId, String roomTitle,
-                                    Long applicantUserId, String applicantUsername);
+    void publishRoomJoinEventToHost(Long hostUserId, Long roomId, String roomTitle,
+                                    Long actorUserId, String actorUsername);
 
     // 내가 참여한 모임방의 나의 댓글이 좋아요를 받는 경우
     void publishRoomCommentLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
