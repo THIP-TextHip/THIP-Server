@@ -1,4 +1,3 @@
-// notification/adapter/in/event/NotificationEventHandler.java (발췌: Room 관련 메서드만)
 package konkuk.thip.message.adapter.in.event;
 
 import konkuk.thip.message.adapter.out.event.dto.FeedEvents;
