@@ -75,4 +75,10 @@ public class User extends BaseDomainEntity {
         }
     }
 
+    public void markAsDeleted() {
+        if (this.oauth2Id != null && !this.oauth2Id.startsWith("deleted:")) {
+            this.oauth2Id = "deleted:" + this.oauth2Id;
+        }
+    }
+
 }
