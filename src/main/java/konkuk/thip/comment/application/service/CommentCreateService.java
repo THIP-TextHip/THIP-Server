@@ -11,9 +11,14 @@ import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.message.application.port.out.FeedEventCommandPort;
+import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.PostType;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +34,13 @@ public class CommentCreateService implements CommentCreateUseCase {
     private final CommentQueryPort commentQueryPort;
     private final CommentLikeQueryPort commentLikeQueryPort;
     private final CommentQueryMapper commentQueryMapper;
-
+    private final UserCommandPort userCommandPort;
 
     private final PostHandler postHandler;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
+
+    private final FeedEventCommandPort feedEventCommandPort;
+    private final RoomEventCommandPort roomEventCommandPort;
 
     @Override
     @Transactional
@@ -47,8 +55,8 @@ public class CommentCreateService implements CommentCreateUseCase {
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
         commentAuthorizationValidator.validateUserCanAccessPostForComment(type, post, command.userId());
 
-        // TODO 피드: 내 게시글의 댓글, 내 댓글에 대한 답글 알림 전송
-        // TODO 기록 및 투표: 모임방의 내 게시글에 대한 댓글, 내 댓글에 대한 답글 알림 전송
+        // 2-2. 푸쉬 알림 전송
+        sendNotifications(command, type, post);
 
         // 3. 댓글 생성
         Long savedCommentId = createCommentDomain(command);
@@ -74,7 +82,26 @@ public class CommentCreateService implements CommentCreateUseCase {
             CommentQueryDto savedCommentDto = commentQueryPort.findRootCommentById(savedCommentId);
             return commentQueryMapper.toRoot(savedCommentDto, false, command.userId());
         }
+    }
 
+    private void sendNotifications(CommentCreateCommand command, PostType type, CountUpdatable post) {
+        PostQueryDto postQueryDto = postHandler.getPostQueryDto(type, post.getId());
+        User actorUser = userCommandPort.findById(command.userId());
+        if (type == PostType.FEED) {
+            // 피드 댓글 알림 이벤트 발행
+            feedEventCommandPort.publishFeedCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+            if (command.isReplyRequest()){
+                // 피드 답글 알림 이벤트 발행
+                feedEventCommandPort.publishFeedRepliedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+            }
+        } else if (type == PostType.RECORD || type == PostType.VOTE) {
+            // 모임방 게시글 댓글 알림 이벤트 발행
+            roomEventCommandPort.publishRoomPostCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+            if (command.isReplyRequest()){
+                // 모임방 게시글 답글 알림 이벤트 발행
+                roomEventCommandPort.publicRoomPostCommentRepliedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+            }
+        }
     }
 
     private Long createCommentDomain(CommentCreateCommand command) {
