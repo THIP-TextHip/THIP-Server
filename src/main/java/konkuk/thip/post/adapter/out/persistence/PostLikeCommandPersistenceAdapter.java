@@ -1,17 +1,26 @@
 package konkuk.thip.post.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.mapper.PostLikeMapper;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
+import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
+import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.common.exception.code.ErrorCode.RECORD_NOT_FOUND;
@@ -49,6 +58,30 @@ public class PostLikeCommandPersistenceAdapter implements PostLikeCommandPort {
         postLikeJpaRepository.deleteAllByPostId(postId);
     }
 
+    @Override
+    public void deleteAllByUserId(Long userId) {
+
+        // 1. 탈퇴 유저가 좋아요한 게시글을 JOIN 조회
+        List<PostJpaEntity> likedPosts = postLikeJpaRepository.findAllPostsWithTypeByUserId(userId);
+        if (likedPosts == null || likedPosts.isEmpty()) {
+            return; // early return
+        }
+        // 2. 탈퇴한 유저의 모든 게시글 좋아요 삭제
+        postLikeJpaRepository.deleteAllByUserId(userId);
+
+        // 3. 게시글 타입별로 좋아요 수 감소가 필요한 게시글 Map 생성
+        Map<PostType, List<PostJpaEntity>> postsByType = new HashMap<>();
+
+        for (PostJpaEntity post : likedPosts) {
+            // 4. 엔티티에서 직접 게시글 좋아요 수 감소
+            post.setLikeCount(Math.max(0, post.getLikeCount() - 1));
+
+            PostType postType = PostType.from(post.getDtype());
+            postsByType.computeIfAbsent(postType, k -> new ArrayList<>()).add(post);
+        }
+        // 5. 게시글 타입별로 저장 처리
+        postsByType.forEach(this::savePostsJpaEntities);
+    }
 
     private PostJpaEntity findPostJpaEntity(PostType postType, Long postId) {
         return switch (postType) {
@@ -59,5 +92,28 @@ public class PostLikeCommandPersistenceAdapter implements PostLikeCommandPort {
             case VOTE -> voteJpaRepository.findById(postId)
                     .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
         };
+    }
+
+    private void savePostsJpaEntities(PostType postType, List<PostJpaEntity> posts) {
+        switch (postType) {
+            case FEED:
+                feedJpaRepository.saveAll(posts.stream()
+                        .filter(p -> p instanceof FeedJpaEntity)
+                        .map(p -> (FeedJpaEntity) p)
+                        .collect(Collectors.toList()));
+                break;
+            case RECORD:
+                recordJpaRepository.saveAll(posts.stream()
+                        .filter(p -> p instanceof RecordJpaEntity)
+                        .map(p -> (RecordJpaEntity) p)
+                        .collect(Collectors.toList()));
+                break;
+            case VOTE:
+                voteJpaRepository.saveAll(posts.stream()
+                        .filter(p -> p instanceof VoteJpaEntity)
+                        .map(p -> (VoteJpaEntity) p)
+                        .collect(Collectors.toList()));
+                break;
+        }
     }
 }
