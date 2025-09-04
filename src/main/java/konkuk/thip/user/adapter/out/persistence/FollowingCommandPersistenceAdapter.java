@@ -13,7 +13,7 @@ import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.*;
 
 import static konkuk.thip.common.exception.code.ErrorCode.FOLLOW_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -53,6 +53,25 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
 
         followingJpaRepository.delete(followingJpaEntity);
     }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+
+        // 1. 탈퇴 유저가 팔로우 중인 유저들 ID 조회
+        List<Long> targetUserIds = followingJpaRepository.findAllTargetUserIdsByUserId(userId);
+        // 2. 탈퇴한 유저의 모든 팔로잉 관계 삭제
+        followingJpaRepository.deleteAllByUserIdOrFollowingUserId(userId);
+        if (targetUserIds == null || targetUserIds.isEmpty()) {
+            return; //early return
+        }
+        // 3. 해당 ID들로 JPA 엔티티 직접 조회
+        List<UserJpaEntity> userEntities = userJpaRepository.findAllById(targetUserIds);
+        // 4. 엔티티에서 직접 팔로워 수 감소
+        userEntities.forEach(entity ->
+                entity.setFollowerCount(Math.max(0, entity.getFollowerCount() - 1)));
+        userJpaRepository.saveAll(userEntities);
+    }
+
 
     private UserJpaEntity updateUserFollowerCount(User targetUser) {
         UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(targetUser.getId()).orElseThrow(
