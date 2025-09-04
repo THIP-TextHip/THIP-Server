@@ -61,8 +61,8 @@ public class S3Service {
 
             // 현재 날짜를 yyMMdd 형식으로 포맷팅
             String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"));
-            // 객체 key 생성 (일단 피드 생성시에만 이미지를 업로드하기때문에 나중에 더 추가되면 분기처리)
-            String key = "feed/" + userId + "/" + datePath + "/" + UUID.randomUUID() + image.filename();
+            // 한글 인코딩 문제 방지를 위해 파일 이름은 사용하지 않고 UUID와 확장자만 사용하여 키 생성
+            String key = "feed/" + userId + "/" + datePath + "/" + UUID.randomUUID() + "." + ext;
 
             // url 유효기간 설정하기(5분)
             Date expiration = getExpiration();
@@ -83,12 +83,12 @@ public class S3Service {
     }
 
     // put 용 URL 생성
-    private GeneratePresignedUrlRequest getPutGeneratePresignedUrlRequest(String fileName, Date expiration) {
-        return new GeneratePresignedUrlRequest(bucket, fileName)
+    private GeneratePresignedUrlRequest getPutGeneratePresignedUrlRequest(String key, Date expiration) {
+        return new GeneratePresignedUrlRequest(bucket, key)
                 .withMethod(HttpMethod.PUT)
-                .withKey(fileName)
+                .withKey(key)
                 .withExpiration(expiration)
-                .withContentType(determineMimeTypeFromExtension(fileName));
+                .withContentType(determineMimeTypeFromExtension(key));
     }
 
     private static Date getExpiration() {
@@ -99,8 +99,8 @@ public class S3Service {
         return expiration;
     }
 
-    private String determineMimeTypeFromExtension(String fileName) {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+    private String determineMimeTypeFromExtension(String key) {
+        String extension = key.substring(key.lastIndexOf('.') + 1).toLowerCase();
         return switch (extension) {
             case "png" -> "image/png";
             case "jpg", "jpeg" -> "image/jpeg";
