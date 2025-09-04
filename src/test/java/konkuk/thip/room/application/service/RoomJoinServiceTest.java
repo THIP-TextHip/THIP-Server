@@ -2,17 +2,22 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.message.application.port.out.RoomEventCommandPort;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.User;
+import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static konkuk.thip.room.application.port.in.dto.RoomJoinType.CANCEL;
@@ -26,6 +31,8 @@ class RoomJoinServiceTest {
     private RoomCommandPort roomCommandPort;
     private RoomParticipantCommandPort roomParticipantCommandPort;
     private RoomJoinService roomJoinService;
+    private UserCommandPort userCommandPort;
+    private RoomEventCommandPort roomEventCommandPort;
 
     private final Long ROOM_ID = 1L;
     private final Long USER_ID = 2L;
@@ -38,10 +45,14 @@ class RoomJoinServiceTest {
     void setUp() {
         roomCommandPort = mock(RoomCommandPort.class);
         roomParticipantCommandPort = mock(RoomParticipantCommandPort.class);
+        userCommandPort = mock(UserCommandPort.class);
+        roomEventCommandPort = mock(RoomEventCommandPort.class);
 
         roomJoinService = new RoomJoinService(
                 roomCommandPort,
-                roomParticipantCommandPort
+                roomParticipantCommandPort,
+                userCommandPort,
+                roomEventCommandPort
         );
     }
 
@@ -71,6 +82,17 @@ class RoomJoinServiceTest {
             given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.empty());
+            given(roomParticipantCommandPort.findHostByRoomId(any()))
+                    .willReturn(RoomParticipant.hostWithoutId(100L, ROOM_ID));
+            given(roomParticipantCommandPort.findAllByRoomId(any())).willReturn(
+                    List.of(
+                            RoomParticipant.memberWithoutId(3L, ROOM_ID),
+                            RoomParticipant.memberWithoutId(4L, ROOM_ID)
+                    )
+            );
+            given(userCommandPort.findById(any())).willReturn(
+                    User.withoutId("nickname", "일반유저", "kakao_1234", Alias.WRITER)
+            );
 
             roomJoinService.changeJoinState(command);
 
