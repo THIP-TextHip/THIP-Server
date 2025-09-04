@@ -10,11 +10,11 @@ public record VoteResult(
     public record VoteItemDto(
             Long voteItemId,
             String itemName,
-            int percentage,
+            int count,
             Boolean isVoted
     ) {
-        public static VoteItemDto of(Long voteItemId, String itemName, int percentage, Boolean isVoted) {
-            return new VoteItemDto(voteItemId, itemName, percentage, isVoted);
+        public static VoteItemDto of(Long voteItemId, String itemName, int count, Boolean isVoted) {
+            return new VoteItemDto(voteItemId, itemName, count, isVoted);
         }
     }
 
