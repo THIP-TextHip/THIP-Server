@@ -10,9 +10,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "comments")
 @Getter
@@ -34,6 +31,11 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @Column(name = "report_count", nullable = false)
     private int reportCount = 0;
 
+    /**
+     * -- SETTER --
+     *  회원 탈퇴용
+     */
+    @Setter
     @Builder.Default
     @Column(name = "like_count", nullable = false)
     private int likeCount = 0;
