@@ -32,7 +32,6 @@ public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver 
                                   WebDataBinderFactory binderFactory) {
 
         Object token = ((HttpServletRequest) webRequest.getNativeRequest()).getAttribute("token");
-        log.info("ArgumentResolver에서 토큰 추출: {}", token);
         if (token == null) {
             throw new AuthException(AUTH_TOKEN_NOT_FOUND);
         }

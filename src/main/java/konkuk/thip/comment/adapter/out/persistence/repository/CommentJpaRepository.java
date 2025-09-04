@@ -30,4 +30,10 @@ public interface CommentJpaRepository extends JpaRepository<CommentJpaEntity, Lo
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE CommentJpaEntity c SET c.status = 'INACTIVE' WHERE c.postJpaEntity.postId IN :postIds")
     void softDeleteAllByPostIds(@Param("postIds") List<Long> postIds);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE CommentJpaEntity c " +
+            "SET c.likeCount = CASE WHEN c.likeCount > 0 THEN c.likeCount - 1 ELSE 0 END " +
+            "WHERE c.commentId IN :likedCommentIds")
+    void bulkDecrementLikeCountByIds(@Param("likedCommentIds") List<Long> likedCommentIds);
 }

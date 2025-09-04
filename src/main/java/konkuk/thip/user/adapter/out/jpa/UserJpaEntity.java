@@ -12,7 +12,7 @@ import org.hibernate.annotations.SQLDelete;
 import java.time.LocalDate;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
-import static konkuk.thip.common.exception.code.ErrorCode.POST_ALREADY_DELETED;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_DELETED;
 
 @Entity
 @Table(name = "users")
@@ -70,7 +70,7 @@ public class UserJpaEntity extends BaseJpaEntity {
 
     public void softDelete(User user) {
         if(this.status.equals(INACTIVE)){
-            throw new InvalidStateException(POST_ALREADY_DELETED);
+            throw new InvalidStateException(USER_ALREADY_DELETED);
         }
         this.status = INACTIVE;
         this.oauth2Id = user.getOauth2Id();

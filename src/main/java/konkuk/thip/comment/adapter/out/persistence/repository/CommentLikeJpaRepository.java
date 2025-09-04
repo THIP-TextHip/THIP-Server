@@ -49,9 +49,12 @@ public interface CommentLikeJpaRepository extends JpaRepository<CommentLikeJpaEn
            WHERE c.userJpaEntity.userId = :userId
        )
        """)
-    void deleteAllByUserId(@Param("userId") Long userId);
+    void deleteAllByCommentAuthorUserId(@Param("userId") Long userId);
 
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
+     @Modifying(clearAutomatically = true, flushAutomatically = true)
+     @Query("DELETE FROM CommentLikeJpaEntity cl WHERE cl.userJpaEntity.userId = :userId")
+    void deleteAllByLikerUserId(@Param("userId") Long userId);
+
     @Query("SELECT cl.commentJpaEntity.commentId FROM CommentLikeJpaEntity cl WHERE cl.userJpaEntity.userId = :userId")
     List<Long> findAllCommentIdsByUserId(@Param("userId") Long userId);
 

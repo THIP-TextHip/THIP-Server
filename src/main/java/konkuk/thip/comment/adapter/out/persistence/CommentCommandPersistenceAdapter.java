@@ -111,7 +111,7 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
             return; //early return
         }
         // 2. 탈퇴한 유저의 모든 댓글, 댓글의 좋아요 삭제
-        commentLikeJpaRepository.deleteAllByUserId(userId);
+        commentLikeJpaRepository.deleteAllByCommentAuthorUserId(userId);
         commentJpaRepository.deleteAllByUserId(userId);
         // 3. 게시글 타입별로 댓글 수 감소가 필요한 게시글 Map 생성
         Map<PostType, List<PostJpaEntity>> postsByType = new HashMap<>();

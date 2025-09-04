@@ -64,12 +64,8 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
         if (targetUserIds == null || targetUserIds.isEmpty()) {
             return; //early return
         }
-        // 3. 해당 ID들로 JPA 엔티티 직접 조회
-        List<UserJpaEntity> userEntities = userJpaRepository.findAllById(targetUserIds);
-        // 4. 엔티티에서 직접 팔로워 수 감소
-        userEntities.forEach(entity ->
-                entity.setFollowerCount(Math.max(0, entity.getFollowerCount() - 1)));
-        userJpaRepository.saveAll(userEntities);
+        // 3. 탈퇴 유저가 팔로우 중인 유저들의 팔로워 수 감소
+        followingJpaRepository.bulkDecrementFollowerCount(targetUserIds);
     }
 
 

@@ -57,13 +57,9 @@ public class CommentLikeCommandPersistenceAdapter implements CommentLikeCommandP
             return; //early return
         }
         // 2. 탈퇴한 유저의 모든 댓글 좋아요 관계 삭제
-        commentLikeJpaRepository.deleteAllByUserId(userId);
-        // 3. 해당 ID들로 JPA 엔티티 직접 조회
-        List<CommentJpaEntity> commentEntities = commentJpaRepository.findAllById(likedCommentIds);
-        // 4. 엔티티에서 직접 좋아요 수 감소
-        commentEntities.forEach(entity ->
-                entity.setLikeCount(Math.max(0, entity.getLikeCount() - 1)));
-        commentJpaRepository.saveAll(commentEntities);
+        commentLikeJpaRepository.deleteAllByLikerUserId(userId);
+        // 3. 탈퇴 유저가 좋아요 누른 댓글의 좋아요 수 감소
+        commentJpaRepository.bulkDecrementLikeCountByIds(likedCommentIds);
     }
 
 }

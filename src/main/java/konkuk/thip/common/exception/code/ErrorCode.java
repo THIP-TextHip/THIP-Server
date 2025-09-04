@@ -49,8 +49,8 @@ public enum ErrorCode implements ResponseCode {
     USER_NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 70006, "다른 사용자가 이미 사용중인 닉네임입니다."),
     USER_ALREADY_SIGNED_UP(HttpStatus.BAD_REQUEST, 70007, "이미 가입된 사용자입니다."),
     USER_NOT_SIGNED_UP(HttpStatus.BAD_REQUEST, 70008, "가입되지 않은 사용자입니다."),
-    USER_CANNOT_DELETE_ROOM_HOST(HttpStatus.BAD_REQUEST, 70009, "모집/진행 중인 방의 host는 회원탈퇴를 할 수 없습니다."),
-    USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 70010, "이미 삭제된 유저 입니다."),
+    USER_CANNOT_DELETE_ROOM_HOST(HttpStatus.BAD_REQUEST, 70009, "모집/진행 중인 방의 방장은 회원탈퇴를 할 수 없습니다."),
+    USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 70010, "이미 삭제된 사용자 입니다."),
 
     /**
      * 75000 : follow error

@@ -16,7 +16,7 @@ public interface VoteItemJpaRepository extends JpaRepository<VoteItemJpaEntity, 
     @Query("DELETE FROM VoteItemJpaEntity vi WHERE vi.voteJpaEntity.postId = :voteId")
     void deleteAllByVoteId(@Param("voteId") Long voteId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM VoteItemJpaEntity vi WHERE vi.voteJpaEntity.postId IN :voteIds")
     void deleteAllByVoteIds(@Param("voteIds") List<Long> voteIds);
 }

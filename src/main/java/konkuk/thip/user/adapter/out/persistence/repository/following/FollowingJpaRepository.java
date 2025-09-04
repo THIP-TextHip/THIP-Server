@@ -1,10 +1,10 @@
 package konkuk.thip.user.adapter.out.persistence.repository.following;
 
-import io.lettuce.core.dynamic.annotation.Param;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +24,11 @@ public interface FollowingJpaRepository extends JpaRepository<FollowingJpaEntity
 
     @Query("SELECT f.followingUserJpaEntity.userId FROM FollowingJpaEntity f WHERE f.userJpaEntity.userId = :userId")
     List<Long> findAllTargetUserIdsByUserId(@Param("userId") Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE UserJpaEntity u " +
+                "SET u.followerCount = CASE WHEN u.followerCount > 0 THEN u.followerCount - 1 ELSE 0 END " +
+                "WHERE u.userId IN :targetUserIds"
+    )
+    void bulkDecrementFollowerCount(@Param("targetUserIds") List<Long> targetUserIds);
 }
