@@ -52,7 +52,9 @@ public class RoomJoinService implements RoomJoinUseCase {
         roomCommandPort.update(room);
 
         // 참여자 푸쉬 알림 전송 (호스트에게만 전송)
-        sendNotifications(roomJoinCommand, room);
+        if (type == RoomJoinType.JOIN) {
+            sendNotifications(roomJoinCommand, room);
+        }
 
         return RoomJoinResult.of(room.getId(), type.getType());
     }
