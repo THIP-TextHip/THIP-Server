@@ -1,11 +1,14 @@
 package konkuk.thip.room.adapter.out.persistence.repository;
 
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, RoomQueryRepository {
@@ -20,4 +23,39 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
             "AND r.startDate > :currentDate")
     int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
 
+    /**
+     * end_date < 오늘 => EXPIRED
+     * 이미 EXPIRED 인 것은 제외
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           update RoomJpaEntity r
+              set r.roomStatus = :status
+            where r.endDate < current_date
+              and r.roomStatus <> :exceptStatus
+           """)
+    int updateRoomStatusToExpired(RoomStatus exceptStatus);
+
+    /**
+     * start_date <= 오늘 AND end_date >= 오늘 => IN_PROGRESS
+     * RECRUITING 인 것만 대상
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           update RoomJpaEntity r
+              set r.roomStatus = :status
+            where r.startDate <= current_date
+              and r.endDate >= current_date
+              and r.roomStatus = :status
+           """)
+    int updateRoomStatusToInProgress(RoomStatus status);
+
+    @Query("""
+           select r
+             from RoomJpaEntity r
+            where r.startDate <= current_date
+              and r.endDate   >= current_date
+              and r.roomStatus = :status
+           """)
+    List<RoomJpaEntity> findProgressTargetIds(RoomStatus status);
 }

@@ -4,6 +4,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.room.adapter.out.jpa.RoomStatus;
 import konkuk.thip.room.adapter.out.mapper.RoomMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
@@ -11,6 +12,7 @@ import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
@@ -55,5 +57,23 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
         );
 
         roomJpaRepository.save(roomJpaEntity.updateFrom(room));
+    }
+
+    @Override
+    public int updateRoomStateToExpired(RoomStatus exceptStatus) {
+        return roomJpaRepository.updateRoomStatusToExpired(exceptStatus);
+    }
+
+    @Override
+    public int updateRoomStateToInProgress(RoomStatus roomStatus) {
+        return roomJpaRepository.updateRoomStatusToInProgress(roomStatus);
+    }
+
+    @Override
+    public List<Room> findProgressTargetRooms(RoomStatus status) {
+        List<RoomJpaEntity> roomJpaEntities = roomJpaRepository.findProgressTargetIds(status);
+        return roomJpaEntities.stream()
+                .map(roomMapper::toDomainEntity)
+                .toList();
     }
 }
