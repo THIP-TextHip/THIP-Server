@@ -216,6 +216,7 @@ public enum ErrorCode implements ResponseCode {
      */
     FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 200000, "존재하지 않는 FCM TOKEN 입니다."),
     FCM_TOKEN_ENABLED_STATE_ALREADY(HttpStatus.BAD_REQUEST, 200001, "요청한 상태로 이미 푸쉬알림 여부가 설정되어 있습니다."),
+    FIREBASE_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 200003, "FCM 푸쉬알림 전송에 실패했습니다.")
 
     ;
 
