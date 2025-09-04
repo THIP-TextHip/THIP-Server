@@ -56,7 +56,7 @@ public class FeedNotificationDispatchService implements FeedNotificationDispatch
     }
 
     @Override
-    public void handleFeedReplied(final FeedEvents.FeedRepliedEvent event) {
+    public void handleFeedCommentReplied(final FeedEvents.FeedCommentRepliedEvent event) {
         Notification notification = buildNotification("새로운 답글이 달렸어요",
                 "@" + event.actorUsername() + " 님이 내 댓글에 답글을 달았어요!");
 

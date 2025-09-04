@@ -29,8 +29,8 @@ public class MessageFeedEventListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onFeedReplied(FeedEvents.FeedRepliedEvent e) {
-        feedUseCase.handleFeedReplied(e);
+    public void onFeedCommentReplied(FeedEvents.FeedCommentRepliedEvent e) {
+        feedUseCase.handleFeedCommentReplied(e);
     }
 
     @Async

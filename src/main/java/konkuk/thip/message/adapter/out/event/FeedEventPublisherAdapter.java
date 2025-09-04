@@ -35,7 +35,7 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     @Override
     public void publishFeedRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
                                         Long feedId) {
-        publisher.publishEvent(FeedEvents.FeedRepliedEvent.builder()
+        publisher.publishEvent(FeedEvents.FeedCommentRepliedEvent.builder()
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)

@@ -16,8 +16,8 @@ public class FeedEvents {
 
     // 누군가 내 댓글에 대댓글을 다는 경우
     @Builder
-    public record FeedRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                   Long feedId) {}
+    public record FeedCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                          Long feedId) {}
 
     // 내가 팔로우하는 사람이 새 글을 올리는 경우
     @Builder
