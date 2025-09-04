@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
+import konkuk.thip.common.security.annotation.AuthToken;
 import konkuk.thip.common.security.annotation.Oauth2Id;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -13,6 +14,7 @@ import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
 import konkuk.thip.user.adapter.in.web.response.UserFollowResponse;
 import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
+import konkuk.thip.user.application.port.in.UserDeleteUseCase;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
 import konkuk.thip.user.application.port.in.UserUpdateUseCase;
@@ -29,6 +31,7 @@ public class UserCommandController {
     private final UserSignupUseCase userSignupUseCase;
     private final UserFollowUsecase userFollowUsecase;
     private final UserUpdateUseCase userUpdateUseCase;
+    private final UserDeleteUseCase userDeleteUseCase;
 
 
     @Operation(
@@ -72,6 +75,19 @@ public class UserCommandController {
             @Parameter(hidden = true) @UserId final Long userId,
             @RequestBody @Valid final UserUpdateRequest userUpdateRequest) {
         userUpdateUseCase.updateUser(userUpdateRequest.toCommand(userId));
+        return BaseResponse.ok(null);
+    }
+
+    @Operation(
+            summary = "회원 탈퇴",
+            description = "사용자가 회원탈퇴를 합니다. 사용자와 관련된 정보가 모두 삭제되고," +
+                    "회원탈퇴한 사용자의 토큰을 블랙리스트에 추가하여 서비스 재진입을 막습니다."
+    )
+    @ExceptionDescription(USER_DELETE)
+    @DeleteMapping("/users")
+    public BaseResponse<Void> deleteUser(@Parameter(hidden = true) @UserId final Long userId,
+                                         @Parameter(hidden = true) @AuthToken final String authToken) {
+        userDeleteUseCase.deleteUser(userId,authToken);
         return BaseResponse.ok(null);
     }
 }
