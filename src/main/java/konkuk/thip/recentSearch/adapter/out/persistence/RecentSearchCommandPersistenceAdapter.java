@@ -56,5 +56,10 @@ public class RecentSearchCommandPersistenceAdapter implements RecentSearchComman
         recentSearchJpaRepository.updateModifiedAt(recentSearch.getId());
     }
 
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        recentSearchJpaRepository.deleteAllByUserId(userId);
+    }
+
 
 }

@@ -6,4 +6,5 @@ public interface PostLikeCommandPort {
     void save(Long userId, Long postId, PostType postType);
     void delete(Long userId, Long postId);
     void deleteAllByPostId(Long postId);
+    void deleteAllByUserId(Long userId);
 }

@@ -1,5 +1,6 @@
 package konkuk.thip.post.adapter.out.persistence;
 
+import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -28,4 +30,15 @@ public interface PostLikeJpaRepository extends JpaRepository<PostLikeJpaEntity, 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM PostLikeJpaEntity pl WHERE pl.postJpaEntity.postId = :postId")
     void deleteAllByPostId(@Param("postId") Long postId);
+
+    @Query("SELECT pl.postJpaEntity FROM PostLikeJpaEntity pl JOIN pl.postJpaEntity WHERE pl.userJpaEntity.userId = :userId")
+    List<PostJpaEntity> findAllPostsWithTypeByUserId(@Param("userId") Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM PostLikeJpaEntity pl WHERE pl.userJpaEntity.userId = :userId")
+    void deleteAllByUserId(@Param("userId") Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM PostLikeJpaEntity pl WHERE pl.postJpaEntity.postId IN :postIds")
+    void deleteAllByPostIds(@Param("postIds") List<Long> postIds);
 }

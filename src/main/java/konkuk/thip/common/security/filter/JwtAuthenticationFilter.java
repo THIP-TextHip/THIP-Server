@@ -8,6 +8,7 @@ import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.common.security.oauth2.CustomOAuth2User;
 import konkuk.thip.common.security.oauth2.LoginUser;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.user.application.port.UserTokenBlacklistQueryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +28,7 @@ import static konkuk.thip.common.security.constant.AuthParameters.*;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserTokenBlacklistQueryPort userTokenBlacklistQueryPort;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -38,6 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new AuthException(AUTH_TOKEN_NOT_FOUND);
             }
 
+            if (userTokenBlacklistQueryPort.isTokenBlacklisted(token)) {
+                throw new AuthException(AUTH_BLACKLIST_TOKEN);
+            }
+
             if (!jwtUtil.validateToken(token)) {
                 throw new AuthException(AUTH_INVALID_TOKEN);
             }
@@ -46,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new AuthException(AUTH_EXPIRED_TOKEN);
             }
 
+            request.setAttribute(JWT_TOKEN_ATTRIBUTE.getValue(), token);
             LoginUser loginUser = jwtUtil.getLoginUser(token);
 
             if (loginUser.userId() != null) {

@@ -129,7 +129,7 @@ class RoomPostSearchApiTest {
                 for (JsonNode voteItem : voteItems) {
                     assertThat(voteItem.path("voteItemId")).isNotNull();
                     assertThat(voteItem.path("itemName")).isNotNull();
-                    assertThat(voteItem.path("percentage")).isNotNull();
+                    assertThat(voteItem.path("count")).isNotNull();
                     assertThat(voteItem.path("isVoted")).isNotNull();
                 }
             }

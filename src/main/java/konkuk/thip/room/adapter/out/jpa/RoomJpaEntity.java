@@ -46,6 +46,11 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(name = "recruit_count",nullable = false)
     private int recruitCount;
 
+    /**
+     * -- SETTER --
+     *  회원 탈퇴용
+     */
+    @Setter
     @Builder.Default
     @Column(name = "member_count",nullable = false)
     private int memberCount = 1;

@@ -1,6 +1,9 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
+import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
+import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -35,6 +38,10 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     private final UserJpaRepository userJpaRepository;
     private final RoomJpaRepository roomJpaRepository;
     private final VoteParticipantJpaRepository voteParticipantJpaRepository;
+
+    private final CommentJpaRepository commentJpaRepository;
+    private final CommentLikeJpaRepository commentLikeJpaRepository;
+    private final PostLikeJpaRepository postLikeJpaRepository;
 
     private final VoteMapper voteMapper;
     private final VoteItemMapper voteItemMapper;
@@ -146,6 +153,45 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
         voteJpaEntity.softDelete();
         voteJpaRepository.save(voteJpaEntity);
+    }
+
+    @Override
+    public void deleteAllVoteParticipantByUserId(Long userId) {
+
+        // 1. 탈퇴 유저가 참여한 모든 투표 항목 ID 조회
+        List<Long> voteItemIds = voteParticipantJpaRepository.findAllVoteItemIdsByUserId(userId);
+        if (voteItemIds == null || voteItemIds.isEmpty()) {
+            return; //early return
+        }
+        // 2. 투표 참여 관계 삭제
+        voteParticipantJpaRepository.deleteAllByUserId(userId);
+        // 3. 해당 ID들로 JPA 엔티티 직접 조회
+        List<VoteItemJpaEntity> voteItemEntities = voteItemJpaRepository.findAllById(voteItemIds);
+        // 4. 엔티티에서 직접 투표 항목 수 감소
+        voteItemEntities.forEach(entity ->
+            entity.setCount(Math.max(0, entity.getCount() - 1)));
+        voteItemJpaRepository.saveAll(voteItemEntities);
+    }
+
+    @Override
+    public void deleteAllVoteByUserId(Long userId) {
+        // 1. 유저가 작성한 투표 게시글 ID 리스트 조회
+        List<Long> voteIds = voteJpaRepository.findVoteIdsByUserId(userId);
+        if (voteIds == null || voteIds.isEmpty()) {
+            return; // early return
+        }
+        // 2-1. 댓글 좋아요 일괄 삭제
+        commentLikeJpaRepository.deleteAllByPostIds(voteIds);
+        // 2-2. 댓글 soft delete 일괄 처리
+        commentJpaRepository.softDeleteAllByPostIds(voteIds);
+        // 3. 게시글 좋아요 일괄 삭제
+        postLikeJpaRepository.deleteAllByPostIds(voteIds);
+        // 4-1. 투표 참여 관계 일괄 삭제
+        voteParticipantJpaRepository.deleteAllByVoteIds(voteIds);
+        // 4-2. 투표 항목 일괄 삭제
+        voteItemJpaRepository.deleteAllByVoteIds(voteIds);
+        // 5. 탈퇴한 유저가 작성한 투표 게시글 일괄 삭제
+        voteJpaRepository.deleteAllByUserId(userId);
     }
 
 

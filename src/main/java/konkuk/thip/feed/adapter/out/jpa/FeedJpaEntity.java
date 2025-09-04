@@ -40,10 +40,6 @@ public class FeedJpaEntity extends PostJpaEntity {
     @Column(name = "content_list", columnDefinition = "TEXT")
     private ContentList contentList = ContentList.empty();
 
-    // 삭제용 피드 저장 양방향 매핑 관계
-    @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<SavedFeedJpaEntity> savedFeeds = new ArrayList<>();
-
     @Column(name = "tag_list", columnDefinition = "TEXT")
     @Convert(converter = TagListJsonConverter.class)
     private TagList tagList = TagList.empty();

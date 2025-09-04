@@ -13,5 +13,9 @@ public interface SavedBookJpaRepository extends JpaRepository<SavedBookJpaEntity
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM SavedBookJpaEntity s WHERE s.userJpaEntity.userId = :userId AND s.bookJpaEntity.bookId = :bookId")
-    void deleteByUserIdAndBookId(Long userId, Long bookId);
+    void deleteByUserIdAndBookId(@Param("userId") Long userId, @Param("bookId") Long bookId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM SavedBookJpaEntity s WHERE s.userJpaEntity.userId = :userId")
+    void deleteAllByUserId(@Param("userId") Long userId);
 }

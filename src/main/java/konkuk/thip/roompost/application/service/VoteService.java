@@ -42,17 +42,12 @@ public class VoteService implements VoteUseCase {
 
         // 2. 투표 결과 반환
         List<VoteItemQueryDto> voteItems = voteQueryPort.findVoteItemsByVoteId(command.voteId(), command.userId());
-        List<Integer> counts = voteItems.stream()
-                .map(VoteItemQueryDto::voteCount)
-                .toList();
-
-        List<Integer> percentages = VoteItem.calculatePercentages(counts);
 
         var voteItemDtos = IntStream.range(0, voteItems.size())
                 .mapToObj(i -> VoteResult.VoteItemDto.of(
                         voteItems.get(i).voteItemId(),
                         voteItems.get(i).itemName(),
-                        percentages.get(i),
+                        voteItems.get(i).voteCount(),
                         voteItems.get(i).isVoted()
                 ))
                 .toList();

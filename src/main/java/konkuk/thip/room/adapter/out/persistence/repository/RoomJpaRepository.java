@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, RoomQueryRepository {
@@ -20,4 +21,6 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
             "AND r.startDate > :currentDate")
     int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
 
+    @Query("SELECT r FROM RoomJpaEntity r WHERE r.roomId IN :roomIds")
+    List<RoomJpaEntity> findAllByIds(@Param("roomIds") List<Long> roomIds);
 }

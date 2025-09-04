@@ -19,4 +19,7 @@ public interface FollowingCommandPort {
     void save(Following following, User targetUser);
 
     void deleteFollowing(Following following, User targetUser);
+
+    void deleteAllByUserId(Long userId);
+
 }

@@ -43,7 +43,6 @@ public class RecordDeleteService implements RecordDeleteUseCase {
         // 3-3. 기록 삭제
         recordCommandPort.delete(record);
 
-        //TODO// 4. 유저 방 진행도 업데이트
         return command.roomId();
     }
 }

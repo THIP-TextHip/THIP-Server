@@ -34,11 +34,11 @@ public record RoomPostSearchResponse(
         public record VoteItemDto(
                 Long voteItemId,
                 String itemName,
-                int percentage,
+                int count,
                 boolean isVoted
         ) {
-            public static VoteItemDto of(Long voteItemId, String itemName, int percentage, boolean isVoted) {
-                return new VoteItemDto(voteItemId, itemName, percentage, isVoted);
+            public static VoteItemDto of(Long voteItemId, String itemName, int count, boolean isVoted) {
+                return new VoteItemDto(voteItemId, itemName, count, isVoted);
             }
         }
     }

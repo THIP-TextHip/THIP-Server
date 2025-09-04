@@ -29,4 +29,6 @@ public interface BookCommandPort {
     void deleteSavedBook(Long userId, Long bookId);
 
     void deleteAllByIdInBatch(Set<Long> unusedBookIds);
+
+    void deleteAllSavedBookByUserId(Long userId);
 }
