@@ -1,6 +1,7 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.mapper.RecordMapper;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
@@ -55,6 +56,11 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
 
         recordJpaEntity.softDelete();
         recordJpaRepository.save(recordJpaEntity);
+    }
+
+    @Override
+    public PostQueryDto getPostQueryDtoById(Long postId) {
+        return recordJpaRepository.getPostQueryDtoByPostId(postId);
     }
 
     @Override
