@@ -3,7 +3,7 @@ package konkuk.thip.message.application.port.in;
 import konkuk.thip.message.adapter.out.event.dto.RoomEvents;
 
 public interface RoomNotificationDispatchUseCase {
-    void handleRoomRecordCommented(RoomEvents.RoomRecordCommentedEvent e);
+    void handleRoomPostCommented(RoomEvents.RoomPostCommentedEvent e);
 
     void handleRoomVoteStarted(RoomEvents.RoomVoteStartedEvent e);
 
@@ -17,5 +17,7 @@ public interface RoomNotificationDispatchUseCase {
 
     void handleRoomCommentLiked(RoomEvents.RoomCommentLikedEvent e);
 
-    void handleRoomRecordLiked(RoomEvents.RoomRecordLikedEvent e);
+    void handleRoomPostLiked(RoomEvents.RoomPostLikedEvent e);
+
+    void handleRoomPostCommentReplied(RoomEvents.RoomPostCommentRepliedEvent e);
 }

@@ -25,7 +25,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
     private final FirebaseMessagingPort firebasePort;
 
     @Override
-    public void handleRoomRecordCommented(final RoomEvents.RoomRecordCommentedEvent event) {
+    public void handleRoomPostCommented(final RoomEvents.RoomPostCommentedEvent event) {
         Notification notification = buildNotification("새로운 댓글이 달렸어요",
                 "@" + event.actorUsername() + " 님이 내 독서기록에 댓글을 달았어요!");
 
@@ -152,7 +152,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
     }
 
     @Override
-    public void handleRoomRecordLiked(final RoomEvents.RoomRecordLikedEvent event) {
+    public void handleRoomPostLiked(final RoomEvents.RoomPostLikedEvent event) {
         Notification notification = buildNotification("좋아요 알림",
                 "@" + event.actorUsername() + " 님이 내 독서기록에 좋아요를 눌렀어요!");
 
@@ -171,6 +171,32 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
                     "type", "group",
                     "postId", String.valueOf(event.postId()),
                     "postType", "RECORD");
+            msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
+        }
+        firebasePort.sendBatch(msgs, tk, dev);
+    }
+
+    @Override
+    public void handleRoomPostCommentReplied(RoomEvents.RoomPostCommentRepliedEvent e) {
+        Notification notification = buildNotification("새로운 댓글이 달렸어요",
+                "@" + e.actorUsername() + " 님이 내 댓글에 대댓글을 달았어요!");
+
+        List<FcmToken> tokens = fcmTokenQueryPort.findEnabledByUserId(e.targetUserId());
+        if (tokens.isEmpty()) return;
+
+        List<Message> msgs = new ArrayList<>(tokens.size());
+        List<String> tk  = new ArrayList<>(tokens.size());
+        List<String> dev = new ArrayList<>(tokens.size());
+
+        for (FcmToken t : tokens) {
+            Message m = buildMessage(t.getFcmToken(), notification,
+                    MessageRoute.ROOM_RECORD_DETAIL,
+                    "roomId", String.valueOf(e.roomId()),
+                    "page", String.valueOf(e.page()),
+                    "type", "group",
+                    "postId", String.valueOf(e.postId()),
+                    "postType", e.postType());
+
             msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
         }
         firebasePort.sendBatch(msgs, tk, dev);

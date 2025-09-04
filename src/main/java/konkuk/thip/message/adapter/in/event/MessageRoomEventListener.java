@@ -17,7 +17,7 @@ public class MessageRoomEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onRoomPostCommented(RoomEvents.RoomPostCommentedEvent e) {
-        roomUseCase.handleRoomRecordCommented(e);
+        roomUseCase.handleRoomPostCommented(e);
     }
 
     @Async
@@ -59,12 +59,12 @@ public class MessageRoomEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onRoomPostLiked(RoomEvents.RoomPostLikedEvent e) {
-        roomUseCase.handleRoomRecordLiked(e);
+        roomUseCase.handleRoomPostLiked(e);
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onRoomPostCommentReplied(RoomEvents.RoomPostCommentRepliedEvent e) {
-        roomUseCase.handleRoomRecordCommentReplied(e);
+        roomUseCase.handleRoomPostCommentReplied(e);
     }
 }

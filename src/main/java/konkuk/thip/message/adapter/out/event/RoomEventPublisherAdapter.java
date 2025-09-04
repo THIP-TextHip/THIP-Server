@@ -13,9 +13,9 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public void publishRoomRecordCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                                Long roomId, Integer page, Long postId, String postType) {
-        publisher.publishEvent(RoomEvents.RoomRecordCommentedEvent.builder()
+    public void publishRoomPostCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                              Long roomId, Integer page, Long postId, String postType) {
+        publisher.publishEvent(RoomEvents.RoomPostCommentedEvent.builder()
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -96,9 +96,22 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomRecordLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                            Long roomId, Integer page, Long postId, String postType) {
-        publisher.publishEvent(RoomEvents.RoomRecordLikedEvent.builder()
+    public void publishRoomPostLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                          Long roomId, Integer page, Long postId, String postType) {
+        publisher.publishEvent(RoomEvents.RoomPostLikedEvent.builder()
+                .targetUserId(targetUserId)
+                .actorUserId(actorUserId)
+                .actorUsername(actorUsername)
+                .roomId(roomId)
+                .page(page)
+                .postId(postId)
+                .postType(postType)
+                .build());
+    }
+
+    @Override
+    public void publicRoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername, Long roomId, Integer page, Long postId, String postType) {
+        publisher.publishEvent(RoomEvents.RoomPostCommentRepliedEvent.builder()
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)

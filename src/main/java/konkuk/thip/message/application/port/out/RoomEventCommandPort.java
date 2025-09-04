@@ -3,8 +3,8 @@ package konkuk.thip.message.application.port.out;
 public interface RoomEventCommandPort {
 
     // 내 모임방 기록/투표에 댓글이 달린 경우
-    void publishRoomRecordCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                         Long roomId, Integer page, Long postId, String postType);
+    void publishRoomPostCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                       Long roomId, Integer page, Long postId, String postType);
 
     // 내가 참여한 모임방에 새로운 투표가 시작된 경우
     void publishRoomVoteStartedEvent(Long targetUserId, Long roomId, String roomTitle,
@@ -29,6 +29,9 @@ public interface RoomEventCommandPort {
                                       Long roomId, Integer page, Long postId);
 
     // 내가 참여한 모임방 안의 나의 기록/투표가 좋아요를 받는 경우
-    void publishRoomRecordLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                     Long roomId, Integer page, Long postId, String postType);
+    void publishRoomPostLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                   Long roomId, Integer page, Long postId, String postType);
+
+    void publicRoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                   Long roomId, Integer page, Long postId, String postType);
 }

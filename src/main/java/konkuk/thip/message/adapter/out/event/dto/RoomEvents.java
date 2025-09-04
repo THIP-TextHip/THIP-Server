@@ -8,8 +8,8 @@ public class RoomEvents {
     // 댓글 대상이 "기록/투표" 모두 가능하므로 통합 스키마 사용
     // 내 모임방 기록/투표에 댓글이 달린 경우
     @Builder
-    public record RoomRecordCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                           Long roomId, Integer page, Long postId, String postType) {}
+    public record RoomPostCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                         Long roomId, Integer page, Long postId, String postType) {}
 
     // 내가 참여한 모임방에 새로운 투표가 시작된 경우
     @Builder
@@ -41,6 +41,11 @@ public class RoomEvents {
 
     // 내가 참여한 모임방의 나의 기록이 좋아요를 받는 경우
     @Builder
-    public record RoomRecordLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+    public record RoomPostLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
+                                     Long roomId, Integer page, Long postId, String postType) {}
+
+    // 내가 참여한 모임방의 나의 댓글에 대댓글이 달린 경우
+    @Builder
+    public record RoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
                                        Long roomId, Integer page, Long postId, String postType) {}
 }
