@@ -2,11 +2,13 @@ package konkuk.thip.user.adapter.out.persistence;
 
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.user.adapter.out.mapper.UserMapper;
 import konkuk.thip.user.adapter.out.persistence.function.ReactionQueryFunction;
 import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,7 @@ import java.util.Set;
 public class UserQueryPersistenceAdapter implements UserQueryPort {
 
     private final UserJpaRepository userJpaRepository;
+    private final UserMapper userMapper;
 
     @Override
     public boolean existsByNickname(String nickname) {
@@ -64,6 +67,13 @@ public class UserQueryPersistenceAdapter implements UserQueryPort {
         return getReactions(userId, cursor,
                 (id, cursorDateTime, size) -> userJpaRepository.findLikeAndCommentByUserId(id, cursorDateTime, size, likeLabel, commentLabel)
         );
+    }
+
+    @Override
+    public List<User> getAllFollowersByUserId(Long userId) {
+        return userJpaRepository.findAllFollowersByUserId(userId).stream()
+                .map(userMapper::toDomainEntity)
+                .toList();
     }
 
     private CursorBasedList<ReactionQueryDto> getReactions(Long userId, Cursor cursor, ReactionQueryFunction reactionQueryFunction) {
