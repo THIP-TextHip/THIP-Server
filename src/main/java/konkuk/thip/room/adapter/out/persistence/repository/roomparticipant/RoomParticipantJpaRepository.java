@@ -30,4 +30,8 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
             "AND rp.roomJpaEntity.roomId = :roomId")
     boolean existsByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
+    @Query("SELECT rp FROM RoomParticipantJpaEntity rp " +
+            "WHERE rp.roomJpaEntity.roomId = :roomId " +
+            "AND rp.roomParticipantRole = 'HOST'")
+    Optional<RoomParticipantJpaEntity> findHostByRoomId(Long roomId);
 }

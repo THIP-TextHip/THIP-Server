@@ -2,6 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.message.application.port.out.RoomEventCommandPort;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
 import konkuk.thip.room.application.port.in.dto.RoomJoinResult;
@@ -10,6 +11,8 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.in.dto.RoomJoinType;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,9 @@ public class RoomJoinService implements RoomJoinUseCase {
 
     private final RoomCommandPort roomCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
+    private final UserCommandPort userCommandPort;
+
+    private final RoomEventCommandPort roomEventCommandPort;
 
     @Override
     @Transactional
@@ -45,7 +51,16 @@ public class RoomJoinService implements RoomJoinUseCase {
         // 방의 상태 업데이트
         roomCommandPort.update(room);
 
+        // 참여자 푸쉬 알림 전송 (호스트에게만 전송)
+        sendNotifications(roomJoinCommand, room);
+
         return RoomJoinResult.of(room.getId(), type.getType());
+    }
+
+    private void sendNotifications(RoomJoinCommand roomJoinCommand, Room room) {
+        RoomParticipant targetUser = roomParticipantCommandPort.findHostByRoomId(room.getId());
+        User actorUser = userCommandPort.findById(roomJoinCommand.userId());
+        roomEventCommandPort.publishRoomJoinEventToHost(targetUser.getUserId(), room.getId(), room.getTitle(), actorUser.getId(), actorUser.getNickname());
     }
 
     private void handleCancel(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Optional<RoomParticipant> roomParticipantOptional, Room room) {
