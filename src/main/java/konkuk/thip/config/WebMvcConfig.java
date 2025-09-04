@@ -1,5 +1,6 @@
 package konkuk.thip.config;
 
+import konkuk.thip.common.security.argument_resolver.AuthTokenArgumentResolver;
 import konkuk.thip.common.security.argument_resolver.Oauth2IdArgumentResolver;
 import konkuk.thip.common.security.argument_resolver.UserIdArgumentResolver;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final UserIdArgumentResolver userIdArgumentResolver;
     private final Oauth2IdArgumentResolver oauth2IdArgumentResolver;
+    private final AuthTokenArgumentResolver authTokenArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(userIdArgumentResolver);
         resolvers.add(oauth2IdArgumentResolver);
+        resolvers.add(authTokenArgumentResolver);
     }
 }
