@@ -32,6 +32,7 @@ public interface RoomEventCommandPort {
     void publishRoomPostLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
                                    Long roomId, Integer page, Long postId, String postType);
 
+    // 내가 참여한 모임방의 나의 댓글에 대댓글이 달린 경우
     void publicRoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
                                    Long roomId, Integer page, Long postId, String postType);
 }
