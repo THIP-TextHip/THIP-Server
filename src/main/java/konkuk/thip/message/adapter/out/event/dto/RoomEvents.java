@@ -37,7 +37,7 @@ public class RoomEvents {
     // 내가 참여한 모임방의 나의 댓글이 좋아요를 받는 경우
     @Builder
     public record RoomCommentLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                        Long roomId, Integer page, Long postId) {}
+                                        Long roomId, Integer page, Long postId, String postType) {}
 
     // 내가 참여한 모임방의 나의 기록이 좋아요를 받는 경우
     @Builder

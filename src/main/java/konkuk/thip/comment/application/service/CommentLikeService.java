@@ -77,7 +77,7 @@ public class CommentLikeService implements CommentLikeUseCase {
         }
         if (comment.getPostType() == PostType.RECORD || comment.getPostType() == PostType.VOTE) {
             PostQueryDto postQueryDto = postHandler.getPostQueryDto(comment.getPostType(), comment.getTargetPostId());
-            roomEventCommandPort.publishRoomCommentLikedEvent(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId());
+            roomEventCommandPort.publishRoomCommentLikedEvent(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
         }
     }
 }

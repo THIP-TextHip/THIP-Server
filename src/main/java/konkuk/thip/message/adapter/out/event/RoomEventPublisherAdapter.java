@@ -84,7 +84,7 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
 
     @Override
     public void publishRoomCommentLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                             Long roomId, Integer page, Long postId) {
+                                             Long roomId, Integer page, Long postId, String postType) {
         publisher.publishEvent(RoomEvents.RoomCommentLikedEvent.builder()
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
@@ -92,6 +92,7 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
                 .roomId(roomId)
                 .page(page)
                 .postId(postId)
+                .postType(postType)
                 .build());
     }
 

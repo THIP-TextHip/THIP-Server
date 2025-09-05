@@ -26,7 +26,7 @@ public interface RoomEventCommandPort {
 
     // 내가 참여한 모임방의 나의 댓글이 좋아요를 받는 경우
     void publishRoomCommentLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                      Long roomId, Integer page, Long postId);
+                                      Long roomId, Integer page, Long postId, String postType);
 
     // 내가 참여한 모임방 안의 나의 기록/투표가 좋아요를 받는 경우
     void publishRoomPostLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,

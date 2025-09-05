@@ -145,7 +145,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
                     "page", String.valueOf(event.page()),
                     "type", "group",
                     "postId", String.valueOf(event.postId()),
-                    "postType", "RECORD");
+                    "postType", String.valueOf(event.postType()));
             msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
         }
         firebasePort.sendBatch(msgs, tk, dev);
