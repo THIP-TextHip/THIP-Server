@@ -43,7 +43,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
                     "page", String.valueOf(event.page()),
                     "type", "group",
                     "postId", String.valueOf(event.postId()),
-                    "postType", event.postType());
+                    "postType", String.valueOf(event.postType()));
 
             msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
         }
@@ -195,7 +195,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
                     "page", String.valueOf(e.page()),
                     "type", "group",
                     "postId", String.valueOf(e.postId()),
-                    "postType", e.postType());
+                    "postType", String.valueOf(e.postType()));
 
             msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
         }

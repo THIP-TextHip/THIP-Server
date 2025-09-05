@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_COMMENT_CREATE;
+import static konkuk.thip.post.domain.PostType.*;
 
 
 @Service
@@ -48,15 +49,17 @@ public class CommentCreateService implements CommentCreateUseCase {
 
         // 1. 댓글/답글 생성 선행검증 및 작성하려는 게시글 타입 검증
         Comment.validateCommentCreate(command.isReplyRequest(), command.parentId());
-        PostType type = PostType.from(command.postType());
+        PostType type = from(command.postType());
 
         // 2. 게시물 타입에 맞게 조회
         CountUpdatable post = postHandler.findPost(type, command.postId());
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
         commentAuthorizationValidator.validateUserCanAccessPostForComment(type, post, command.userId());
 
-        // 2-2. 푸쉬 알림 전송
-        sendNotifications(command, type, post);
+        // 2-2. 댓글 생성 푸쉬 알림 전송 (게시글 작성자에게)
+        PostQueryDto postQueryDto = postHandler.getPostQueryDto(type, post.getId());
+        User actorUser = userCommandPort.findById(command.userId());
+        sendNotificationsToPostWriter(postQueryDto, actorUser);
 
         // 3. 댓글 생성
         Long savedCommentId = createCommentDomain(command);
@@ -73,6 +76,10 @@ public class CommentCreateService implements CommentCreateUseCase {
         if (command.isReplyRequest()) {
             // 부모 댓글 조회
             CommentQueryDto parentCommentDto = commentQueryPort.findRootCommentById(command.parentId());
+
+            // 답글 생성 푸쉬 알림 전송 (부모 댓글 작성자에게)
+            sendNotificationsToParentCommentWriter(postQueryDto, parentCommentDto, actorUser);
+
             // 사용자 부모 댓글 좋아요 여부 조회
             boolean isLikedParentComment = commentLikeQueryPort.isLikedCommentByUser(command.userId(),parentCommentDto.commentId());
 
@@ -84,23 +91,23 @@ public class CommentCreateService implements CommentCreateUseCase {
         }
     }
 
-    private void sendNotifications(CommentCreateCommand command, PostType type, CountUpdatable post) {
-        PostQueryDto postQueryDto = postHandler.getPostQueryDto(type, post.getId());
-        User actorUser = userCommandPort.findById(command.userId());
-        if (type == PostType.FEED) {
+    private void sendNotificationsToPostWriter(PostQueryDto postQueryDto, User actorUser) {
+        if (postQueryDto.postType().equals(FEED.getType())) {
             // 피드 댓글 알림 이벤트 발행
             feedEventCommandPort.publishFeedCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
-            if (command.isReplyRequest()){
-                // 피드 답글 알림 이벤트 발행
-                feedEventCommandPort.publishFeedRepliedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
-            }
-        } else if (type == PostType.RECORD || type == PostType.VOTE) {
+        } else if (postQueryDto.postType().equals(RECORD.getType()) || postQueryDto.postType().equals(VOTE.getType())) {
             // 모임방 게시글 댓글 알림 이벤트 발행
             roomEventCommandPort.publishRoomPostCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
-            if (command.isReplyRequest()){
-                // 모임방 게시글 답글 알림 이벤트 발행
-                roomEventCommandPort.publishRoomPostCommentRepliedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
-            }
+        }
+    }
+
+    private void sendNotificationsToParentCommentWriter(PostQueryDto postQueryDto, CommentQueryDto parentCommentDto, User actorUser) {
+        if (postQueryDto.postType().equals(FEED.getType())) {
+            // 피드 답글 알림 이벤트 발행
+            feedEventCommandPort.publishFeedRepliedEvent(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+        } else if (postQueryDto.postType().equals(RECORD.getType()) || postQueryDto.postType().equals(VOTE.getType())) {
+            // 모임방 게시글 답글 알림 이벤트 발행
+            roomEventCommandPort.publishRoomPostCommentRepliedEvent(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
         }
     }
 
