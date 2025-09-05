@@ -14,7 +14,7 @@ permissions:
 env:
   RESOURCE_PATH: src/main/resources
   TEST_RESOURCE_PATH: src/test/resources
-  FIREBASE_KEY_PATH: src/main/resources/firebase
+  FIREBASE_KEY_PATH: ${{ secrets.FIREBASE_KEY_PATH }}
 
 jobs:
   build:
