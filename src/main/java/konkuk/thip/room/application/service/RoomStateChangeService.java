@@ -55,7 +55,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
         for (Room room : targetRooms) {
             List<RoomParticipant> targetUsers = roomParticipantCommandPort.findAllByRoomId(room.getId());
             for (RoomParticipant participant : targetUsers) {
-                roomEventCommandPort.publishRoomActivityStartedEvent(participant.getId(), room.getId(), room.getTitle());
+                roomEventCommandPort.publishRoomActivityStartedEvent(participant.getUserId(), room.getId(), room.getTitle());
             }
         }
     }
