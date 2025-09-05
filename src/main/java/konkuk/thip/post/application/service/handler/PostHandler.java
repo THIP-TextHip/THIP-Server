@@ -37,9 +37,10 @@ public class PostHandler {
     }
 
     public PostQueryDto getPostQueryDto(PostType type, Long postId) {
-        return switch (type) {
-            case FEED -> feedCommandPort.getPostQueryDtoById(postId);
-            default -> recordCommandPort.getPostQueryDtoById(postId);
-        };
+        if (type == PostType.FEED) {
+            return feedCommandPort.getPostQueryDtoById(postId);
+        }
+
+        return recordCommandPort.getPostQueryDtoById(postId);
     }
 }
