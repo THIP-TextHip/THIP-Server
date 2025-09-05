@@ -58,17 +58,20 @@ public class FeedCreateService implements FeedCreateUseCase {
                 command.imageUrls()
         );
 
-        // 4. 피드 작성 푸쉬 알림 전송
-        sendNotifications(command, feed);
+        // 4. 피드 영속화
+        Long savedFeedId = feedCommandPort.save(feed);
 
-        return feedCommandPort.save(feed);
+        // 5. 피드 작성 푸쉬 알림 전송
+        sendNotifications(command, savedFeedId);
+
+        return savedFeedId;
     }
 
-    private void sendNotifications(FeedCreateCommand command, Feed feed) {
+    private void sendNotifications(FeedCreateCommand command, Long savedFeedId) {
         List<User> targetUsers = userQueryPort.getAllFollowersByUserId(command.userId());
         User actorUser = userCommandPort.findById(command.userId());
         for (User targetUser : targetUsers) {
-            feedEventCommandPort.publishFolloweeNewPostEvent(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), feed.getId());
+            feedEventCommandPort.publishFolloweeNewPostEvent(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
         }
     }
 
