@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
@@ -22,8 +23,11 @@ public class FirebaseConfig {
 
     @Bean
     FirebaseApp firebaseApp(@Value("${firebase.file-path}") String filePath) throws IOException {
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(filePath).getInputStream());
+        GoogleCredentials googleCredentials;
+        ClassPathResource resource = new ClassPathResource(filePath);
+        try (InputStream in = resource.getInputStream()) {
+            googleCredentials = GoogleCredentials.fromStream(in);
+        }
 
         FirebaseOptions firebaseOptions = FirebaseOptions.builder()
                 .setCredentials(googleCredentials)
@@ -32,7 +36,6 @@ public class FirebaseConfig {
         if (FirebaseApp.getApps().isEmpty()) {
             return FirebaseApp.initializeApp(firebaseOptions);
         }
-
         return FirebaseApp.getInstance();
     }
 
