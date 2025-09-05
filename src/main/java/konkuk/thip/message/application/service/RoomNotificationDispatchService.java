@@ -38,7 +38,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
 
         for (FcmToken t : tokens) {
             Message m = buildMessage(t.getFcmToken(), notification,
-                    MessageRoute.ROOM_RECORD_DETAIL,
+                    MessageRoute.ROOM_POST_DETAIL,
                     "roomId", String.valueOf(event.roomId()),
                     "page", String.valueOf(event.page()),
                     "type", "group",
@@ -140,7 +140,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
 
         for (FcmToken t : tokens) {
             Message m = buildMessage(t.getFcmToken(), notification,
-                    MessageRoute.ROOM_RECORD_DETAIL,
+                    MessageRoute.ROOM_POST_DETAIL,
                     "roomId", String.valueOf(event.roomId()),
                     "page", String.valueOf(event.page()),
                     "type", "group",
@@ -165,12 +165,12 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
 
         for (FcmToken t : tokens) {
             Message m = buildMessage(t.getFcmToken(), notification,
-                    MessageRoute.ROOM_RECORD_DETAIL,
+                    MessageRoute.ROOM_POST_DETAIL,
                     "roomId", String.valueOf(event.roomId()),
                     "page", String.valueOf(event.page()),
                     "type", "group",
                     "postId", String.valueOf(event.postId()),
-                    "postType", "RECORD");
+                    "postType", String.valueOf(event.postType()));
             msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
         }
         firebasePort.sendBatch(msgs, tk, dev);
@@ -190,7 +190,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
 
         for (FcmToken t : tokens) {
             Message m = buildMessage(t.getFcmToken(), notification,
-                    MessageRoute.ROOM_RECORD_DETAIL,
+                    MessageRoute.ROOM_POST_DETAIL,
                     "roomId", String.valueOf(e.roomId()),
                     "page", String.valueOf(e.page()),
                     "type", "group",
