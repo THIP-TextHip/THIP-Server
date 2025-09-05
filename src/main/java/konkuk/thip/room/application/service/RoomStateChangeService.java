@@ -28,7 +28,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
     /**
      * end_date < 오늘 => EXPIRED
      */
-    @Async
+    @Async("schedulerAsyncExecutor")
     @Override
     @Transactional
     public void changeRoomStateToExpired() {
@@ -39,6 +39,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
     /**
      * start_date <= 오늘 AND end_date >= 오늘 => IN_PROGRESS
      */
+    @Async("schedulerAsyncExecutor")
     @Override
     @Transactional
     public void changeRoomStateToProgress() {
