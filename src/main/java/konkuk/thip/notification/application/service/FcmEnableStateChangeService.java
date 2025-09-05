@@ -19,7 +19,7 @@ public class FcmEnableStateChangeService implements FcmEnableStateChangeUseCase 
     public boolean changeEnableState(FcmEnableStateChangeCommand command) {
         FcmToken fcmToken = fcmTokenLoadPort.getByDeviceIdOrThrow(command.deviceId());
 
-        fcmToken.changeEnableState(command.enable());
+        fcmToken.changeEnableState(command.enable(), command.userId());
         fcmTokenLoadPort.update(fcmToken);
 
         return command.enable();

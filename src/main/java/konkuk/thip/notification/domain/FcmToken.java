@@ -53,15 +53,18 @@ public class FcmToken extends BaseDomainEntity {
         this.userId = userId;
     }
 
-    public void changeEnableState(boolean enable) {
-        validateChangeEnableState(enable);
+    public void changeEnableState(boolean enable, long actorUserId) {
+        validateChangeEnableState(enable, actorUserId);
         this.isEnabled = enable;
     }
 
-    private void validateChangeEnableState(boolean enable) {
+    private void validateChangeEnableState(boolean enable, long actorUserId) {
         if (this.isEnabled == enable) {
             throw new InvalidStateException(ErrorCode.FCM_TOKEN_ENABLED_STATE_ALREADY,
                     new IllegalArgumentException("이미 " + (enable ? "활성화" : "비활성화") + "된 상태입니다."));
+        }
+        if (this.userId != actorUserId) {
+            throw new InvalidStateException(ErrorCode.FCM_TOKEN_CHANGE_ENABLE_STATE_FORBIDDEN);
         }
     }
 }
