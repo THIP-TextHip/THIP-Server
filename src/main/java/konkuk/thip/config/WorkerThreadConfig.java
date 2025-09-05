@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableAsync
@@ -47,7 +48,8 @@ public class WorkerThreadConfig implements AsyncConfigurer {
         executor.setQueueCapacity(10);      // 작은 큐 (스케줄링된 작업이므로)
         executor.setThreadNamePrefix("scheduler-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
-//        executor.setAwaitTerminationSeconds(120);  // 배치작업 완료 대기시간
+        executor.setAwaitTerminationSeconds(120);  // 배치작업 완료 대기시간
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }
