@@ -110,7 +110,7 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publicRoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername, Long roomId, Integer page, Long postId, String postType) {
+    public void publishRoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername, Long roomId, Integer page, Long postId, String postType) {
         publisher.publishEvent(RoomEvents.RoomPostCommentRepliedEvent.builder()
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)

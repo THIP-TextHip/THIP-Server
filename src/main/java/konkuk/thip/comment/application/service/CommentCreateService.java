@@ -99,7 +99,7 @@ public class CommentCreateService implements CommentCreateUseCase {
             roomEventCommandPort.publishRoomPostCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
             if (command.isReplyRequest()){
                 // 모임방 게시글 답글 알림 이벤트 발행
-                roomEventCommandPort.publicRoomPostCommentRepliedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+                roomEventCommandPort.publishRoomPostCommentRepliedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
             }
         }
     }
