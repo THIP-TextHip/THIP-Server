@@ -65,8 +65,8 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
     }
 
     @Override
-    public int updateRoomStateToInProgress(RoomStatus roomStatus) {
-        return roomJpaRepository.updateRoomStatusToInProgress(roomStatus);
+    public int updateRoomStateToInProgress(RoomStatus fromStatus, RoomStatus toStatus) {
+        return roomJpaRepository.updateRoomStatusToInProgress(fromStatus, toStatus);
     }
 
     @Override

@@ -34,7 +34,7 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
             where r.endDate < current_date
               and r.roomStatus <> :exceptStatus
            """)
-    int updateRoomStatusToExpired(RoomStatus exceptStatus);
+    int updateRoomStatusToExpired(@Param("exceptStatus") RoomStatus exceptStatus);
 
     /**
      * start_date <= 오늘 AND end_date >= 오늘 => IN_PROGRESS
@@ -43,12 +43,12 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
            update RoomJpaEntity r
-              set r.roomStatus = :status
+              set r.roomStatus = :toStatus
             where r.startDate <= current_date
               and r.endDate >= current_date
-              and r.roomStatus = :status
+              and r.roomStatus = :fromStatus
            """)
-    int updateRoomStatusToInProgress(RoomStatus status);
+    int updateRoomStatusToInProgress(@Param("fromStatus") RoomStatus fromStatus, @Param("toStatus") RoomStatus toStatus);
 
     @Query("""
            select r
@@ -57,5 +57,5 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
               and r.endDate   >= current_date
               and r.roomStatus = :status
            """)
-    List<RoomJpaEntity> findProgressTargetIds(RoomStatus status);
+    List<RoomJpaEntity> findProgressTargetIds(@Param("status") RoomStatus status);
 }

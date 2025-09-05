@@ -24,7 +24,7 @@ public interface RoomCommandPort {
 
     int updateRoomStateToExpired(RoomStatus exceptStatus);
 
-    int updateRoomStateToInProgress(RoomStatus roomStatus);
+    int updateRoomStateToInProgress(RoomStatus fromStatus, RoomStatus toStatus);
 
     List<Room> findProgressTargetRooms(RoomStatus status);
 }

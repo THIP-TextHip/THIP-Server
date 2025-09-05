@@ -46,7 +46,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
         // 방 모임방 활동 시작 푸쉬알림 전송
         sendNotifications();
 
-        int updated = roomCommandPort.updateRoomStateToInProgress(RoomStatus.RECRUITING);
+        int updated = roomCommandPort.updateRoomStateToInProgress(RoomStatus.RECRUITING, RoomStatus.IN_PROGRESS);
         log.info("[RoomState] IN_PROGRESS로 변경된 건수={}", updated);
     }
 
