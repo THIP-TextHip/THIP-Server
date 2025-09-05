@@ -6,15 +6,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
-import konkuk.thip.common.swagger.SwaggerResponseDescription;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenDeleteRequest;
+import konkuk.thip.notification.adapter.in.web.request.FcmTokenEnableStateChangeRequest;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenRegisterRequest;
 import konkuk.thip.notification.adapter.in.web.response.FcmTokenEnableStateChangeResponse;
+import konkuk.thip.notification.application.port.in.FcmDeleteUseCase;
 import konkuk.thip.notification.application.port.in.FcmEnableStateChangeUseCase;
 import konkuk.thip.notification.application.port.in.FcmRegisterUseCase;
-import konkuk.thip.notification.adapter.in.web.request.FcmTokenEnableStateChangeRequest;
-import konkuk.thip.notification.application.port.in.FcmDeleteUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,7 +51,7 @@ public class NotificationCommandController {
     }
 
     @Operation(summary = "FCM 토큰 삭제", description = "사용자의 FCM 토큰을 삭제합니다.")
-    @ExceptionDescription(SwaggerResponseDescription)
+    @ExceptionDescription(FCM_TOKEN_DELETE)
     @DeleteMapping("/notifications/fcm-tokens")
     public BaseResponse<Void> deleteFcmToken(
             @RequestBody @Valid FcmTokenDeleteRequest request,
