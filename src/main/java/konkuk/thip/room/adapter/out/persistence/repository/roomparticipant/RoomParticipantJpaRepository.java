@@ -33,5 +33,5 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
     @Query("SELECT rp FROM RoomParticipantJpaEntity rp " +
             "WHERE rp.roomJpaEntity.roomId = :roomId " +
             "AND rp.roomParticipantRole = 'HOST'")
-    Optional<RoomParticipantJpaEntity> findHostByRoomId(Long roomId);
+    Optional<RoomParticipantJpaEntity> findHostByRoomId(@Param("roomId") Long roomId);
 }
