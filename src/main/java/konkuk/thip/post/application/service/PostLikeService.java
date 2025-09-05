@@ -68,6 +68,9 @@ public class PostLikeService implements PostLikeUseCase {
 
     private void sendNotifications(PostIsLikeCommand command) {
         PostQueryDto postQueryDto = postHandler.getPostQueryDto(command.postType(), command.postId());
+
+        if(command.userId().equals(postQueryDto.creatorId())) return; // 자신의 게시글에 좋아요 누르는 경우 제외
+
         User actorUser = userCommandPort.findById(command.userId());
         // 좋아요 푸쉬알림 전송
         if (command.postType() == PostType.FEED) {

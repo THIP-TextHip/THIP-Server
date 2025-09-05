@@ -54,7 +54,7 @@ public class CommentLikeService implements CommentLikeUseCase {
             commentLikeCommandPort.save(command.userId(), command.commentId());
 
             // 댓글 좋아요 푸쉬알림 전송
-            sendNotifcations(command, comment);
+            sendNotifications(command, comment);
         } else {
             comment.validateCanUnlike(alreadyLiked); // 좋아요 취소 가능 여부 검증
             commentLikeCommandPort.delete(command.userId(), command.commentId());
@@ -67,11 +67,13 @@ public class CommentLikeService implements CommentLikeUseCase {
         return CommentIsLikeResult.of(comment.getId(), command.isLike());
     }
 
-    private void sendNotifcations(CommentIsLikeCommand command, Comment comment) {
+    private void sendNotifications(CommentIsLikeCommand command, Comment comment) {
+        if (command.userId().equals(comment.getCreatorId())) return; // 자신의 댓글에 좋아요 누르는 경우 제외
+
         User actorUser = userCommandPort.findById(command.userId());
         // 좋아요 푸쉬알림 전송
         if (comment.getPostType() == PostType.FEED) {
-            feedEventCommandPort.publishFeedCommentLikedEvent(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), comment.getId());
+            feedEventCommandPort.publishFeedCommentLikedEvent(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), comment.getTargetPostId());
         }
         if (comment.getPostType() == PostType.RECORD || comment.getPostType() == PostType.VOTE) {
             PostQueryDto postQueryDto = postHandler.getPostQueryDto(comment.getPostType(), comment.getTargetPostId());
