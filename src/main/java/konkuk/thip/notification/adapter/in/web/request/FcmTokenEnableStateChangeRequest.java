@@ -9,7 +9,7 @@ import konkuk.thip.notification.application.port.in.dto.FcmEnableStateChangeComm
 public record FcmTokenEnableStateChangeRequest(
         @NotNull
         @Schema(description = "푸시 알림 수신 여부", example = "true")
-        boolean enable,
+        Boolean enable,
 
         @NotBlank
         @Schema(description = "디바이스 고유 ID", example = "device12345")
