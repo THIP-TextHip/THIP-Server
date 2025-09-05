@@ -43,7 +43,7 @@ public class NotificationCommandController {
     @ExceptionDescription(FCM_TOKEN_ENABLE_STATE_CHANGE)
     @PatchMapping("/notifications/enable-state")
     public BaseResponse<FcmTokenEnableStateChangeResponse> updatePushNotificationSetting(
-            @RequestBody FcmTokenEnableStateChangeRequest request,
+            @RequestBody @Valid FcmTokenEnableStateChangeRequest request,
             @Parameter(hidden = true) @UserId Long userId
     ) {
         return BaseResponse.ok(
@@ -53,7 +53,7 @@ public class NotificationCommandController {
     @DeleteMapping("/fcm-tokens")
     @Operation(summary = "FCM 토큰 삭제", description = "사용자의 FCM 토큰을 삭제합니다.")
     public BaseResponse<Void> deleteFcmToken(
-            @RequestBody FcmTokenDeleteRequest request,
+            @RequestBody @Valid FcmTokenDeleteRequest request,
             @Parameter(hidden = true) @UserId Long userId
     ) {
         fcmDeleteUseCase.deleteToken(request.toCommand(userId));
