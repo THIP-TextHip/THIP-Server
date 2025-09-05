@@ -63,8 +63,12 @@ public class FcmToken extends BaseDomainEntity {
             throw new InvalidStateException(ErrorCode.FCM_TOKEN_ENABLED_STATE_ALREADY,
                     new IllegalArgumentException("이미 " + (enable ? "활성화" : "비활성화") + "된 상태입니다."));
         }
+        validateFcmOwner(actorUserId);
+    }
+
+    public void validateFcmOwner(long actorUserId) {
         if (this.userId != actorUserId) {
-            throw new InvalidStateException(ErrorCode.FCM_TOKEN_CHANGE_ENABLE_STATE_FORBIDDEN);
+            throw new InvalidStateException(ErrorCode.FCM_TOKEN_ACCESS_FORBIDDEN);
         }
     }
 }

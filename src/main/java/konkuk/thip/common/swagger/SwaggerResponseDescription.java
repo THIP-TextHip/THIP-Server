@@ -337,8 +337,13 @@ public enum SwaggerResponseDescription {
     FCM_TOKEN_ENABLE_STATE_CHANGE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
             FCM_TOKEN_NOT_FOUND,
-            FCM_TOKEN_ENABLED_STATE_ALREADY
+            FCM_TOKEN_ENABLED_STATE_ALREADY,
+            FCM_TOKEN_ACCESS_FORBIDDEN
     ))),
+    FCM_TOKEN_DELETE(new LinkedHashSet<>(Set.of(
+            FCM_TOKEN_NOT_FOUND,
+            FCM_TOKEN_ACCESS_FORBIDDEN
+    )))
 
   ;
     private final Set<ErrorCode> errorCodeList;
