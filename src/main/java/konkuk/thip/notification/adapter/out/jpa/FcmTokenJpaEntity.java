@@ -3,6 +3,7 @@ package konkuk.thip.notification.adapter.out.jpa;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.notification.domain.FcmToken;
+import konkuk.thip.notification.domain.value.PlatformType;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 

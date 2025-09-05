@@ -1,6 +1,6 @@
 package konkuk.thip.notification.application.port.in.dto;
 
-import konkuk.thip.notification.adapter.out.jpa.PlatformType;
+import konkuk.thip.notification.domain.value.PlatformType;
 import lombok.Builder;
 
 @Builder

@@ -3,7 +3,7 @@ package konkuk.thip.notification.adapter.in.web.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import konkuk.thip.notification.adapter.out.jpa.PlatformType;
+import konkuk.thip.notification.domain.value.PlatformType;
 import konkuk.thip.notification.application.port.in.dto.FcmTokenRegisterCommand;
 
 @Schema(description = "FCM 토큰 등록 요청 DTO")

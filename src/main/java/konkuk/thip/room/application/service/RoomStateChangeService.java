@@ -1,7 +1,7 @@
 package konkuk.thip.room.application.service;
 
 import konkuk.thip.message.application.port.out.RoomEventCommandPort;
-import konkuk.thip.room.adapter.out.jpa.RoomStatus;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.room.application.port.in.RoomStateChangeUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;

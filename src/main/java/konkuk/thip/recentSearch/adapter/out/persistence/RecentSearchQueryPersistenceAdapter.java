@@ -1,6 +1,6 @@
 package konkuk.thip.recentSearch.adapter.out.persistence;
 
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.recentSearch.adapter.out.mapper.RecentSearchMapper;
 import konkuk.thip.recentSearch.adapter.out.persistence.repository.RecentSearchJpaRepository;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchQueryPort;
