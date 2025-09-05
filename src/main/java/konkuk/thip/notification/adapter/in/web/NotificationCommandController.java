@@ -29,7 +29,7 @@ public class NotificationCommandController {
     private final FcmDeleteUseCase fcmDeleteUseCase;
 
     @Operation(summary = "FCM 토큰 등록", description = "사용자의 FCM 토큰을 서버에 등록합니다. 기존 토큰이 있다면 deviceId 기준으로 토큰을 갱신합니다.")
-    @PostMapping("/fcm-tokens")
+    @PostMapping("/notifications/fcm-tokens")
     @ExceptionDescription(FCM_TOKEN_REGISTER)
     public BaseResponse<Void> registerFcmToken(
             @RequestBody @Valid FcmTokenRegisterRequest request,
@@ -50,7 +50,7 @@ public class NotificationCommandController {
                 FcmTokenEnableStateChangeResponse.of(fcmEnableStateChangeUseCase.changeEnableState(request.toCommand(userId))));
     }
 
-    @DeleteMapping("/fcm-tokens")
+    @DeleteMapping("/notifications/fcm-tokens")
     @Operation(summary = "FCM 토큰 삭제", description = "사용자의 FCM 토큰을 삭제합니다.")
     public BaseResponse<Void> deleteFcmToken(
             @RequestBody @Valid FcmTokenDeleteRequest request,
