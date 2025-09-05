@@ -92,6 +92,8 @@ public class CommentCreateService implements CommentCreateUseCase {
     }
 
     private void sendNotificationsToPostWriter(PostQueryDto postQueryDto, User actorUser) {
+        if (postQueryDto.creatorId().equals(actorUser.getId())) return; // 자신이 작성한 게시글 제외
+
         if (postQueryDto.postType().equals(FEED.getType())) {
             // 피드 댓글 알림 이벤트 발행
             feedEventCommandPort.publishFeedCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
@@ -102,6 +104,8 @@ public class CommentCreateService implements CommentCreateUseCase {
     }
 
     private void sendNotificationsToParentCommentWriter(PostQueryDto postQueryDto, CommentQueryDto parentCommentDto, User actorUser) {
+        if (parentCommentDto.creatorId().equals(actorUser.getId())) return; // 자신이 작성한 댓글 제외
+
         if (postQueryDto.postType().equals(FEED.getType())) {
             // 피드 답글 알림 이벤트 발행
             feedEventCommandPort.publishFeedRepliedEvent(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
