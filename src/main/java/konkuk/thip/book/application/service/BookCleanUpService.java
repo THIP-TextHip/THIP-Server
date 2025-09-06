@@ -19,7 +19,7 @@ public class BookCleanUpService implements BookCleanUpUseCase {
     private final BookCommandPort bookCommandPort;
     private final BookQueryPort bookQueryPort;
 
-    @Async
+    @Async("schedulerAsyncExecutor")
     @Override
     @Transactional
     public void deleteUnusedBooks() {

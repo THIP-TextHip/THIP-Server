@@ -1,6 +1,7 @@
 package konkuk.thip.post.application.service.handler;
 
 import konkuk.thip.common.annotation.application.HelperService;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
@@ -33,5 +34,13 @@ public class PostHandler {
             case RECORD -> recordCommandPort.update((Record) post);
             case VOTE -> voteCommandPort.updateVote((Vote) post);
         }
+    }
+
+    public PostQueryDto getPostQueryDto(PostType type, Long postId) {
+        if (type == PostType.FEED) {
+            return feedCommandPort.getPostQueryDtoById(postId);
+        }
+
+        return recordCommandPort.getPostQueryDtoById(postId);
     }
 }

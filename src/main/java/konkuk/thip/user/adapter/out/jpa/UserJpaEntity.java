@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
+import konkuk.thip.user.domain.value.UserRole;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 

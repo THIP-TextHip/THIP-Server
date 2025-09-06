@@ -8,7 +8,7 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepo
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;

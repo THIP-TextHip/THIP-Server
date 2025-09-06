@@ -28,7 +28,7 @@ public class BookMostSearchRankService {
     private final BookCommandPort bookCommandPort;
 
     // 매일 0시 실행
-    @Async
+    @Async("schedulerAsyncExecutor")
     @Scheduled(cron = "0 0 0 * * *")
     public void updateDailySearchRank() {
 

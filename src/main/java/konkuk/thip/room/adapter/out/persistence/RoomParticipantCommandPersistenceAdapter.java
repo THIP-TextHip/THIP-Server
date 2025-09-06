@@ -71,6 +71,15 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
     }
 
     @Override
+    public RoomParticipant findHostByRoomId(Long roomId) {
+        RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findHostByRoomId(roomId).orElseThrow(
+                () -> new EntityNotFoundException(ErrorCode.ROOM_PARTICIPANT_NOT_FOUND)
+        );
+
+        return roomParticipantMapper.toDomainEntity(roomParticipantJpaEntity);
+    }
+
+    @Override
     public Optional<RoomParticipant> findByUserIdAndRoomIdOptional(Long userId, Long roomId) {
         return roomParticipantJpaRepository.findByUserIdAndRoomId(userId, roomId)
                 .map(roomParticipantMapper::toDomainEntity);

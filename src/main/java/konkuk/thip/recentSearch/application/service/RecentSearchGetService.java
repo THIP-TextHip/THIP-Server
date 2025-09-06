@@ -1,7 +1,7 @@
 package konkuk.thip.recentSearch.application.service;
 
 import konkuk.thip.recentSearch.adapter.in.web.response.RecentSearchGetResponse;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.recentSearch.application.RecentSearchQueryMapper;
 import konkuk.thip.recentSearch.application.port.in.RecentSearchGetUseCase;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchQueryPort;

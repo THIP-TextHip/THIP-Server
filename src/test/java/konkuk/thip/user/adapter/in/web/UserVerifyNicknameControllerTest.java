@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDate;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
-import static konkuk.thip.user.adapter.out.jpa.UserRole.USER;
+import static konkuk.thip.user.domain.value.UserRole.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

@@ -2,7 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.recentSearch.application.service.manager.RecentSearchCreateManager;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.application.mapper.RoomQueryMapper;

@@ -13,6 +13,8 @@ import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
+import konkuk.thip.post.application.port.out.dto.QPostQueryDto;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
@@ -386,6 +388,21 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .orderBy(savedFeed.createdAt.desc())
                 .limit(size + 1)
                 .fetch();
+    }
+
+    @Override
+    public PostQueryDto getPostQueryDtoByPostId(Long postId) {
+        return jpaQueryFactory
+                .select(new QPostQueryDto(
+                        feed.postId,
+                        feed.userJpaEntity.userId,
+                        feed.dtype,
+                        Expressions.nullExpression(),
+                        Expressions.nullExpression()
+                ))
+                .from(feed)
+                .where(feed.postId.eq(postId))
+                .fetchOne();
     }
 
     /**

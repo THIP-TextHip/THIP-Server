@@ -1,4 +1,4 @@
-package konkuk.thip.room.adapter.out.jpa;
+package konkuk.thip.room.domain.value;
 
 public enum RoomStatus {
     RECRUITING,

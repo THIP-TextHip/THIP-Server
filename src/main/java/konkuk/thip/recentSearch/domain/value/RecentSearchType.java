@@ -1,4 +1,4 @@
-package konkuk.thip.recentSearch.adapter.out.jpa;
+package konkuk.thip.recentSearch.domain.value;
 
 
 import konkuk.thip.common.exception.InvalidStateException;

@@ -1,7 +1,7 @@
 package konkuk.thip.user.adapter.out.mapper;
 
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.domain.User;
 import org.springframework.stereotype.Component;
 

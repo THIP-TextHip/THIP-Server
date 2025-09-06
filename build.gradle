@@ -89,6 +89,8 @@ dependencies {
 	implementation "org.flywaydb:flyway-core"
 	implementation "org.flywaydb:flyway-mysql"
 
+	// Firebase
+	implementation 'com.google.firebase:firebase-admin:9.3.0'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

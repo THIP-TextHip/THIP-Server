@@ -9,6 +9,7 @@ import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +79,11 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     @Override
     public void deleteSavedFeed(Long userId, Long feedId) {
         savedFeedJpaRepository.deleteByUserIdAndFeedId(userId, feedId);
+    }
+
+    @Override
+    public PostQueryDto getPostQueryDtoById(Long postId) {
+        return feedJpaRepository.getPostQueryDtoByPostId(postId);
     }
 
     @Override

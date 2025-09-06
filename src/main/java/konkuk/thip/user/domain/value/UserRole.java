@@ -1,5 +1,5 @@
 
-package konkuk.thip.user.adapter.out.jpa;
+package konkuk.thip.user.domain.value;
 
 import lombok.Getter;
 

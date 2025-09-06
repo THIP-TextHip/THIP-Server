@@ -1,6 +1,7 @@
 package konkuk.thip.roompost.adapter.out.persistence.repository.record;
 
 import konkuk.thip.common.util.Cursor;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.roompost.adapter.out.persistence.RoomPostSortType;
 import konkuk.thip.roompost.application.port.out.dto.RoomPostQueryDto;
 
@@ -11,4 +12,6 @@ public interface RecordQueryRepository {
     List<RoomPostQueryDto> findMyRecords(Long roomId, Long userId, Cursor cursor);
 
     List<RoomPostQueryDto> findGroupRecordsOrderBySortType(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview, RoomPostSortType roomPostSortType);
+
+    PostQueryDto getPostQueryDtoByPostId(Long postId);
 }

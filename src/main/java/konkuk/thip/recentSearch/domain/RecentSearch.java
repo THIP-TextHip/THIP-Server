@@ -1,7 +1,7 @@
 package konkuk.thip.recentSearch.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

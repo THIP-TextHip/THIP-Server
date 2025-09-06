@@ -7,6 +7,8 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.post.adapter.out.jpa.QPostJpaEntity;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
+import konkuk.thip.post.application.port.out.dto.QPostQueryDto;
 import konkuk.thip.roompost.adapter.out.jpa.QRecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.QVoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.RoomPostSortType;
@@ -198,5 +200,38 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 post.commentCount,
                 isOverviewExpr().eq(1)
         );
+    }
+
+    @Override
+    public PostQueryDto getPostQueryDtoByPostId(Long postId) {
+        return queryFactory
+                .select(new QPostQueryDto(
+                        post.postId,
+                        post.userJpaEntity.userId,
+                        post.dtype,
+                        pageExprForDto(),    // dtype에 따라 Record/Vote의 page
+                        roomIdExprForDto()   // dtype에 따라 Record/Vote의 roomId
+                ))
+                .from(post)
+                .where(post.postId.eq(postId))
+                .fetchOne();
+    }
+
+    private NumberExpression<Integer> pageExprForDto() {
+        return new CaseBuilder()
+                .when(post.dtype.eq(RECORD.getType()))
+                .then(treat(post, QRecordJpaEntity.class).page)
+                .when(post.dtype.eq(VOTE.getType()))
+                .then(treat(post, QVoteJpaEntity.class).page)
+                .otherwise((Integer) null);
+    }
+
+    private NumberExpression<Long> roomIdExprForDto() {
+        return new CaseBuilder()
+                .when(post.dtype.eq(RECORD.getType()))
+                .then(treat(post, QRecordJpaEntity.class).roomJpaEntity.roomId)
+                .when(post.dtype.eq(VOTE.getType()))
+                .then(treat(post, QVoteJpaEntity.class).roomJpaEntity.roomId)
+                .otherwise((Long) null);
     }
 }

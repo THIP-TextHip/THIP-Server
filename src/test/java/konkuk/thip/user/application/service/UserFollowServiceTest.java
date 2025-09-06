@@ -1,6 +1,7 @@
 package konkuk.thip.user.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.message.application.port.out.FeedEventCommandPort;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
@@ -28,11 +29,14 @@ class UserFollowServiceTest {
     private UserCommandPort userCommandPort;
     private UserFollowService userFollowService;
 
+    private FeedEventCommandPort feedEventCommandPort;
+
     @BeforeEach
     void setUp() {
         followingCommandPort = mock(FollowingCommandPort.class);
         userCommandPort = mock(UserCommandPort.class);
-        userFollowService = new UserFollowService(followingCommandPort, userCommandPort);
+        feedEventCommandPort = mock(FeedEventCommandPort.class);
+        userFollowService = new UserFollowService(followingCommandPort, userCommandPort, feedEventCommandPort);
     }
 
     @Nested
@@ -68,6 +72,7 @@ class UserFollowServiceTest {
 
             User user = createUserWithFollowerCount(0);
             when(userCommandPort.findById(targetUserId)).thenReturn(user);
+            when(userCommandPort.findById(userId)).thenReturn(user); // 알림 전송용
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, true);
 

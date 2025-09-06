@@ -1,6 +1,7 @@
 package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.message.application.port.out.FeedEventCommandPort;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
@@ -22,6 +23,8 @@ public class UserFollowService implements UserFollowUsecase {
     private final FollowingCommandPort followingCommandPort;
     private final UserCommandPort userCommandPort;
 
+    private final FeedEventCommandPort feedEventCommandPort;
+
     @Override
     @Transactional
     public Boolean changeFollowingState(UserFollowCommand followCommand) {
@@ -39,12 +42,20 @@ public class UserFollowService implements UserFollowUsecase {
         if (isFollowRequest) { // 팔로우 요청인 경우
             targetUser.increaseFollowerCount();
             followingCommandPort.save(Following.withoutId(userId, targetUserId), targetUser);
+
+            // 팔로우 푸쉬알림 전송
+            sendNotifications(userId, targetUserId);
             return true;
         } else { // 언팔로우 요청인 경우
             targetUser.decreaseFollowerCount();
             followingCommandPort.deleteFollowing(optionalFollowing.get(), targetUser);
             return false;
         }
+    }
+
+    private void sendNotifications(Long userId, Long targetUserId) {
+        User actorUser = userCommandPort.findById(userId);
+        feedEventCommandPort.publishFollowEvent(targetUserId, actorUser.getId(), actorUser.getNickname());
     }
 
     private void validateParams(Long userId, Long targetUserId) {

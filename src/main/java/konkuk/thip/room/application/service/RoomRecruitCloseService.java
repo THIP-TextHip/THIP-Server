@@ -2,6 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.message.application.port.out.RoomEventCommandPort;
 import konkuk.thip.room.application.port.in.RoomRecruitCloseUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RoomRecruitCloseService implements RoomRecruitCloseUseCase {
@@ -18,7 +21,8 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final RoomCommandPort roomCommandPort;
 
-    //todo 모집 마감시 방 참여자들에게 모집 마감 알림 전송
+    private final RoomEventCommandPort roomEventCommandPort;
+
     @Override
     @Transactional
     public Long closeRoomRecruit(Long userId, Long roomId) {
@@ -37,9 +41,19 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUseCase {
         // 4. Room 테이블 업데이트
         roomCommandPort.update(room);
 
+        // 5. 방 참여자들에게 모집 마감 알림 전송 (호스트 제외)
+        sendNotifications(roomId, room);
+
         return room.getId();
     }
 
+    private void sendNotifications(Long roomId, Room room) {
+        List<RoomParticipant> actorUsers = roomParticipantCommandPort.findAllByRoomId(roomId);
+        for (RoomParticipant participant : actorUsers) {
+            if(participant.isHost()) continue; // 호스트는 제외
+            roomEventCommandPort.publishRoomRecruitClosedEarlyEvent(participant.getUserId(), roomId, room.getTitle());
+        }
+    }
 
     private void validateCloseable(RoomParticipant roomParticipant) {
         if (roomParticipant.isMember()) {

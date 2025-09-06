@@ -1,5 +1,5 @@
 
-package konkuk.thip.room.adapter.out.jpa;
+package konkuk.thip.room.domain.value;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
