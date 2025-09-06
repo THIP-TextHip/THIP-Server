@@ -30,7 +30,7 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
            update RoomJpaEntity r
-              set r.roomStatus = :status
+              set r.roomStatus = :exceptStatus
             where r.endDate < current_date
               and r.roomStatus <> :exceptStatus
            """)
@@ -48,7 +48,7 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
               and r.endDate >= current_date
               and r.roomStatus = :fromStatus
            """)
-    int updateRoomStatusToInProgress(@Param("fromStatus") RoomStatus fromStatus, @Param("toStatus") RoomStatus toStatus);
+    int updateRoomStatus(@Param("fromStatus") RoomStatus fromStatus, @Param("toStatus") RoomStatus toStatus);
 
     @Query("""
            select r
