@@ -37,7 +37,7 @@ public class FcmTokenJpaEntity extends BaseJpaEntity {
     @Column(name = "is_enabled", nullable = false)
     private boolean isEnabled; // 푸쉬알림 수신 여부
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
