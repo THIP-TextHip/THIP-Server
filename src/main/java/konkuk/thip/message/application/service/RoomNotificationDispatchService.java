@@ -7,7 +7,7 @@ import konkuk.thip.message.application.port.out.FirebaseMessagingPort;
 import konkuk.thip.message.adapter.out.event.dto.RoomEvents;
 import konkuk.thip.message.domain.NotificationCategory;
 import konkuk.thip.message.domain.MessageRoute;
-import konkuk.thip.notification.application.port.out.FcmTokenLoadPort;
+import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class RoomNotificationDispatchService implements RoomNotificationDispatchUseCase {
 
-    private final FcmTokenLoadPort fcmTokenQueryPort;
+    private final FcmTokenPersistencePort fcmTokenQueryPort;
     private final FirebaseMessagingPort firebasePort;
 
     @Override

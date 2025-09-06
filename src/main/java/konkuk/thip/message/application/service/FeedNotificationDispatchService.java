@@ -7,7 +7,7 @@ import konkuk.thip.message.application.port.out.FirebaseMessagingPort;
 import konkuk.thip.message.adapter.out.event.dto.FeedEvents;
 import konkuk.thip.message.domain.NotificationCategory;
 import konkuk.thip.message.domain.MessageRoute;
-import konkuk.thip.notification.application.port.out.FcmTokenLoadPort;
+import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class FeedNotificationDispatchService implements FeedNotificationDispatchUseCase {
 
-    private final FcmTokenLoadPort fcmTokenLoadPort;
+    private final FcmTokenPersistencePort fcmTokenPersistencePort;
     private final FirebaseMessagingPort firebasePort;
 
     @Override
@@ -29,7 +29,7 @@ public class FeedNotificationDispatchService implements FeedNotificationDispatch
         Notification n = buildNotification("팔로워 알림",
                 "@" + event.actorUsername() + " 님이 나를 띱했어요!");
 
-        List<FcmToken> tokens = fcmTokenLoadPort.findEnabledByUserId(event.targetUserId());
+        List<FcmToken> tokens = fcmTokenPersistencePort.findEnabledByUserId(event.targetUserId());
 
         if (tokens.isEmpty()) return;
 
@@ -88,7 +88,7 @@ public class FeedNotificationDispatchService implements FeedNotificationDispatch
     }
 
     private void pushFeedDetail(Long userId, Notification notification, Long feedId) {
-        List<FcmToken> tokens = fcmTokenLoadPort.findEnabledByUserId(userId);
+        List<FcmToken> tokens = fcmTokenPersistencePort.findEnabledByUserId(userId);
 
         if (tokens.isEmpty()) return;
 

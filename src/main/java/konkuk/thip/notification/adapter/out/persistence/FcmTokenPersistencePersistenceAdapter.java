@@ -5,7 +5,7 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.adapter.out.jpa.FcmTokenJpaEntity;
 import konkuk.thip.notification.adapter.out.mapper.FcmTokenMapper;
 import konkuk.thip.notification.adapter.out.persistence.repository.FcmTokenJpaRepository;
-import konkuk.thip.notification.application.port.out.FcmTokenLoadPort;
+import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class FcmTokenLoadPersistenceAdapter implements FcmTokenLoadPort {
+public class FcmTokenPersistencePersistenceAdapter implements FcmTokenPersistencePort {
 
     private final FcmTokenJpaRepository fcmTokenJpaRepository;
     private final UserJpaRepository userJpaRepository;

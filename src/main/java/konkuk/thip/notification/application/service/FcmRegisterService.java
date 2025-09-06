@@ -2,7 +2,7 @@ package konkuk.thip.notification.application.service;
 
 import konkuk.thip.notification.application.port.in.FcmRegisterUseCase;
 import konkuk.thip.notification.application.port.in.dto.FcmTokenRegisterCommand;
-import konkuk.thip.notification.application.port.out.FcmTokenLoadPort;
+import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,13 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class FcmRegisterService implements FcmRegisterUseCase {
 
-    private final FcmTokenLoadPort fcmTokenLoadPort;
+    private final FcmTokenPersistencePort fcmTokenPersistencePort;
 
     @Override
     @Transactional
     public void registerToken(FcmTokenRegisterCommand command) {
         // 같은 디바이스로 등록된 토큰이 있는지 확인
-        fcmTokenLoadPort.findByDeviceId(command.deviceId()).ifPresentOrElse(
+        fcmTokenPersistencePort.findByDeviceId(command.deviceId()).ifPresentOrElse(
                 existingToken -> {
                     // 있으면 새로운 계정으로 교체 또는 기존 계정의 토큰 갱신
                     existingToken.updateToken(
@@ -29,11 +29,11 @@ public class FcmRegisterService implements FcmRegisterUseCase {
                             LocalDate.now(),
                             command.userId()
                     );
-                    fcmTokenLoadPort.update(existingToken);
+                    fcmTokenPersistencePort.update(existingToken);
                 },
                 () -> {
                     // 없으면 새로 등록
-                    fcmTokenLoadPort.save(FcmToken.withoutId(
+                    fcmTokenPersistencePort.save(FcmToken.withoutId(
                             command.fcmToken(),
                             command.deviceId(),
                             command.platformType(),

@@ -7,7 +7,7 @@ import konkuk.thip.notification.domain.FcmToken;
 import java.util.List;
 import java.util.Optional;
 
-public interface FcmTokenLoadPort {
+public interface FcmTokenPersistencePort {
     Optional<FcmToken> findByDeviceId(String deviceId);
 
     default FcmToken getByDeviceIdOrThrow(String deviceId) {
