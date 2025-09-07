@@ -1,7 +1,6 @@
 package konkuk.thip.room.application.port.out;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.room.domain.Room;
 
 import java.util.List;
@@ -22,9 +21,9 @@ public interface RoomCommandPort {
 
     void update(Room room);
 
-    int updateRoomStateToExpired(RoomStatus exceptStatus);
+    int updateRoomStateToExpired();
 
-    int updateRoomState(RoomStatus fromStatus, RoomStatus toStatus);
+    int updateRoomStateFromRecruitingToProgress();
 
-    List<Room> findProgressTargetRooms(RoomStatus status);
+    List<Room> findProgressTargetRooms();
 }

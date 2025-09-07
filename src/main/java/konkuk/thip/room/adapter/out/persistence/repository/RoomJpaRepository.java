@@ -1,7 +1,6 @@
 package konkuk.thip.room.adapter.out.persistence.repository;
 
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.domain.value.RoomStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,11 +29,11 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
            update RoomJpaEntity r
-              set r.roomStatus = :exceptStatus
+              set r.roomStatus = 'EXPIRED'
             where r.endDate < current_date
-              and r.roomStatus <> :exceptStatus
+              and r.roomStatus <> 'EXPIRED'
            """)
-    int updateRoomStatusToExpired(@Param("exceptStatus") RoomStatus exceptStatus);
+    int updateRoomStatusToExpired();
 
     /**
      * start_date <= 오늘 AND end_date >= 오늘 => IN_PROGRESS
@@ -43,19 +42,19 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
            update RoomJpaEntity r
-              set r.roomStatus = :toStatus
+              set r.roomStatus = 'IN_PROGRESS'
             where r.startDate <= current_date
               and r.endDate >= current_date
-              and r.roomStatus = :fromStatus
+              and r.roomStatus = 'RECRUITING'
            """)
-    int updateRoomStatus(@Param("fromStatus") RoomStatus fromStatus, @Param("toStatus") RoomStatus toStatus);
+    int updateRoomStatusFromRecruitingToProgress();
 
     @Query("""
            select r
              from RoomJpaEntity r
             where r.startDate <= current_date
               and r.endDate   >= current_date
-              and r.roomStatus = :status
+              and r.roomStatus = 'RECRUITING'
            """)
-    List<RoomJpaEntity> findProgressTargetIds(@Param("status") RoomStatus status);
+    List<RoomJpaEntity> findProgressTargetIds();
 }

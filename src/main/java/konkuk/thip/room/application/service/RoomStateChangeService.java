@@ -1,7 +1,6 @@
 package konkuk.thip.room.application.service;
 
 import konkuk.thip.message.application.port.out.RoomEventCommandPort;
-import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.room.application.port.in.RoomStateChangeUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
@@ -32,7 +31,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
     @Override
     @Transactional
     public void changeRoomStateToExpired() {
-        int updated = roomCommandPort.updateRoomStateToExpired(RoomStatus.EXPIRED);
+        int updated = roomCommandPort.updateRoomStateToExpired();
         log.info("[RoomState] EXPIRED로 변경된 건수={}", updated);
     }
 
@@ -46,12 +45,12 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
         // 방 모임방 활동 시작 푸쉬알림 전송
         sendNotifications();
 
-        int updated = roomCommandPort.updateRoomState(RoomStatus.RECRUITING, RoomStatus.IN_PROGRESS);
+        int updated = roomCommandPort.updateRoomStateFromRecruitingToProgress();
         log.info("[RoomState] IN_PROGRESS로 변경된 건수={}", updated);
     }
 
     private void sendNotifications() {
-        List<Room> targetRooms = roomCommandPort.findProgressTargetRooms(RoomStatus.RECRUITING);
+        List<Room> targetRooms = roomCommandPort.findProgressTargetRooms();
         for (Room room : targetRooms) {
             List<RoomParticipant> targetUsers = roomParticipantCommandPort.findAllByRoomId(room.getId());
             for (RoomParticipant participant : targetUsers) {
