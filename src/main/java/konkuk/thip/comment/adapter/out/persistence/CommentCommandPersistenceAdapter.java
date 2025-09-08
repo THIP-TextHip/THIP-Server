@@ -18,7 +18,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -112,23 +111,26 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
         }
         // 2. 탈퇴한 유저의 모든 댓글, 댓글의 좋아요 삭제
         commentLikeJpaRepository.deleteAllByCommentAuthorUserId(userId);
-        commentJpaRepository.deleteAllByUserId(userId);
-        // 3. 게시글 타입별로 댓글 수 감소가 필요한 게시글 Map 생성
-        Map<PostType, List<PostJpaEntity>> postsByType = new HashMap<>();
-        for (CommentJpaEntity comment : commentsWithPosts) {
-            PostJpaEntity post = comment.getPostJpaEntity();
-            post = (PostJpaEntity) Hibernate.unproxy(post); // 프록시 강제 초기화 및 타입 변경
-            post.setCommentCount(Math.max(0, post.getCommentCount() - 1));
+        commentJpaRepository.softDeleteAllByUserId(userId);
 
-            // 4. 엔티티에서 직접 게시글 댓글 수 감소
+        // 3) Post 엔티티 기준으로 감소해야 할 횟수를 그룹핑하여 집계
+        Map<PostJpaEntity, Long> decMap = commentsWithPosts.stream()
+                .collect(Collectors.groupingBy(CommentJpaEntity::getPostJpaEntity, Collectors.counting()));
+
+        // 4) 타입별로 묶어 한 번만 감소 적용 후 저장
+        Map<PostType, List<PostJpaEntity>> postsByType = new EnumMap<>(PostType.class);
+
+        decMap.forEach((post, dec) -> {
+            // 댓글 수를 집계만큼 한 번에 감소
+            int newCount = Math.max(0, post.getCommentCount() - dec.intValue());
+            post.setCommentCount(newCount);
+
             PostType postType = PostType.from(post.getDtype());
             postsByType.computeIfAbsent(postType, k -> new ArrayList<>()).add(post);
-        }
+        });
         // 5. 게시글 타입별로 저장 처리
         postsByType.forEach(this::savePostsJpaEntities);
     }
-
-
 
     private void savePostsJpaEntities(PostType postType, List<PostJpaEntity> posts) {
         switch (postType) {
