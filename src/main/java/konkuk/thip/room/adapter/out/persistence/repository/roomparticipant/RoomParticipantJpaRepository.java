@@ -1,7 +1,7 @@
 package konkuk.thip.room.adapter.out.persistence.repository.roomparticipant;
 
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.persistence.projection.RoomStatsRow;
+import konkuk.thip.room.adapter.out.persistence.projection.RoomAggregateProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -56,5 +56,5 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
            where rp.roomJpaEntity.roomId in :roomIds
            group by rp.roomJpaEntity.roomId
         """)
-    List<RoomStatsRow> aggregateStatsByRoomIds(@Param("roomIds") List<Long> roomIds);
+    List<RoomAggregateProjection> aggregateStatsByRoomIds(@Param("roomIds") List<Long> roomIds);
 }

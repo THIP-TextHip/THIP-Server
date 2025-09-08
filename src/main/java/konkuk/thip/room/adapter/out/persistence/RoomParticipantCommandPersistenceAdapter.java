@@ -8,7 +8,7 @@ import konkuk.thip.room.adapter.out.mapper.RoomParticipantMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
-import konkuk.thip.room.adapter.out.persistence.projection.RoomStatsRow;
+import konkuk.thip.room.adapter.out.persistence.projection.RoomAggregateProjection;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -90,10 +90,10 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
         roomParticipantJpaRepository.softDeleteAllByUserId(userId);
 
         // 3. 남은 ACTIVE 참여자 기준 방별 평균/인원 집계
-        List<RoomStatsRow> stats = roomParticipantJpaRepository.aggregateStatsByRoomIds(roomIds);
+        List<RoomAggregateProjection> stats = roomParticipantJpaRepository.aggregateStatsByRoomIds(roomIds);
 
         // 4. 방 정보(진행률, 멤버수) 업데이트
-        for (RoomStatsRow row : stats) {
+        for (RoomAggregateProjection row : stats) {
             roomJpaRepository.updateRoomStats(
                     row.getRoomId(),
                     row.getAvgPercentage() == null ? 0.0 : row.getAvgPercentage(),
