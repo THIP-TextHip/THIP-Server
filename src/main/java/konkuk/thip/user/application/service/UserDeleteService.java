@@ -57,13 +57,11 @@ public class UserDeleteService implements UserDeleteUseCase {
 
         // 3. 유저가 남긴 관련 정보들 삭제
         // 팔로잉 관계 삭제
-        // 유저가 팔로워인 팔로잉 관계 -> 유저가 팔로우 중인 유저들의 팔로워 수 감소 -> 관계 삭제
-        // 유저를 팔로우 하는 팔로잉 관계 -> 관계 삭제
         followingCommandPort.deleteAllByUserId(userId);
         // 최근검색어 삭제
         recentSearchCommandPort.deleteAllByUserId(userId);
         // 알림 삭제 // TODO 알림구현 적용되면 수정
-        // notificationCommandPort.deleteAllByUserId(userId);
+        // notificationCommandPort.softDeleteAllByUserId(userId);
         // 책/피드 저장 관계 삭제
         feedCommandPort.deleteAllSavedFeedByUserId(userId);
         bookCommandPort.deleteAllSavedBookByUserId(userId);
@@ -79,24 +77,14 @@ public class UserDeleteService implements UserDeleteUseCase {
         postLikeCommandPort.deleteAllByUserId(userId);
 
         // 피드 삭제
-        // 댓글 삭제 -> 댓글의 좋아요 삭제
-        // 좋아요 삭제
-        // 피드 저장관계 삭제
         feedCommandPort.deleteAllFeedByUserId(userId);
         // 기록 삭제
-        // 댓글 삭제 -> 댓글의 좋아요 삭제
-        // 좋아요 삭제
         recordCommandPort.deleteAllByUserId(userId);
         // 투표 삭제
-        // 댓글 삭제 -> 댓글의 좋아요 삭제
-        // 좋아요 삭제
-        // 투표 참여 관계 일괄 삭제 -> 투표 항목 일괄 삭제
         voteCommandPort.deleteAllVoteByUserId(userId);
 
-        // 방 참여 관계 삭제 (member는 진행/모집/만료, host는 만료)
-        // 방 멤버수 감소, 방 진행도 업데이트
+        // 방 참여 관계 삭제
         roomParticipantCommandPort.deleteAllByUserId(userId);
-
         // 유저 삭제
         userCommandPort.delete(user);
         // 토큰 블랙리스트 추가
