@@ -55,7 +55,7 @@ public class UserTokenBlacklistRedisAdapter implements UserTokenBlacklistQueryPo
             throw new ExternalApiException(JSON_PROCESSING_ERROR);
         }
         redisTemplate.opsForValue().set(key, valueJson);
-        log.info("Add token to blacklist - userId: {}, withdrawalTime: {}, expiration: {}",
+        log.info("블랙리스트에 탈퇴한 회원 토큰 및 관련 정보 추가 - userId: {}, withdrawalTime: {}, expiration: {}",
                 loginUser.userId(),
                 withdrawalTime,
                 expiration
