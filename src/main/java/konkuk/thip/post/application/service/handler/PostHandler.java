@@ -1,13 +1,15 @@
 package konkuk.thip.post.application.service.handler;
 
 import konkuk.thip.common.annotation.application.HelperService;
-import konkuk.thip.post.domain.CountUpdatable;
-import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.post.application.port.out.PostQueryPort;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
+import konkuk.thip.post.domain.CountUpdatable;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.roompost.application.port.out.RecordCommandPort;
-import konkuk.thip.roompost.domain.Record;
 import konkuk.thip.roompost.application.port.out.VoteCommandPort;
+import konkuk.thip.roompost.domain.Record;
 import konkuk.thip.roompost.domain.Vote;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,8 @@ public class PostHandler {
     private final FeedCommandPort feedCommandPort;
     private final RecordCommandPort recordCommandPort;
     private final VoteCommandPort voteCommandPort;
+
+    private final PostQueryPort postQueryPort;
 
     public CountUpdatable findPost(PostType type, Long postId) {
         return switch (type) {
@@ -33,5 +37,13 @@ public class PostHandler {
             case RECORD -> recordCommandPort.update((Record) post);
             case VOTE -> voteCommandPort.updateVote((Vote) post);
         }
+    }
+
+    public PostQueryDto getPostQueryDto(PostType type, Long postId) {
+        return switch (type) {
+            case FEED -> postQueryPort.getPostQueryDtoByFeedId(postId);
+            case RECORD -> postQueryPort.getPostQueryDtoByRecordId(postId);
+            case VOTE -> postQueryPort.getPostQueryDtoByVoteId(postId);
+        };
     }
 }

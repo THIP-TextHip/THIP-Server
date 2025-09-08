@@ -1,5 +1,10 @@
 package konkuk.thip.common.security.util;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import io.jsonwebtoken.*;
 import konkuk.thip.common.security.oauth2.LoginUser;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +55,8 @@ public class JwtUtil {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
+        } catch (SignatureException e) {
+            log.info("Invalid JWT Signature", e);
         } catch (MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {

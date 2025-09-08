@@ -3,6 +3,7 @@ package konkuk.thip.roompost.application.service;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.message.application.port.out.RoomEventCommandPort;
 import konkuk.thip.roompost.application.port.in.RecordCreateUseCase;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordCreateCommand;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordCreateResult;
@@ -14,9 +15,13 @@ import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.roompost.application.service.manager.RoomProgressManager;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.RECORD_CANNOT_BE_OVERVIEW;
 
@@ -28,9 +33,12 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final RoomCommandPort roomCommandPort;
     private final BookCommandPort bookCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
+    private final UserCommandPort userCommandPort;
 
     private final RoomParticipantValidator roomParticipantValidator;
     private final RoomProgressManager roomProgressManager;
+
+    private final RoomEventCommandPort roomEventCommandPort;
 
     @Override
     @Transactional
@@ -63,7 +71,19 @@ public class RecordCreateService implements RecordCreateUseCase {
         // 5. RoomParticipant, Room progress 정보 update
         roomProgressManager.updateUserAndRoomProgress(roomParticipant, room, book, record.getPage());
 
+        // 6. 모임방 참여자들에게 기록 생성 알림 전송 (본인 제외)
+        sendNotifications(command, room, record, newRecordId);
+
         return RecordCreateResult.of(newRecordId, command.roomId());
+    }
+
+    private void sendNotifications(RecordCreateCommand command, Room room, Record record, Long newRecordId) {
+        User actorUser = userCommandPort.findById(command.userId());
+        List<RoomParticipant> targetUsers = roomParticipantCommandPort.findAllByRoomId(command.roomId());
+        for (RoomParticipant targetUser : targetUsers) {
+            if (targetUser.getUserId().equals(command.userId())) continue; // 본인 제외
+            roomEventCommandPort.publishRoomRecordCreatedEvent(targetUser.getUserId(), actorUser.getId(), actorUser.getNickname(), room.getId(), room.getTitle(), record.getPage(), newRecordId);
+        }
     }
 
     private void validateRoomParticipant(RoomParticipant roomParticipant, boolean isOverview) {

@@ -13,15 +13,15 @@ import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.domain.value.Alias;
 
 import java.time.LocalDate;

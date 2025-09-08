@@ -1,6 +1,5 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
-import konkuk.thip.feed.application.port.out.dto.TagCategoryQueryDto;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 
 import java.time.LocalDateTime;

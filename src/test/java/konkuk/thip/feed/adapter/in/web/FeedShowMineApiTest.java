@@ -5,7 +5,7 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
+import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;

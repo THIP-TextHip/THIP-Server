@@ -9,12 +9,18 @@ import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
-import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.message.application.port.out.FeedEventCommandPort;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.application.port.out.UserQueryPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +29,11 @@ public class FeedCreateService implements FeedCreateUseCase {
     private final BookCommandPort bookCommandPort;
     private final FeedCommandPort feedCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
+    private final UserQueryPort userQueryPort;
+    private final UserCommandPort userCommandPort;
 
     private final ImageUrlValidationService imageUrlValidationService;
+    private final FeedEventCommandPort feedEventCommandPort;
 
     @Override
     @Transactional
@@ -48,7 +57,22 @@ public class FeedCreateService implements FeedCreateUseCase {
                 command.tagList(),
                 command.imageUrls()
         );
-        return feedCommandPort.save(feed);
+
+        // 4. 피드 영속화
+        Long savedFeedId = feedCommandPort.save(feed);
+
+        // 5. 피드 작성 푸쉬 알림 전송
+        sendNotifications(command, savedFeedId);
+
+        return savedFeedId;
+    }
+
+    private void sendNotifications(FeedCreateCommand command, Long savedFeedId) {
+        List<User> targetUsers = userQueryPort.getAllFollowersByUserId(command.userId());
+        User actorUser = userCommandPort.findById(command.userId());
+        for (User targetUser : targetUsers) {
+            feedEventCommandPort.publishFolloweeNewPostEvent(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package konkuk.thip.post.adapter.out.persistence;
+package konkuk.thip.post.adapter.out.persistence.repository;
 
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;

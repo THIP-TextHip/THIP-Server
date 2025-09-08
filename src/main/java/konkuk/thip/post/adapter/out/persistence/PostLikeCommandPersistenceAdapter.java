@@ -1,6 +1,7 @@
 package konkuk.thip.post.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;

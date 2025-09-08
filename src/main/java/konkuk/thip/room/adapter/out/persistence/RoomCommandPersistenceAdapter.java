@@ -11,9 +11,11 @@ import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.ROOM_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
@@ -55,5 +57,23 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
         );
 
         roomJpaRepository.save(roomJpaEntity.updateFrom(room));
+    }
+
+    @Override
+    public int updateRoomStateToExpired() {
+        return roomJpaRepository.updateRoomStatusToExpired();
+    }
+
+    @Override
+    public int updateRoomStateFromRecruitingToProgress() {
+        return roomJpaRepository.updateRoomStatusFromRecruitingToProgress();
+    }
+
+    @Override
+    public List<Room> findProgressTargetRooms() {
+        List<RoomJpaEntity> roomJpaEntities = roomJpaRepository.findProgressTargetIds();
+        return roomJpaEntities.stream()
+                .map(roomMapper::toDomainEntity)
+                .toList();
     }
 }

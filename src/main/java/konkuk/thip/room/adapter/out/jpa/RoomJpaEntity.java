@@ -6,6 +6,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.room.domain.value.RoomStatus;
 import lombok.*;
 
 import java.time.LocalDate;

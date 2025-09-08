@@ -1,5 +1,8 @@
 package konkuk.thip.post.application.service;
 
+import konkuk.thip.message.application.port.out.FeedEventCommandPort;
+import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeCommand;
@@ -8,7 +11,10 @@ import konkuk.thip.post.application.port.in.PostLikeUseCase;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.post.application.service.validator.PostLikeAuthorizationValidator;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.post.domain.service.PostCountService;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +25,14 @@ public class PostLikeService implements PostLikeUseCase {
 
     private final PostLikeQueryPort postLikeQueryPort;
     private final PostLikeCommandPort postLikeCommandPort;
+    private final UserCommandPort userCommandPort;
 
     private final PostHandler postHandler;
     private final PostCountService postCountService;
     private final PostLikeAuthorizationValidator postLikeAuthorizationValidator;
+
+    private final FeedEventCommandPort feedEventCommandPort;
+    private final RoomEventCommandPort roomEventCommandPort;
 
     @Override
     @Transactional
@@ -41,6 +51,9 @@ public class PostLikeService implements PostLikeUseCase {
         if (command.isLike()) {
             postLikeAuthorizationValidator.validateUserCanLike(alreadyLiked); // 좋아요 가능 여부 검증
             postLikeCommandPort.save(command.userId(), command.postId(),command.postType());
+
+            // 좋아요 푸쉬알림 전송
+            sendNotifications(command);
         } else {
             postLikeAuthorizationValidator.validateUserCanUnLike(alreadyLiked); // 좋아요 취소 가능 여부 검증
             postLikeCommandPort.delete(command.userId(), command.postId());
@@ -51,5 +64,20 @@ public class PostLikeService implements PostLikeUseCase {
         postHandler.updatePost(command.postType(), post);
 
         return PostIsLikeResult.of(post.getId(), command.isLike());
+    }
+
+    private void sendNotifications(PostIsLikeCommand command) {
+        PostQueryDto postQueryDto = postHandler.getPostQueryDto(command.postType(), command.postId());
+
+        if(command.userId().equals(postQueryDto.creatorId())) return; // 자신의 게시글에 좋아요 누르는 경우 제외
+
+        User actorUser = userCommandPort.findById(command.userId());
+        // 좋아요 푸쉬알림 전송
+        if (command.postType() == PostType.FEED) {
+            feedEventCommandPort.publishFeedLikedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+        }
+        if (command.postType() == PostType.RECORD || command.postType() == PostType.VOTE) {
+            roomEventCommandPort.publishRoomPostLikedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+        }
     }
 }

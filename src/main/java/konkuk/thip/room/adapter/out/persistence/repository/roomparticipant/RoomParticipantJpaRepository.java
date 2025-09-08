@@ -32,6 +32,11 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
             "AND rp.roomJpaEntity.roomId = :roomId")
     boolean existsByUserIdAndRoomId(@Param("userId") Long userId, @Param("roomId") Long roomId);
 
+    @Query("SELECT rp FROM RoomParticipantJpaEntity rp " +
+            "WHERE rp.roomJpaEntity.roomId = :roomId " +
+            "AND rp.roomParticipantRole = 'HOST'")
+    Optional<RoomParticipantJpaEntity> findHostByRoomId(@Param("roomId") Long roomId);
+
     @Query("SELECT CASE WHEN COUNT(rp) > 0 THEN true ELSE false END " +
             "FROM RoomParticipantJpaEntity rp " +
             "JOIN RoomJpaEntity r ON rp.roomJpaEntity.roomId = r.roomId " +
