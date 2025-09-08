@@ -38,7 +38,8 @@ public enum SwaggerResponseDescription {
     USER_DELETE(new LinkedHashSet<>(Set.of(
             USER_CANNOT_DELETE_ROOM_HOST,
             USER_NOT_FOUND,
-            USER_ALREADY_DELETED
+            USER_ALREADY_DELETED,
+            USER_OAUTH2ID_CANNOT_BE_NULL
     ))),
 
     // Follow
