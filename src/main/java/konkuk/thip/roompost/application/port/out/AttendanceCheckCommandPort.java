@@ -19,4 +19,6 @@ public interface AttendanceCheckCommandPort {
     }
 
     void delete(AttendanceCheck attendanceCheck);
+
+    void deleteAllByUserId(Long userId);
 }

@@ -92,4 +92,9 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     public void deleteAllByIdInBatch(Set<Long> unusedBookIds) {
         bookJpaRepository.deleteAllByIdInBatch(unusedBookIds);
     }
+
+    @Override
+    public void deleteAllSavedBookByUserId(Long userId) {
+        savedBookJpaRepository.deleteAllByUserId(userId);
+    }
 }

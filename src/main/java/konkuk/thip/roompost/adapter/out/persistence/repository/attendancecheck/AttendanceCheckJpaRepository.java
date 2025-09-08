@@ -2,6 +2,7 @@ package konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck;
 
 import konkuk.thip.roompost.adapter.out.jpa.AttendanceCheckJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,4 +23,8 @@ public interface AttendanceCheckJpaRepository extends JpaRepository<AttendanceCh
             "AND a.createdAt >= :startOfDay " +
             "AND a.createdAt < :endOfDay")
     int countByUserIdAndRoomIdAndCreatedAtBetween(@Param("userId") Long userId, @Param("roomId") Long roomId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE AttendanceCheckJpaEntity a SET a.status = 'INACTIVE' WHERE a.userJpaEntity.userId = :userId")
+    void softDeleteAllByUserId(@Param("userId") Long userId);
 }

@@ -26,4 +26,9 @@ public interface RoomParticipantCommandPort {
     void update(RoomParticipant roomParticipant);
 
     RoomParticipant findHostByRoomId(Long roomId);
+
+    boolean existsHostUserInActiveRoom(Long userId);
+
+    void deleteAllByUserId(Long userId);
+
 }

@@ -11,4 +11,5 @@ public interface UserCommandPort {
     User findById(Long userId);
     Map<Long, User> findByIds(List<Long> userIds);
     void update(User user);
+    void delete(User user);
 }

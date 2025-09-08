@@ -23,6 +23,9 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long>, U
 
     boolean existsByOauth2Id(String oauth2Id);
 
+    @Query("SELECT f.followingUserJpaEntity.userId FROM FollowingJpaEntity f WHERE f.userJpaEntity.userId = :userId")
+    List<Long> findAllTargetUserIdsByUserId(@Param("userId") Long userId);
+
     @Query("SELECT f.userJpaEntity FROM FollowingJpaEntity f WHERE f.followingUserJpaEntity.userId = :userId")
     List<UserJpaEntity> findAllFollowersByUserId(@Param("userId") Long userId);
 }

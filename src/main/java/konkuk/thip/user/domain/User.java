@@ -9,6 +9,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
+import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_DELETED;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_OAUTH2ID_CANNOT_BE_NULL;
+
 @Getter
 @SuperBuilder
 public class User extends BaseDomainEntity {
@@ -73,6 +76,16 @@ public class User extends BaseDomainEntity {
         if(nickname.equals(this.nickname)) { // 현재 닉네임과 같으면 업데이트 불가
             throw new InvalidStateException(ErrorCode.USER_NICKNAME_CANNOT_BE_SAME);
         }
+    }
+
+    public void markAsDeleted() {
+        if (this.oauth2Id == null) {
+            throw new InvalidStateException(USER_OAUTH2ID_CANNOT_BE_NULL);
+        }
+        if (this.oauth2Id.startsWith("deleted:")) {
+            throw new InvalidStateException(USER_ALREADY_DELETED);
+        }
+        this.oauth2Id = "deleted:" + this.oauth2Id;
     }
 
 }

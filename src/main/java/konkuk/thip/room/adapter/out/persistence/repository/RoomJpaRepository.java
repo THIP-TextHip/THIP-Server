@@ -22,6 +22,14 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
             "AND r.startDate > :currentDate")
     int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           update RoomJpaEntity r
+           set r.roomPercentage = :avg,
+               r.memberCount    = :count
+           where r.roomId = :roomId
+        """)
+    void updateRoomStats(@Param("roomId") Long roomId, @Param("avg") double avg, @Param("count") int count);
     /**
      * end_date < 오늘 => EXPIRED
      * 이미 EXPIRED 인 것은 제외

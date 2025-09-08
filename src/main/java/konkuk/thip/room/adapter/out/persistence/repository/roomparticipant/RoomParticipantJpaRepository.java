@@ -1,7 +1,9 @@
 package konkuk.thip.room.adapter.out.persistence.repository.roomparticipant;
 
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
+import konkuk.thip.room.adapter.out.persistence.projection.RoomAggregateProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -34,4 +36,30 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
             "WHERE rp.roomJpaEntity.roomId = :roomId " +
             "AND rp.roomParticipantRole = 'HOST'")
     Optional<RoomParticipantJpaEntity> findHostByRoomId(@Param("roomId") Long roomId);
+
+    @Query("SELECT CASE WHEN COUNT(rp) > 0 THEN true ELSE false END " +
+            "FROM RoomParticipantJpaEntity rp " +
+            "JOIN RoomJpaEntity r ON rp.roomJpaEntity.roomId = r.roomId " +
+            "WHERE rp.userJpaEntity.userId = :userId " +
+            "AND rp.roomParticipantRole = 'HOST' " +
+            "AND (r.roomStatus = 'IN_PROGRESS' OR r.roomStatus = 'RECRUITING')")
+    boolean existsHostUserInActiveRoom(@Param("userId") Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE RoomParticipantJpaEntity rp SET rp.status = 'INACTIVE' WHERE rp.userJpaEntity.userId = :userId")
+    void softDeleteAllByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT rp.roomJpaEntity.roomId FROM RoomParticipantJpaEntity rp WHERE rp.userJpaEntity.userId = :userId")
+    List<Long> findRoomIdsByUserId(@Param("userId") Long userId);
+
+
+    @Query("""
+            select rp.roomJpaEntity.roomId as roomId,
+                  avg(rp.userPercentage)  as avgPercentage,
+                  count(rp)               as memberCount
+           from RoomParticipantJpaEntity rp
+           where rp.roomJpaEntity.roomId in :roomIds
+           group by rp.roomJpaEntity.roomId
+        """)
+    List<RoomAggregateProjection> aggregateStatsByRoomIds(@Param("roomIds") List<Long> roomIds);
 }

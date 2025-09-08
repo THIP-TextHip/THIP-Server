@@ -20,7 +20,6 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.roompost.application.port.out.VoteQueryPort;
 import konkuk.thip.roompost.application.port.out.dto.VoteItemQueryDto;
-import konkuk.thip.roompost.domain.VoteItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -144,20 +143,12 @@ public class RoomPostSearchService implements RoomPostSearchUseCase {
 
     // VoteItemQueryDto 목록을 RecordSearchResponse.PostDto.VoteItemDto 목록으로 변환하는 메서드
     private List<RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto> mapToVoteItemDtos(List<VoteItemQueryDto> items, boolean isLocked) {
-        // voteCount를 모아 리스트로 변환
-        List<Integer> counts = items.stream()
-                .map(VoteItemQueryDto::voteCount)
-                .toList();
-
-        // 도메인에게 계산 위임
-        List<Integer> percentages = VoteItem.calculatePercentages(counts);
-
         // 계산 결과를 이용해 DTO 조립
         return IntStream.range(0, items.size())
                 .mapToObj(i -> RoomPostSearchResponse.RoomPostSearchDto.VoteItemDto.of(
                         items.get(i).voteItemId(),
                         isLocked ? roomPostAccessValidator.createBlurredString(items.get(i).itemName()) : items.get(i).itemName(),
-                        percentages.get(i),
+                        items.get(i).voteCount(),
                         items.get(i).isVoted()
                 ))
                 .toList();

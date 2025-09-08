@@ -22,4 +22,6 @@ public interface RecordCommandPort {
     }
 
     void delete(Record record);
+
+    void deleteAllByUserId(Long userId);
 }

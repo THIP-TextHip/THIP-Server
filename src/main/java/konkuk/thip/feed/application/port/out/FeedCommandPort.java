@@ -19,4 +19,6 @@ public interface FeedCommandPort {
     void delete(Feed feed);
     void saveSavedFeed(Long userId, Long feedId);
     void deleteSavedFeed(Long userId, Long feedId);
+    void deleteAllSavedFeedByUserId(Long userId);
+    void deleteAllFeedByUserId(Long userId);
 }
