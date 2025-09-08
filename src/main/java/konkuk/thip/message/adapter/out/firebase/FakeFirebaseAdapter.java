@@ -14,13 +14,14 @@ import java.util.List;
 @Profile("local | test")
 @RequiredArgsConstructor
 public class FakeFirebaseAdapter implements FirebaseMessagingPort {
+
     @Override
     public void send(Message message, String fcmToken, String deviceId) {
-        log.info("FirebaseAdapter.send()");
+        log.info("[FakeFCM:SEND] token={} device={} message={}", fcmToken, deviceId, message);
     }
 
     @Override
     public void sendBatch(List<Message> messages, List<String> fcmTokens, List<String> deviceIds) {
-        log.info("FirebaseAdapter.sendBatch()");
+        log.info("[FakeFCM:BATCH] count={} tokens={} devices={}", messages.size(), fcmTokens, deviceIds);
     }
 }
