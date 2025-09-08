@@ -29,6 +29,7 @@ import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaR
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteParticipantJpaRepository;
+import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
@@ -43,6 +44,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -87,7 +89,6 @@ public class UserDeleteApiTest {
 
     @Autowired private JwtUtil jwtUtil;
     @Autowired private EntityManager entityManager;
-    @Autowired private ObjectMapper objectMapper;
 
     @AfterEach
     void tearDown() {
@@ -121,8 +122,8 @@ public class UserDeleteApiTest {
         UserJpaEntity otherMemberUser3 = userJpaRepository.save(TestEntityFactory.createUser(Alias.ARTIST));
 
         // 팔로잉 관계 설정
-        followingJpaRepository.save(TestEntityFactory.createFollowing(testUser1, otherHostUser2)); // 유저 1이 유저 2 팔로우
-        followingJpaRepository.save(TestEntityFactory.createFollowing(otherMemberUser3, testUser1)); // 유저 3이 유저 1팔로우
+        FollowingJpaEntity u1_u2_f1 = followingJpaRepository.save(TestEntityFactory.createFollowing(testUser1, otherHostUser2)); // 유저 1이 유저 2 팔로우
+        FollowingJpaEntity u3_u1_f2 = followingJpaRepository.save(TestEntityFactory.createFollowing(otherMemberUser3, testUser1)); // 유저 3이 유저 1팔로우
         followingJpaRepository.save(TestEntityFactory.createFollowing(otherMemberUser3, otherHostUser2)); // 유저 3이 유저 2팔로우
         otherHostUser2.setFollowerCount(2); userJpaRepository.save(otherHostUser2); //유저 2 팔로워수 2
         testUser1.setFollowerCount(1); userJpaRepository.save(testUser1); //유저 1 팔로워수 1
@@ -264,9 +265,10 @@ public class UserDeleteApiTest {
         // then: 1) 유저 팔로잉/팔로워 관계 삭제
         // 탈퇴한 유저1의 팔로잉/팔로워 관계는 모두 삭제되어야하고, 관련 없는 유저3->유저2 팔로우관계만 남아있어야함
         // 유저2의 팔로워 수가 1이어야함
-        assertEquals(followingJpaRepository.findAll().get(0).getUserJpaEntity().getUserId(), otherMemberUser3.getUserId());
-        assertEquals(2, (int) otherHostUser2.getFollowerCount());
-
+        assertTrue(followingJpaRepository.findById(u1_u2_f1.getFollowingId()).isEmpty());
+        assertTrue(followingJpaRepository.findById(u3_u1_f2.getFollowingId()).isEmpty());
+        UserJpaEntity updateUser2 = userJpaRepository.findById(otherHostUser2.getUserId()).orElse(null);
+        assertEquals(1, updateUser2.getFollowerCount());
         // 2) 최근검색어 삭제
         assertTrue(recentSearchJpaRepository.findAll().isEmpty());
 
@@ -282,12 +284,13 @@ public class UserDeleteApiTest {
         // 탈퇴한 유저가 참여한 투표관계 모두 삭제
         // 탈퇴한 유저가 참여했던 투표의 득표수 감소
         assertTrue(voteParticipantJpaRepository.findById(u1_vp1.getVoteParticipantId()).isEmpty());
-        assertEquals(1, v1_vi1.getCount());
+        VoteItemJpaEntity updateVi1 = voteItemJpaRepository.findById(v1_vi1.getVoteItemId()).orElse(null);
+        assertEquals(0, updateVi1.getCount());
 
         // 6) 유저 댓글 좋아요 삭제
         // 탈퇴한 유저의 모든 댓글 좋아요 관계 삭제
         // 탈퇴한 유저가 좋아요한 댓글의 좋아요 수 감소
-        assertTrue(voteParticipantJpaRepository.findById(u1_c1_cl1.getLikeId()).isEmpty());
+        assertTrue(commentLikeJpaRepository.findById(u1_c1_cl1.getLikeId()).isEmpty());
         CommentJpaEntity updatedCm1 = commentJpaRepository.findById(u2_v1_c1.getCommentId()).orElse(null);
         assertEquals(0, updatedCm1.getLikeCount());
 
