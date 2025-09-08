@@ -82,11 +82,6 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     }
 
     @Override
-    public PostQueryDto getPostQueryDtoById(Long postId) {
-        return feedJpaRepository.getPostQueryDtoByPostId(postId);
-    }
-
-    @Override
     public void delete(Feed feed) {
         FeedJpaEntity feedJpaEntity = feedJpaRepository.findByPostId(feed.getId())
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));

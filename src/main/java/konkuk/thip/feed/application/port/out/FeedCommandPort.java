@@ -3,7 +3,6 @@ package konkuk.thip.feed.application.port.out;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.domain.Feed;
-import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 
 import java.util.Optional;
 
@@ -20,6 +19,4 @@ public interface FeedCommandPort {
     void delete(Feed feed);
     void saveSavedFeed(Long userId, Long feedId);
     void deleteSavedFeed(Long userId, Long feedId);
-
-    PostQueryDto getPostQueryDtoById(Long postId);
 }

@@ -390,21 +390,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .fetch();
     }
 
-    @Override
-    public PostQueryDto getPostQueryDtoByPostId(Long postId) {
-        return jpaQueryFactory
-                .select(new QPostQueryDto(
-                        feed.postId,
-                        feed.userJpaEntity.userId,
-                        feed.dtype,
-                        Expressions.nullExpression(),
-                        Expressions.nullExpression()
-                ))
-                .from(feed)
-                .where(feed.postId.eq(postId))
-                .fetchOne();
-    }
-
     /**
      * SavedFeed 전용 DTO 매핑
      */
