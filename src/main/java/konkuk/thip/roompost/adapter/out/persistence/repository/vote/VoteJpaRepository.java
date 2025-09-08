@@ -21,5 +21,5 @@ public interface VoteJpaRepository extends JpaRepository<VoteJpaEntity, Long>, V
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE VoteJpaEntity v SET v.status = 'INACTIVE' WHERE v.userJpaEntity.userId = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
+    void softDeleteAllByUserId(@Param("userId") Long userId);
 }
