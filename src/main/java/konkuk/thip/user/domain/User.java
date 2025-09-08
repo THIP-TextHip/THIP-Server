@@ -9,6 +9,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
+import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_DELETED;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_OAUTH2ID_CANNOT_BE_NULL;
+
 @Getter
 @SuperBuilder
 public class User extends BaseDomainEntity {
@@ -76,9 +79,13 @@ public class User extends BaseDomainEntity {
     }
 
     public void markAsDeleted() {
-        if (this.oauth2Id != null && !this.oauth2Id.startsWith("deleted:")) {
-            this.oauth2Id = "deleted:" + this.oauth2Id;
+        if (this.oauth2Id == null) {
+            throw new InvalidStateException(USER_OAUTH2ID_CANNOT_BE_NULL);
         }
+        if (this.oauth2Id.startsWith("deleted:")) {
+            throw new InvalidStateException(USER_ALREADY_DELETED);
+        }
+        this.oauth2Id = "deleted:" + this.oauth2Id;
     }
 
 }
