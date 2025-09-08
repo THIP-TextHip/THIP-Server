@@ -51,6 +51,7 @@ public enum ErrorCode implements ResponseCode {
     USER_NOT_SIGNED_UP(HttpStatus.BAD_REQUEST, 70008, "가입되지 않은 사용자입니다."),
     USER_CANNOT_DELETE_ROOM_HOST(HttpStatus.BAD_REQUEST, 70009, "모집/진행 중인 방의 방장은 회원탈퇴를 할 수 없습니다."),
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 70010, "이미 삭제된 사용자 입니다."),
+    USER_OAUTH2ID_CANNOT_BE_NULL(HttpStatus.INTERNAL_SERVER_ERROR, 70011, "유저의 OAuth2Id 값이 null일 수 없습니다."),
 
     /**
      * 75000 : follow error
