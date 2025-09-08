@@ -8,6 +8,7 @@ import konkuk.thip.room.adapter.out.mapper.RoomParticipantMapper;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
+import konkuk.thip.room.adapter.out.persistence.projection.RoomStatsRow;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -87,24 +88,17 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
         }
         // 2. 유저의 모든 방 참여 관계 일괄 삭제
         roomParticipantJpaRepository.softDeleteAllByUserId(userId);
-        // 3. 해당 ID들로 JPA 엔티티 직접 조회
-        List<RoomJpaEntity> roomJpaEntities = roomJpaRepository.findAllByIds(roomIds);
 
-        // 4. 유저가 탈퇴 처리된 각 방에 대해 진행률 및 멤버 수 업데이트
-        for (RoomJpaEntity room : roomJpaEntities) {
-            // 현재 방의 참가자 전체 조회 (탈퇴한 유저는 이미 삭제됨)
-            List<RoomParticipantJpaEntity> roomParticipantEntities = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId());
+        // 3. 남은 ACTIVE 참여자 기준 방별 평균/인원 집계
+        List<RoomStatsRow> stats = roomParticipantJpaRepository.aggregateStatsByRoomIds(roomIds);
 
-            // 평균 진행률 계산
-            double totalProgress = roomParticipantEntities.stream()
-                    .mapToDouble(RoomParticipantJpaEntity::getUserPercentage)
-                    .sum();
-            double avgProgress = roomParticipantEntities.isEmpty() ? 0.0 : (totalProgress / roomParticipantEntities.size());
-
-            // 방 정보(진행률, 멤버수) 업데이트
-            room.updateRoomPercentage(avgProgress);
-            room.setMemberCount(roomParticipantEntities.size()); // 남은 참가자 수로 설정
-
+        // 4. 방 정보(진행률, 멤버수) 업데이트
+        for (RoomStatsRow row : stats) {
+            roomJpaRepository.updateRoomStats(
+                    row.getRoomId(),
+                    row.getAvgPercentage() == null ? 0.0 : row.getAvgPercentage(),
+                    row.getMemberCount().intValue()
+            );
         }
     }
 
