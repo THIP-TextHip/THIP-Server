@@ -27,7 +27,7 @@ public interface RoomQueryRepository {
 
     List<RoomQueryDto> findPlayingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
-    List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
+    List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Integer priorityCursor, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
     List<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
