@@ -101,35 +101,57 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
         commentJpaRepository.softDeleteAllByPostId(postId);
     }
 
+//    @Override
+//    public void deleteAllByUserId(Long userId) {
+//
+//        // 1. 탈퇴 유저가 작성한 댓글과 연관된 게시글을 JOIN FETCH로 함께 조회
+//        List<CommentJpaEntity> commentsWithPosts = commentJpaRepository.findAllCommentsWithPostsByUserId(userId);
+//        if (commentsWithPosts == null || commentsWithPosts.isEmpty()) {
+//            return; //early return
+//        }
+//        // 2. 탈퇴한 유저의 모든 댓글, 댓글의 좋아요 삭제
+//        commentLikeJpaRepository.deleteAllByCommentAuthorUserId(userId);
+//        commentJpaRepository.softDeleteAllByUserId(userId);
+//
+//        // 3) Post 엔티티 기준으로 감소해야 할 횟수를 그룹핑하여 집계
+//        Map<PostJpaEntity, Long> decMap = commentsWithPosts.stream()
+//                .collect(Collectors.groupingBy(CommentJpaEntity::getPostJpaEntity, Collectors.counting()));
+//
+//        // 4) 타입별로 묶어 한 번만 감소 적용 후 저장
+//        Map<PostType, List<PostJpaEntity>> postsByType = new EnumMap<>(PostType.class);
+//
+//        decMap.forEach((post, dec) -> {
+//            // 댓글 수를 집계만큼 한 번에 감소
+//            int newCount = Math.max(0, post.getCommentCount() - dec.intValue());
+//            post.setCommentCount(newCount);
+//
+//            PostType postType = PostType.from(post.getDtype());
+//            postsByType.computeIfAbsent(postType, k -> new ArrayList<>()).add(post);
+//        });
+//        // 5. 게시글 타입별로 저장 처리
+//        postsByType.forEach(this::savePostsJpaEntities);
+//    }
+
     @Override
     public void deleteAllByUserId(Long userId) {
-
         // 1. 탈퇴 유저가 작성한 댓글과 연관된 게시글을 JOIN FETCH로 함께 조회
         List<CommentJpaEntity> commentsWithPosts = commentJpaRepository.findAllCommentsWithPostsByUserId(userId);
         if (commentsWithPosts == null || commentsWithPosts.isEmpty()) {
             return; //early return
         }
-        // 2. 탈퇴한 유저의 모든 댓글, 댓글의 좋아요 삭제
-        commentLikeJpaRepository.deleteAllByCommentAuthorUserId(userId);
-        commentJpaRepository.softDeleteAllByUserId(userId);
 
-        // 3) Post 엔티티 기준으로 감소해야 할 횟수를 그룹핑하여 집계
+        // 2. 삭제될 댓글이 어느 Post에 몇 개씩 붙어있는지 집계 (postId 기준 추천)
         Map<PostJpaEntity, Long> decMap = commentsWithPosts.stream()
                 .collect(Collectors.groupingBy(CommentJpaEntity::getPostJpaEntity, Collectors.counting()));
 
-        // 4) 타입별로 묶어 한 번만 감소 적용 후 저장
-        Map<PostType, List<PostJpaEntity>> postsByType = new EnumMap<>(PostType.class);
+        for (PostJpaEntity p : decMap.keySet()) {
+            long dec = decMap.getOrDefault(p, 0L);
+            p.setCommentCount(Math.max(0, p.getCommentCount() - (int) dec));
+        }
 
-        decMap.forEach((post, dec) -> {
-            // 댓글 수를 집계만큼 한 번에 감소
-            int newCount = Math.max(0, post.getCommentCount() - dec.intValue());
-            post.setCommentCount(newCount);
-
-            PostType postType = PostType.from(post.getDtype());
-            postsByType.computeIfAbsent(postType, k -> new ArrayList<>()).add(post);
-        });
-        // 5. 게시글 타입별로 저장 처리
-        postsByType.forEach(this::savePostsJpaEntities);
+        // 3. 탈퇴한 유저의 모든 댓글, 댓글의 좋아요 삭제
+        commentLikeJpaRepository.deleteAllByCommentAuthorUserId(userId);
+        commentJpaRepository.softDeleteAllByUserId(userId);
     }
 
     private void savePostsJpaEntities(PostType postType, List<PostJpaEntity> posts) {

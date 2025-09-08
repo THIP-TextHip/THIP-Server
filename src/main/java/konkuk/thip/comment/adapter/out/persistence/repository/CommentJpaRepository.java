@@ -24,9 +24,13 @@ public interface CommentJpaRepository extends JpaRepository<CommentJpaEntity, Lo
     @Query("UPDATE CommentJpaEntity c SET c.status = 'INACTIVE' WHERE c.userJpaEntity.userId = :userId")
     void softDeleteAllByUserId(@Param("userId") Long userId);
 
+//    @Query("SELECT c FROM CommentJpaEntity c JOIN FETCH c.postJpaEntity p " +
+//            "WHERE (TYPE(p) = FeedJpaEntity OR TYPE(p) = RecordJpaEntity OR TYPE(p) = VoteJpaEntity) " +
+//            "AND c.userJpaEntity.userId = :userId")
+//    List<CommentJpaEntity> findAllCommentsWithPostsByUserId(@Param("userId") Long userId);
+
     @Query("SELECT c FROM CommentJpaEntity c JOIN FETCH c.postJpaEntity p " +
-            "WHERE (TYPE(p) = FeedJpaEntity OR TYPE(p) = RecordJpaEntity OR TYPE(p) = VoteJpaEntity) " +
-            "AND c.userJpaEntity.userId = :userId")
+            "WHERE c.userJpaEntity.userId = :userId")
     List<CommentJpaEntity> findAllCommentsWithPostsByUserId(@Param("userId") Long userId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
