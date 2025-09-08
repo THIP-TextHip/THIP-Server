@@ -22,9 +22,6 @@ public interface FollowingJpaRepository extends JpaRepository<FollowingJpaEntity
     @Query("DELETE FROM FollowingJpaEntity f WHERE f.userJpaEntity.userId = :userId OR f.followingUserJpaEntity.userId = :userId")
     void deleteAllByUserIdOrFollowingUserId(@Param("userId") Long userId);
 
-    @Query("SELECT f.followingUserJpaEntity.userId FROM FollowingJpaEntity f WHERE f.userJpaEntity.userId = :userId")
-    List<Long> findAllTargetUserIdsByUserId(@Param("userId") Long userId);
-
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE UserJpaEntity u " +
                 "SET u.followerCount = CASE WHEN u.followerCount > 0 THEN u.followerCount - 1 ELSE 0 END " +
