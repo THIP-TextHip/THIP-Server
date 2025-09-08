@@ -13,7 +13,7 @@ import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
