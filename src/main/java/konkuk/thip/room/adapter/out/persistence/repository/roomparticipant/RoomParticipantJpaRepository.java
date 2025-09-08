@@ -41,7 +41,7 @@ public interface RoomParticipantJpaRepository extends JpaRepository<RoomParticip
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE RoomParticipantJpaEntity rp SET rp.status = 'INACTIVE' WHERE rp.userJpaEntity.userId = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
+    void softDeleteAllByUserId(@Param("userId") Long userId);
 
     @Query("SELECT rp.roomJpaEntity.roomId FROM RoomParticipantJpaEntity rp WHERE rp.userJpaEntity.userId = :userId")
     List<Long> findRoomIdsByUserId(@Param("userId") Long userId);

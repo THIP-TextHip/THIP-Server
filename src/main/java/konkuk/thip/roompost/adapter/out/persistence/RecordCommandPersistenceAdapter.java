@@ -79,8 +79,8 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
         commentJpaRepository.softDeleteAllByPostIds(recordIds);
         // 3. 게시글 좋아요 일괄 삭제
         postLikeJpaRepository.deleteAllByPostIds(recordIds);
-        // 4. 탈퇴한 유저가 작성한 기록 게시글 일괄 삭제
-        recordJpaRepository.deleteAllByUserId(userId);
+        // 4. 탈퇴한 유저가 작성한 기록 soft delete 일괄 처리
+        recordJpaRepository.softDeleteAllByUserId(userId);
     }
 
     @Override

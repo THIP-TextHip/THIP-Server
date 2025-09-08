@@ -58,6 +58,6 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
 
     @Override
     public void deleteAllByUserId(Long userId) {
-        attendanceCheckJpaRepository.deleteAllByUserId(userId);
+        attendanceCheckJpaRepository.softDeleteAllByUserId(userId);
     }
 }

@@ -77,6 +77,8 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
 
     @Override
     public void deleteAllByUserId(Long userId) {
+        // 방 참여 관계 삭제 (member는 진행/모집/만료, host는 만료)
+        // 방 멤버수 감소, 방 진행도 업데이트
 
         // 1. 유저가 참여한 방 ID 리스트 조회
         List<Long> roomIds = roomParticipantJpaRepository.findRoomIdsByUserId(userId);
@@ -84,7 +86,7 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
             return; // early return
         }
         // 2. 유저의 모든 방 참여 관계 일괄 삭제
-        roomParticipantJpaRepository.deleteAllByUserId(userId);
+        roomParticipantJpaRepository.softDeleteAllByUserId(userId);
         // 3. 해당 ID들로 JPA 엔티티 직접 조회
         List<RoomJpaEntity> roomJpaEntities = roomJpaRepository.findAllByIds(roomIds);
 
@@ -104,7 +106,6 @@ public class RoomParticipantCommandPersistenceAdapter implements RoomParticipant
             room.setMemberCount(roomParticipantEntities.size()); // 남은 참가자 수로 설정
 
         }
-        roomJpaRepository.saveAll(roomJpaEntities);
     }
 
     @Override

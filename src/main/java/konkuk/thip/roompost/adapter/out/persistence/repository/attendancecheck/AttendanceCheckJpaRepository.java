@@ -26,5 +26,5 @@ public interface AttendanceCheckJpaRepository extends JpaRepository<AttendanceCh
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE AttendanceCheckJpaEntity a SET a.status = 'INACTIVE' WHERE a.userJpaEntity.userId = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
+    void softDeleteAllByUserId(@Param("userId") Long userId);
 }

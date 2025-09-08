@@ -21,5 +21,5 @@ public interface RecordJpaRepository extends JpaRepository<RecordJpaEntity, Long
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE RecordJpaEntity r SET r.status = 'INACTIVE' WHERE r.userJpaEntity.userId = :userId")
-    void deleteAllByUserId(@Param("userId") Long userId);
+    void softDeleteAllByUserId(@Param("userId") Long userId);
 }
