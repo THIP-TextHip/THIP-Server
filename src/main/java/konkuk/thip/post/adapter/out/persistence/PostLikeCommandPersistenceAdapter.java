@@ -60,60 +60,29 @@ public class PostLikeCommandPersistenceAdapter implements PostLikeCommandPort {
 
     @Override
     public void deleteAllByUserId(Long userId) {
-
         // 1. 탈퇴 유저가 좋아요한 게시글을 JOIN 조회
         List<PostJpaEntity> likedPosts = postLikeJpaRepository.findAllPostsWithTypeByUserId(userId);
         if (likedPosts == null || likedPosts.isEmpty()) {
             return; // early return
         }
-        // 2. 탈퇴한 유저의 모든 게시글 좋아요 삭제
-        postLikeJpaRepository.deleteAllByUserId(userId);
 
-        // 3. 게시글 타입별로 좋아요 수 감소가 필요한 게시글 Map 생성
-        Map<PostType, List<PostJpaEntity>> postsByType = new HashMap<>();
-
+        // 2. 게시글 좋아요 수 감소
         for (PostJpaEntity post : likedPosts) {
-            // 4. 엔티티에서 직접 게시글 좋아요 수 감소
             post.setLikeCount(Math.max(0, post.getLikeCount() - 1));
-
-            PostType postType = PostType.from(post.getDtype());
-            postsByType.computeIfAbsent(postType, k -> new ArrayList<>()).add(post);
         }
-        // 5. 게시글 타입별로 저장 처리
-        postsByType.forEach(this::savePostsJpaEntities);
+
+        // 3. 탈퇴한 유저의 모든 게시글 좋아요 삭제
+        postLikeJpaRepository.deleteAllByUserId(userId);
     }
 
     private PostJpaEntity findPostJpaEntity(PostType postType, Long postId) {
         return switch (postType) {
-            case FEED -> feedJpaRepository.findById(postId)
+            case FEED -> feedJpaRepository.findByPostId(postId)
                     .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
-            case RECORD -> recordJpaRepository.findById(postId)
+            case RECORD -> recordJpaRepository.findByPostId(postId)
                     .orElseThrow(() -> new EntityNotFoundException(RECORD_NOT_FOUND));
-            case VOTE -> voteJpaRepository.findById(postId)
+            case VOTE -> voteJpaRepository.findByPostId(postId)
                     .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
         };
-    }
-
-    private void savePostsJpaEntities(PostType postType, List<PostJpaEntity> posts) {
-        switch (postType) {
-            case FEED:
-                feedJpaRepository.saveAll(posts.stream()
-                        .filter(p -> p instanceof FeedJpaEntity)
-                        .map(p -> (FeedJpaEntity) p)
-                        .collect(Collectors.toList()));
-                break;
-            case RECORD:
-                recordJpaRepository.saveAll(posts.stream()
-                        .filter(p -> p instanceof RecordJpaEntity)
-                        .map(p -> (RecordJpaEntity) p)
-                        .collect(Collectors.toList()));
-                break;
-            case VOTE:
-                voteJpaRepository.saveAll(posts.stream()
-                        .filter(p -> p instanceof VoteJpaEntity)
-                        .map(p -> (VoteJpaEntity) p)
-                        .collect(Collectors.toList()));
-                break;
-        }
     }
 }
