@@ -165,12 +165,8 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         }
         // 2. 투표 참여 관계 삭제
         voteParticipantJpaRepository.deleteAllByUserId(userId);
-        // 3. 해당 ID들로 JPA 엔티티 직접 조회
-        List<VoteItemJpaEntity> voteItemEntities = voteItemJpaRepository.findAllById(voteItemIds);
-        // 4. 엔티티에서 직접 투표 항목 수 감소
-        voteItemEntities.forEach(entity ->
-            entity.setCount(Math.max(0, entity.getCount() - 1)));
-        voteItemJpaRepository.saveAll(voteItemEntities);
+        // 3. 탈퇴 유저가 투표 했던 투표 항목들의 득표 수 감소
+        voteItemJpaRepository.bulkDecrementLikeCount(voteItemIds);
     }
 
     @Override
@@ -190,8 +186,8 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         voteParticipantJpaRepository.deleteAllByVoteIds(voteIds);
         // 4-2. 투표 항목 일괄 삭제
         voteItemJpaRepository.deleteAllByVoteIds(voteIds);
-        // 5. 탈퇴한 유저가 작성한 투표 게시글 일괄 삭제
-        voteJpaRepository.deleteAllByUserId(userId);
+        // 5. 탈퇴한 유저가 작성한 투표 soft delete 일괄 처리
+        voteJpaRepository.softDeleteAllByUserId(userId);
     }
 
 
