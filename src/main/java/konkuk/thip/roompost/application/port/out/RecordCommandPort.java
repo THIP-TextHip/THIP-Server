@@ -2,7 +2,6 @@ package konkuk.thip.roompost.application.port.out;
 
 
 import konkuk.thip.common.exception.EntityNotFoundException;
-import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.roompost.domain.Record;
 
 import java.util.Optional;
@@ -23,6 +22,4 @@ public interface RecordCommandPort {
     }
 
     void delete(Record record);
-
-    PostQueryDto getPostQueryDtoById(Long postId);
 }
