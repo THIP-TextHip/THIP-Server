@@ -21,7 +21,7 @@ public class PostHandler {
     private final RecordCommandPort recordCommandPort;
     private final VoteCommandPort voteCommandPort;
 
-    private final PostQueryPort portQueryPort;
+    private final PostQueryPort postQueryPort;
 
     public CountUpdatable findPost(PostType type, Long postId) {
         return switch (type) {
@@ -41,9 +41,9 @@ public class PostHandler {
 
     public PostQueryDto getPostQueryDto(PostType type, Long postId) {
         return switch (type) {
-            case FEED -> portQueryPort.getPostQueryDtoByFeedId(postId);
-            case RECORD -> portQueryPort.getPostQueryDtoByRecordId(postId);
-            case VOTE -> portQueryPort.getPostQueryDtoByVoteId(postId);
+            case FEED -> postQueryPort.getPostQueryDtoByFeedId(postId);
+            case RECORD -> postQueryPort.getPostQueryDtoByRecordId(postId);
+            case VOTE -> postQueryPort.getPostQueryDtoByVoteId(postId);
         };
     }
 }
