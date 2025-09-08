@@ -35,7 +35,12 @@ public enum SwaggerResponseDescription {
             USER_NICKNAME_UPDATE_TOO_FREQUENT,
             USER_NICKNAME_ALREADY_EXISTS
     ))),
-
+    USER_DELETE(new LinkedHashSet<>(Set.of(
+            USER_CANNOT_DELETE_ROOM_HOST,
+            USER_NOT_FOUND,
+            USER_ALREADY_DELETED,
+            USER_OAUTH2ID_CANNOT_BE_NULL
+    ))),
 
     // Follow
     CHANGE_FOLLOW_STATE(new LinkedHashSet<>(Set.of(
@@ -348,6 +353,7 @@ public enum SwaggerResponseDescription {
 //                AUTH_TOKEN_NOT_FOUND
 //                AUTH_LOGIN_FAILED,
 //                AUTH_UNSUPPORTED_SOCIAL_LOGIN,
+//                AUTH_BLACKLIST_TOKEN,
 
 //                JSON_PROCESSING_ERROR
         )));

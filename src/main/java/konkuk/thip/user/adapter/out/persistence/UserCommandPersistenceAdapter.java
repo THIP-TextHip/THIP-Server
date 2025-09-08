@@ -55,4 +55,14 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
         userJpaEntity.updateIncludeAliasFrom(user);
         userJpaRepository.save(userJpaEntity);
     }
+
+    @Override
+    public void delete(User user) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(user.getId()).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND)
+        );
+
+        userJpaEntity.softDelete(user);
+        userJpaRepository.save(userJpaEntity);
+    }
 }

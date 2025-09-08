@@ -23,6 +23,7 @@ public enum ErrorCode implements ResponseCode {
     AUTH_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, 40104, "로그인에 실패했습니다."),
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
     AUTH_INVALID_LOGIN_TOKEN_KEY(HttpStatus.UNAUTHORIZED, 40106, "유효하지 않은 로그인 토큰 키입니다."),
+    AUTH_BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, 40107, "블랙리스트에 등록된 토큰입니다."),
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
     AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
@@ -48,6 +49,9 @@ public enum ErrorCode implements ResponseCode {
     USER_NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 70006, "다른 사용자가 이미 사용중인 닉네임입니다."),
     USER_ALREADY_SIGNED_UP(HttpStatus.BAD_REQUEST, 70007, "이미 가입된 사용자입니다."),
     USER_NOT_SIGNED_UP(HttpStatus.BAD_REQUEST, 70008, "가입되지 않은 사용자입니다."),
+    USER_CANNOT_DELETE_ROOM_HOST(HttpStatus.BAD_REQUEST, 70009, "모집/진행 중인 방의 방장은 회원탈퇴를 할 수 없습니다."),
+    USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 70010, "이미 삭제된 사용자 입니다."),
+    USER_OAUTH2ID_CANNOT_BE_NULL(HttpStatus.INTERNAL_SERVER_ERROR, 70011, "유저의 OAuth2Id 값이 null일 수 없습니다."),
 
     /**
      * 75000 : follow error

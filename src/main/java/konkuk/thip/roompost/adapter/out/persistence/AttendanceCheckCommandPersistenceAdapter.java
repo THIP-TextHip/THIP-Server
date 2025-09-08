@@ -55,4 +55,9 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
 
         attendanceCheckJpaRepository.delete(attendanceCheckJpaEntity);
     }
+
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        attendanceCheckJpaRepository.softDeleteAllByUserId(userId);
+    }
 }

@@ -41,7 +41,6 @@ public class VoteDeleteService implements VoteDeleteUseCase {
         // 3-3. 투표 삭제
         voteCommandPort.delete(vote);
 
-        //TODO// 4. 유저 방 진행도 업데이트
         return command.roomId();
     }
 }

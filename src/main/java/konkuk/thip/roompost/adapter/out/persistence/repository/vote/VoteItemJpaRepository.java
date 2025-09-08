@@ -15,4 +15,14 @@ public interface VoteItemJpaRepository extends JpaRepository<VoteItemJpaEntity, 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM VoteItemJpaEntity vi WHERE vi.voteJpaEntity.postId = :voteId")
     void deleteAllByVoteId(@Param("voteId") Long voteId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM VoteItemJpaEntity vi WHERE vi.voteJpaEntity.postId IN :voteIds")
+    void deleteAllByVoteIds(@Param("voteIds") List<Long> voteIds);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE VoteItemJpaEntity vi " +
+            "SET vi.count = CASE WHEN vi.count > 0 THEN vi.count - 1 ELSE 0 END " +
+            "WHERE vi.voteItemId IN :voteItemIds")
+    void bulkDecrementLikeCount(@Param("voteItemIds") List<Long> voteItemIds);
 }

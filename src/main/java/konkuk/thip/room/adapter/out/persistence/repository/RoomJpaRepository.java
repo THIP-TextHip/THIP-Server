@@ -2,6 +2,7 @@ package konkuk.thip.room.adapter.out.persistence.repository;
 
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,4 +21,12 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
             "AND r.startDate > :currentDate")
     int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           update RoomJpaEntity r
+           set r.roomPercentage = :avg,
+               r.memberCount    = :count
+           where r.roomId = :roomId
+        """)
+    void updateRoomStats(@Param("roomId") Long roomId, @Param("avg") double avg, @Param("count") int count);
 }
