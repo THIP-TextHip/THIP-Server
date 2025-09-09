@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Profile("prod | dev")
+@Profile({"!test", "!local"})
 @RequiredArgsConstructor
 public class FirebaseAdapter implements FirebaseMessagingPort {
 
