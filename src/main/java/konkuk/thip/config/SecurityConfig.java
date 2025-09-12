@@ -1,5 +1,6 @@
 package konkuk.thip.config;
 
+import konkuk.thip.common.security.constant.SecurityWhitelist;
 import konkuk.thip.common.security.filter.JwtAuthenticationEntryPoint;
 import konkuk.thip.common.security.filter.JwtAuthenticationFilter;
 import konkuk.thip.common.security.oauth2.CustomOAuth2UserService;
@@ -48,17 +49,6 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
 
-    private static final String[] WHITELIST = {
-            "/swagger-ui/**", "/api-docs/**", "/swagger-ui.html",
-            "/v3/api-docs/**","/oauth2/authorization/**",
-            "/login/oauth2/code/**", "/actuator/health",
-            "/auth/users", "/auth/token",
-
-            "/api/test/**",  // for test
-
-            "/auth/exchange-temp-token", "/auth/set-cookie", // deprecated
-    };
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -75,7 +65,7 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler) // OAuth2 로그인 성공 시 처리
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITELIST).permitAll()
+                        .requestMatchers(SecurityWhitelist.patterns()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(jwtAuthenticationEntryPoint))

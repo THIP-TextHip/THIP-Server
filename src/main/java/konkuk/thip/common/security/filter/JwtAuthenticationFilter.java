@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import konkuk.thip.common.exception.AuthException;
+import konkuk.thip.common.security.constant.SecurityWhitelist;
 import konkuk.thip.common.security.oauth2.CustomOAuth2User;
 import konkuk.thip.common.security.oauth2.LoginUser;
 import konkuk.thip.common.security.util.JwtUtil;
@@ -98,18 +99,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // 화이트리스트 경로에 대해서는 JWT 필터 제외
-        return path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/api-docs")
-                || path.startsWith("/actuator/health")
-                || path.startsWith("/oauth2/authorization")
-                || path.startsWith("/login/oauth2/code")
-                || path.startsWith("/auth/users")
-                || path.equals("/auth/token")
-
-//                || path.equals("/auth/set-cookie")
-//                || path.equals("/auth/exchange-temp-token")
-                ;
+        return SecurityWhitelist.patternsList().stream()
+                .anyMatch(path::startsWith);
     }
 
 }
