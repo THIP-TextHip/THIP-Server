@@ -3,10 +3,7 @@ package konkuk.thip.notification.application.service;
 import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.message.application.port.out.RoomEventCommandPort;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
-import konkuk.thip.notification.application.port.out.NotificationCommandPort;
-import konkuk.thip.notification.application.service.template.NotificationTemplate;
 import konkuk.thip.notification.application.service.template.room.*;
-import konkuk.thip.notification.domain.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,26 +19,8 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
      * 2) 푸시 알림은 AFTER_COMMIT 리스너에서 "비동기"로 발송한다.
      */
 
-    private final NotificationCommandPort notificationCommandPort;
+    private final NotificationSyncExecutor notificationSyncExecutor;
     private final RoomEventCommandPort roomEventCommandPort;
-
-    // ========================= 공통 헬퍼 =========================
-    private <T> void notifyWithTemplate(
-            NotificationTemplate<T> template,
-            T args,
-            Long targetUserId,
-            Runnable eventPublisher
-    ) {
-        String title = template.title(args);
-        String content = template.content(args);
-        saveNotification(title, content, targetUserId);
-        eventPublisher.run();
-    }
-
-    private void saveNotification(String title, String content, Long targetUserId) {
-        Notification notification = Notification.withoutId(title, content, targetUserId);
-        notificationCommandPort.save(notification);
-    }
 
     // ========================= Room 영역 =========================
     @Override
@@ -49,11 +28,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     public void notifyRoomPostCommented(Long targetUserId, Long actorUserId, String actorUsername,
                                         Long roomId, Integer page, Long postId, String postType) {
         var args = new RoomPostCommentedTemplate.Args(actorUsername);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomPostCommentedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomPostCommentedEvent(targetUserId, actorUserId, actorUsername, roomId, page, postId, postType)
+                (title, content) -> roomEventCommandPort.publishRoomPostCommentedEvent(
+                        title, content, targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+                )
         );
     }
 
@@ -61,11 +42,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomVoteStarted(Long targetUserId, Long roomId, String roomTitle, Integer page, Long postId) {
         var args = new RoomVoteStartedTemplate.Args(roomTitle);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomVoteStartedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomVoteStartedEvent(targetUserId, roomId, roomTitle, page, postId)
+                (title, content) -> roomEventCommandPort.publishRoomVoteStartedEvent(
+                        title, content, targetUserId, roomId, roomTitle, page, postId
+                )
         );
     }
 
@@ -74,11 +57,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     public void notifyRoomRecordCreated(Long targetUserId, Long actorUserId, String actorUsername,
                                         Long roomId, String roomTitle, Integer page, Long postId) {
         var args = new RoomRecordCreatedTemplate.Args(roomTitle, actorUsername);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomRecordCreatedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomRecordCreatedEvent(targetUserId, actorUserId, actorUsername, roomId, roomTitle, page, postId)
+                (title, content) -> roomEventCommandPort.publishRoomRecordCreatedEvent(
+                        title, content, targetUserId, actorUserId, actorUsername, roomId, roomTitle, page, postId
+                )
         );
     }
 
@@ -86,11 +71,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomRecruitClosedEarly(Long targetUserId, Long roomId, String roomTitle) {
         var args = new RoomRecruitClosedEarlyTemplate.Args(roomTitle);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomRecruitClosedEarlyTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomRecruitClosedEarlyEvent(targetUserId, roomId, roomTitle)
+                (title, content) -> roomEventCommandPort.publishRoomRecruitClosedEarlyEvent(
+                        title, content, targetUserId, roomId, roomTitle
+                )
         );
     }
 
@@ -98,11 +85,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomActivityStarted(Long targetUserId, Long roomId, String roomTitle) {
         var args = new RoomActivityStartedTemplate.Args(roomTitle);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomActivityStartedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomActivityStartedEvent(targetUserId, roomId, roomTitle)
+                (title, content) -> roomEventCommandPort.publishRoomActivityStartedEvent(
+                        title, content, targetUserId, roomId, roomTitle
+                )
         );
     }
 
@@ -110,11 +99,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomJoinToHost(Long hostUserId, Long roomId, String roomTitle, Long actorUserId, String actorUsername) {
         var args = new RoomJoinToHostTemplate.Args(roomTitle, actorUsername);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomJoinToHostTemplate.INSTANCE,
                 args,
                 hostUserId,
-                () -> roomEventCommandPort.publishRoomJoinEventToHost(hostUserId, roomId, roomTitle, actorUserId, actorUsername)
+                (title, content) -> roomEventCommandPort.publishRoomJoinEventToHost(
+                        title, content, hostUserId, roomId, roomTitle, actorUserId, actorUsername
+                )
         );
     }
 
@@ -123,11 +114,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     public void notifyRoomCommentLiked(Long targetUserId, Long actorUserId, String actorUsername,
                                        Long roomId, Integer page, Long postId, String postType) {
         var args = new RoomCommentLikedTemplate.Args(actorUsername);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomCommentLikedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomCommentLikedEvent(targetUserId, actorUserId, actorUsername, roomId, page, postId, postType)
+                (title, content) -> roomEventCommandPort.publishRoomCommentLikedEvent(
+                        title, content, targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+                )
         );
     }
 
@@ -136,11 +129,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     public void notifyRoomPostLiked(Long targetUserId, Long actorUserId, String actorUsername,
                                     Long roomId, Integer page, Long postId, String postType) {
         var args = new RoomPostLikedTemplate.Args(actorUsername);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomPostLikedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomPostLikedEvent(targetUserId, actorUserId, actorUsername, roomId, page, postId, postType)
+                (title, content) -> roomEventCommandPort.publishRoomPostLikedEvent(
+                        title, content, targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+                )
         );
     }
 
@@ -149,11 +144,13 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     public void notifyRoomPostCommentReplied(Long targetUserId, Long actorUserId, String actorUsername,
                                              Long roomId, Integer page, Long postId, String postType) {
         var args = new RoomPostCommentRepliedTemplate.Args(actorUsername);
-        notifyWithTemplate(
+        notificationSyncExecutor.execute(
                 RoomPostCommentRepliedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                () -> roomEventCommandPort.publishRoomPostCommentRepliedEvent(targetUserId, actorUserId, actorUsername, roomId, page, postId, postType)
+                (title, content) -> roomEventCommandPort.publishRoomPostCommentRepliedEvent(
+                        title, content, targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+                )
         );
     }
 }
