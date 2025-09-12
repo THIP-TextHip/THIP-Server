@@ -3,6 +3,7 @@ package konkuk.thip.roompost.application.service;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
@@ -55,6 +56,9 @@ class VoteCreateServiceTest {
     @Autowired
     private VoteCreateService voteCreateService;
 
+    @Autowired
+    private NotificationJpaRepository notificationJpaRepository;
+
     @AfterEach
     void tearDown() {
         voteItemJpaRepository.deleteAllInBatch();
@@ -62,6 +66,7 @@ class VoteCreateServiceTest {
         roomParticipantJpaRepository.deleteAllInBatch();
         roomJpaRepository.deleteAllInBatch();
         bookJpaRepository.deleteAllInBatch();
+        notificationJpaRepository.deleteAllInBatch();
         userJpaRepository.deleteAllInBatch();
     }
 
