@@ -1,6 +1,8 @@
 package konkuk.thip.notification.application.service;
 
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.message.adapter.out.event.dto.RoomEvents;
+import konkuk.thip.message.application.port.in.RoomNotificationDispatchUseCase;
 import konkuk.thip.notification.adapter.out.jpa.NotificationJpaEntity;
 import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
@@ -11,14 +13,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -28,6 +36,8 @@ class RoomNotificationOrchestratorSyncImplTest {
     @Autowired RoomNotificationOrchestrator orchestrator; // 반드시 인터페이스 타입으로 주입(트랜잭션 프록시 적용)
     @Autowired NotificationJpaRepository notificationJpaRepository;
     @Autowired UserJpaRepository userJpaRepository;
+
+    @MockitoBean RoomNotificationDispatchUseCase roomNotificationDispatchUseCase;
 
     private Long targetUserId;
 
@@ -88,5 +98,70 @@ class RoomNotificationOrchestratorSyncImplTest {
         assertThat(saved.getUserJpaEntity().getUserId()).isEqualTo(targetUserId);
         assertThat(saved.getTitle()).isNotBlank();
         assertThat(saved.getContent()).contains(actorUsername);
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("커밋 시: AFTER_COMMIT 리스너가 handleRoomPostCommented 호출 & Notification 커밋됨")
+    void roomPostCommented_afterCommit_listenerInvoked_andNotificationCommitted() {
+        // given
+        Long actorUserId = 301L;
+        String actorUsername = "alice";
+        Long roomId = 1001L;
+        Integer page = 7;
+        Long postId = 5001L;
+        String postType = "RECORD";
+
+        // when (트랜잭션 안)
+        orchestrator.notifyRoomPostCommented(
+                targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+        );
+
+        // 실제 커밋 트리거 → AFTER_COMMIT 리스너 실행 (test 프로필은 @Async 동기화)
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        // then : 리스너에 전달되는 DTO 필드 검증
+        ArgumentCaptor<RoomEvents.RoomPostCommentedEvent> captor =
+                ArgumentCaptor.forClass(RoomEvents.RoomPostCommentedEvent.class);
+        verify(roomNotificationDispatchUseCase).handleRoomPostCommented(captor.capture());
+
+        RoomEvents.RoomPostCommentedEvent event = captor.getValue();
+        assertThat(event).isNotNull();
+        assertThat(event.title()).isNotBlank();
+        assertThat(event.content()).contains(actorUsername);
+        assertThat(event.targetUserId()).isEqualTo(targetUserId);
+        assertThat(event.actorUserId()).isEqualTo(actorUserId);
+        assertThat(event.actorUsername()).isEqualTo(actorUsername);
+        assertThat(event.roomId()).isEqualTo(roomId);
+        assertThat(event.page()).isEqualTo(page);
+        assertThat(event.postId()).isEqualTo(postId);
+        assertThat(event.postType()).isEqualTo(postType);
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("롤백 시: AFTER_COMMIT 리스너는 호출되지 않고, Notification도 저장되지 않음")
+    void roomPostCommented_rollback_listenerNotInvoked_andNotificationNotCommitted() {
+        // given
+        Long actorUserId = 302L;
+        String actorUsername = "bob";
+        Long roomId = 1002L;
+        Integer page = 2;
+        Long postId = 5002L;
+        String postType = "RECORD";
+
+        // when
+        orchestrator.notifyRoomPostCommented(
+                targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+        );
+
+        // 롤백 트리거 → AFTER_COMMIT 미실행
+        TestTransaction.flagForRollback();
+        TestTransaction.end();
+
+        // then
+        verify(roomNotificationDispatchUseCase, times(0)).handleRoomPostCommented(any());
+        assertThat(notificationJpaRepository.findAll()).isEmpty();
     }
 }
