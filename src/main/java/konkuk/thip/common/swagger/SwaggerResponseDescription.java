@@ -147,7 +147,8 @@ public enum SwaggerResponseDescription {
     RECORD_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             RECORD_NOT_FOUND,
-            RECORD_ACCESS_FORBIDDEN
+            RECORD_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
     RECORD_PIN(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
@@ -158,7 +159,8 @@ public enum SwaggerResponseDescription {
     RECORD_UPDATE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             RECORD_NOT_FOUND,
-            RECORD_ACCESS_FORBIDDEN
+            RECORD_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
 
     // Vote
@@ -175,7 +177,8 @@ public enum SwaggerResponseDescription {
             VOTE_ITEM_NOT_FOUND,
             VOTE_ITEM_ALREADY_VOTED,
             VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL,
-            VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE
+            VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE,
+            ROOM_IS_EXPIRED
     ))),
     VOTE_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
@@ -251,8 +254,8 @@ public enum SwaggerResponseDescription {
             VOTE_NOT_FOUND,
             INVALID_COMMENT_CREATE,
             FEED_ACCESS_FORBIDDEN,
-            ROOM_ACCESS_FORBIDDEN
-
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
     CHANGE_COMMENT_LIKE_STATE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -264,7 +267,8 @@ public enum SwaggerResponseDescription {
             COMMENT_NOT_LIKED_CANNOT_CANCEL,
             COMMENT_LIKE_COUNT_UNDERFLOW,
             FEED_ACCESS_FORBIDDEN,
-            ROOM_ACCESS_FORBIDDEN
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
     COMMENT_DELETE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -275,7 +279,8 @@ public enum SwaggerResponseDescription {
             COMMENT_DELETE_FORBIDDEN,
             COMMENT_COUNT_UNDERFLOW,
             FEED_ACCESS_FORBIDDEN,
-            ROOM_ACCESS_FORBIDDEN
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
 
     // Book
@@ -321,7 +326,8 @@ public enum SwaggerResponseDescription {
             ROOM_NOT_FOUND,
             USER_NOT_FOUND,
             ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED,
-            ATTENDANCE_CHECK_NOT_FOUND
+            ATTENDANCE_CHECK_NOT_FOUND,
+            ROOM_IS_EXPIRED
     ))),
 
     ATTENDANCE_CHECK_SHOW(new LinkedHashSet<>(Set.of(

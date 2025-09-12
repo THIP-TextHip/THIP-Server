@@ -2,12 +2,13 @@ package konkuk.thip.roompost.application.service;
 
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
+import konkuk.thip.room.application.port.out.RoomCommandPort;
+import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.roompost.application.port.in.RecordDeleteUseCase;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordDeleteCommand;
 import konkuk.thip.roompost.application.port.out.RecordCommandPort;
-import konkuk.thip.roompost.application.service.manager.RoomProgressManager;
 import konkuk.thip.roompost.domain.Record;
-import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +20,9 @@ public class RecordDeleteService implements RecordDeleteUseCase {
     private final RecordCommandPort recordCommandPort;
     private final CommentCommandPort commentCommandPort;
     private final PostLikeCommandPort postLikeCommandPort;
+    private final RoomCommandPort roomCommandPort;
 
     private final RoomParticipantValidator roomParticipantValidator;
-    private final RoomProgressManager roomProgressManager;
 
     @Override
     @Transactional
@@ -29,6 +30,9 @@ public class RecordDeleteService implements RecordDeleteUseCase {
 
         // 1. 방 참여자 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
+
+        Room room = roomCommandPort.getByIdOrThrow(command.roomId());
+        room.validateRoomExpired();
 
         // 2. 기록 조회 및 검증
         Record record = recordCommandPort.getByIdOrThrow(command.recordId());
