@@ -43,8 +43,6 @@ public class UserQueryController {
     private final UserSearchUsecase userSearchUsecase;
     private final UserMyPageUseCase userMyPageUseCase;
     private final UserShowFollowingsInFeedViewUseCase userShowFollowingsInFeedViewUseCase;
-    private final UserShowNotificationSettingsInfoUseCase userShowNotificationSettingsInfoUseCase;
-
 
     @Operation(
             summary = "닉네임 중복 확인",
@@ -169,19 +167,5 @@ public class UserQueryController {
             @Parameter(hidden = true) @UserId Long userId
     ) {
         return BaseResponse.ok(userShowFollowingsInFeedViewUseCase.showMyFollowingsInFeedView(userId));
-    }
-
-    @Operation(
-            summary = "사용자 푸시알림 수신여부 조회 (마이페이지 -> 알림설정)",
-            description = "알림설정 페이지에서 사용자의 푸시알림 수신여부 정보를 조회합니다."
-    )
-    @ExceptionDescription(USER_GET_NOTIFICATION_INFO)
-    @GetMapping("/users/notification-settings")
-    public BaseResponse<UserNotificationSettingsInfoResponse> showUserNotificationSettingsInfo(
-            @Parameter(hidden = true) @UserId final Long userId,
-            @Parameter(description = "디바이스 고유 ID", example = "device12345")
-            @RequestParam("deviceId") final String deviceId) {
-        return BaseResponse.ok(
-                UserNotificationSettingsInfoResponse.of(userShowNotificationSettingsInfoUseCase.getUserNotificationSettingsInfo(userId,deviceId)));
     }
 }

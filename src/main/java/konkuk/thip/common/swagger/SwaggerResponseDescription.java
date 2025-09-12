@@ -41,10 +41,6 @@ public enum SwaggerResponseDescription {
             USER_ALREADY_DELETED,
             USER_OAUTH2ID_CANNOT_BE_NULL
     ))),
-    USER_GET_NOTIFICATION_INFO(new LinkedHashSet<>(Set.of(
-            FCM_TOKEN_NOT_FOUND,
-            FCM_TOKEN_ACCESS_FORBIDDEN
-    ))),
 
     // Follow
     CHANGE_FOLLOW_STATE(new LinkedHashSet<>(Set.of(
@@ -352,7 +348,10 @@ public enum SwaggerResponseDescription {
     FCM_TOKEN_DELETE(new LinkedHashSet<>(Set.of(
             FCM_TOKEN_NOT_FOUND,
             FCM_TOKEN_ACCESS_FORBIDDEN
-    )))
+    ))),
+    NOTIFICATION_GET_ENABLE_STATE(new LinkedHashSet<>(Set.of(
+            FCM_TOKEN_NOT_FOUND
+    ))),
 
   ;
     private final Set<ErrorCode> errorCodeList;
