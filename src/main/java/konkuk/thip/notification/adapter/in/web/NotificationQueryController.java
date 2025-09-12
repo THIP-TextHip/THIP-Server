@@ -2,6 +2,7 @@ package konkuk.thip.notification.adapter.in.web;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.NOTIFICATION_GET_ENABLE_STATE;
 
+@Tag(name = "Notification Query API", description = "알림 조회 관련 API")
 @RestController
 @RequiredArgsConstructor
 public class NotificationQueryController {
