@@ -183,12 +183,14 @@ public enum SwaggerResponseDescription {
     VOTE_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             VOTE_NOT_FOUND,
-            VOTE_ACCESS_FORBIDDEN
+            VOTE_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
     VOTE_UPDATE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             VOTE_NOT_FOUND,
-            VOTE_ACCESS_FORBIDDEN
+            VOTE_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED
     ))),
 
 
@@ -337,7 +339,8 @@ public enum SwaggerResponseDescription {
     ATTENDANCE_CHECK_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             ATTENDANCE_CHECK_NOT_FOUND,
-            ATTENDANCE_CHECK_CAN_NOT_DELETE
+            ATTENDANCE_CHECK_CAN_NOT_DELETE,
+            ROOM_IS_EXPIRED
     ))),
 
     // Notiification

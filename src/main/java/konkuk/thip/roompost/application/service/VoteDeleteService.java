@@ -3,7 +3,9 @@ package konkuk.thip.roompost.application.service;
 import jakarta.transaction.Transactional;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
+import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.roompost.application.port.in.VoteDeleteUseCase;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteDeleteCommand;
 import konkuk.thip.roompost.application.port.out.VoteCommandPort;
@@ -18,6 +20,7 @@ public class VoteDeleteService implements VoteDeleteUseCase {
     private final VoteCommandPort voteCommandPort;
     private final CommentCommandPort commentCommandPort;
     private final PostLikeCommandPort postLikeCommandPort;
+    private final RoomCommandPort roomCommandPort;
 
     private final RoomParticipantValidator roomParticipantValidator;
 
@@ -27,6 +30,10 @@ public class VoteDeleteService implements VoteDeleteUseCase {
 
         // 1. 방 참여자 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
+
+        // 1.1 방 존재 여부 및 만료 검증
+        Room room = roomCommandPort.getByIdOrThrow(command.roomId());
+        room.validateRoomExpired();
 
         // 2. 투표 조회 및 검증
         Vote vote = voteCommandPort.getByIdOrThrow(command.voteId());
