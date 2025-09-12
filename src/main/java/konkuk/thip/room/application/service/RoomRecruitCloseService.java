@@ -2,7 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.room.application.port.in.RoomRecruitCloseUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
@@ -21,7 +21,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final RoomCommandPort roomCommandPort;
 
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -51,7 +51,7 @@ public class RoomRecruitCloseService implements RoomRecruitCloseUseCase {
         List<RoomParticipant> actorUsers = roomParticipantCommandPort.findAllByRoomId(roomId);
         for (RoomParticipant participant : actorUsers) {
             if(participant.isHost()) continue; // 호스트는 제외
-            roomEventCommandPort.publishRoomRecruitClosedEarlyEvent(participant.getUserId(), roomId, room.getTitle());
+            roomNotificationOrchestrator.notifyRoomRecruitClosedEarly(participant.getUserId(), roomId, room.getTitle());
         }
     }
 

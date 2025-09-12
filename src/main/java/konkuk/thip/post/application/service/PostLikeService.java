@@ -1,7 +1,7 @@
 package konkuk.thip.post.application.service;
 
-import konkuk.thip.message.application.port.out.FeedEventCommandPort;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.CountUpdatable;
@@ -31,8 +31,8 @@ public class PostLikeService implements PostLikeUseCase {
     private final PostCountService postCountService;
     private final PostLikeAuthorizationValidator postLikeAuthorizationValidator;
 
-    private final FeedEventCommandPort feedEventCommandPort;
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final FeedNotificationOrchestrator feedNotificationOrchestrator;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -74,10 +74,10 @@ public class PostLikeService implements PostLikeUseCase {
         User actorUser = userCommandPort.findById(command.userId());
         // 좋아요 푸쉬알림 전송
         if (command.postType() == PostType.FEED) {
-            feedEventCommandPort.publishFeedLikedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+            feedNotificationOrchestrator.notifyFeedLiked(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
         }
         if (command.postType() == PostType.RECORD || command.postType() == PostType.VOTE) {
-            roomEventCommandPort.publishRoomPostLikedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+            roomNotificationOrchestrator.notifyRoomPostLiked(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
         }
     }
 }

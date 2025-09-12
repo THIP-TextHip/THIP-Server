@@ -11,8 +11,8 @@ import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.message.application.port.out.FeedEventCommandPort;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.application.service.handler.PostHandler;
@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_COMMENT_CREATE;
 import static konkuk.thip.post.domain.PostType.*;
-
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +39,8 @@ public class CommentCreateService implements CommentCreateUseCase {
     private final PostHandler postHandler;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
 
-    private final FeedEventCommandPort feedEventCommandPort;
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final FeedNotificationOrchestrator feedNotificationOrchestrator;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -96,10 +95,10 @@ public class CommentCreateService implements CommentCreateUseCase {
 
         if (postQueryDto.postType().equals(FEED.getType())) {
             // 피드 댓글 알림 이벤트 발행
-            feedEventCommandPort.publishFeedCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+            feedNotificationOrchestrator.notifyFeedCommented(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
         } else if (postQueryDto.postType().equals(RECORD.getType()) || postQueryDto.postType().equals(VOTE.getType())) {
             // 모임방 게시글 댓글 알림 이벤트 발행
-            roomEventCommandPort.publishRoomPostCommentedEvent(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+            roomNotificationOrchestrator.notifyRoomPostCommented(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
         }
     }
 
@@ -108,10 +107,10 @@ public class CommentCreateService implements CommentCreateUseCase {
 
         if (postQueryDto.postType().equals(FEED.getType())) {
             // 피드 답글 알림 이벤트 발행
-            feedEventCommandPort.publishFeedRepliedEvent(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
+            feedNotificationOrchestrator.notifyFeedReplied(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
         } else if (postQueryDto.postType().equals(RECORD.getType()) || postQueryDto.postType().equals(VOTE.getType())) {
             // 모임방 게시글 답글 알림 이벤트 발행
-            roomEventCommandPort.publishRoomPostCommentRepliedEvent(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+            roomNotificationOrchestrator.notifyRoomPostCommentReplied(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
         }
     }
 
