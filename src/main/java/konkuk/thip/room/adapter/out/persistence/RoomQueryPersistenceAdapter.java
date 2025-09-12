@@ -25,8 +25,8 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     private final RoomJpaRepository roomJpaRepository;
 
     @Override
-    public int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate) {
-        return roomJpaRepository.countActiveRoomsByBookIdAndStartDateAfter(isbn, currentDate);
+    public int countRecruitingRoomsByBookIsbn(String isbn) {
+        return roomJpaRepository.countRecruitingRoomsByBookIsbn(isbn);
     }
 
     @Override
