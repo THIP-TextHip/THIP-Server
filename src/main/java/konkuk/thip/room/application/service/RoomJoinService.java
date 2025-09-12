@@ -34,11 +34,11 @@ public class RoomJoinService implements RoomJoinUseCase {
     public RoomJoinResult changeJoinState(RoomJoinCommand roomJoinCommand) {
         RoomJoinType type = roomJoinCommand.type();
 
-        // 방이 존재하지 않거나 만료된 경우
+        // 방이 존재하지 않거나 모집기간이 만료된 경우 예외 처리
         Room room = roomCommandPort.findById(roomJoinCommand.roomId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL));
 
-        validateRoom(room);
+        room.validateRoomRecruitExpired();
 
         Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
 
@@ -91,11 +91,6 @@ public class RoomJoinService implements RoomJoinUseCase {
 
         //Room의 memberCount 업데이트
         room.increaseMemberCount();
-    }
-
-    private void validateRoom(Room room) {
-        room.validateRoomRecruitExpired();
-        room.validateRoomExpired();
     }
 
     // 방장이 참여 취소를 요청한 경우
