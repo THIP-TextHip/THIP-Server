@@ -3,8 +3,8 @@ package konkuk.thip.user.application.port.out;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.application.port.out.dto.ReactionQueryDto;
-import konkuk.thip.user.application.port.in.dto.UserViewAliasChoiceResult;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
+import konkuk.thip.user.domain.User;
 
 import java.util.List;
 import java.util.Set;
@@ -25,4 +25,6 @@ public interface UserQueryPort {
     CursorBasedList<ReactionQueryDto> findCommentReactionsByUserId(Long userId, Cursor cursor, String label);
 
     CursorBasedList<ReactionQueryDto> findBothReactionsByUserId(Long userId, Cursor cursor, String likeLabel, String commentLabel);
+
+    List<User> getAllFollowersByUserId(Long userId);
 }

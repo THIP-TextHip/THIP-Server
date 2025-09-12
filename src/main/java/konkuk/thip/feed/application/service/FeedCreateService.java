@@ -4,18 +4,21 @@ import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
+import konkuk.thip.common.s3.service.ImageUrlValidationService;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
-import konkuk.thip.feed.application.port.out.S3CommandPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
-import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.message.application.port.out.FeedEventCommandPort;
+import konkuk.thip.user.application.port.out.UserCommandPort;
+import konkuk.thip.user.application.port.out.UserQueryPort;
+import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,47 +26,52 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedCreateService implements FeedCreateUseCase {
 
-    private final S3CommandPort s3CommandPort;
     private final BookCommandPort bookCommandPort;
     private final FeedCommandPort feedCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
+    private final UserQueryPort userQueryPort;
+    private final UserCommandPort userCommandPort;
+
+    private final ImageUrlValidationService imageUrlValidationService;
+    private final FeedEventCommandPort feedEventCommandPort;
 
     @Override
     @Transactional
-    //TODO 추후 예외 발생시 이미 s3에 업로드된 이미지 삭제 방식 논의
-    public Long createFeed(FeedCreateCommand command, List<MultipartFile> images) {
+    public Long createFeed(FeedCreateCommand command) {
 
         // 1. 피드 생성 비지니스 정책 검증
         TagList.validateTags(Tag.fromList(command.tagList()));
-        // todo 나중에 presignedURL로 바꾸면 ContentList.of로 변경
-        ContentList.validateImageCount(images != null ? images.size() : 0);
+        ContentList.validateImageCount(ContentList.of(command.imageUrls()).size());
+        // 1-1. 서명된 url 검증
+        imageUrlValidationService.validateUrlDomainAndUser(command.imageUrls(),command.userId());
 
         // 2. Book 검증 및 조회
         Long targetBookId = findOrCreateBookByIsbn(command.isbn());
 
-        // 3. 이미지 업로드
-        List<String> imageUrls = null;
-        try {
-            imageUrls = (images == null || images.isEmpty())
-                    ? List.of()
-                    : s3CommandPort.uploadImages(images);
+        // 3. Feed 생성 및 저장
+        Feed feed = Feed.withoutId(
+                command.contentBody(),
+                command.userId(),
+                command.isPublic(),
+                targetBookId,
+                command.tagList(),
+                command.imageUrls()
+        );
 
-            // 4. Feed 생성 및 저장 (Content도 함께 생성 및 저장 애그리거트 루트인 Feed가 생성책임 가지고있음)
-            Feed feed = Feed.withoutId(
-                    command.contentBody(),
-                    command.userId(),
-                    command.isPublic(),
-                    targetBookId,
-                    command.tagList(),
-                    imageUrls
-            );
-            return feedCommandPort.save(feed);
+        // 4. 피드 영속화
+        Long savedFeedId = feedCommandPort.save(feed);
 
-        } catch (Exception e) {
-            if (imageUrls != null && !imageUrls.isEmpty()) {
-                s3CommandPort.deleteImages(imageUrls);
-            }
-            throw e;
+        // 5. 피드 작성 푸쉬 알림 전송
+        sendNotifications(command, savedFeedId);
+
+        return savedFeedId;
+    }
+
+    private void sendNotifications(FeedCreateCommand command, Long savedFeedId) {
+        List<User> targetUsers = userQueryPort.getAllFollowersByUserId(command.userId());
+        User actorUser = userCommandPort.findById(command.userId());
+        for (User targetUser : targetUsers) {
+            feedEventCommandPort.publishFolloweeNewPostEvent(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
         }
     }
 

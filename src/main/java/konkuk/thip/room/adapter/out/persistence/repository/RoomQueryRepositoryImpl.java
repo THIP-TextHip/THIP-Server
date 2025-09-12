@@ -10,19 +10,16 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.DateUtil;
-import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.adapter.out.jpa.QRoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.QRoomParticipantJpaEntity;
+import konkuk.thip.room.application.port.out.dto.QRoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.QRoomQueryDto;
+import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.value.Category;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -40,8 +37,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     /** 모집중 + ACTIVE 공통 where */
     private BooleanBuilder recruitingActiveWhere(LocalDate today) {
         BooleanBuilder where = new BooleanBuilder();
-        where.and(room.startDate.after(today))
-                .and(room.status.eq(StatusType.ACTIVE));
+        where.and(room.startDate.after(today));
         return where;
     }
 
@@ -199,67 +195,54 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public Page<RoomGetHomeJoinedListResponse.JoinedRoomInfo> searchHomeJoinedRooms(Long userId, LocalDate date, Pageable pageable) {
+    public List<RoomParticipantQueryDto> findHomeJoinedRoomsByUserPercentage(
+            Long userId,
+            Double userPercentageCursor,
+            LocalDate startDateCursor,
+            Long roomIdCursor,
+            int pageSize) {
 
-        QRoomParticipantJpaEntity userRoomSub = new QRoomParticipantJpaEntity("userRoomSub");
-
-        // 1. 검색 조건(where) 조립
+        // 검색 조건(where) 조립
         // 유저가 참여한 방만: userId 조건
         // 활동 기간 중인 방만: startDate ≤ today ≤ endDate
         BooleanBuilder where = new BooleanBuilder();
         where.and(participant.userJpaEntity.userId.eq(userId));
-        where.and(participant.status.eq(StatusType.ACTIVE));
-        where.and(room.startDate.loe(date));
-        where.and(room.endDate.goe(date));
+        where.and(room.startDate.loe(LocalDate.now()));
+        where.and(room.endDate.goe(LocalDate.now()));
 
-        // 2. 페이징된 목록 조회
-        List<Tuple> tuples = queryFactory
-                .select(
+        // 커서 기반 추가 조건
+        if (userPercentageCursor != null && startDateCursor != null && roomIdCursor != null) {
+            where.and(participant.userPercentage.lt(userPercentageCursor)
+                            .or(participant.userPercentage.eq(userPercentageCursor)
+                                            .and(room.startDate.gt(startDateCursor))
+                                            .or(participant.userPercentage.eq(userPercentageCursor)
+                                                    .and(room.startDate.eq(startDateCursor))
+                                                    .and(room.roomId.gt(roomIdCursor))
+                                            )
+                            )
+            );
+        }
+
+        return queryFactory
+                .select(new QRoomParticipantQueryDto(
                         room.roomId,
                         book.imageUrl,
                         room.title,
                         room.memberCount,
-                        room.recruitCount,
-                        room.startDate,
-                        book.title,
-                        participant.userPercentage
-                )
+                        participant.userPercentage,
+                        room.startDate
+                ))
                 .from(participant)
                 .join(participant.roomJpaEntity, room)
                 .join(room.bookJpaEntity, book)
                 .where(where)
                 .orderBy(
                         participant.userPercentage.desc(), // 진행률 높은 순(내림차순)
-                        room.startDate.asc() // 진행률 같으면 활동 시작일 빠른 순 (오름차순)
+                        room.startDate.asc(), // 진행률 같으면 활동 시작일 빠른 순 (오름차순)
+                        room.roomId.asc() // 둘 다 같으면 방 아이디 작은 순 (오름차순)
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .limit(pageSize + 1)
                 .fetch();
-        // TODO : 추후에 오프셋 페이징이 아니라, 키셋 페이징 기법 도입 검토
-
-        // 3. Tuple → DTO 매핑
-        List<RoomGetHomeJoinedListResponse.JoinedRoomInfo> content = tuples.stream()
-                .map(t -> RoomGetHomeJoinedListResponse.JoinedRoomInfo.builder()
-                        .roomId(t.get(room.roomId))
-                        .bookImageUrl(t.get(book.imageUrl))
-                        .roomTitle(t.get(room.title))
-                        .memberCount(t.get(room.memberCount))
-                        .userPercentage(t.get(participant.userPercentage).intValue())
-                        .build()
-                )
-                .toList();
-
-        // 4. 전체 개수 조회 (페이징 정보 계산용)
-        Long totalCount = queryFactory
-                .select(participant.count())
-                .from(participant)
-                .join(participant.roomJpaEntity, room)
-                .where(where)
-                .fetchOne();
-        long total = (totalCount != null) ? totalCount : 0L;
-
-        // 5. PageImpl 생성하여 반환
-        return new PageImpl<>(content, pageable, total);
     }
 
     // 1) 모집중인 방
@@ -269,9 +252,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-                .and(participant.status.eq(StatusType.ACTIVE))
-                .and(room.startDate.after(today))
-                .and(room.status.eq(StatusType.ACTIVE));      // 유저가 참여한 방 && 모집중인 방
+                .and(room.startDate.after(today));  // 유저가 참여한 방 && 모집중인 방
         DateExpression<LocalDate> cursorExpr = room.startDate;      // 커서 비교는 startDate(= 모집 마감일 - 1일)
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
                 cursorExpr.asc(), room.roomId.asc()
@@ -287,10 +268,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-                .and(participant.status.eq(StatusType.ACTIVE))
                 .and(room.startDate.loe(today))
-                .and(room.endDate.goe(today))
-                .and(room.status.eq(StatusType.ACTIVE));      // 유저가 참여한 방 && 현재 진행중인 방
+                .and(room.endDate.goe(today));      // 유저가 참여한 방 && 현재 진행중인 방
         DateExpression<LocalDate> cursorExpr = room.endDate;        // 커서 비교는 endDate(= 진행 마감일)
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
                 cursorExpr.asc(), room.roomId.asc()
@@ -302,15 +281,13 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     // 3) 진행＋모집 통합
     @Override
     public List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(
-            Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
+            Long userId, Integer priorityCursor, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression playing   = room.startDate.loe(today).and(room.endDate.goe(today));
         BooleanExpression recruiting = room.startDate.after(today);
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-                .and(participant.status.eq(StatusType.ACTIVE))
-                .and(playing.or(recruiting))
-                .and(room.status.eq(StatusType.ACTIVE));     // 유저가 참여한 방 && 현재 진행중인 방 + 모집중인 방
+                .and(playing.or(recruiting));     // 유저가 참여한 방 && 현재 진행중인 방 + 모집중인 방
 
         // 진행중: cursor=endDate, 모집중: cursor=startDate
         DateExpression<LocalDate> cursorExpr = new CaseBuilder()
@@ -322,13 +299,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .when(playing).then(0)
                 .otherwise(1);
 
-        OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
-                priority.asc(),
-                cursorExpr.asc(),
-                room.roomId.asc()
-        };
-
-        return fetchMyRooms(base, cursorExpr, orders, true, dateCursor, roomIdCursor, pageSize);
+        return fetchMyRoomsWithPriority(base, priority, cursorExpr, priorityCursor, dateCursor, roomIdCursor, pageSize);
     }
 
     // 4) 만료된 방
@@ -338,9 +309,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     ) {
         LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-                .and(participant.status.eq(StatusType.ACTIVE))
-                .and(room.endDate.before(today))
-                .and(room.status.eq(StatusType.ACTIVE));       // 유저가 참여한 방 && 만료된 방
+                .and(room.endDate.before(today));       // 유저가 참여한 방 && 만료된 방
 
         DateExpression<LocalDate> cursorExpr = room.endDate;
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
@@ -392,8 +361,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
         DateExpression<LocalDate> cursorExpr = room.startDate; // 커서 비교는 startDate(= 모집 마감일 - 1일)
         BooleanExpression baseCondition = room.bookJpaEntity.isbn.eq(isbn)
-                .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
-                .and(room.status.eq(StatusType.ACTIVE));
+                .and(room.startDate.after(LocalDate.now()));    // 모집 마감 시각 > 현재 시각
+
 
         if (dateCursor != null && roomIdCursor != null) { // 첫 페이지가 아닌 경우
             baseCondition = baseCondition.and(cursorExpr.gt(dateCursor)
@@ -422,8 +391,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
         return room.category.eq(category)
                 .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
                 .and(room.isPublic.isTrue()) // 공개 방만 조회
-                .and(userJoinedRoom(userId).not()) // 유저가 참여하지 않은 방만 조회
-                .and(room.status.eq(StatusType.ACTIVE));
+                .and(userJoinedRoom(userId).not()); // 유저가 참여하지 않은 방만 조회
     }
 
     /**
@@ -438,9 +406,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .exists();
     }
 
-    /**
-     * 공통 커서 + 2단계 조회 (IDs → entities) 처리
-     */
+    // ======================================================
+    // 공통 fetch (키셋: (date, id)) - 단일 축(모집/진행/만료) 전용
+    // ======================================================
     private List<RoomQueryDto> fetchMyRooms(
             BooleanExpression baseCondition,
             DateExpression<LocalDate> cursorExpr,
@@ -451,7 +419,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
             int pageSize
     ) {
         BooleanBuilder where = new BooleanBuilder(baseCondition);
-        if (dateCursor != null && roomIdCursor != null) {       // 첫 페이지가 아닌 경우
+        if (dateCursor != null && roomIdCursor != null) {   // 2중 복합 커서
             if (ascending) {
                 where.and(cursorExpr.gt(dateCursor)
                         .or(cursorExpr.eq(dateCursor)
@@ -463,7 +431,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
             }
         }
 
-        // 2) DTO 프로젝션: 필요한 필드만 바로 조회
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -472,7 +439,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.recruitCount,
                         room.memberCount,
                         room.startDate,
-                        room.endDate,
+                        cursorExpr, // endDate 자리에 상황별 deadline 컬럼 전달
                         room.isPublic
                 ))
                 .from(participant)
@@ -480,6 +447,55 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .join(room.bookJpaEntity, book)
                 .where(where)
                 .orderBy(orders)
+                .limit(pageSize + 1)
+                .fetch();
+    }
+
+    // ======================================================
+    // 공통 fetch (키셋: (priority, date, id)) - 혼합(진행+모집) 전용
+    // ======================================================
+    private List<RoomQueryDto> fetchMyRoomsWithPriority(
+            BooleanExpression baseCondition,
+            NumberExpression<Integer> priorityExpr,
+            DateExpression<LocalDate> cursorExpr,
+            Integer priorityCursor,
+            LocalDate dateCursor,
+            Long roomIdCursor,
+            int pageSize
+    ) {
+        BooleanBuilder where = new BooleanBuilder(baseCondition);
+
+        if (priorityCursor != null && dateCursor != null && roomIdCursor != null) {     // 3중 복합 커서
+            where.and(
+                    priorityExpr.gt(priorityCursor)
+                            .or(priorityExpr.eq(priorityCursor)
+                                    .and(cursorExpr.gt(dateCursor)
+                                            .or(cursorExpr.eq(dateCursor)
+                                                    .and(room.roomId.gt(roomIdCursor))
+                                            )
+                                    )
+                            )
+            );
+        }
+
+        return queryFactory
+                .select(new QRoomQueryDto(
+                        room.roomId,
+                        book.imageUrl,
+                        room.title,
+                        room.recruitCount,
+                        room.memberCount,
+                        room.startDate,
+                        cursorExpr, // endDate 자리에 상황별 deadline 컬럼 전달
+                        room.isPublic
+                ))
+                .from(participant)
+                .join(participant.roomJpaEntity, room)
+                .join(room.bookJpaEntity, book)
+                .where(where)
+                .orderBy(
+                        new OrderSpecifier<?>[]{priorityExpr.asc(), cursorExpr.asc(), room.roomId.asc()}
+                )
                 .limit(pageSize + 1)
                 .fetch();
     }

@@ -2,7 +2,7 @@ package konkuk.thip.recentSearch.adapter.out.persistence.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

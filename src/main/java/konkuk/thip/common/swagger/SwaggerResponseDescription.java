@@ -35,7 +35,12 @@ public enum SwaggerResponseDescription {
             USER_NICKNAME_UPDATE_TOO_FREQUENT,
             USER_NICKNAME_ALREADY_EXISTS
     ))),
-
+    USER_DELETE(new LinkedHashSet<>(Set.of(
+            USER_CANNOT_DELETE_ROOM_HOST,
+            USER_NOT_FOUND,
+            USER_ALREADY_DELETED,
+            USER_OAUTH2ID_CANNOT_BE_NULL
+    ))),
 
     // Follow
     CHANGE_FOLLOW_STATE(new LinkedHashSet<>(Set.of(
@@ -150,6 +155,11 @@ public enum SwaggerResponseDescription {
             RECORD_NOT_FOUND,
             RECORD_ACCESS_FORBIDDEN
     ))),
+    RECORD_UPDATE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            RECORD_NOT_FOUND,
+            RECORD_ACCESS_FORBIDDEN
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(
@@ -172,6 +182,11 @@ public enum SwaggerResponseDescription {
             VOTE_NOT_FOUND,
             VOTE_ACCESS_FORBIDDEN
     ))),
+    VOTE_UPDATE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            VOTE_NOT_FOUND,
+            VOTE_ACCESS_FORBIDDEN
+    ))),
 
 
     // FEED
@@ -180,14 +195,16 @@ public enum SwaggerResponseDescription {
             BOOK_NOT_FOUND,
             TAG_NOT_FOUND,
             TAG_NAME_NOT_MATCH,
-            CONTENT_LIST_SIZE_OVERFLOW,
             TAG_SHOULD_BE_UNIQUE,
             TAG_LIST_SIZE_OVERFLOW,
             BOOK_NAVER_API_PARSING_ERROR,
-            BOOK_NAVER_API_ISBN_NOT_FOUND,
-            EMPTY_FILE_EXCEPTION,
-            EXCEPTION_ON_IMAGE_UPLOAD,
-            INVALID_FILE_EXTENSION
+            URL_INVALID_DOMAIN,
+            URL_USER_ID_MISMATCH
+    ))),
+    FEED_IMAGE_UPLOAD(new LinkedHashSet<>(Set.of(
+            INVALID_FILE_EXTENSION,
+            FILE_SIZE_OVERFLOW,
+            CONTENT_LIST_SIZE_OVERFLOW
     ))),
     FEED_UPDATE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -311,6 +328,31 @@ public enum SwaggerResponseDescription {
             ROOM_ACCESS_FORBIDDEN
     ))),
 
+    ATTENDANCE_CHECK_DELETE(new LinkedHashSet<>(Set.of(
+            ROOM_ACCESS_FORBIDDEN,
+            ATTENDANCE_CHECK_NOT_FOUND,
+            ATTENDANCE_CHECK_CAN_NOT_DELETE
+    ))),
+
+    // Notiification
+    FCM_TOKEN_REGISTER(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            FCM_TOKEN_NOT_FOUND
+    ))),
+    FCM_TOKEN_ENABLE_STATE_CHANGE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            FCM_TOKEN_NOT_FOUND,
+            FCM_TOKEN_ENABLED_STATE_ALREADY,
+            FCM_TOKEN_ACCESS_FORBIDDEN
+    ))),
+    FCM_TOKEN_DELETE(new LinkedHashSet<>(Set.of(
+            FCM_TOKEN_NOT_FOUND,
+            FCM_TOKEN_ACCESS_FORBIDDEN
+    ))),
+    NOTIFICATION_GET_ENABLE_STATE(new LinkedHashSet<>(Set.of(
+            FCM_TOKEN_NOT_FOUND
+    ))),
+
   ;
     private final Set<ErrorCode> errorCodeList;
     SwaggerResponseDescription(Set<ErrorCode> errorCodeList) {
@@ -330,6 +372,7 @@ public enum SwaggerResponseDescription {
 //                AUTH_TOKEN_NOT_FOUND
 //                AUTH_LOGIN_FAILED,
 //                AUTH_UNSUPPORTED_SOCIAL_LOGIN,
+//                AUTH_BLACKLIST_TOKEN,
 
 //                JSON_PROCESSING_ERROR
         )));

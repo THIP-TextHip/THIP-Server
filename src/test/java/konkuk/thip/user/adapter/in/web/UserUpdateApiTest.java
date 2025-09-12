@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;

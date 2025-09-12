@@ -27,7 +27,7 @@ import java.util.Set;
 
 import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
-import static konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType.BOOK_SEARCH;
+import static konkuk.thip.recentSearch.domain.value.RecentSearchType.BOOK_SEARCH;
 
 @Service
 @RequiredArgsConstructor

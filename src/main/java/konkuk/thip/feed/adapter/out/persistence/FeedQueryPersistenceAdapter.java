@@ -88,12 +88,12 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
 
     @Override
     public int countAllFeedsByUserId(Long userId) {
-        return (int) feedJpaRepository.countAllFeedsByUserId(userId, StatusType.ACTIVE);
+        return (int) feedJpaRepository.countAllFeedsByUserId(userId);
     }
 
     @Override
     public int countPublicFeedsByUserId(Long userId) {
-        return (int) feedJpaRepository.countPublicFeedsByUserId(userId, StatusType.ACTIVE);
+        return (int) feedJpaRepository.countPublicFeedsByUserId(userId);
     }
 
     @Override
@@ -107,11 +107,11 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     }
 
     @Override
-    public CursorBasedList<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, Cursor cursor) {
-        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+    public CursorBasedList<FeedQueryDto> findSavedFeedsBySavedAt(Long userId, Cursor cursor) {
+        LocalDateTime lastSavedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
         int size = cursor.getPageSize();
 
-        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findSavedFeedsByCreatedAt(userId, lastCreatedAt, size);
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findSavedFeedsByCreatedAt(userId, lastSavedAt, size);
 
         return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(feedQueryDto.savedCreatedAt().toString()));

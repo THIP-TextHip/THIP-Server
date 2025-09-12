@@ -4,6 +4,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.*;
 import konkuk.thip.common.security.oauth2.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +55,8 @@ public class JwtUtil {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
+        } catch (SignatureException e) {
+            log.info("Invalid JWT Signature", e);
         } catch (MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
@@ -86,4 +90,17 @@ public class JwtUtil {
         }
         return LoginUser.createExistingUser(oauth2Id, userId);
     }
+
+    public Date getExpirationAllowExpired(String token) {
+        try {
+            Jws<Claims> jwt = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return jwt.getPayload().getExpiration();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getExpiration();
+        }
+    }
+
 }

@@ -17,13 +17,13 @@ public class AwsS3ImageUrlInitializer {
     private final AwsS3Properties awsS3Properties;
 
     @PostConstruct
-    void bindBucketBaseUrl() {
-        String baseUrl = awsS3Properties.bucketBaseUrl();
+    void bindCloudFrontBaseUrl() {
+        String baseUrl = awsS3Properties.cloudFrontBaseUrl();
         if (baseUrl == null || baseUrl.isEmpty()) {
             throw new BusinessException(AWS_BUCKET_BASE_URL_NOT_CONFIGURED);
         }
 
-        Alias.registerBaseUrlSupplier(awsS3Properties::bucketBaseUrl);
-        Category.registerBaseUrlSupplier(awsS3Properties::bucketBaseUrl);
+        Alias.registerBaseUrlSupplier(awsS3Properties::cloudFrontBaseUrl);
+        Category.registerBaseUrlSupplier(awsS3Properties::cloudFrontBaseUrl);
     }
 }

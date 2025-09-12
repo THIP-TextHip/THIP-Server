@@ -6,7 +6,7 @@ import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
@@ -24,7 +24,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 import static konkuk.thip.common.exception.code.ErrorCode.INVALID_MY_ROOM_TYPE;
@@ -491,5 +490,92 @@ class RoomShowMineApiTest {
                 .andExpect(jsonPath("$.data.roomList[0].memberCount", is(7)))       // 기존 6명 + user
                 .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-1일뒤-활동시작")))
                 .andExpect(jsonPath("$.data.roomList[1].memberCount", is(6)));       // 기존 5명 + user
+    }
+
+    @Test
+    @DisplayName("혼합(진행+모집) 무한스크롤: (priority, date, id) 키셋으로 중복/누락 없이 페이징된다.")
+    void get_my_playing_and_recruiting_rooms_pagination() throws Exception {
+        // given
+        // 진행중인 방 6개 (endDate 임박 순서: +1d ~ +6d)
+        RoomJpaEntity playing1 = saveScienceRoom("진행중인방-책-P1", "pisbn1", "과학-방-1일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(1), 10);
+        changeRoomMemberCount(playing1, 3);
+        RoomJpaEntity playing2 = saveScienceRoom("진행중인방-책-P2", "pisbn2", "과학-방-2일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(2), 10);
+        changeRoomMemberCount(playing2, 4);
+        RoomJpaEntity playing3 = saveScienceRoom("진행중인방-책-P3", "pisbn3", "과학-방-3일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(3), 10);
+        changeRoomMemberCount(playing3, 5);
+        RoomJpaEntity playing4 = saveScienceRoom("진행중인방-책-P4", "pisbn4", "과학-방-4일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(4), 10);
+        changeRoomMemberCount(playing4, 6);
+        RoomJpaEntity playing5 = saveScienceRoom("진행중인방-책-P5", "pisbn5", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), 10);
+        changeRoomMemberCount(playing5, 7);
+        RoomJpaEntity playing6 = saveScienceRoom("진행중인방-책-P6", "pisbn6", "과학-방-6일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(6), 10);
+        changeRoomMemberCount(playing6, 8);
+
+        // 모집중인 방 6개 (startDate 임박 순서: +1d ~ +6d)
+        RoomJpaEntity recruiting1 = saveScienceRoom("모집중인방-책-R1", "risbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruiting1, 3);
+        RoomJpaEntity recruiting2 = saveScienceRoom("모집중인방-책-R2", "risbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruiting2, 4);
+        RoomJpaEntity recruiting3 = saveScienceRoom("모집중인방-책-R3", "risbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruiting3, 5);
+        RoomJpaEntity recruiting4 = saveScienceRoom("모집중인방-책-R4", "risbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruiting4, 6);
+        RoomJpaEntity recruiting5 = saveScienceRoom("모집중인방-책-R5", "risbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruiting5, 7);
+        RoomJpaEntity recruiting6 = saveScienceRoom("모집중인방-책-R6", "risbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10);
+        changeRoomMemberCount(recruiting6, 8);
+
+        Alias alias = TestEntityFactory.createScienceAlias();
+        UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
+
+        // 유저 참여
+        saveSingleUserToRoom(playing1, user);
+        saveSingleUserToRoom(playing2, user);
+        saveSingleUserToRoom(playing3, user);
+        saveSingleUserToRoom(playing4, user);
+        saveSingleUserToRoom(playing5, user);
+        saveSingleUserToRoom(playing6, user);
+        saveSingleUserToRoom(recruiting1, user);
+        saveSingleUserToRoom(recruiting2, user);
+        saveSingleUserToRoom(recruiting3, user);
+        saveSingleUserToRoom(recruiting4, user);
+        saveSingleUserToRoom(recruiting5, user);
+        saveSingleUserToRoom(recruiting6, user);
+
+        // when: 첫 페이지 (type 파라미터 없음 -> 혼합 조회)
+        ResultActions page1 = mockMvc.perform(get("/rooms/my")
+                .requestAttr("userId", user.getUserId()));
+
+        // then: 첫 페이지는 10개, 진행중(6) 먼저, 이후 모집중(4)
+        page1.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isLast", is(false)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(10)))
+                // 진행중 6개 (endDate 임박순)
+                .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-1일뒤-활동마감")))
+                .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-2일뒤-활동마감")))
+                .andExpect(jsonPath("$.data.roomList[2].roomName", is("과학-방-3일뒤-활동마감")))
+                .andExpect(jsonPath("$.data.roomList[3].roomName", is("과학-방-4일뒤-활동마감")))
+                .andExpect(jsonPath("$.data.roomList[4].roomName", is("과학-방-5일뒤-활동마감")))
+                .andExpect(jsonPath("$.data.roomList[5].roomName", is("과학-방-6일뒤-활동마감")))
+                // 이어서 모집중 4개 (startDate 임박순)
+                .andExpect(jsonPath("$.data.roomList[6].roomName", is("과학-방-1일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[7].roomName", is("과학-방-2일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[8].roomName", is("과학-방-3일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[9].roomName", is("과학-방-4일뒤-활동시작")));
+
+        // 다음 페이지 커서: 첫 페이지의 마지막 레코드 = recruiting4
+        // 혼합 커서 형식 = priority|deadlineDate|roomId (priority: 진행=0, 모집=1; deadlineDate: 진행=endDate, 모집=startDate)
+        String nextCursor = "1|" + recruiting4.getStartDate() + "|" + recruiting4.getRoomId();
+
+        // when: 두 번째 페이지
+        ResultActions page2 = mockMvc.perform(get("/rooms/my")
+                .requestAttr("userId", user.getUserId())
+                .param("cursor", nextCursor));
+
+        // then: 남은 모집중 2개, isLast=true, 중복/누락 없음
+        page2.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.isLast", is(true)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(2)))
+                .andExpect(jsonPath("$.data.roomList[0].roomName", is("과학-방-5일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomList[1].roomName", is("과학-방-6일뒤-활동시작")));
     }
 }

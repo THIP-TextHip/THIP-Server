@@ -14,6 +14,7 @@ permissions:
 env:
   RESOURCE_PATH: src/main/resources
   TEST_RESOURCE_PATH: src/test/resources
+  FIREBASE_KEY_PATH: ${{ secrets.FIREBASE_KEY_PATH }}
 
 jobs:
   build:
@@ -35,6 +36,12 @@ jobs:
           mkdir -p ${{ env.TEST_RESOURCE_PATH }}
           echo "${{ secrets.APPLICATION_YML_DEV }}" | base64 --decode > ${{ env.RESOURCE_PATH }}/application.yml
           echo "${{ secrets.APPLICATION_YML_TEST }}" | base64 --decode > ${{ env.TEST_RESOURCE_PATH }}/application-test.yml
+
+      - name: 🔐 Create Firebase Key from secret (base64)
+        run: |
+          mkdir -p ${{ env.FIREBASE_KEY_PATH }}
+          echo "${{ secrets.FIREBASE_KEY }}" | base64 --decode > ${{ env.FIREBASE_KEY_PATH }}/serviceAccountKey.json
+        shell: bash
 
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x gradlew

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static konkuk.thip.common.exception.code.ErrorCode.ALIAS_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @Repository
@@ -33,7 +32,7 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     @Override
     public User findById(Long userId) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(userId).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(userId).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return userMapper.toDomainEntity(userJpaEntity);
@@ -41,7 +40,7 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     @Override
     public Map<Long, User> findByIds(List<Long> userIds) {
-        List<UserJpaEntity> entities = userJpaRepository.findAllById(userIds);
+        List<UserJpaEntity> entities = userJpaRepository.findAllById(userIds);  // 내부 구현 메서드가 jpql 기반이므로 필터 적용 대상임을 확인함
         return entities.stream()
                 .map(userMapper::toDomainEntity)
                 .collect(Collectors.toMap(User::getId, Function.identity()));
@@ -49,11 +48,21 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     @Override
     public void update(User user) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(user.getId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(user.getId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
         userJpaEntity.updateIncludeAliasFrom(user);
+        userJpaRepository.save(userJpaEntity);
+    }
+
+    @Override
+    public void delete(User user) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(user.getId()).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND)
+        );
+
+        userJpaEntity.softDelete(user);
         userJpaRepository.save(userJpaEntity);
     }
 }

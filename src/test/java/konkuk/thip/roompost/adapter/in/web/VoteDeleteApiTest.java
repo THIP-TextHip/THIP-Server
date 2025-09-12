@@ -6,9 +6,9 @@ import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
+import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
@@ -113,10 +113,12 @@ class VoteDeleteApiTest {
 
 
         // then: 1) 투표 soft delete (status=INACTIVE)
-        assertThat(voteJpaRepository.findByPostIdAndStatus(vote.getPostId(), INACTIVE)).isPresent();
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findById(vote.getPostId()).orElse(null);
+        assertThat(voteJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // 2) 댓글 삭제 soft delete
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(comment.getCommentId(),INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(comment.getCommentId()).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // 3) 댓글 좋아요 물리 삭제
         assertThat(commentLikeJpaRepository.count()).isEqualTo(0);

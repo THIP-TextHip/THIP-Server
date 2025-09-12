@@ -12,4 +12,8 @@ public interface RecentSearchJpaRepository extends JpaRepository<RecentSearchJpa
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE RecentSearchJpaEntity r SET r.modifiedAt = CURRENT_TIMESTAMP WHERE r.recentSearchId = :recentSearchId")
     void updateModifiedAt(@Param("recentSearchId") Long recentSearchId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM RecentSearchJpaEntity r WHERE r.userJpaEntity.userId = :userId")
+    void deleteAllByUserId(@Param("userId") Long userId);
 }

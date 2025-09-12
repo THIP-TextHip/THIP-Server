@@ -1,10 +1,11 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
+import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
+import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteItemJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.VoteParticipantJpaEntity;
@@ -18,13 +19,14 @@ import konkuk.thip.roompost.application.port.out.VoteCommandPort;
 import konkuk.thip.roompost.domain.Vote;
 import konkuk.thip.roompost.domain.VoteItem;
 import konkuk.thip.roompost.domain.VoteParticipant;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 
 @Repository
@@ -37,17 +39,21 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
     private final RoomJpaRepository roomJpaRepository;
     private final VoteParticipantJpaRepository voteParticipantJpaRepository;
 
+    private final CommentJpaRepository commentJpaRepository;
+    private final CommentLikeJpaRepository commentLikeJpaRepository;
+    private final PostLikeJpaRepository postLikeJpaRepository;
+
     private final VoteMapper voteMapper;
     private final VoteItemMapper voteItemMapper;
     private final VoteParticipantMapper voteParticipantMapper;
 
     @Override
     public Long saveVote(Vote vote) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(vote.getCreatorId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(vote.getCreatorId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(vote.getRoomId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(vote.getRoomId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
@@ -59,7 +65,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         if (voteItems.isEmpty()) return;
 
         Long voteId = voteItems.get(0).getVoteId();
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(voteId,ACTIVE).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostId(voteId).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 
@@ -72,7 +78,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public Optional<Vote> findById(Long id) {
-        return voteJpaRepository.findByPostIdAndStatus(id,ACTIVE)
+        return voteJpaRepository.findByPostId(id)
                 .map(voteMapper::toDomainEntity);
     }
 
@@ -109,7 +115,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void saveVoteParticipant(VoteParticipant voteParticipant) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(voteParticipant.getUserId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(voteParticipant.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 
@@ -138,7 +144,7 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public void delete(Vote vote) {
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(vote.getId(),ACTIVE).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostId(vote.getId()).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 
@@ -149,10 +155,45 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
         voteJpaRepository.save(voteJpaEntity);
     }
 
+    @Override
+    public void deleteAllVoteParticipantByUserId(Long userId) {
+
+        // 1. 탈퇴 유저가 참여한 모든 투표 항목 ID 조회
+        List<Long> voteItemIds = voteParticipantJpaRepository.findAllVoteItemIdsByUserId(userId);
+        if (voteItemIds == null || voteItemIds.isEmpty()) {
+            return; //early return
+        }
+        // 2. 투표 참여 관계 삭제
+        voteParticipantJpaRepository.deleteAllByUserId(userId);
+        // 3. 탈퇴 유저가 투표 했던 투표 항목들의 득표 수 감소
+        voteItemJpaRepository.bulkDecrementLikeCount(voteItemIds);
+    }
+
+    @Override
+    public void deleteAllVoteByUserId(Long userId) {
+        // 1. 유저가 작성한 투표 게시글 ID 리스트 조회
+        List<Long> voteIds = voteJpaRepository.findVoteIdsByUserId(userId);
+        if (voteIds == null || voteIds.isEmpty()) {
+            return; // early return
+        }
+        // 2-1. 댓글 좋아요 일괄 삭제
+        commentLikeJpaRepository.deleteAllByPostIds(voteIds);
+        // 2-2. 댓글 soft delete 일괄 처리
+        commentJpaRepository.softDeleteAllByPostIds(voteIds);
+        // 3. 게시글 좋아요 일괄 삭제
+        postLikeJpaRepository.deleteAllByPostIds(voteIds);
+        // 4-1. 투표 참여 관계 일괄 삭제
+        voteParticipantJpaRepository.deleteAllByVoteIds(voteIds);
+        // 4-2. 투표 항목 일괄 삭제
+        voteItemJpaRepository.deleteAllByVoteIds(voteIds);
+        // 5. 탈퇴한 유저가 작성한 투표 soft delete 일괄 처리
+        voteJpaRepository.softDeleteAllByUserId(userId);
+    }
+
 
     @Override
     public void updateVote(Vote vote) {
-        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostIdAndStatus(vote.getId(),ACTIVE).orElseThrow(
+        VoteJpaEntity voteJpaEntity = voteJpaRepository.findByPostId(vote.getId()).orElseThrow(
                 () -> new EntityNotFoundException(VOTE_NOT_FOUND)
         );
 

@@ -7,12 +7,12 @@ import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -131,8 +132,11 @@ class RoomParticipantDeleteApiTest {
                 .andExpect(status().isOk());
 
         // 방에서 참여자 정보가 사라졌는지 확인
-        boolean exists = roomParticipantJpaRepository.existsByUserIdAndRoomId(participant.getUserId(), room.getRoomId());
-        assertThat(exists).isFalse();
+        em.flush();
+        em.clear();     // 영속성 컨텍스트 초기화 -> 테스트 코드에 트랜잭션이 있으므로
+
+        RoomParticipantJpaEntity member = roomParticipantJpaRepository.findById(memberParticipation.getRoomParticipantId()).orElse(null);
+        assertThat(member.getStatus()).isEqualTo(INACTIVE);
 
         // 인원수 감소 확인
         RoomJpaEntity updateRoom = roomJpaRepository.findById(room.getRoomId()).orElseThrow();

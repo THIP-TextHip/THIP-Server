@@ -6,6 +6,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.room.domain.value.RoomStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -46,11 +47,21 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(name = "recruit_count",nullable = false)
     private int recruitCount;
 
+    /**
+     * -- SETTER --
+     *  회원 탈퇴용
+     */
+    @Setter
     @Builder.Default
     @Column(name = "member_count",nullable = false)
     private int memberCount = 1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Builder.Default
+    @Column(name = "room_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomStatus roomStatus = RoomStatus.RECRUITING;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity bookJpaEntity;
 
@@ -68,6 +79,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
         this.endDate = room.getEndDate();
         this.recruitCount = room.getRecruitCount();
         this.memberCount = room.getMemberCount();
+        this.roomStatus = room.getRoomStatus();
         return this;
     }
 

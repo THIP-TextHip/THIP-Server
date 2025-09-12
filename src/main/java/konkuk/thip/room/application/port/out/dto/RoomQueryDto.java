@@ -1,12 +1,12 @@
 package konkuk.thip.room.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import jakarta.annotation.Nullable;
 import lombok.Builder;
 import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 
+// TODO : RoomStatus 도입 + RoomQueryRepositoryImpl 코드 수정
 @Builder
 public record RoomQueryDto(
         Long roomId,
@@ -18,7 +18,7 @@ public record RoomQueryDto(
         LocalDate endDate,       // 방 진행 마감일 or 방 모집 마감일
         Boolean isPublic        // 공개방 여부
 ) {
-    // 내가 참여한 모임방(모집중, 진행중, 모집+진행중z, 완료된) 조회 시 활용
+    // 내가 참여한 모임방(모집중, 진행중, 모집+진행중, 완료된) 조회 시 활용
     @QueryProjection
     public RoomQueryDto {
         Assert.notNull(roomId, "roomId must not be null");

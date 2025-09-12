@@ -7,21 +7,16 @@ import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
-import konkuk.thip.feed.adapter.in.web.request.FeedCreateRequest;
-import konkuk.thip.feed.adapter.in.web.request.FeedIsLikeRequest;
-import konkuk.thip.feed.adapter.in.web.request.FeedIsSavedRequest;
-import konkuk.thip.feed.adapter.in.web.request.FeedUpdateRequest;
+import konkuk.thip.feed.adapter.in.web.request.*;
 import konkuk.thip.feed.adapter.in.web.response.FeedIdResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsLikeResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsSavedResponse;
-import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
-import konkuk.thip.feed.application.port.in.FeedDeleteUseCase;
-import konkuk.thip.feed.application.port.in.FeedSavedUseCase;
-import konkuk.thip.feed.application.port.in.FeedUpdateUseCase;
+import konkuk.thip.feed.adapter.in.web.response.FeedUploadImagePresignedUrlResponse;
+import konkuk.thip.feed.adapter.out.s3.S3Service;
+import konkuk.thip.feed.application.port.in.*;
 import konkuk.thip.post.application.port.in.PostLikeUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,6 +33,8 @@ public class FeedCommandController {
     private final PostLikeUseCase postLikeUseCase;
     private final FeedDeleteUseCase feedDeleteUseCase;
 
+    private final S3Service s3Service;
+
     @Operation(
             summary = "피드 작성",
             description = "사용자가 피드를 작성합니다."
@@ -45,10 +42,21 @@ public class FeedCommandController {
     @ExceptionDescription(FEED_CREATE)
     @PostMapping("/feeds")
     public BaseResponse<FeedIdResponse> createFeed(
-            @RequestPart("request") @Valid final FeedCreateRequest request,
-            @Parameter(description = "피드에 첨부할 이미지 파일들") @RequestPart(value = "images", required = false) final List<MultipartFile> images,
+            @RequestBody @Valid final FeedCreateRequest request,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(FeedIdResponse.of(feedCreateUseCase.createFeed(request.toCommand(userId),images)));
+        return BaseResponse.ok(FeedIdResponse.of(feedCreateUseCase.createFeed(request.toCommand(userId))));
+    }
+
+    @Operation(
+            summary = "피드 생성시 이미지 업로드용 presigned url 발급 요청",
+            description = "S3에 프론트엔드가 직접 이미지를 업로드하기위한 presigned url를 발급 받습니다."
+    )
+    @ExceptionDescription(FEED_IMAGE_UPLOAD)
+    @PostMapping("/feeds/images/presigned-url")
+    public BaseResponse<FeedUploadImagePresignedUrlResponse> getPresignedUrls(
+            @RequestBody @Valid final List<FeedUploadImagePresignedUrlRequest> request,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(s3Service.getPresignedUrl(request,userId));
     }
 
     @Operation(

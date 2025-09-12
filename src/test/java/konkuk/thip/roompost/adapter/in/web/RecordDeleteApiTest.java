@@ -6,12 +6,12 @@ import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.post.adapter.out.persistence.PostLikeJpaRepository;
+import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -89,11 +89,13 @@ class RecordDeleteApiTest {
                 .andExpect(status().isOk());
 
 
-        // then: 1) 기록 soft delete (status=INACTIVE)
-        assertThat(recordJpaRepository.findByPostIdAndStatus(record.getPostId(), INACTIVE)).isPresent();
+        // then: 1) 기록 soft delete (status=INACTIVE -> findByPostId() 조회 안됨)
+        RecordJpaEntity deletedRecord = recordJpaRepository.findById(record.getPostId()).orElse(null);
+        assertThat(deletedRecord.getStatus()).isEqualTo(INACTIVE);
 
         // 2) 댓글 삭제 soft delete
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(comment.getCommentId(),INACTIVE)).isPresent();
+        CommentJpaEntity deleteComment = commentJpaRepository.findById(comment.getCommentId()).orElse(null);
+        assertThat(deleteComment.getStatus()).isEqualTo(INACTIVE);
 
         // 3) 댓글 좋아요 삭제
         assertThat(commentLikeJpaRepository.count()).isEqualTo(0);

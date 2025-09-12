@@ -1,11 +1,9 @@
 package konkuk.thip.room.adapter.out.persistence.repository;
 
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
-import konkuk.thip.room.adapter.in.web.response.RoomGetHomeJoinedListResponse;
+import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.value.Category;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -23,13 +21,13 @@ public interface RoomQueryRepository {
 
     List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, Category category, int count);
 
-    Page<RoomGetHomeJoinedListResponse.JoinedRoomInfo> searchHomeJoinedRooms(Long userId, LocalDate today, Pageable pageable);
+    List<RoomParticipantQueryDto> findHomeJoinedRoomsByUserPercentage(Long userId, Double userPercentageCursor, LocalDate startDateCursor, Long roomIdCursor, int pageSize);
 
     List<RoomQueryDto> findRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
     List<RoomQueryDto> findPlayingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
-    List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
+    List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(Long userId, Integer priorityCursor, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
     List<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 

@@ -95,6 +95,12 @@ public class Vote extends BaseDomainEntity implements RoomPost {
         }
     }
 
+    public void updateVote(Long userId, Long roomId, String content) {
+        validateRoomId(roomId);
+        validateCreator(userId);
+        this.content = content;
+    }
+
     public void validateDeletable(Long userId,Long roomId) {
         validateRoomId(roomId);
         validateCreator(userId);
@@ -105,4 +111,5 @@ public class Vote extends BaseDomainEntity implements RoomPost {
             throw new InvalidStateException(VOTE_ACCESS_FORBIDDEN, new IllegalArgumentException("투표가 해당 방에 속하지 않습니다."));
         }
     }
+
 }

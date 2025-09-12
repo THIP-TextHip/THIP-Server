@@ -101,6 +101,12 @@ public class Record extends BaseDomainEntity implements RoomPost {
         }
     }
 
+    public void updateRecord(Long userId, Long roomId, String content) {
+        validateRoomId(roomId);
+        validateCreator(userId);
+        this.content = content;
+    }
+
     public void validateDeletable(Long userId,Long roomId) {
         validateRoomId(roomId);
         validateCreator(userId);

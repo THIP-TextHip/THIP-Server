@@ -26,7 +26,7 @@ public class NotificationJpaEntity extends BaseJpaEntity {
     @Column(name = "is_checked",nullable = false)
     private boolean isChecked;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 }

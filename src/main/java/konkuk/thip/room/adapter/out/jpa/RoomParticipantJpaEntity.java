@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -31,15 +32,15 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
     private double userPercentage = 0.0;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "room_participant_role",nullable = false)
+    @Column(name = "room_participant_role", nullable = false)
     private RoomParticipantRole roomParticipantRole;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "room_id", nullable = false)
     private RoomJpaEntity roomJpaEntity;
 
     @VisibleForTesting

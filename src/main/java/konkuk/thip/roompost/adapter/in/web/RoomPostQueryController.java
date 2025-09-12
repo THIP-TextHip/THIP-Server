@@ -80,7 +80,11 @@ public class RoomPostQueryController {
             @Parameter(description = "핀하려는 기록이 작성된 모임 ID", example = "1") @PathVariable("roomId") final Long roomId,
             @Parameter(description = "핀하려는 기록 ID", example = "1") @PathVariable("recordId") final Long recordId,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(recordPinUseCase.pinRecord(new RecordPinQuery(roomId, recordId, userId)));
+        return BaseResponse.ok(RecordPinResponse.of(recordPinUseCase.pinRecord(
+                RecordPinQuery.builder()
+                        .roomId(roomId).
+                        recordId(recordId)
+                        .userId(userId).build())));
     }
 
     @Operation(

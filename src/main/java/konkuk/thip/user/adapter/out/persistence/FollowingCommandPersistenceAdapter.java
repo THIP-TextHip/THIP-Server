@@ -13,7 +13,7 @@ import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.*;
 
 import static konkuk.thip.common.exception.code.ErrorCode.FOLLOW_NOT_FOUND;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
@@ -36,7 +36,7 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
 
     @Override
     public void save(Following following, User targetUser) { // insert용
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(following.getUserId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(following.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
         UserJpaEntity targetUserJpaEntity = updateUserFollowerCount(targetUser);
@@ -54,8 +54,25 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
         followingJpaRepository.delete(followingJpaEntity);
     }
 
+    @Override
+    public void deleteAllByUserId(Long userId) {
+        // 유저가 팔로워인 팔로잉 관계 -> 유저가 팔로우 중인 유저들의 팔로워 수 감소 -> 관계 삭제
+        // 유저를 팔로우 하는 팔로잉 관계 -> 관계 삭제
+
+        // 1. 탈퇴 유저가 팔로우 중인 유저들 ID 조회
+        List<Long> targetUserIds = userJpaRepository.findAllTargetUserIdsByUserId(userId);
+        // 2. 탈퇴한 유저의 모든 팔로잉 관계 삭제
+        followingJpaRepository.deleteAllByUserIdOrFollowingUserId(userId);
+        if (targetUserIds == null || targetUserIds.isEmpty()) {
+            return; //early return
+        }
+        // 3. 탈퇴 유저가 팔로우 중인 유저들의 팔로워 수 감소
+        followingJpaRepository.bulkDecrementFollowerCount(targetUserIds);
+    }
+
+
     private UserJpaEntity updateUserFollowerCount(User targetUser) {
-        UserJpaEntity userJpaEntity = userJpaRepository.findById(targetUser.getId()).orElseThrow(
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(targetUser.getId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND)
         );
 

@@ -12,14 +12,16 @@ import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
+import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchJpaEntity;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.domain.value.Alias;
 
 import java.time.LocalDate;
@@ -279,49 +281,14 @@ public class TestEntityFactory {
      * 공개/비공개 여부만을 설정하는 기본 피드 생성을 위한 팩토리 메서드
      */
     public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic) {
-
-//        return FeedJpaEntity.builder()
-//                .content("기본 피드 본문입니다.")
-//                .isPublic(isPublic)
-//                .likeCount(0)
-//                .commentCount(0)
-//                .reportCount(0)
-//                .userJpaEntity(user)
-//                .bookJpaEntity(book)
-//                .contentList(ContentList.empty())
-//                .build();
         return createFeed(user, book, isPublic, 0, 0, Collections.emptyList(), Collections.emptyList());
     }
 
     public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, boolean isPublic, int likeCount, int commentCount, List<String> imageUrls) {
-
-//        FeedJpaEntity feed = FeedJpaEntity.builder()
-//                .content("이미지 포함 피드")
-//                .isPublic(isPublic)
-//                .likeCount(0)
-//                .commentCount(0)
-//                .reportCount(0)
-//                .userJpaEntity(user)
-//                .bookJpaEntity(book)
-//                .contentList(ContentList.of(imageUrls))
-//                .build();
-//
         return createFeed(user, book, isPublic, likeCount, commentCount, imageUrls, Collections.emptyList());
     }
 
     public static FeedJpaEntity createFeed(UserJpaEntity user, BookJpaEntity book, List<String> imageUrls, boolean isPublic) {
-
-//        FeedJpaEntity feed = FeedJpaEntity.builder()
-//                .content("이미지 포함 피드")
-//                .isPublic(isPublic)
-//                .likeCount(0)
-//                .commentCount(0)
-//                .reportCount(0)
-//                .userJpaEntity(user)
-//                .bookJpaEntity(book)
-//                .contentList(ContentList.of(imageUrls))
-//                .build();
-//
         return createFeed(user, book, isPublic, 0, 0, imageUrls, Collections.emptyList());
     }
 
@@ -391,4 +358,13 @@ public class TestEntityFactory {
                 .userJpaEntity(userJpaEntity)
                 .build();
     }
+
+    public static RecentSearchJpaEntity createRecentSearch(UserJpaEntity userJpaEntity) {
+        return RecentSearchJpaEntity.builder()
+                .searchTerm("테스트검색어")
+                .type(RecentSearchType.BOOK_SEARCH)
+                .userJpaEntity(userJpaEntity)
+                .build();
+    }
+
 }

@@ -11,9 +11,11 @@ import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NOT_FOUND;
+import static konkuk.thip.common.exception.code.ErrorCode.ROOM_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     @Override
     public Room getByIdOrThrow(Long id) {
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(id).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(id).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
         return roomMapper.toDomainEntity(roomJpaEntity);
@@ -34,7 +36,7 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     @Override
     public Optional<Room> findById(Long id) {
-        return roomJpaRepository.findById(id)
+        return roomJpaRepository.findByRoomId(id)
                 .map(roomMapper::toDomainEntity);
     }
 
@@ -50,10 +52,28 @@ public class RoomCommandPersistenceAdapter implements RoomCommandPort {
 
     @Override
     public void update(Room room) {
-        RoomJpaEntity roomJpaEntity = roomJpaRepository.findById(room.getId()).orElseThrow(
+        RoomJpaEntity roomJpaEntity = roomJpaRepository.findByRoomId(room.getId()).orElseThrow(
                 () -> new EntityNotFoundException(ROOM_NOT_FOUND)
         );
 
         roomJpaRepository.save(roomJpaEntity.updateFrom(room));
+    }
+
+    @Override
+    public int updateRoomStateToExpired() {
+        return roomJpaRepository.updateRoomStatusToExpired();
+    }
+
+    @Override
+    public int updateRoomStateFromRecruitingToProgress() {
+        return roomJpaRepository.updateRoomStatusFromRecruitingToProgress();
+    }
+
+    @Override
+    public List<Room> findProgressTargetRooms() {
+        List<RoomJpaEntity> roomJpaEntities = roomJpaRepository.findProgressTargetIds();
+        return roomJpaEntities.stream()
+                .map(roomMapper::toDomainEntity)
+                .toList();
     }
 }

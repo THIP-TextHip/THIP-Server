@@ -1,9 +1,9 @@
 package konkuk.thip.roompost.application.service;
 
 import konkuk.thip.book.application.mapper.BookQueryMapper;
+import konkuk.thip.book.application.port.in.dto.BookPinResult;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.roompost.adapter.in.web.response.RecordPinResponse;
 import konkuk.thip.roompost.application.port.in.RecordPinUseCase;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordPinQuery;
 import konkuk.thip.roompost.application.port.out.RecordCommandPort;
@@ -25,7 +25,7 @@ public class RecordPinService implements RecordPinUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public RecordPinResponse pinRecord(RecordPinQuery query) {
+    public BookPinResult pinRecord(RecordPinQuery query) {
 
         // 1. 방 참여자 검증
         roomParticipantValidator.validateUserIsRoomMember(query.roomId(), query.userId());
@@ -37,6 +37,6 @@ public class RecordPinService implements RecordPinUseCase {
 
         // 3. 책 정보 조회 및 반환
         Book book = bookCommandPort.findBookByRoomId(query.roomId());
-        return RecordPinResponse.of(bookQueryMapper.toBookSelectableResult(book));
+        return bookQueryMapper.toBookPinResult(book);
     }
 }

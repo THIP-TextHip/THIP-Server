@@ -17,11 +17,11 @@ public class SavedFeedJpaEntity extends BaseJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long savedId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private FeedJpaEntity feedJpaEntity;
 }

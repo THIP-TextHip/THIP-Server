@@ -21,12 +21,17 @@ public class VoteItemJpaEntity extends BaseJpaEntity {
     @Column(name = "item_name",length = 70, nullable = false)
     private String itemName;
 
+    /**
+     * -- SETTER --
+     *  회원 탈퇴용
+     */
+    @Setter
     @Builder.Default
     @Column(nullable = false)
     private int count = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private VoteJpaEntity voteJpaEntity;
 
     public VoteItemJpaEntity updateFrom(VoteItem voteItem) {

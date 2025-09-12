@@ -10,9 +10,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "comments")
 @Getter
@@ -34,12 +31,16 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @Column(name = "report_count", nullable = false)
     private int reportCount = 0;
 
+    /**
+     * -- SETTER --
+     *  회원 탈퇴용
+     */
+    @Setter
     @Builder.Default
     @Column(name = "like_count", nullable = false)
     private int likeCount = 0;
 
-    //TODO 상속구조 해지하면서 postType만 가질지, postId + postType가질지 논의 필요
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
 
@@ -47,18 +48,16 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @Column(name = "post_type", nullable = false, length = 10)
     private PostType postType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
 
+    /**
+     * nullable = true : 최상위 댓글인 경우 null
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;
-
-    // 삭제용 댓글 좋아요 양방향 매핑 관계
-    @Builder.Default
-    @OneToMany(mappedBy = "commentJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<CommentLikeJpaEntity> commentLikeList = new ArrayList<>();
 
     public CommentJpaEntity updateFrom(Comment comment) {
         this.reportCount = comment.getReportCount();
@@ -71,5 +70,4 @@ public class CommentJpaEntity extends BaseJpaEntity {
     public void updateLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
-
 }

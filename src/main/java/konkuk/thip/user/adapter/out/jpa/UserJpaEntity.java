@@ -3,11 +3,17 @@ package konkuk.thip.user.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.User;
+import konkuk.thip.user.domain.value.UserRole;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDate;
+
+import static konkuk.thip.common.entity.StatusType.INACTIVE;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_ALREADY_DELETED;
 
 @Entity
 @Table(name = "users")
@@ -15,6 +21,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE users SET status = 'INACTIVE' WHERE user_id = ?")
 public class UserJpaEntity extends BaseJpaEntity {
 
     @Id
@@ -31,6 +38,11 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "oauth2_id", length = 50, nullable = false)
     private String oauth2Id;
 
+    /**
+     * -- SETTER --
+     *  회원 탈퇴용
+     */
+    @Setter
     @Builder.Default
     private Integer followerCount = 0; // 팔로워 수
 
@@ -56,4 +68,13 @@ public class UserJpaEntity extends BaseJpaEntity {
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
     }
+
+    public void softDelete(User user) {
+        if(this.status.equals(INACTIVE)){
+            throw new InvalidStateException(USER_ALREADY_DELETED);
+        }
+        this.status = INACTIVE;
+        this.oauth2Id = user.getOauth2Id();
+    }
+
 }

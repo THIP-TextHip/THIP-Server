@@ -1,7 +1,7 @@
 package konkuk.thip.recentSearch.application.service;
 
 import konkuk.thip.recentSearch.adapter.in.web.response.RecentSearchGetResponse;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.recentSearch.application.RecentSearchQueryMapper;
 import konkuk.thip.recentSearch.application.port.in.RecentSearchGetUseCase;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchQueryPort;
@@ -21,6 +21,7 @@ public class RecentSearchGetService implements RecentSearchGetUseCase {
 
     private static final int MAX_RECENT_SEARCHES = 5;
 
+    @Override
     @Transactional(readOnly = true)
     public RecentSearchGetResponse getRecentSearches(String typeParam, Long userId) {
         RecentSearchType type = RecentSearchType.from(typeParam);

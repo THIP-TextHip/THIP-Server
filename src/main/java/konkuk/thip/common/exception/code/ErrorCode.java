@@ -23,9 +23,12 @@ public enum ErrorCode implements ResponseCode {
     AUTH_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, 40104, "로그인에 실패했습니다."),
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
     AUTH_INVALID_LOGIN_TOKEN_KEY(HttpStatus.UNAUTHORIZED, 40106, "유효하지 않은 로그인 토큰 키입니다."),
+    AUTH_BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, 40107, "블랙리스트에 등록된 토큰입니다."),
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
     AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
+
+    PERSISTENCE_TRANSACTION_REQUIRED(HttpStatus.INTERNAL_SERVER_ERROR, 50110, "@Transactional 컨텍스트가 필요합니다. 트랜잭션 범위 내에서만 사용할 수 있습니다."),
 
     /* 60000부터 비즈니스 예외 */
     /**
@@ -46,6 +49,9 @@ public enum ErrorCode implements ResponseCode {
     USER_NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 70006, "다른 사용자가 이미 사용중인 닉네임입니다."),
     USER_ALREADY_SIGNED_UP(HttpStatus.BAD_REQUEST, 70007, "이미 가입된 사용자입니다."),
     USER_NOT_SIGNED_UP(HttpStatus.BAD_REQUEST, 70008, "가입되지 않은 사용자입니다."),
+    USER_CANNOT_DELETE_ROOM_HOST(HttpStatus.BAD_REQUEST, 70009, "모집/진행 중인 방의 방장은 회원탈퇴를 할 수 없습니다."),
+    USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 70010, "이미 삭제된 사용자 입니다."),
+    USER_OAUTH2ID_CANNOT_BE_NULL(HttpStatus.INTERNAL_SERVER_ERROR, 70011, "유저의 OAuth2Id 값이 null일 수 없습니다."),
 
     /**
      * 75000 : follow error
@@ -172,10 +178,10 @@ public enum ErrorCode implements ResponseCode {
     /**
      * 170000 : Image File error
      */
-    EMPTY_FILE_EXCEPTION(HttpStatus.BAD_REQUEST, 170001, "업로드하려는 이미지가 비어있습니다."),
-    EXCEPTION_ON_IMAGE_UPLOAD(HttpStatus.BAD_REQUEST, 170002, "이미지 업로드에 실패하였습니다."),
-    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170003, "올바르지 않은 파일 형식입니다."),
-    IO_EXCEPTION_ON_IMAGE_DELETE(HttpStatus.BAD_REQUEST, 170004, "파일 삭제에 실패하였습니다."),
+    INVALID_FILE_EXTENSION(HttpStatus.BAD_REQUEST, 170001, "허용하지 않는 파일 확장자입니다."),
+    FILE_SIZE_OVERFLOW(HttpStatus.BAD_REQUEST, 170002, "파일 크기가 허용 범위를 초과했습니다."),
+    URL_INVALID_DOMAIN(HttpStatus.BAD_REQUEST, 170003, "잘못된 이미지 URL 형식입니다."),
+    URL_USER_ID_MISMATCH(HttpStatus.BAD_REQUEST, 170004, "URL의 사용자 ID가 요청 사용자와 일치하지 않습니다."),
 
     /**
      * 180000 : Post error
@@ -207,6 +213,15 @@ public enum ErrorCode implements ResponseCode {
      */
     ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, 195000, "오늘의 한마디 작성 가능 횟수를 초과하였습니다."),
     ATTENDANCE_CHECK_NOT_FOUND(HttpStatus.NOT_FOUND, 195001, "존재하지 않는 ATTENDANCE CHECK 입니다."),
+    ATTENDANCE_CHECK_CAN_NOT_DELETE(HttpStatus.FORBIDDEN, 195002, "오늘의 한마디는 본인만 삭제할 수 있습니다."),
+
+    /**
+     * 200000 : Fcm error
+     */
+    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 200000, "존재하지 않는 FCM TOKEN 입니다."),
+    FCM_TOKEN_ENABLED_STATE_ALREADY(HttpStatus.BAD_REQUEST, 200001, "요청한 상태로 이미 푸쉬 알림 여부가 설정되어 있습니다."),
+    FCM_TOKEN_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 200002, "토큰을 소유하고 있는 계정이 아닙니다."),
+    FIREBASE_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 200003, "FCM 푸쉬 알림 전송에 실패했습니다.")
 
     ;
 

@@ -8,12 +8,13 @@ import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import konkuk.thip.book.adapter.out.jpa.QBookJpaEntity;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
+import konkuk.thip.post.application.port.out.dto.PostQueryDto;
+import konkuk.thip.post.application.port.out.dto.QPostQueryDto;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
@@ -134,7 +135,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                         .and(following.followingUserJpaEntity.userId.eq(feed.userJpaEntity.userId)))
                 .where(
                         // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
-                        feed.status.eq(StatusType.ACTIVE),
                         feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
                         cursorCondition
                 )
@@ -152,7 +152,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .from(feed)
                 .where(
                         // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
-                        feed.status.eq(StatusType.ACTIVE),
                         feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
                         lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
                 )
@@ -168,8 +167,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         return jpaQueryFactory
                 .select(feed).distinct()
                 .from(feed)
-                .leftJoin(feed.userJpaEntity, user).fetchJoin()
-                .leftJoin(feed.bookJpaEntity, book).fetchJoin()
+                .join(feed.userJpaEntity, user).fetchJoin()     // user 필수
+                .join(feed.bookJpaEntity, book).fetchJoin()     // book 필수
                 .where(feed.postId.in(ids))
                 .fetch();
     }
@@ -218,7 +217,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .from(feed)
                 .where(
                         // ACTIVE 인 feed & 내가 작성한 글 & cursorCondition
-                        feed.status.eq(StatusType.ACTIVE),
                         feed.userJpaEntity.userId.eq(userId),
                         lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
                 )
@@ -233,7 +231,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .from(feed)
                 .where(
                         // ACTIVE 인 feed & 특정 유저가 작성한 공개 글 & cursorCondition
-                        feed.status.eq(StatusType.ACTIVE),
                         feed.userJpaEntity.userId.eq(userId),
                         feed.isPublic.eq(Boolean.TRUE),
                         lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
@@ -348,8 +345,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
 
     // 필터링 조건: 책 ISBN & 공개 피드
     private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
-        return feed.status.eq(StatusType.ACTIVE)
-                .and(feed.bookJpaEntity.isbn.eq(isbn))
+        return feed.bookJpaEntity.isbn.eq(isbn)
 //                .and(feed.userJpaEntity.userId.ne(userId))
                 .and(feed.isPublic.eq(true));
     }
@@ -361,8 +357,7 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .from(feed)
                 .where(
                         feed.userJpaEntity.userId.in(userIds),
-                        feed.isPublic.isTrue(),
-                        feed.status.eq(StatusType.ACTIVE)
+                        feed.isPublic.isTrue()
                 )
                 .groupBy(feed.userJpaEntity.userId)
                 .orderBy(feed.createdAt.max().desc())
@@ -374,7 +369,6 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
     public List<FeedQueryDto> findSavedFeedsByCreatedAt(Long userId, LocalDateTime lastSavedAt, int size) {
 
         BooleanExpression where = savedFeed.userJpaEntity.userId.eq(userId)
-                .and(savedFeed.feedJpaEntity.status.eq(StatusType.ACTIVE))
                 .and(
                         savedFeed.feedJpaEntity.userJpaEntity.userId.eq(userId)
                                 .or(savedFeed.feedJpaEntity.isPublic.eq(true))

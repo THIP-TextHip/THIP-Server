@@ -24,4 +24,6 @@ public interface CommentCommandPort {
     void delete(Comment comment);
 
     void softDeleteAllByPostId(Long postId);
+
+    void deleteAllByUserId(Long userId);
 }

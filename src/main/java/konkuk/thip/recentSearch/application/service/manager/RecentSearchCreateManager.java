@@ -1,7 +1,7 @@
 package konkuk.thip.recentSearch.application.service.manager;
 
-import konkuk.thip.common.annotation.HelperService;
-import konkuk.thip.recentSearch.adapter.out.jpa.RecentSearchType;
+import konkuk.thip.common.annotation.application.HelperService;
+import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchQueryPort;
 import konkuk.thip.recentSearch.domain.RecentSearch;

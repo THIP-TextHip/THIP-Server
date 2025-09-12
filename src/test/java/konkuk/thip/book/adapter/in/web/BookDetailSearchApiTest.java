@@ -8,14 +8,14 @@ import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
-import konkuk.thip.user.adapter.out.jpa.UserRole;
+import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.junit.jupiter.api.AfterEach;
@@ -31,11 +31,10 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@DisplayName("[통합] 방 상세보기 api 통합 테스트")
+@DisplayName("[통합] 책 상세보기 api 통합 테스트")
 class BookDetailSearchApiTest {
 
     @Autowired
@@ -114,12 +113,12 @@ class BookDetailSearchApiTest {
 
     @AfterEach
     void tearDown() {
-        savedBookJpaRepository.deleteAll();
+        savedBookJpaRepository.deleteAllInBatch();
         feedJpaRepository.deleteAllInBatch();
         roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

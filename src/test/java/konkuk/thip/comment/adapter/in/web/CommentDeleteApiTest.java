@@ -12,7 +12,7 @@ import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.adapter.out.jpa.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -106,7 +106,8 @@ class CommentDeleteApiTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(commentId,INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(commentId).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
     }
 
     @Test
@@ -126,7 +127,8 @@ class CommentDeleteApiTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(replyId,INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(replyId).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
     }
 
     @Test
@@ -148,7 +150,8 @@ class CommentDeleteApiTest {
                 .andExpect(status().isOk());
 
         // then
-        assertThat(commentJpaRepository.findByCommentIdAndStatus(commentId,INACTIVE)).isPresent();
+        CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(commentId).orElse(null);
+        assertThat(commentJpaEntity.getStatus()).isEqualTo(INACTIVE);
 
         // Feed 댓글수 감소 확인
         FeedJpaEntity updatedFeed = feedJpaRepository.findById(feed.getPostId()).get();

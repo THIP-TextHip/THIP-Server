@@ -6,6 +6,7 @@ import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.common.exception.code.ErrorCode;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface BookCommandPort {
 
@@ -27,4 +28,7 @@ public interface BookCommandPort {
     void saveSavedBook(Long userId, Long bookId);
     void deleteSavedBook(Long userId, Long bookId);
 
+    void deleteAllByIdInBatch(Set<Long> unusedBookIds);
+
+    void deleteAllSavedBookByUserId(Long userId);
 }

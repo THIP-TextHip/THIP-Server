@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-//@Table(name = "feeds")
 @DiscriminatorValue("FEED")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,17 +32,13 @@ public class FeedJpaEntity extends PostJpaEntity {
     private int reportCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id")   // RECORD, VOTE 로 인해 nullable = true로 설정
     private BookJpaEntity bookJpaEntity;
 
     // JSON 문자열로 저장되는 단일 컬럼
     @Convert(converter = ContentListJsonConverter.class)
     @Column(name = "content_list", columnDefinition = "TEXT")
     private ContentList contentList = ContentList.empty();
-
-    // 삭제용 피드 저장 양방향 매핑 관계
-    @OneToMany(mappedBy = "feedJpaEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<SavedFeedJpaEntity> savedFeeds = new ArrayList<>();
 
     @Column(name = "tag_list", columnDefinition = "TEXT")
     @Convert(converter = TagListJsonConverter.class)
