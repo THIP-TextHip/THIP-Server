@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +18,8 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
 
     @Query("SELECT COUNT(r) FROM RoomJpaEntity r " +
             "WHERE r.bookJpaEntity.isbn = :isbn " +
-            "AND r.startDate > :currentDate")
-    int countActiveRoomsByBookIdAndStartDateAfter(@Param("isbn") String isbn, @Param("currentDate") LocalDate currentDate);
+            "AND r.roomStatus = 'RECRUITING'")
+    int countRecruitingRoomsByBookIsbn(@Param("isbn") String isbn);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
