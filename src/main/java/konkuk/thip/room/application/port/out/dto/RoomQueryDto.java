@@ -29,6 +29,7 @@ public record RoomQueryDto(
         Assert.notNull(endDate, "endDate must not be null");
         Assert.notNull(recruitCount, "recruitCount must not be null");
         Assert.notNull(memberCount, "memberCount must not be null");
+        Assert.notNull(roomStatus, "roomStatus must not be null");
     }
 
     @QueryProjection
