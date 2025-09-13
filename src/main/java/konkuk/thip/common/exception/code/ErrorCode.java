@@ -101,6 +101,7 @@ public enum ErrorCode implements ResponseCode {
     ROOM_MEMBER_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 100007, "방의 인원 수가 1 이하(방장 포함)입니다."),
     ROOM_IS_EXPIRED(HttpStatus.BAD_REQUEST, 100008, "방이 만료되었습니다."),
     ROOM_POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 100009, "일치하는 방 게시물 타입 이름이 없습니다. [RECORD, VOTE] 중 하나여야 합니다."),
+    ROOM_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, 100010, "진행 중인 방이 아닙니다."),
 
     /**
      * 110000 : vote error
