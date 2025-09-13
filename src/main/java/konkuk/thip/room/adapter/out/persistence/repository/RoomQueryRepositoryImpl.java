@@ -200,11 +200,9 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
         // 검색 조건(where) 조립
         // 유저가 참여한 방만: userId 조건
-        // 활동 기간 중인 방만: startDate ≤ today ≤ endDate
+        // 활동 기간 중인 방만: IN_PROGRESS 상태
         BooleanBuilder where = new BooleanBuilder();
         where.and(participant.userJpaEntity.userId.eq(userId));
-//        where.and(room.startDate.loe(LocalDate.now()));
-//        where.and(room.endDate.goe(LocalDate.now()));
         where.and(room.roomStatus.eq(RoomStatus.IN_PROGRESS)); // 활동 기간 중인 방만: IN_PROGRESS 상태
 
         // 커서 기반 추가 조건
@@ -247,9 +245,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomQueryDto> findRecruitingRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
-        LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-//                .and(room.startDate.after(today));  // 유저가 참여한 방 && 모집중인 방
                 .and(room.roomStatus.eq(RoomStatus.RECRUITING));  // 유저가 참여한 방 && 모집중인 방
         DateExpression<LocalDate> cursorExpr = room.startDate;      // 커서 비교는 startDate(= 모집 마감일 - 1일)
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
@@ -264,10 +260,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomQueryDto> findPlayingRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
-        LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-//                .and(room.startDate.loe(today))
-//                .and(room.endDate.goe(today));      // 유저가 참여한 방 && 현재 진행중인 방
                 .and(room.roomStatus.eq(RoomStatus.IN_PROGRESS)); // 유저가 참여한 방 && 현재 진행중인 방
         DateExpression<LocalDate> cursorExpr = room.endDate;        // 커서 비교는 endDate(= 진행 마감일)
         OrderSpecifier<?>[] orders = new OrderSpecifier<?>[]{
@@ -282,9 +275,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomQueryDto> findPlayingAndRecruitingRoomsUserParticipated(
             Long userId, Integer priorityCursor, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
-        LocalDate today = LocalDate.now();
-//        BooleanExpression playing   = room.startDate.loe(today).and(room.endDate.goe(today));
-//        BooleanExpression recruiting = room.startDate.after(today);
         BooleanExpression playing   = room.roomStatus.eq(RoomStatus.IN_PROGRESS);
         BooleanExpression recruiting = room.roomStatus.eq(RoomStatus.RECRUITING);
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
@@ -308,9 +298,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomQueryDto> findExpiredRoomsUserParticipated(
             Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize
     ) {
-        LocalDate today = LocalDate.now();
         BooleanExpression base = participant.userJpaEntity.userId.eq(userId)
-//                .and(room.endDate.before(today));       // 유저가 참여한 방 && 만료된 방
                 .and(room.roomStatus.eq(RoomStatus.EXPIRED)); // 유저가 참여한 방 && 만료된 방
 
         DateExpression<LocalDate> cursorExpr = room.endDate;
@@ -365,7 +353,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     public List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
         DateExpression<LocalDate> cursorExpr = room.startDate; // 커서 비교는 startDate(= 모집 마감일 - 1일)
         BooleanExpression baseCondition = room.bookJpaEntity.isbn.eq(isbn)
-//                .and(room.startDate.after(LocalDate.now()));    // 모집 마감 시각 > 현재 시각
                 .and(room.roomStatus.eq(RoomStatus.RECRUITING)); // 모집중인 방
 
 
@@ -395,7 +382,6 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 
     private BooleanExpression findDeadlinePopularRoomCondition(Category category, Long userId) {
         return room.category.eq(category)
-//                .and(room.startDate.after(LocalDate.now())) // 모집 마감 시각 > 현재 시각
                 .and(room.roomStatus.eq(RoomStatus.RECRUITING)) // 모집중인 방
                 .and(room.isPublic.isTrue()) // 공개 방만 조회
                 .and(userJoinedRoom(userId).not()); // 유저가 참여하지 않은 방만 조회

@@ -141,9 +141,6 @@ public class Room extends BaseDomainEntity {
     }
 
     public boolean isRecruitmentPeriodExpired() {
-//        LocalDate today = LocalDate.now();
-//        // 모집 마감일: startDate.minusDays(1)
-//        return today.isAfter(this.startDate.minusDays(1));
         return this.roomStatus != RoomStatus.RECRUITING;
     }
 
@@ -171,7 +168,6 @@ public class Room extends BaseDomainEntity {
 
     public void startRoomProgress() {
         validateRoomRecruitExpired();
-//        validateRoomExpired();
 
         startDate = LocalDate.now();
         roomStatus = RoomStatus.IN_PROGRESS;
