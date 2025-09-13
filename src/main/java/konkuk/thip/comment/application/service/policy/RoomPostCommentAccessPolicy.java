@@ -18,7 +18,7 @@ public class RoomPostCommentAccessPolicy implements CommentAccessPolicy {
     public void validateCommentAccess(CountUpdatable post, Long userId) {
         RoomPost roomPost = (RoomPost) post;
         roomParticipantValidator.validateUserIsRoomMember(roomPost.getRoomId(), userId);
-        roomValidator.validateRoomExpired(roomPost.getRoomId());
+        roomValidator.validateRoomInProgress(roomPost.getRoomId());
     }
 
 }

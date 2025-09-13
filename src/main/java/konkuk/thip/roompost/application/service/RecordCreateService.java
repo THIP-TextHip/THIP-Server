@@ -99,7 +99,7 @@ public class RecordCreateService implements RecordCreateUseCase {
 
     private void validateRoom(Room room) {
         // 방이 만료되었는지 검증
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
     }
 
     private void validateRecord(Record record, Book book) {

@@ -32,7 +32,7 @@ public class RecordDeleteService implements RecordDeleteUseCase {
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
 
         Room room = roomCommandPort.getByIdOrThrow(command.roomId());
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
 
         // 2. 기록 조회 및 검증
         Record record = recordCommandPort.getByIdOrThrow(command.recordId());

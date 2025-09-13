@@ -41,7 +41,7 @@ class VoteServiceTest {
         roomCommandPort = mock(RoomCommandPort.class);
 
         Room mockRoom = mock(Room.class);
-        doNothing().when(mockRoom).validateRoomExpired();
+        doNothing().when(mockRoom).validateRoomInProgress();
         when(roomCommandPort.getByIdOrThrow(anyLong())).thenReturn(mockRoom);
 
         voteService = new VoteService(voteCommandPort, voteQueryPort, roomParticipantValidator, roomCommandPort);

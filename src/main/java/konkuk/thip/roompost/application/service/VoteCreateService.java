@@ -55,7 +55,7 @@ public class VoteCreateService implements VoteCreateUseCase {
         Room room = roomCommandPort.getByIdOrThrow(vote.getRoomId());
         Book book = bookCommandPort.findById(room.getBookId());
         validateVote(vote, book);
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
 
         // 2. vote 저장
         Long savedVoteId = voteCommandPort.saveVote(vote);

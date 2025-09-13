@@ -65,6 +65,6 @@ public class RoomPostUpdateService implements RoomPostUpdateUseCase {
 
     private void validateRoom(Long command) {
         Room room = roomCommandPort.getByIdOrThrow(command);
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
     }
 }

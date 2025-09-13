@@ -11,9 +11,9 @@ public class RoomValidator {
 
     private final RoomCommandPort roomCommandPort;
 
-    public void validateRoomExpired(Long roomId) {
+    public void validateRoomInProgress(Long roomId) {
         Room room = roomCommandPort.getByIdOrThrow(roomId);
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
     }
 
 }

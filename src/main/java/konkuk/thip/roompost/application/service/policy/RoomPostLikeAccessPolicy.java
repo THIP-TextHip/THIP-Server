@@ -19,6 +19,6 @@ public class RoomPostLikeAccessPolicy implements PostLikeAccessPolicy {
     public void validatePostLikeAccess(CountUpdatable post, Long userId) {
         RoomPost roomPost = (RoomPost) post;
         roomParticipantValidator.validateUserIsRoomMember(roomPost.getRoomId(), userId);
-        roomValidator.validateRoomExpired(roomPost.getRoomId());
+        roomValidator.validateRoomInProgress(roomPost.getRoomId());
     }
 }

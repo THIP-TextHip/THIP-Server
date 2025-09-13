@@ -177,9 +177,12 @@ public class Room extends BaseDomainEntity {
         roomStatus = RoomStatus.IN_PROGRESS;
     }
 
-    public void validateRoomExpired() {
+    public void validateRoomInProgress() {
         if (this.roomStatus == RoomStatus.EXPIRED) {
             throw new InvalidStateException(ErrorCode.ROOM_IS_EXPIRED);
+        }
+        if (this.roomStatus != RoomStatus.IN_PROGRESS) {
+            throw new InvalidStateException(ErrorCode.ROOM_NOT_IN_PROGRESS);
         }
     }
 

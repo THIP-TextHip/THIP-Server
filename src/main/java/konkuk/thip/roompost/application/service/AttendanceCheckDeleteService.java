@@ -26,7 +26,7 @@ public class AttendanceCheckDeleteService implements AttendanceCheckDeleteUseCas
 
         // 1-1. 방이 만료되었는지 검증
         Room room = roomCommandPort.getByIdOrThrow(roomId);
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
 
         // 2. creator 겁증
         AttendanceCheck attendanceCheck = attendanceCheckCommandPort.getByIdOrThrow(attendanceCheckId);

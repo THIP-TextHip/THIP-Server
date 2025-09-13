@@ -33,7 +33,7 @@ public class VoteDeleteService implements VoteDeleteUseCase {
 
         // 1.1 방 존재 여부 및 만료 검증
         Room room = roomCommandPort.getByIdOrThrow(command.roomId());
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
 
         // 2. 투표 조회 및 검증
         Vote vote = voteCommandPort.getByIdOrThrow(command.voteId());

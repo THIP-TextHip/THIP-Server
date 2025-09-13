@@ -37,7 +37,7 @@ public class AttendanceCheckCreateService implements AttendanceCheckCreateUseCas
 
         // 1-2. 방이 만료되었는지 검증
         Room room = roomCommandPort.getByIdOrThrow(command.roomId());
-        room.validateRoomExpired();
+        room.validateRoomInProgress();
 
         // 2. 유저가 해당 방에서 오늘 이미 작성한 오늘의 한마디 개수 조회
         int alreadyWrittenCountToday = attendanceCheckQueryPort.countAttendanceChecksOnTodayByUser(command.creatorId(), command.roomId());
