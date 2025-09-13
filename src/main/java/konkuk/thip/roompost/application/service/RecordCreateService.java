@@ -61,7 +61,7 @@ public class RecordCreateService implements RecordCreateUseCase {
         Book book = bookCommandPort.findById(room.getBookId());
 
         // 3. 유효성 검증
-        validateRoom(room);
+        room.validateRoomInProgress(); // 방이 만료되었는지 검증
         validateRoomParticipant(roomParticipant, command.isOverview());
         validateRecord(record, book);
 
@@ -95,11 +95,6 @@ public class RecordCreateService implements RecordCreateUseCase {
             );
             throw new BusinessException(RECORD_CANNOT_BE_OVERVIEW, new IllegalStateException(message));
         }
-    }
-
-    private void validateRoom(Room room) {
-        // 방이 만료되었는지 검증
-        room.validateRoomInProgress();
     }
 
     private void validateRecord(Record record, Book book) {
