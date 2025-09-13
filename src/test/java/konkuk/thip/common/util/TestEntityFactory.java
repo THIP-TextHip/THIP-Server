@@ -141,6 +141,7 @@ public class TestEntityFactory {
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(RoomStatus.IN_PROGRESS)
                 .build();
     }
 
