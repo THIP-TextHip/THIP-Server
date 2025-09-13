@@ -1,5 +1,6 @@
 package konkuk.thip.common.security.filter;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,13 +13,17 @@ import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.application.port.UserTokenBlacklistQueryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.server.PathContainer;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import java.io.IOException;
+import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.common.security.constant.AuthParameters.*;
@@ -30,6 +35,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserTokenBlacklistQueryPort userTokenBlacklistQueryPort;
+
+    private List<PathPattern> whitelistPatterns;
+    private final PathPatternParser pathPatternParser = new PathPatternParser();
+
+    @PostConstruct
+    void initWhitelistPatterns() {
+        this.whitelistPatterns = SecurityWhitelist.patternsList().stream()
+                .map(pathPatternParser::parse)   // 애플리케이션 시작 시 1회 컴파일
+                .toList();
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // 컨텍스트 패스 고려한 실제 경로(= path) 추출
+        String requestUri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String path = (contextPath != null && !contextPath.isEmpty() && requestUri.startsWith(contextPath))
+                ? requestUri.substring(contextPath.length())
+                : requestUri;
+
+        PathContainer container = PathContainer.parsePath(path);
+
+        // PathPattern으로 세그먼트 기반 매칭
+        return whitelistPatterns.stream().anyMatch(p -> p.matches(container));
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -93,14 +123,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("토큰이 없습니다.");
         return null;
     }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-
-        // 화이트리스트 경로에 대해서는 JWT 필터 제외
-        return SecurityWhitelist.patternsList().stream()
-                .anyMatch(path::startsWith);
-    }
-
 }
