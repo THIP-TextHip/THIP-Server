@@ -83,7 +83,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 room.recruitCount,
                 room.memberCount,
                 room.startDate,
-                room.isPublic
+                room.isPublic,
+                room.roomStatus
         );
     }
 
@@ -329,7 +330,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
-                        room.startDate
+                        room.startDate,
+                        room.roomStatus
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
@@ -348,7 +350,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.title,
                         room.recruitCount,
                         room.memberCount,
-                        room.startDate
+                        room.startDate,
+                        room.roomStatus
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
@@ -379,7 +382,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.recruitCount,
                         room.memberCount,
                         cursorExpr,
-                        room.isPublic
+                        room.isPublic,
+                        room.roomStatus
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
@@ -443,7 +447,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.memberCount,
                         room.startDate,
                         cursorExpr, // endDate 자리에 상황별 deadline 컬럼 전달
-                        room.isPublic
+                        room.isPublic,
+                        room.roomStatus
                 ))
                 .from(participant)
                 .join(participant.roomJpaEntity, room)
@@ -490,7 +495,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                         room.memberCount,
                         room.startDate,
                         cursorExpr, // endDate 자리에 상황별 deadline 컬럼 전달
-                        room.isPublic
+                        room.isPublic,
+                        room.roomStatus
                 ))
                 .from(participant)
                 .join(participant.roomJpaEntity, room)

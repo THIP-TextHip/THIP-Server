@@ -1,6 +1,7 @@
 package konkuk.thip.room.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import konkuk.thip.room.domain.value.RoomStatus;
 import lombok.Builder;
 import org.springframework.util.Assert;
 
@@ -16,7 +17,8 @@ public record RoomQueryDto(
         Integer memberCount,
         LocalDate startDate,    // 방 진행 시작일
         LocalDate endDate,       // 방 진행 마감일 or 방 모집 마감일
-        Boolean isPublic        // 공개방 여부
+        Boolean isPublic,        // 공개방 여부
+        RoomStatus roomStatus
 ) {
     // 내가 참여한 모임방(모집중, 진행중, 모집+진행중, 완료된) 조회 시 활용
     @QueryProjection
@@ -36,9 +38,10 @@ public record RoomQueryDto(
             String roomName,
             Integer recruitCount,
             Integer memberCount,
-            LocalDate endDate
+            LocalDate endDate,
+            RoomStatus roomStatus
     ) {
-        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate, null);
+        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate, null, roomStatus);
     }
 
     // 방 검색 시 활용
@@ -50,8 +53,9 @@ public record RoomQueryDto(
             Integer recruitCount,
             Integer memberCount,
             LocalDate endDate,
-            Boolean isPublic
+            Boolean isPublic,
+            RoomStatus roomStatus
     ) {
-        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate, isPublic);
+        this(roomId, bookImageUrl, roomName, recruitCount, memberCount, null, endDate, isPublic, roomStatus);
     }
 }
