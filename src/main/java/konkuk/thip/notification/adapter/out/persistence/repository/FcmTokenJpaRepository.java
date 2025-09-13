@@ -21,4 +21,7 @@ public interface FcmTokenJpaRepository extends JpaRepository<FcmTokenJpaEntity, 
     @Modifying
     @Query("DELETE FROM FcmTokenJpaEntity f WHERE f.userJpaEntity.userId = :userId AND f.deviceId = :deviceId")
     void deleteByUserIdAndDeviceId(Long userId, String deviceId);
+
+    @Query("SELECT f FROM FcmTokenJpaEntity f WHERE f.deviceId = :deviceId AND f.userJpaEntity.userId = :userId")
+    Optional<FcmTokenJpaEntity> findByDeviceIdAndUserId(String deviceId, Long userId);
 }

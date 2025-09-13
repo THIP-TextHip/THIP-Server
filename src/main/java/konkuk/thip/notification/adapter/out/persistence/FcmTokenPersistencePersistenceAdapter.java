@@ -31,6 +31,13 @@ public class FcmTokenPersistencePersistenceAdapter implements FcmTokenPersistenc
     }
 
     @Override
+    public Optional<FcmToken> findByDeviceIdAndUserId(String deviceId, Long userId) {
+        return fcmTokenJpaRepository.findByDeviceIdAndUserId(deviceId, userId)
+                .map(fcmTokenMapper::toDomainEntity);
+    }
+
+
+    @Override
     public FcmToken save(FcmToken token) {
         UserJpaEntity user = userJpaRepository.findByUserId(token.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
