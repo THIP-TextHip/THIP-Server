@@ -18,6 +18,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -140,10 +141,11 @@ public class TestEntityFactory {
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(RoomStatus.IN_PROGRESS)
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, LocalDate startDate, LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, LocalDate startDate, LocalDate endDate, RoomStatus roomStatus) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -153,10 +155,11 @@ public class TestEntityFactory {
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, String roomName, LocalDate startDate, LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, String roomName, LocalDate startDate, LocalDate endDate, RoomStatus roomStatus) {
         return RoomJpaEntity.builder()
                 .title(roomName)
                 .description("설명")
@@ -166,6 +169,7 @@ public class TestEntityFactory {
                 .recruitCount(20)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build();
     }
 

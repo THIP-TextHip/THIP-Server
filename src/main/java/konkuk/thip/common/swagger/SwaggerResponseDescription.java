@@ -136,7 +136,8 @@ public enum SwaggerResponseDescription {
             BOOK_NOT_FOUND,
             ROOM_IS_EXPIRED,
             RECORD_CANNOT_BE_OVERVIEW,
-            INVALID_RECORD_PAGE_RANGE
+            INVALID_RECORD_PAGE_RANGE,
+            ROOM_NOT_IN_PROGRESS
     ))),
     RECORD_SEARCH(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -147,7 +148,9 @@ public enum SwaggerResponseDescription {
     RECORD_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             RECORD_NOT_FOUND,
-            RECORD_ACCESS_FORBIDDEN
+            RECORD_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
     RECORD_PIN(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
@@ -158,7 +161,9 @@ public enum SwaggerResponseDescription {
     RECORD_UPDATE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             RECORD_NOT_FOUND,
-            RECORD_ACCESS_FORBIDDEN
+            RECORD_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
 
     // Vote
@@ -168,24 +173,31 @@ public enum SwaggerResponseDescription {
             BOOK_NOT_FOUND,
             ROOM_IS_EXPIRED,
             VOTE_CANNOT_BE_OVERVIEW,
-            INVALID_VOTE_PAGE_RANGE
+            INVALID_VOTE_PAGE_RANGE,
+            ROOM_NOT_IN_PROGRESS
     ))),
     VOTE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             VOTE_ITEM_NOT_FOUND,
             VOTE_ITEM_ALREADY_VOTED,
             VOTE_ITEM_NOT_VOTED_CANNOT_CANCEL,
-            VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE
+            VOTE_ITEM_COUNT_CANNOT_BE_NEGATIVE,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
     VOTE_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             VOTE_NOT_FOUND,
-            VOTE_ACCESS_FORBIDDEN
+            VOTE_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
     VOTE_UPDATE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             VOTE_NOT_FOUND,
-            VOTE_ACCESS_FORBIDDEN
+            VOTE_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
 
 
@@ -251,8 +263,9 @@ public enum SwaggerResponseDescription {
             VOTE_NOT_FOUND,
             INVALID_COMMENT_CREATE,
             FEED_ACCESS_FORBIDDEN,
-            ROOM_ACCESS_FORBIDDEN
-
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
     CHANGE_COMMENT_LIKE_STATE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -264,7 +277,9 @@ public enum SwaggerResponseDescription {
             COMMENT_NOT_LIKED_CANNOT_CANCEL,
             COMMENT_LIKE_COUNT_UNDERFLOW,
             FEED_ACCESS_FORBIDDEN,
-            ROOM_ACCESS_FORBIDDEN
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
     COMMENT_DELETE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -275,7 +290,9 @@ public enum SwaggerResponseDescription {
             COMMENT_DELETE_FORBIDDEN,
             COMMENT_COUNT_UNDERFLOW,
             FEED_ACCESS_FORBIDDEN,
-            ROOM_ACCESS_FORBIDDEN
+            ROOM_ACCESS_FORBIDDEN,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
 
     // Book
@@ -321,7 +338,9 @@ public enum SwaggerResponseDescription {
             ROOM_NOT_FOUND,
             USER_NOT_FOUND,
             ATTENDANCE_CHECK_WRITE_LIMIT_EXCEEDED,
-            ATTENDANCE_CHECK_NOT_FOUND
+            ATTENDANCE_CHECK_NOT_FOUND,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
 
     ATTENDANCE_CHECK_SHOW(new LinkedHashSet<>(Set.of(
@@ -331,7 +350,9 @@ public enum SwaggerResponseDescription {
     ATTENDANCE_CHECK_DELETE(new LinkedHashSet<>(Set.of(
             ROOM_ACCESS_FORBIDDEN,
             ATTENDANCE_CHECK_NOT_FOUND,
-            ATTENDANCE_CHECK_CAN_NOT_DELETE
+            ATTENDANCE_CHECK_CAN_NOT_DELETE,
+            ROOM_IS_EXPIRED,
+            ROOM_NOT_IN_PROGRESS
     ))),
 
     // Notiification

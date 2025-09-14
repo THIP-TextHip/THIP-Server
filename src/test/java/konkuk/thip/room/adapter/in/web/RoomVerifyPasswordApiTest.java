@@ -6,6 +6,7 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
@@ -162,6 +163,7 @@ class RoomVerifyPasswordApiTest {
                         .startDate(LocalDate.now()) // 오늘 시작이므로 모집기간은 어제까지
                         .endDate(LocalDate.now().plusDays(5))
                         .recruitCount(3)
+                        .roomStatus(RoomStatus.IN_PROGRESS) // 이미 시작된 방
                         .build()
         );
         Long expiredRoomId = expiredRoom.getRoomId();

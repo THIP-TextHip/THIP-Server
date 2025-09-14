@@ -5,10 +5,11 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
@@ -74,6 +75,7 @@ class RoomGetDeadlinePopularApiTest {
             RoomJpaEntity deadlineRoom = TestEntityFactory.createRoom(book, category);
             deadlineRoom.updateStartDate(today.plusDays(i + 1));
             deadlineRoom.updateMemberCount(5);
+            deadlineRoom.updateRoomStatus(RoomStatus.RECRUITING);
             rooms.add(roomJpaRepository.save(deadlineRoom));
         }
 
@@ -81,6 +83,7 @@ class RoomGetDeadlinePopularApiTest {
             RoomJpaEntity popularRoom = TestEntityFactory.createRoom(book, category);
             popularRoom.updateStartDate(today.plusDays(10 + i));
             popularRoom.updateMemberCount(maxMemberCount - i);
+            popularRoom.updateRoomStatus(RoomStatus.RECRUITING);
             rooms.add(roomJpaRepository.save(popularRoom));
         }
 
@@ -88,17 +91,20 @@ class RoomGetDeadlinePopularApiTest {
         RoomJpaEntity expiredRoom = TestEntityFactory.createRoom(book, category);
         expiredRoom.updateStartDate(today);
         expiredRoom.updateIsPublic(true);
+        expiredRoom.updateRoomStatus(RoomStatus.EXPIRED);
         roomJpaRepository.save(expiredRoom);
 
         // 비공개 방 (조건 불만족)
         privateRoom = TestEntityFactory.createRoom(book, category);
         privateRoom.updateStartDate(today.plusDays(2));
+        privateRoom.updateRoomStatus(RoomStatus.RECRUITING);
         privateRoom.updateIsPublic(false);
         roomJpaRepository.save(privateRoom);
 
         // 내가 참여한 방 (조건 불만족)
         joinedRoom = TestEntityFactory.createRoom(book, category);
         joinedRoom.updateStartDate(today.plusDays(5));
+        joinedRoom.updateRoomStatus(RoomStatus.RECRUITING);
         joinedRoom = roomJpaRepository.save(joinedRoom);
         participantJpaRepository.save(
                 TestEntityFactory.createRoomParticipant(joinedRoom, currentUser, RoomParticipantRole.MEMBER, 0)

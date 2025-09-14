@@ -5,15 +5,14 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.room.domain.value.Category;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface RoomQueryPort {
 
-    int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate);
+    int countRecruitingRoomsByBookIsbn(String isbn);
 
     /**
      * 방 검색

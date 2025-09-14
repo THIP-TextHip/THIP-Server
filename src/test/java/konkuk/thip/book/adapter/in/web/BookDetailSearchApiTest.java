@@ -14,6 +14,7 @@ import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomP
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -155,6 +156,7 @@ class BookDetailSearchApiTest {
                 .roomPercentage(0.0)
                 .startDate(LocalDate.now().minusDays(10))
                 .endDate(LocalDate.now().minusDays(5))
+                .roomStatus(RoomStatus.IN_PROGRESS)
                 .recruitCount(10)
                 .bookJpaEntity(book)
                 .category(Category.LITERATURE)

@@ -1,6 +1,8 @@
 package konkuk.thip.roompost.application.service;
 
 import konkuk.thip.common.util.DateUtil;
+import konkuk.thip.room.application.port.out.RoomCommandPort;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.roompost.application.port.in.AttendanceCheckCreateUseCase;
 import konkuk.thip.roompost.application.port.in.dto.attendancecheck.AttendanceCheckCreateCommand;
 import konkuk.thip.roompost.application.port.in.dto.attendancecheck.AttendanceCheckCreateResult;
@@ -22,6 +24,7 @@ public class AttendanceCheckCreateService implements AttendanceCheckCreateUseCas
     private final AttendanceCheckCommandPort attendanceCheckCommandPort;
     private final UserCommandPort userCommandPort;
     private final AttendanceCheckQueryPort attendanceCheckQueryPort;
+    private final RoomCommandPort roomCommandPort;
 
     @Transactional
     @Override
@@ -31,6 +34,10 @@ public class AttendanceCheckCreateService implements AttendanceCheckCreateUseCas
         User user = userCommandPort.findById(command.creatorId());
         // 1-1. 유저가 해당 방에 오늘의 한마디를 작성할 수 있는지 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.creatorId());
+
+        // 1-2. 방이 만료되었는지 검증
+        Room room = roomCommandPort.getByIdOrThrow(command.roomId());
+        room.validateRoomInProgress();
 
         // 2. 유저가 해당 방에서 오늘 이미 작성한 오늘의 한마디 개수 조회
         int alreadyWrittenCountToday = attendanceCheckQueryPort.countAttendanceChecksOnTodayByUser(command.creatorId(), command.roomId());
