@@ -144,7 +144,7 @@ class RoomPlayingOrExpiredDetailViewApiTest {
     @DisplayName("완료된 모임방 상세조회할 경우, [해당 모임방의 정보, 책 정보, 유저의 현재 활동 정보, 현재 진행중인 투표]를 반환한다.")
     void get_expired_room_detail() throws Exception {
         //given
-        RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1),EXPIRED);
+        RoomJpaEntity room = saveScienceRoom("과학-책", "isbn1", "과학-방-지난달-활동시작", LocalDate.now().minusDays(31),EXPIRED);
         saveUsersToRoom(room, 4);
         RoomParticipantJpaEntity roomParticipantJpaEntity = roomParticipantJpaRepository.findAllByRoomId(room.getRoomId()).get(0);
         roomParticipantJpaRepository.delete(roomParticipantJpaEntity);
@@ -165,9 +165,9 @@ class RoomPlayingOrExpiredDetailViewApiTest {
         //then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.isHost", is(false)))
-                .andExpect(jsonPath("$.data.roomName", is("과학-방-1일뒤-활동시작")))
+                .andExpect(jsonPath("$.data.roomName", is("과학-방-지난달-활동시작")))
                 .andExpect(jsonPath("$.data.roomImageUrl", is(Category.SCIENCE_IT.getImageUrl())))      // 방 대표 이미지 추가
-                .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().plusDays(1)))))
+                .andExpect(jsonPath("$.data.progressStartDate", is(DateUtil.formatDate(LocalDate.now().minusDays(31)))))
                 .andExpect(jsonPath("$.data.memberCount", is(4)))
                 .andExpect(jsonPath("$.data.recruitCount", is(10)))
                 .andExpect(jsonPath("$.data.isbn", is("isbn1")))
