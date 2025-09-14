@@ -348,7 +348,10 @@ public enum SwaggerResponseDescription {
     FCM_TOKEN_DELETE(new LinkedHashSet<>(Set.of(
             FCM_TOKEN_NOT_FOUND,
             FCM_TOKEN_ACCESS_FORBIDDEN
-    )))
+    ))),
+    NOTIFICATION_GET_ENABLE_STATE(new LinkedHashSet<>(Set.of(
+            FCM_TOKEN_NOT_FOUND
+    ))),
 
   ;
     private final Set<ErrorCode> errorCodeList;

@@ -28,8 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.GET_USER_FOLLOW;
-import static konkuk.thip.common.swagger.SwaggerResponseDescription.USER_SEARCH;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 
 @Tag(name = "User Query API", description = "사용자가 주체가 되는 조회")
 @Validated
