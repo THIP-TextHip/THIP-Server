@@ -34,20 +34,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * /rooms?category=문학 API 통합 테스트
- * - 마감 임박, 인기 방 조회
- * - 내가 참여한 방은 제외
+ * - 마감 임박, 인기 방, 최근생성된 방 조회
  * - 비공개 방은 제외
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@DisplayName("[통합] 마감 임박 및 인기 방 조회 API 통합 테스트")
+@DisplayName("[통합] 마감 임박, 인기 방, 최근 생성된 방 조회 API 통합 테스트")
 @Transactional
-class RoomGetDeadlinePopularApiTest {
+class RoomGetDeadlinePopularRecentApiTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private RoomJpaRepository roomJpaRepository;
-    @Autowired private RoomParticipantJpaRepository participantJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
 
@@ -61,7 +59,6 @@ class RoomGetDeadlinePopularApiTest {
     private final LocalDate today = LocalDate.now();
 
     private RoomJpaEntity privateRoom;
-    private RoomJpaEntity joinedRoom;
 
     @BeforeEach
     void setUp() {
@@ -100,19 +97,10 @@ class RoomGetDeadlinePopularApiTest {
         privateRoom.updateRoomStatus(RoomStatus.RECRUITING);
         privateRoom.updateIsPublic(false);
         roomJpaRepository.save(privateRoom);
-
-        // 내가 참여한 방 (조건 불만족)
-        joinedRoom = TestEntityFactory.createRoom(book, category);
-        joinedRoom.updateStartDate(today.plusDays(5));
-        joinedRoom.updateRoomStatus(RoomStatus.RECRUITING);
-        joinedRoom = roomJpaRepository.save(joinedRoom);
-        participantJpaRepository.save(
-                TestEntityFactory.createRoomParticipant(joinedRoom, currentUser, RoomParticipantRole.MEMBER, 0)
-        );
     }
 
     @Test
-    @DisplayName("카테고리별로 마감 임박 방 4개와 인기 방 4개를 조회하고 조건과 정렬을 검증한다")
+    @DisplayName("카테고리별로 마감 임박 방 4개와 인기 방 4개 최근생성된 방 4개를 조회하고 조건과 정렬을 검증한다")
     void getDeadlineAndPopularRooms() throws Exception {
         mockMvc.perform(
                         get("/rooms")
@@ -128,20 +116,10 @@ class RoomGetDeadlinePopularApiTest {
                 .andExpect(jsonPath("$.data.deadlineRoomList[0].bookImageUrl").isString())
                 .andExpect(jsonPath("$.data.deadlineRoomList[0].roomName").isString())
                 .andExpect(jsonPath("$.data.deadlineRoomList[0].memberCount").isNumber())
-                .andExpect(jsonPath("$.data.deadlineRoomList[0].deadlineDate").isString());
-    }
-
-    @Test
-    @DisplayName("내가 참여한 방은 조회 결과에 포함되지 않는다")
-    void joinedRoomIsExcluded() throws Exception {
-        mockMvc.perform(
-                        get("/rooms")
-                                .param("category", "문학")
-                                .requestAttr("userId", currentUser.getUserId())
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.deadlineRoomList[*].roomId", not(hasItem(joinedRoom.getRoomId().intValue()))))
-                .andExpect(jsonPath("$.data.popularRoomList[*].roomId", not(hasItem(joinedRoom.getRoomId().intValue()))));
+                .andExpect(jsonPath("$.data.deadlineRoomList[0].deadlineDate").isString())
+                .andExpect(jsonPath("$.data.recentRoomList", hasSize(4)))
+                .andExpect(jsonPath("$.data.recentRoomList[0].roomId").value(rooms.get(9).getRoomId())) //최근생성된 방은 생성된 순으로 정렬
+                .andExpect(jsonPath("$.data.recentRoomList[1].roomId").value(rooms.get(8).getRoomId()));
     }
 
     @Test

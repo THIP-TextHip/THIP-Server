@@ -36,10 +36,11 @@ public interface RoomQueryPort {
 
     CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
 
+    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, int limit);
     /**
      * 임시 메서드
      * TODO 리펙토링 대상
