@@ -1,6 +1,7 @@
 package konkuk.thip.room.application.port.out.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import konkuk.thip.room.domain.value.RoomStatus;
 import lombok.Builder;
 import org.springframework.util.Assert;
 
@@ -13,8 +14,9 @@ public record RoomParticipantQueryDto(
         String roomTitle,
         Integer memberCount,
         Double userPercentage,
-        LocalDate startDate   // 방 진행 시작일
-) {
+        LocalDate startDate,  // 방 진행 시작일
+        RoomStatus roomStatus
+        ) {
     @QueryProjection
     public RoomParticipantQueryDto {
         Assert.notNull(roomId, "roomId must not be null");
@@ -23,5 +25,6 @@ public record RoomParticipantQueryDto(
         Assert.notNull(memberCount, "memberCount must not be null");
         Assert.notNull(userPercentage, "userPercentage must not be null");
         Assert.notNull(startDate, "startDate must not be null");
+        Assert.notNull(roomStatus, "roomStatus must not be null");
     }
 }

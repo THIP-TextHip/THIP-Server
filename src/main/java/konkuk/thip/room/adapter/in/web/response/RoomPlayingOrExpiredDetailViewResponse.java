@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record RoomPlayingDetailViewResponse(
+public record RoomPlayingOrExpiredDetailViewResponse(
         boolean isHost,
         Long roomId,
         String roomName,

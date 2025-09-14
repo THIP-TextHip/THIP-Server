@@ -68,6 +68,29 @@ public class DateUtil {
         return "마감 임박";
     }
 
+    public static String RecruitingRoomFormatAfterTimeSimple(LocalDate date) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dateTime = date.atStartOfDay();
+        Duration d = Duration.between(now, dateTime);
+
+        if (d.isNegative() || d.isZero()) {
+            return "??";
+        }
+
+        long days = d.toDays();
+        if (days > 0) {
+            return days + "일";
+        }
+
+        long hours = d.toHours();
+        if (hours >= 1) {
+            return hours + "시간";
+        }
+
+        long minutes = d.toMinutes();
+        return minutes + "분";
+    }
+
 
     public static String formatDate(LocalDate date) {
         return date.format(DATE_FORMATTER);
