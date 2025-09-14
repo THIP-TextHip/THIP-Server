@@ -1,6 +1,7 @@
 package konkuk.thip.user.adapter.in.web;
 
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
@@ -34,16 +35,15 @@ class UserFollowApiTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserJpaRepository userJpaRepository;
-
-    @Autowired
-    private FollowingJpaRepository followingJpaRepository;
+    @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private FollowingJpaRepository followingJpaRepository;
+    @Autowired private NotificationJpaRepository notificationJpaRepository;
 
     @AfterEach
     void tearDown() {
         followingJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAll();
+        notificationJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

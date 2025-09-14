@@ -13,7 +13,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,14 +93,6 @@ class RoomCloseJoinApiTest {
 
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, host, RoomParticipantRole.HOST, 0.0));
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, member, RoomParticipantRole.MEMBER, 0.0));
-    }
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

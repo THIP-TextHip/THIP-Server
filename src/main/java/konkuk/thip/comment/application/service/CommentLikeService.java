@@ -8,8 +8,8 @@ import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
-import konkuk.thip.message.application.port.out.FeedEventCommandPort;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.CountUpdatable;
@@ -32,8 +32,8 @@ public class CommentLikeService implements CommentLikeUseCase {
     private final PostHandler postHandler;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
 
-    private final FeedEventCommandPort feedEventCommandPort;
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final FeedNotificationOrchestrator feedNotificationOrchestrator;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -73,11 +73,11 @@ public class CommentLikeService implements CommentLikeUseCase {
         User actorUser = userCommandPort.findById(command.userId());
         // 좋아요 푸쉬알림 전송
         if (comment.getPostType() == PostType.FEED) {
-            feedEventCommandPort.publishFeedCommentLikedEvent(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), comment.getTargetPostId());
+            feedNotificationOrchestrator.notifyFeedCommentLiked(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), comment.getTargetPostId());
         }
         if (comment.getPostType() == PostType.RECORD || comment.getPostType() == PostType.VOTE) {
             PostQueryDto postQueryDto = postHandler.getPostQueryDto(comment.getPostType(), comment.getTargetPostId());
-            roomEventCommandPort.publishRoomCommentLikedEvent(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+            roomNotificationOrchestrator.notifyRoomCommentLiked(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
         }
     }
 }

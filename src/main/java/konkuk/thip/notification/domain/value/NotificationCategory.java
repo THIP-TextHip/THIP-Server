@@ -1,4 +1,4 @@
-package konkuk.thip.message.domain;
+package konkuk.thip.notification.domain.value;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] RecordCommandController 테스트")
-class RecordCreateControllerTest {
+class RecordCreateApiTest {
 
     @Autowired
     MockMvc mockMvc;

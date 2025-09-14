@@ -2,7 +2,7 @@ package konkuk.thip.roompost.application.service;
 
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
@@ -35,7 +35,7 @@ public class VoteCreateService implements VoteCreateUseCase {
 
     private final RoomProgressManager roomProgressManager;
 
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Transactional
     @Override
@@ -81,7 +81,7 @@ public class VoteCreateService implements VoteCreateUseCase {
         List<RoomParticipant> targetUsers = roomParticipantCommandPort.findAllByRoomId(command.roomId());
         for (RoomParticipant targetUser : targetUsers) {
             if (targetUser.getUserId().equals(command.userId())) continue; // 본인 제외
-            roomEventCommandPort.publishRoomVoteStartedEvent(targetUser.getUserId(), room.getId(), room.getTitle(), vote.getPage(), newVoteId);
+            roomNotificationOrchestrator.notifyRoomVoteStarted(targetUser.getUserId(), room.getId(), room.getTitle(), vote.getPage(), newVoteId);
         }
     }
 

@@ -2,7 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
 import konkuk.thip.room.application.port.in.dto.RoomJoinResult;
@@ -27,7 +27,7 @@ public class RoomJoinService implements RoomJoinUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final UserCommandPort userCommandPort;
 
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -45,7 +45,7 @@ public class RoomJoinService implements RoomJoinUseCase {
         // 방 참여 상태 변경 요청에 따라 분기 처리
         switch (type) {
             case JOIN -> handleJoin(roomJoinCommand, roomParticipantOptional, room);
-            case CANCEL -> handleCancel(roomJoinCommand, roomParticipantOptional, roomParticipantOptional, room);
+            case CANCEL -> handleCancel(roomJoinCommand, roomParticipantOptional, room);
         }
 
         // 방의 상태 업데이트
@@ -62,10 +62,10 @@ public class RoomJoinService implements RoomJoinUseCase {
     private void sendNotifications(RoomJoinCommand roomJoinCommand, Room room) {
         RoomParticipant targetUser = roomParticipantCommandPort.findHostByRoomId(room.getId());
         User actorUser = userCommandPort.findById(roomJoinCommand.userId());
-        roomEventCommandPort.publishRoomJoinEventToHost(targetUser.getUserId(), room.getId(), room.getTitle(), actorUser.getId(), actorUser.getNickname());
+        roomNotificationOrchestrator.notifyRoomJoinToHost(targetUser.getUserId(), room.getId(), room.getTitle(), actorUser.getId(), actorUser.getNickname());
     }
 
-    private void handleCancel(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Optional<RoomParticipant> roomParticipantOptional, Room room) {
+    private void handleCancel(RoomJoinCommand roomJoinCommand, Optional<RoomParticipant> participantOptional, Room room) {
         // 참여하지 않은 상태
         RoomParticipant participant = participantOptional.orElseThrow(() ->
                 new BusinessException(ErrorCode.USER_NOT_PARTICIPATED_CANNOT_CANCEL)

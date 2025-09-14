@@ -13,8 +13,12 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public void publishFollowEvent(Long targetUserId, Long actorUserId, String actorUsername) {
+    public void publishFollowEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername) {
         publisher.publishEvent(FeedEvents.FollowerEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -22,9 +26,13 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     }
 
     @Override
-    public void publishFeedCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                          Long feedId) {
+    public void publishFeedCommentedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long feedId) {
         publisher.publishEvent(FeedEvents.FeedCommentedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -33,9 +41,13 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     }
 
     @Override
-    public void publishFeedRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                        Long feedId) {
+    public void publishFeedRepliedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long feedId) {
         publisher.publishEvent(FeedEvents.FeedCommentRepliedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -44,9 +56,13 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     }
 
     @Override
-    public void publishFolloweeNewPostEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                            Long feedId) {
+    public void publishFolloweeNewPostEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long feedId) {
         publisher.publishEvent(FeedEvents.FolloweeNewPostEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -55,9 +71,13 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     }
 
     @Override
-    public void publishFeedLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                      Long feedId) {
+    public void publishFeedLikedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long feedId) {
         publisher.publishEvent(FeedEvents.FeedLikedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -66,9 +86,13 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
     }
 
     @Override
-    public void publishFeedCommentLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                             Long feedId) {
+    public void publishFeedCommentLikedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long feedId) {
         publisher.publishEvent(FeedEvents.FeedCommentLikedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)

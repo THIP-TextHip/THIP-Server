@@ -5,7 +5,7 @@ import com.google.firebase.messaging.Notification;
 import konkuk.thip.message.application.port.in.FeedNotificationDispatchUseCase;
 import konkuk.thip.message.application.port.out.FirebaseMessagingPort;
 import konkuk.thip.message.adapter.out.event.dto.FeedEvents;
-import konkuk.thip.message.domain.NotificationCategory;
+import konkuk.thip.notification.domain.value.NotificationCategory;
 import konkuk.thip.message.domain.MessageRoute;
 import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;
@@ -26,8 +26,7 @@ public class FeedNotificationDispatchService implements FeedNotificationDispatch
 
     @Override
     public void handleFollower(final FeedEvents.FollowerEvent event) {
-        Notification n = buildNotification("팔로워 알림",
-                "@" + event.actorUsername() + " 님이 나를 띱했어요!");
+        Notification n = buildNotification(event.title(), event.content());
 
         List<FcmToken> tokens = fcmTokenPersistencePort.findEnabledByUserId(event.targetUserId());
 
@@ -49,40 +48,35 @@ public class FeedNotificationDispatchService implements FeedNotificationDispatch
 
     @Override
     public void handleFeedCommented(final FeedEvents.FeedCommentedEvent event) {
-        Notification notification = buildNotification("새로운 댓글이 달렸어요",
-                "@" +event.actorUsername() + " 님이 내 글에 댓글을 달았어요!");
+        Notification notification = buildNotification(event.title(), event.content());
 
         pushFeedDetail(event.targetUserId(), notification, event.feedId());
     }
 
     @Override
     public void handleFeedCommentReplied(final FeedEvents.FeedCommentRepliedEvent event) {
-        Notification notification = buildNotification("새로운 답글이 달렸어요",
-                "@" + event.actorUsername() + " 님이 내 댓글에 답글을 달았어요!");
+        Notification notification = buildNotification(event.title(), event.content());
 
         pushFeedDetail(event.targetUserId(), notification, event.feedId());
     }
 
     @Override
     public void handleFolloweeNewPost(final FeedEvents.FolloweeNewPostEvent event) {
-        Notification notification = buildNotification("새 글 알림",
-                "@" + event.actorUsername() + " 님이 새로운 글을 작성했어요!");
+        Notification notification = buildNotification(event.title(), event.content());
 
         pushFeedDetail(event.targetUserId(), notification, event.feedId());
     }
 
     @Override
     public void handleFeedLiked(final FeedEvents.FeedLikedEvent event) {
-        Notification notification = buildNotification("내 글을 좋아합니다",
-                "@" + event.actorUsername() + " 님이 내 글에 좋아요를 눌렀어요!");
+        Notification notification = buildNotification(event.title(), event.content());
 
         pushFeedDetail(event.targetUserId(), notification, event.feedId());
     }
 
     @Override
     public void handleFeedCommentLiked(final FeedEvents.FeedCommentLikedEvent event) {
-        Notification notification = buildNotification("좋아요 알림",
-                "@" + event.actorUsername() + " 님이 내 댓글에 좋아요를 눌렀어요!");
+        Notification notification = buildNotification(event.title(), event.content());
 
         pushFeedDetail(event.targetUserId(), notification, event.feedId());
     }
@@ -109,7 +103,7 @@ public class FeedNotificationDispatchService implements FeedNotificationDispatch
     }
 
     private Notification buildNotification(final String title, final String body) {
-        return Notification.builder().setTitle(NotificationCategory.FEED.prefixedTitle(title)).setBody(body).build();
+        return Notification.builder().setTitle(title).setBody(body).build();
     }
 
     private Message buildMessage(final String token, final Notification n,

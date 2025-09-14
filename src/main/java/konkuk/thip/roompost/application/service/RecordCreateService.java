@@ -3,7 +3,7 @@ package konkuk.thip.roompost.application.service;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.roompost.application.port.in.RecordCreateUseCase;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordCreateCommand;
 import konkuk.thip.roompost.application.port.in.dto.record.RecordCreateResult;
@@ -38,7 +38,7 @@ public class RecordCreateService implements RecordCreateUseCase {
     private final RoomParticipantValidator roomParticipantValidator;
     private final RoomProgressManager roomProgressManager;
 
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -82,7 +82,7 @@ public class RecordCreateService implements RecordCreateUseCase {
         List<RoomParticipant> targetUsers = roomParticipantCommandPort.findAllByRoomId(command.roomId());
         for (RoomParticipant targetUser : targetUsers) {
             if (targetUser.getUserId().equals(command.userId())) continue; // 본인 제외
-            roomEventCommandPort.publishRoomRecordCreatedEvent(targetUser.getUserId(), actorUser.getId(), actorUser.getNickname(), room.getId(), room.getTitle(), record.getPage(), newRecordId);
+            roomNotificationOrchestrator.notifyRoomRecordCreated(targetUser.getUserId(), actorUser.getId(), actorUser.getNickname(), room.getId(), room.getTitle(), record.getPage(), newRecordId);
         }
     }
 

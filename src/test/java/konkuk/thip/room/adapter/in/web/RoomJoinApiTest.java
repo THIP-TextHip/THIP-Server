@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
@@ -48,6 +49,7 @@ class RoomJoinApiTest {
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
+    @Autowired private NotificationJpaRepository notificationJpaRepository;
 
     private RoomJpaEntity room;
     private UserJpaEntity host;
@@ -110,9 +112,10 @@ class RoomJoinApiTest {
     @AfterEach
     void tearDown() {
         roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        notificationJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

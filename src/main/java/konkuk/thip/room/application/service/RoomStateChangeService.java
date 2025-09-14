@@ -1,6 +1,6 @@
 package konkuk.thip.room.application.service;
 
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.room.application.port.in.RoomStateChangeUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
@@ -22,7 +22,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
     private final RoomCommandPort roomCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
 
-    private final RoomEventCommandPort roomEventCommandPort;
+    private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     /**
      * end_date < 오늘 => EXPIRED
@@ -54,7 +54,7 @@ public class RoomStateChangeService implements RoomStateChangeUseCase {
         for (Room room : targetRooms) {
             List<RoomParticipant> targetUsers = roomParticipantCommandPort.findAllByRoomId(room.getId());
             for (RoomParticipant participant : targetUsers) {
-                roomEventCommandPort.publishRoomActivityStartedEvent(participant.getUserId(), room.getId(), room.getTitle());
+                roomNotificationOrchestrator.notifyRoomActivityStarted(participant.getUserId(), room.getId(), room.getTitle());
             }
         }
     }
