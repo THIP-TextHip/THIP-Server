@@ -7,7 +7,7 @@ import konkuk.thip.common.exception.code.ErrorCode;
 @HelperService
 public class RoomPostAccessValidator {
 
-    private static final String BLURRED_STRING = "여긴 못 지나가지롱~~";
+    private static final String BLURRED_STRING = "태정태세문단세예성연중인명선광인효현숙경영정순헌철고순";
 
     public void validateGroupRoomPostFilters(Integer pageStart, Integer pageEnd, Boolean isPageFilter, Boolean isOverview, int bookPageSize, double currentPercentage) {
         if(!isPageFilter && !isOverview) { // 어떤 필터도 적용되지 않는 경우
@@ -52,20 +52,30 @@ public class RoomPostAccessValidator {
             return contents;
         }
 
-        int originalLength = contents.length();
         int blurLen = BLURRED_STRING.length();
+        StringBuilder sb = new StringBuilder(contents.length());
 
-        // 필요한 전체 반복 횟수 계산
-        int repeat = originalLength / blurLen;
+        // 블러 문자열 인덱스
+        int blurIndex = 0;
 
-        StringBuilder sb = new StringBuilder(originalLength);
+        for (int i = 0; i < contents.length(); i++) {
+            char ch = contents.charAt(i);
 
-        // 몫 만큼 반복
-        for (int i = 0; i < repeat + 1; i++) {
-            sb.append(BLURRED_STRING);
+            // 특수문자/공백일 경우 그대로 append
+            if (Character.isWhitespace(ch) || isSpecialCharacter(ch)) {
+                sb.append(ch);
+            } else {
+                // 나머지 문자들은 모두 치환
+                sb.append(BLURRED_STRING.charAt(blurIndex));
+                blurIndex = (blurIndex + 1) % blurLen; // 순환
+            }
         }
-
         return sb.toString();
+    }
+
+    private boolean isSpecialCharacter(char ch) {
+        // 아스키 문자 중 문자/숫자만 제외하고 모두 특수문자 처리 예시
+        return !Character.isLetterOrDigit(ch);
     }
 
     public boolean isLocked(int currentPage, int bookPageSize) {
