@@ -24,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 비공개 방 비밀번호 입력 검증 api 통합 테스트")
 class RoomVerifyPasswordApiTest {
@@ -98,13 +100,6 @@ class RoomVerifyPasswordApiTest {
                         .build()
         );
         publicRoomId = publicRoom.getRoomId();
-    }
-
-    @AfterEach
-    void tearDown() {
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
     }
 
     @Test

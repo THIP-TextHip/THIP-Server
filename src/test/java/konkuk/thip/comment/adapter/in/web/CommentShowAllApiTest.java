@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 댓글 조회 api 통합 테스트")
+@Transactional
 class CommentShowAllApiTest {
 
     @Autowired private MockMvc mockMvc;
@@ -48,15 +50,6 @@ class CommentShowAllApiTest {
     @Autowired private JdbcTemplate jdbcTemplate;
 
     private static final String FEED_POST_TYPE = PostType.FEED.getType();
-
-    @AfterEach
-    void tearDown() {
-        commentLikeJpaRepository.deleteAllInBatch();
-        commentJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("댓글 조회 요청에 대하여, 특정 게시글(= 피드, 기록, 투표)의 루트 댓글, 루트 댓글의 모든 자식 댓글의 데이터를 구분하여 반환한다.")

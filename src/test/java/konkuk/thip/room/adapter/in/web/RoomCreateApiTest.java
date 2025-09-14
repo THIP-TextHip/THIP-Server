@@ -40,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 방 생성 api 통합 테스트")
 class RoomCreateApiTest {
 
@@ -49,14 +50,6 @@ class RoomCreateApiTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     private void saveUserAndLiteratureCategory() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -68,8 +61,6 @@ class RoomCreateApiTest {
                 .role(UserRole.USER)
                 .alias(alias)
                 .build());
-
-        Category category = TestEntityFactory.createLiteratureCategory();
     }
 
     private void saveBookWithPageCount() {

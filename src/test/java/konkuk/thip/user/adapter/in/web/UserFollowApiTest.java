@@ -1,14 +1,12 @@
 package konkuk.thip.user.adapter.in.web;
 
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -27,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 팔로잉 상태 변경 API 통합 테스트")
@@ -37,14 +37,6 @@ class UserFollowApiTest {
 
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private FollowingJpaRepository followingJpaRepository;
-    @Autowired private NotificationJpaRepository notificationJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        followingJpaRepository.deleteAllInBatch();
-        notificationJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("팔로우 요청 후 언팔로우 요청 시 엔티티가 삭제되었는지 확인한다.")

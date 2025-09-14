@@ -1,6 +1,6 @@
 package konkuk.thip.roompost.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
@@ -14,7 +14,6 @@ import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.A
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.ATTENDANCE_CHECK_CAN_NOT_DELETE;
@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 오늘의 한마디 삭제 api 통합 테스트")
 class AttendanceCheckDeleteApiTest {
@@ -42,21 +43,12 @@ class AttendanceCheckDeleteApiTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired private ObjectMapper objectMapper;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private AttendanceCheckJpaRepository attendanceCheckJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        attendanceCheckJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
+    @Autowired private EntityManager em;
 
     @Test
     @DisplayName("오늘의 한마디 작성자는 본인이 작성한 오늘의 한마디를 삭제(= soft delete) 할 수 있다.")
@@ -80,6 +72,9 @@ class AttendanceCheckDeleteApiTest {
                         .requestAttr("userId", me.getUserId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.roomId", is(room.getRoomId().intValue())));
+
+        em.flush();
+        em.clear();
 
         AttendanceCheckJpaEntity deleted = attendanceCheckJpaRepository.findById(ac1.getAttendanceCheckId()).orElse(null);
         Assertions.assertNotNull(deleted);
