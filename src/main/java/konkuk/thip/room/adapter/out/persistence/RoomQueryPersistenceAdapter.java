@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -179,8 +180,8 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, int limit) {
-        return roomJpaRepository.findRoomsByCategoryOrderByCreatedAtDesc(category, limit);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime now, int limit) {
+        return roomJpaRepository.findRoomsByCategoryOrderByCreatedAtDesc(category, now, limit);
     }
 
     @Override

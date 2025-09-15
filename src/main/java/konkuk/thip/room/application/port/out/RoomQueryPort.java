@@ -8,6 +8,7 @@ import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.value.Category;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomQueryPort {
@@ -40,7 +41,7 @@ public interface RoomQueryPort {
 
     List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime now, int limit);
     /**
      * 임시 메서드
      * TODO 리펙토링 대상

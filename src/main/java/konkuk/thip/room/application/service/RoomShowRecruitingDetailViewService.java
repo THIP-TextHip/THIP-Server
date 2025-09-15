@@ -64,7 +64,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
                 .isPublic(room.isPublic())
                 .progressStartDate(DateUtil.formatDate(room.getStartDate()))
                 .progressEndDate(DateUtil.formatDate(room.getEndDate()))
-                .recruitEndDate(DateUtil.RecruitingRoomFormatAfterTime(room.getStartDate()))
+                .recruitEndDate(DateUtil.recruitingRoomFormatAfterTime(room.getStartDate()))
                 .category(room.getCategory().getValue())
                 .categoryColor(roomQueryPort.findAliasColorOfCategory(room.getCategory()))      // TODO : 리펙토링 대상
                 .roomDescription(room.getDescription())

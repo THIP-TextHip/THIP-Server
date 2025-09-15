@@ -363,7 +363,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime now, int limit) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -377,7 +377,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .from(room)
                 .join(room.bookJpaEntity, book)
                 .where(findDeadlinePopularRecentRoomCondition(category)
-                        .and(room.createdAt.goe(LocalDateTime.now().minusHours(72)))) //생성된지 72시간 이내
+                        .and(room.createdAt.goe(now.minusHours(72))))
                 .orderBy(room.createdAt.desc(), room.roomId.desc())
                 .limit(limit)
                 .fetch();

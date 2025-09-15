@@ -7,6 +7,7 @@ import konkuk.thip.recentSearch.domain.value.RecentSearchType;
 import konkuk.thip.recentSearch.application.service.manager.RecentSearchCreateManager;
 import konkuk.thip.room.adapter.in.web.response.RoomSearchResponse;
 import konkuk.thip.room.application.mapper.RoomQueryMapper;
+import konkuk.thip.room.application.port.in.dto.RoomSearchMode;
 import konkuk.thip.room.application.port.in.dto.RoomSearchSortParam;
 import konkuk.thip.room.application.port.in.RoomSearchUseCase;
 import konkuk.thip.room.application.port.in.dto.RoomSearchQuery;
@@ -30,23 +31,29 @@ public class RoomSearchService implements RoomSearchUseCase {
     private final RoomQueryMapper roomQueryMapper;
 
     @Override
-    @Transactional // <- 최근 검색 저장으로 인한 트랜잭션
+    @Transactional
     public RoomSearchResponse searchRecruitingRooms(RoomSearchQuery query) {
-        // 1. validation
+        // 1) 파라미터 파싱/검증
         RoomSearchSortParam sortParam = RoomSearchSortParam.from(query.sortStr());
-        validateSearchParams(query.keyword(),query.isAllCategory(),query.categoryStr());
+        validateSearchParams(query.keyword(), query.isAllCategory(), query.categoryStr());
         Category category = validateCategory(query.categoryStr());
 
-        // 2. Cursor 생성
+        // 2) 검색 모드/키워드 결정
+        RoomSearchMode mode = RoomSearchMode.determineSearchMode(category, query.isAllCategory(), query.keyword());
+        String effectiveKeyword = RoomSearchMode.resolveEffectiveKeyword(mode, query.keyword());
+
+        // 3) 커서 생성
         Cursor cursor = Cursor.from(query.cursorStr(), DEFAULT_PAGE_SIZE);
 
-        // 3. 방 검색
-        CursorBasedList<RoomQueryDto> result = executeRecruitingRoomSearch(query, category, sortParam, cursor);
+        // 4) 실행 (정렬 기준별 단일 switch)
+        CursorBasedList<RoomQueryDto> result = executeSearchMode(mode, sortParam, effectiveKeyword, category, cursor);
 
-        // 4. 검색 완료일 경우, 최근 검색어 저장
-        recentSearchCreateManager.saveRecentSearchByUser(query.userId(), query.keyword(), RecentSearchType.ROOM_SEARCH, query.isFinalized());
+        // 5) 최근 검색어 저장
+        recentSearchCreateManager.saveRecentSearchByUser(
+                query.userId(), query.keyword(), RecentSearchType.ROOM_SEARCH, query.isFinalized()
+        );
 
-        // 5. response 구성
+        // 6) 응답 매핑
         return new RoomSearchResponse(
                 roomQueryMapper.toRoomSearchResponse(result.contents()),
                 result.nextCursor(),
@@ -54,49 +61,43 @@ public class RoomSearchService implements RoomSearchUseCase {
         );
     }
 
-    private CursorBasedList<RoomQueryDto> executeRecruitingRoomSearch(RoomSearchQuery query, Category category, RoomSearchSortParam sortParam, Cursor cursor) {
-        boolean isAllCategory = query.isAllCategory();
-        String keyword = query.keyword();
-        boolean isKeywordEmpty = (keyword == null || keyword.trim().isEmpty());
+    private CursorBasedList<RoomQueryDto> executeSearchMode(
+            RoomSearchMode mode,
+            RoomSearchSortParam sort,
+            String keyword,
+            Category category,
+            Cursor cursor
+    ) {
+        return switch (sort) {
+            case DEADLINE -> executeByDeadline(mode, keyword, category, cursor);
+            case MEMBER_COUNT -> executeByMemberCount(mode, keyword, category, cursor);
+            default -> throw new BusinessException(
+                    API_INVALID_PARAM,
+                    new IllegalArgumentException("지원하지 않는 정렬 기준입니다: " + sort)
+            );
+        };
+    }
 
-        // 빈 키워드이면서 isAllCategory가 true인 경우는 전체 조회를 위해 빈 문자열을 사용하고, 그렇지 않으면 그대로 keyword를 사용
-        String effectiveKeyword = isKeywordEmpty && isAllCategory ? "" : keyword;
+    private CursorBasedList<RoomQueryDto> executeByDeadline(
+            RoomSearchMode mode, String keyword, Category category, Cursor cursor
+    ) {
+        return switch (mode) {
+            case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByDeadline(keyword, cursor);
+            case CATEGORY_ALL -> roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline("", category, cursor);
+            case CATEGORY_BY_KEYWORD ->
+                    roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(keyword, category, cursor);
+        };
+    }
 
-        if (category == null) {
-            // 전체 카테고리 중에서
-            // 1) 전체검색(isAllCategory=true)이거나
-            // 2) 키워드가 비어있지 않은 경우
-            // 해당 조건 모두 포함해서 키워드 기반 검색 또는 전체 검색 수행
-            if (isAllCategory || !isKeywordEmpty) {
-                switch (sortParam) {
-                    case DEADLINE:
-                        return roomQueryPort.searchRecruitingRoomsByDeadline(effectiveKeyword, cursor);
-                    case MEMBER_COUNT:
-                        return roomQueryPort.searchRecruitingRoomsByMemberCount(effectiveKeyword, cursor);
-                }
-            }
-        } else {
-            if (isAllCategory && isKeywordEmpty) {
-                // isAllCategory가 true이고, 키워드가 비어있으면
-                // 특정 카테고리 내에서 '전체 조회'를 의미함 즉, 키워드 없이 카테고리 필터만 적용해서 전체 방 조회
-                switch (sortParam) {
-                    case DEADLINE:
-                        return roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline("", category, cursor);
-                    case MEMBER_COUNT:
-                        return roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount("", category, cursor);
-                }
-            } else if (!isAllCategory) {
-                // isAllCategory가 false인 경우 (전체검색 아님)
-                // category가 존재하고 키워드는 있거나 빈 문자열이어도 키워드 기반 조회 수행
-                switch (sortParam) {
-                    case DEADLINE:
-                        return roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(effectiveKeyword, category, cursor);
-                    case MEMBER_COUNT:
-                        return roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(effectiveKeyword, category, cursor);
-                }
-            }
-        }
-        return null;
+    private CursorBasedList<RoomQueryDto> executeByMemberCount(
+            RoomSearchMode mode, String keyword, Category category, Cursor cursor
+    ) {
+        return switch (mode) {
+            case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByMemberCount(keyword, cursor);
+            case CATEGORY_ALL -> roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount("", category, cursor);
+            case CATEGORY_BY_KEYWORD ->
+                    roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(keyword, category, cursor);
+        };
     }
 
     private Category validateCategory(String categoryStr) {

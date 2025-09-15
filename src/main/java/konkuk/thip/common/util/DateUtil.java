@@ -46,7 +46,7 @@ public class DateUtil {
         return minutes + "분 뒤";
     }
 
-    public static String RecruitingRoomFormatAfterTime(LocalDate date) {
+    public static String recruitingRoomFormatAfterTime(LocalDate date) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dateTime = date.atStartOfDay();
         Duration d = Duration.between(now, dateTime);
@@ -68,7 +68,7 @@ public class DateUtil {
         return "마감 임박";
     }
 
-    public static String RecruitingRoomFormatAfterTimeSimple(LocalDate date) {
+    public static String recruitingRoomFormatAfterTimeSimple(LocalDate date) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dateTime = date.atStartOfDay();
         Duration d = Duration.between(now, dateTime);

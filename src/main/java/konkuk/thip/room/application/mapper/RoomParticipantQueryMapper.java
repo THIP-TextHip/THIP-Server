@@ -27,7 +27,7 @@ public interface RoomParticipantQueryMapper {
         if (IN_PROGRESS.equals(dto.roomStatus())) {
             userPercentage = dto.userPercentage().intValue();
         } else if (RECRUITING.equals(dto.roomStatus())) {
-            deadlineDate = DateUtil.RecruitingRoomFormatAfterTimeSimple(dto.startDate());
+            deadlineDate = DateUtil.recruitingRoomFormatAfterTimeSimple(dto.startDate());
         }
 
         return new RoomGetHomeJoinedListResponse.JoinedRoomInfo(
