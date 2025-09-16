@@ -14,7 +14,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 방 생성 api 통합 테스트")
 class RoomCreateApiTest {
 
@@ -49,14 +49,6 @@ class RoomCreateApiTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     private void saveUserAndLiteratureCategory() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -68,8 +60,6 @@ class RoomCreateApiTest {
                 .role(UserRole.USER)
                 .alias(alias)
                 .build());
-
-        Category category = TestEntityFactory.createLiteratureCategory();
     }
 
     private void saveBookWithPageCount() {

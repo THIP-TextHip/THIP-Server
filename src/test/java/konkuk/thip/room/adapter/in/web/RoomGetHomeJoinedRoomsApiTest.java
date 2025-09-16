@@ -14,7 +14,6 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 모임 홈 참여중인 내 모임방 조회 api 통합 테스트")
 class RoomGetHomeJoinedRoomsApiTest {
 
@@ -77,14 +78,6 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // 2번방에 유저 1이 호스트
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room2,user1, RoomParticipantRole.HOST,60.0));
-    }
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
     }
 
     private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, LocalDate endDate, int recruitCount) {
@@ -205,8 +198,8 @@ class RoomGetHomeJoinedRoomsApiTest {
     }
 
     @Test
-    @DisplayName("사용자가 참여중인 방 목록 중 모집중(시작 전)인 방은 참여중 목록에 포함되지 않는다.")
-    void getHomeJoinedRooms_excludeRecruitingRooms() throws Exception {
+    @DisplayName("사용자가 참여중인 방 목록 중 모집중(시작 전)인 방도 참여중 목록에 포함된다.")
+    void getHomeJoinedRooms_includeRecruitingRooms() throws Exception {
 
         // given
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -231,11 +224,13 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.roomList", hasSize(1)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(2)))
                 .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
                 .andExpect(jsonPath("$.data.isLast", is(true)))
                 .andExpect(jsonPath("$.data.roomList[0].roomId", is(activeRoom.getRoomId().intValue())))
-                .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(50)));
+                .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(50)))
+                .andExpect(jsonPath("$.data.roomList[1].roomId", is(recruitRoom.getRoomId().intValue())))
+                .andExpect(jsonPath("$.data.roomList[1].userPercentage", is(-1)));
     }
 
 

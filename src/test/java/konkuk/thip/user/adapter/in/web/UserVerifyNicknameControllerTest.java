@@ -8,7 +8,6 @@ import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 닉네임 중복 검증 api 테스트")
 class UserVerifyNicknameControllerTest {
@@ -44,11 +45,6 @@ class UserVerifyNicknameControllerTest {
 
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        userJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("[닉네임]값이 unique 할 경우, true를 반환한다.")

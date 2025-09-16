@@ -15,15 +15,15 @@ public class RecentSearchCreateManager {
     private final RecentSearchQueryPort recentSearchQueryPort;
 
     public void saveRecentSearchByUser(Long userId, String keyword, RecentSearchType type, boolean isFinalized) {
-        // 검색완료일 경우에 최근검색어 추가
-        if (isFinalized) {
-            // 동일 조건 (userId + keyword + type) 검색 기록이 이미 있는지 확인
-            recentSearchQueryPort.findRecentSearchByKeywordAndUserId(keyword, userId, type)
-                    .ifPresentOrElse(
-                            recentSearchCommandPort::touch, // 있으면 modifiedAt 갱신
-                            () -> recentSearchCommandPort.save(RecentSearch.withoutId(keyword, type, userId)) // 없으면 새로 저장
-                    );
-        }
+        if (!isFinalized) return; // 검색완료일 경우에 최근검색어 추가
+        if (keyword == null || keyword.trim().isEmpty()) return;
+        String normalized = keyword.trim();
 
+        // 동일 조건 (userId + keyword + type) 검색 기록이 이미 있는지 확인
+        recentSearchQueryPort.findRecentSearchByKeywordAndUserId(normalized, userId, type)
+                .ifPresentOrElse(
+                        recentSearchCommandPort::touch, // 있으면 modifiedAt 갱신
+                        () -> recentSearchCommandPort.save(RecentSearch.withoutId(normalized, type, userId)) // 없으면 새로 저장
+                );
     }
 }

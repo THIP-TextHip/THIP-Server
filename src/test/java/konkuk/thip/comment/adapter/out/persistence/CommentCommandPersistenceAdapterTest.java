@@ -6,15 +6,12 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.mapper.CommentMapper;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
-import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.config.TestQuerydslConfig;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.domain.PostType;
-import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
-import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
@@ -37,12 +34,9 @@ class CommentCommandPersistenceAdapterTest {
 
     @Autowired CommentCommandPersistenceAdapter adapter;    // repository 인터페이스가 아니므로 자동 스캔 X -> import 해줘야함
     @Autowired CommentJpaRepository commentJpaRepository;
-    @Autowired CommentLikeJpaRepository commentLikeJpaRepository;
     @Autowired BookJpaRepository bookJpaRepository;
     @Autowired FeedJpaRepository feedJpaRepository;
     @Autowired UserJpaRepository userJpaRepository;
-    @Autowired RecordJpaRepository recordJpaRepository;
-    @Autowired VoteJpaRepository voteJpaRepository;
 
     @MockitoBean CommentMapper commentMapper;   // Mock bean 으로 설정
 

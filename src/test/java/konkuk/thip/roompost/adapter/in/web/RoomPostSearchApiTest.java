@@ -345,7 +345,7 @@ class RoomPostSearchApiTest {
             String content = post.path("content").asText();
 
             if (isLocked) {
-                assertThat(content).contains("여긴 못 지나가지롱~~");
+                assertThat(content).contains("태정 태세문단세");
             }
         }
     }

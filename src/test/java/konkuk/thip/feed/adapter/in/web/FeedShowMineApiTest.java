@@ -5,13 +5,9 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
-import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -35,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 내 피드 조회 api 통합 테스트")
+@Transactional
 class FeedShowMineApiTest {
 
     @Autowired
@@ -47,29 +45,10 @@ class FeedShowMineApiTest {
     private FeedJpaRepository feedJpaRepository;
 
     @Autowired
-    private FollowingJpaRepository followingJpaRepository;
-
-    @Autowired
     private BookJpaRepository bookJpaRepository;
 
     @Autowired
-    private SavedFeedJpaRepository savedFeedJpaRepository;
-
-    @Autowired
-    private PostLikeJpaRepository postLikeJpaRepository;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        postLikeJpaRepository.deleteAllInBatch();
-        savedFeedJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        followingJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("내 피드 조회를 요청할 경우, [feedId, 작성일, 책정보, ,,] 의 피드 정보를 최신순으로 정렬해서 반환한다.")

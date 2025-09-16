@@ -13,7 +13,6 @@ import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -34,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 독서 메이트(방 멤버) 조회 api 통합 테스트")
 class RoomGetMemberListApiTest {
@@ -101,15 +102,6 @@ class RoomGetMemberListApiTest {
         followingJpaRepository.save(TestEntityFactory.createFollowing(user2, user3));
         // user3이 user1을 팔로우
         followingJpaRepository.save(TestEntityFactory.createFollowing(user3, user1));
-    }
-
-    @AfterEach
-    void tearDown() {
-        followingJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
     }
 
     @Test

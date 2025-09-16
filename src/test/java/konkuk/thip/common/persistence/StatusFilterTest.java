@@ -8,7 +8,6 @@ import konkuk.thip.config.StatusFilterTestConfig;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public class StatusFilterTest {
 
     @Autowired private UserJpaRepository userJpaRepository;
@@ -36,13 +36,6 @@ public class StatusFilterTest {
     @Autowired private StatusFilterTestConfig.TestUserQuerydslService testUserQuerydslService;
 
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void tearDown() {
-        savedBookJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     private void saveActiveUser(int count) {
         for (int i = 1; i <= count; i++) {

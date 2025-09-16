@@ -11,7 +11,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -34,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("[통합] 저장한 책 조회 API 통합 테스트")
 class BookShowSavedListApiTest {
 
@@ -46,15 +47,6 @@ class BookShowSavedListApiTest {
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        savedBookJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("저장된 책 조회 시 책 정보를 저장한 최신순으로 정렬해서 반환한다.")
