@@ -1,5 +1,6 @@
 package konkuk.thip.comment.adapter.in.web;
 
+import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
@@ -20,7 +21,6 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +29,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.post.domain.PostType.FEED;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 댓글 삭제 api 통합 테스트")
 class CommentDeleteApiTest {
@@ -54,6 +56,8 @@ class CommentDeleteApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private CommentLikeJpaRepository commentLikeJpaRepository;
+
+    @Autowired private EntityManager em;
 
     private Alias alias;
     private UserJpaEntity user;
@@ -77,19 +81,6 @@ class CommentDeleteApiTest {
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
     }
 
-    @AfterEach
-    void tearDown() {
-        recordJpaRepository.deleteAllInBatch();
-        voteJpaRepository.deleteAllInBatch();
-        commentLikeJpaRepository.deleteAll();
-        commentJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAllInBatch();
-    }
-
     @Test
     @DisplayName("루트댓글을 삭제하면 [soft delete 처리]된다")
     void deleteRootComment_success() throws Exception {
@@ -104,6 +95,9 @@ class CommentDeleteApiTest {
         mockMvc.perform(delete("/comments/{commentId}", commentId)
                         .requestAttr("userId", user.getUserId()))
                 .andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
 
         // then
         CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(commentId).orElse(null);
@@ -125,6 +119,9 @@ class CommentDeleteApiTest {
         mockMvc.perform(delete("/comments/{commentId}", replyId)
                         .requestAttr("userId", user.getUserId()))
                 .andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
 
         // then
         CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(replyId).orElse(null);
@@ -148,6 +145,9 @@ class CommentDeleteApiTest {
         mockMvc.perform(delete("/comments/{commentId}", commentId)
                         .requestAttr("userId", user.getUserId()))
                 .andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
 
         // then
         CommentJpaEntity commentJpaEntity = commentJpaRepository.findById(commentId).orElse(null);

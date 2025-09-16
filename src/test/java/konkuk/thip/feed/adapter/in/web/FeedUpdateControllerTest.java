@@ -5,7 +5,6 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
@@ -52,7 +51,6 @@ class FeedUpdateControllerTest {
 
     @BeforeEach
     void setUp() {
-
         Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));

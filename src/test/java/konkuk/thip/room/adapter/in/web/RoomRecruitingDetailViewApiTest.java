@@ -15,7 +15,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.value.UserRole;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 모집 중인 방 상세조회 api 통합 테스트")
 class RoomRecruitingDetailViewApiTest {
@@ -46,17 +47,7 @@ class RoomRecruitingDetailViewApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-    }
-
     private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount, RoomStatus roomStatus) {
-        Alias alias = TestEntityFactory.createScienceAlias();
-
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
                 .isbn(isbn)
@@ -85,8 +76,6 @@ class RoomRecruitingDetailViewApiTest {
     }
 
     private RoomJpaEntity saveLiteratureRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount, RoomStatus roomStatus) {
-        Alias alias = TestEntityFactory.createLiteratureAlias();
-
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
                 .isbn(isbn)

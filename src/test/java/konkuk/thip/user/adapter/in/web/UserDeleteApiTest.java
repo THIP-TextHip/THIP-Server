@@ -34,7 +34,6 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.application.port.UserTokenBlacklistQueryPort;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -61,6 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc
 @DisplayName("[통합] 회원탈퇴 api 테스트")
 public class UserDeleteApiTest {
@@ -86,28 +87,7 @@ public class UserDeleteApiTest {
     @Autowired private UserTokenBlacklistQueryPort userTokenBlacklistQueryPort;
 
     @Autowired private JwtUtil jwtUtil;
-    @Autowired private EntityManager entityManager;
-
-    @AfterEach
-    void tearDown() {
-        followingJpaRepository.deleteAllInBatch();
-        recentSearchJpaRepository.deleteAllInBatch();
-        savedFeedJpaRepository.deleteAllInBatch();
-        savedBookJpaRepository.deleteAllInBatch();
-        attendanceCheckJpaRepository.deleteAllInBatch();
-        voteParticipantJpaRepository.deleteAllInBatch();
-        commentLikeJpaRepository.deleteAllInBatch();
-        commentJpaRepository.deleteAllInBatch();
-        postLikeJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        recordJpaRepository.deleteAllInBatch();
-        voteItemJpaRepository.deleteAllInBatch();
-        voteJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-    }
+    @Autowired private EntityManager em;
 
     @Test
     @DisplayName("회원탈퇴 성공시 모든 연관 엔티티가 각 엔티티 삭제 전략에 맞게 삭제되고 탈퇴한 회원의 토큰이 블랙리스트에 등록된다.")
@@ -260,6 +240,9 @@ public class UserDeleteApiTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
+        em.flush();
+        em.clear();
+
         // then: 1) 유저 팔로잉/팔로워 관계 삭제
         // 탈퇴한 유저1의 팔로잉/팔로워 관계는 모두 삭제되어야하고, 관련 없는 유저3->유저2 팔로우관계만 남아있어야함
         // 유저2의 팔로워 수가 1이어야함
@@ -390,7 +373,6 @@ public class UserDeleteApiTest {
 
         // 12) 유저 soft delete (status=INACTIVE)
         // 탈퇴한 유저의 oauth2Id는 deleted:로 시작해야함
-        entityManager.clear();
         UserJpaEntity deletedUser = userJpaRepository.findById(testUser1.getUserId()).orElse(null);
         assertThat(deletedUser.getStatus()).isEqualTo(INACTIVE);
         assertThat(deletedUser.getOauth2Id()).startsWith("deleted:");

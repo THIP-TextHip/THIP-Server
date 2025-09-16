@@ -8,13 +8,10 @@ import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
 import konkuk.thip.feed.domain.value.Tag;
-import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
-import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 단일 피드 조회 api 통합 테스트")
 class FeedShowSingleApiTest {
 
@@ -42,22 +41,9 @@ class FeedShowSingleApiTest {
     private MockMvc mockMvc;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
-    @Autowired private FollowingJpaRepository followingJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private SavedFeedJpaRepository savedFeedJpaRepository;
-    @Autowired private PostLikeJpaRepository postLikeJpaRepository;
-
     private List<Tag> tags;
-
-    @AfterEach
-    void tearDown() {
-        postLikeJpaRepository.deleteAllInBatch();
-        savedFeedJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        followingJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("단일 피드 조회를 요청할 경우, [피드 정보, 피드 작성자 정보, 피드와 연관된 태그들] 등의 정보를 반환한다.")

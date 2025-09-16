@@ -1,10 +1,10 @@
 package konkuk.thip.room.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
@@ -15,7 +15,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -39,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 방 참여/취소 API 통합 테스트")
 class RoomJoinApiTest {
@@ -49,7 +50,7 @@ class RoomJoinApiTest {
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private UserJpaRepository userJpaRepository;
-    @Autowired private NotificationJpaRepository notificationJpaRepository;
+    @Autowired private EntityManager em;
 
     private RoomJpaEntity room;
     private UserJpaEntity host;
@@ -109,15 +110,6 @@ class RoomJoinApiTest {
                 .build());
     }
 
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        notificationJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
-
     @Test
     @DisplayName("방 참여 성공 - 참여자 저장 및 인원수 증가 확인")
     void joinRoom_success() throws Exception {
@@ -174,6 +166,9 @@ class RoomJoinApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
 
         // 참여자 삭제 확인
         RoomParticipantJpaEntity member = roomParticipantJpaRepository.findById(memberParticipation.getRoomParticipantId()).orElse(null);

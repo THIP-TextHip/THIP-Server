@@ -3,7 +3,7 @@ package konkuk.thip.roompost.adapter.out.persistence.repository.vote;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomPlayingOrExpiredDetailViewResponse;
 import konkuk.thip.roompost.adapter.out.jpa.QVoteItemJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.QVoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.jpa.QVoteParticipantJpaEntity;
@@ -54,7 +54,7 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
     }
 
     @Override
-    public List<RoomPlayingDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count) {
+    public List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count) {
         // 1. Fetch top votes by total participation count
         List<VoteJpaEntity> topVotes = jpaQueryFactory
                 .select(vote)
@@ -69,16 +69,16 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
         // 2. Map to DTOs including vote items
         return topVotes.stream()
                 .map(vote -> {
-                    List<RoomPlayingDetailViewResponse.CurrentVote.VoteItem> voteItems = jpaQueryFactory
+                    List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote.VoteItem> voteItems = jpaQueryFactory
                             .select(voteItem)
                             .from(voteItem)
                             .where(voteItem.voteJpaEntity.eq(vote))
                             .orderBy(voteItem.count.desc())
                             .fetch()
                             .stream()
-                            .map(item -> new RoomPlayingDetailViewResponse.CurrentVote.VoteItem(item.getItemName()))
+                            .map(item -> new RoomPlayingOrExpiredDetailViewResponse.CurrentVote.VoteItem(item.getItemName()))
                             .toList();
-                    return new RoomPlayingDetailViewResponse.CurrentVote(
+                    return new RoomPlayingOrExpiredDetailViewResponse.CurrentVote(
                             vote.getContent(),
                             vote.getPage(),
                             vote.isOverview(),

@@ -10,7 +10,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -32,7 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@DisplayName("[통합] 방 검색 api 통합 테스트")
+@DisplayName("[통합] 책 검색 api 통합 테스트")
+@Transactional
 class BookSearchApiTest {
 
     @Autowired
@@ -68,12 +69,6 @@ class BookSearchApiTest {
                 .build());
 
         testToken = jwtUtil.createAccessToken(user.getUserId());
-    }
-
-    @AfterEach
-    void tearDown() {
-        recentSearchJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
     }
 
     @Test

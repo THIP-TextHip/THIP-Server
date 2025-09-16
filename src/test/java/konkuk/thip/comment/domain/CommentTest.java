@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static konkuk.thip.common.entity.StatusType.ACTIVE;
-import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.post.domain.PostType.FEED;
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,21 +28,6 @@ class CommentTest {
                 .reportCount(0)
                 .likeCount(0)
                 .status(ACTIVE)
-                .build();
-    }
-
-
-    private Comment createInactiveComment(Long postId) {
-        return Comment.builder()
-                .id(124L) //ID 임의 주입
-                .content(CONTENT)
-                .targetPostId(postId)
-                .creatorId(CREATOR_ID)
-                .postType(FEED)
-                .parentCommentId(null)
-                .reportCount(0)
-                .likeCount(0)
-                .status(INACTIVE)
                 .build();
     }
 

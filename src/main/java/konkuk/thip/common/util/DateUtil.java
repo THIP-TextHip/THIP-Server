@@ -46,7 +46,7 @@ public class DateUtil {
         return minutes + "분 뒤";
     }
 
-    public static String RecruitingRoomFormatAfterTime(LocalDate date) {
+    public static String recruitingRoomFormatAfterTime(LocalDate date) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dateTime = date.atStartOfDay();
         Duration d = Duration.between(now, dateTime);
@@ -66,6 +66,29 @@ public class DateUtil {
         }
 
         return "마감 임박";
+    }
+
+    public static String recruitingRoomFormatAfterTimeSimple(LocalDate date) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dateTime = date.atStartOfDay();
+        Duration d = Duration.between(now, dateTime);
+
+        if (d.isNegative() || d.isZero()) {
+            return "??";
+        }
+
+        long days = d.toDays();
+        if (days > 0) {
+            return days + "일";
+        }
+
+        long hours = d.toHours();
+        if (hours >= 1) {
+            return hours + "시간";
+        }
+
+        long minutes = d.toMinutes();
+        return minutes + "분";
     }
 
 
