@@ -9,6 +9,8 @@ import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.notification.adapter.out.jpa.NotificationJpaEntity;
+import konkuk.thip.notification.domain.value.NotificationCategory;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
@@ -371,4 +373,13 @@ public class TestEntityFactory {
                 .build();
     }
 
+    public static NotificationJpaEntity createNotification(UserJpaEntity user, String title, NotificationCategory category) {
+        return NotificationJpaEntity.builder()
+                .title(title)
+                .content("알림 내용")
+                .isChecked(false)
+                .notificationCategory(category)
+                .userJpaEntity(user)
+                .build();
+    }
 }
