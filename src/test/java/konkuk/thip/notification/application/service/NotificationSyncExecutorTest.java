@@ -3,6 +3,7 @@ package konkuk.thip.notification.application.service;
 import konkuk.thip.notification.application.port.out.NotificationCommandPort;
 import konkuk.thip.notification.application.service.template.NotificationTemplate;
 import konkuk.thip.notification.domain.Notification;
+import konkuk.thip.notification.domain.value.NotificationCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,6 +28,8 @@ class NotificationSyncExecutorTest {
             public String title(String args) { return "테스트제목"; }
             @Override
             public String content(String args) { return "테스트내용"; }
+            @Override
+            public NotificationCategory notificationCategory(String args) { return NotificationCategory.FEED; }
         };
 
         // publish 호출 시 강제로 예외를 던지는 invoker
