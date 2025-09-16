@@ -16,5 +16,10 @@ public enum RoomVoteStartedTemplate implements NotificationTemplate<RoomVoteStar
         return "새로운 투표가 시작되었어요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.ROOM;
+    }
+
     public record Args(String roomTitle) {}
 }

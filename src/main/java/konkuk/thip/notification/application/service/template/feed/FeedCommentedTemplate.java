@@ -16,5 +16,10 @@ public enum FeedCommentedTemplate implements NotificationTemplate<FeedCommentedT
         return "@" + args.actorUsername() + " 님이 내 글에 댓글을 달았어요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.FEED;
+    }
+
     public record Args(String actorUsername) {}
 }
