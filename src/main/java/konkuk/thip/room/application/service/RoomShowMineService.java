@@ -25,12 +25,11 @@ public class RoomShowMineService implements RoomShowMineUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public RoomShowMineResponse getMyRooms(Long userId, String type, String cursor) {
+    public RoomShowMineResponse getMyRooms(Long userId, MyRoomType myRoomType, String cursor) {
         // 1. cursor 생성
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
-        // 2. type 검증 및 커서 기반 조회
-        MyRoomType myRoomType = MyRoomType.from(type);
+        // 2. 커서 기반 조회
         CursorBasedList<RoomQueryDto> result = switch (myRoomType) {
                 case RECRUITING -> roomQueryPort
                         .findRecruitingRoomsUserParticipated(userId, nextCursor);
