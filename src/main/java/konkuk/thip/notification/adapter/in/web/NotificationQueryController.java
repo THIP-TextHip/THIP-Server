@@ -7,13 +7,17 @@ import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.notification.adapter.in.web.response.NotificationShowEnableStateResponse;
+import konkuk.thip.notification.adapter.in.web.response.NotificationShowResponse;
 import konkuk.thip.notification.application.port.in.NotificationShowEnableStateUseCase;
+import konkuk.thip.notification.application.port.in.NotificationShowUseCase;
+import konkuk.thip.notification.application.port.in.dto.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static konkuk.thip.common.swagger.SwaggerResponseDescription.NOTIFICATION_GET_ENABLE_STATE;
+import static konkuk.thip.common.swagger.SwaggerResponseDescription.NOTIFICATION_SHOW;
 
 @Tag(name = "Notification Query API", description = "알림 조회 관련 API")
 @RestController
@@ -21,6 +25,7 @@ import static konkuk.thip.common.swagger.SwaggerResponseDescription.NOTIFICATION
 public class NotificationQueryController {
 
     private final NotificationShowEnableStateUseCase notificationShowEnableStateUseCase;
+    private final NotificationShowUseCase notificationShowUseCase;
 
     @Operation(
             summary = "사용자 푸시알림 수신여부 조회 (마이페이지 -> 알림설정)",
@@ -34,5 +39,21 @@ public class NotificationQueryController {
             @RequestParam("deviceId") final String deviceId) {
         return BaseResponse.ok(
                 NotificationShowEnableStateResponse.of(notificationShowEnableStateUseCase.getNotificationShowEnableState(userId,deviceId)));
+    }
+
+    @Operation(
+            summary = "유저의 알림 조회",
+            description = "유저의 알림 목록을 조회합니다. 최신순으로 정렬합니다."
+    )
+    @ExceptionDescription(NOTIFICATION_SHOW)
+    @GetMapping("/notifications")
+    public BaseResponse<NotificationShowResponse> showNotifications(
+            @UserId final Long userId,
+            @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
+            @RequestParam(value = "cursor", required = false) final String cursor,
+            @Parameter(description = "알림 타입. 해당 파라미터 값이 null인 경우에는 알림 타입을 구분하지 않고 조회합니다.", example = "feed or room")
+            @RequestParam(value = "type", required = false, defaultValue = "feedAndRoom") final String type
+    ) {
+        return BaseResponse.ok(notificationShowUseCase.showNotifications(userId, cursor, NotificationType.from(type)));
     }
 }

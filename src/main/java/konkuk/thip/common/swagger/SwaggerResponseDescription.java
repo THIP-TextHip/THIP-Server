@@ -373,6 +373,9 @@ public enum SwaggerResponseDescription {
     NOTIFICATION_GET_ENABLE_STATE(new LinkedHashSet<>(Set.of(
             FCM_TOKEN_NOT_FOUND
     ))),
+    NOTIFICATION_SHOW(new LinkedHashSet<>(Set.of(
+            INVALID_NOTIFICATION_TYPE
+    ))),
 
   ;
     private final Set<ErrorCode> errorCodeList;
