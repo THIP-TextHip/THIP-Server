@@ -36,7 +36,7 @@ public interface RoomQueryRepository {
 
     List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime now, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime createdAfter, int limit);
 
     List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 }

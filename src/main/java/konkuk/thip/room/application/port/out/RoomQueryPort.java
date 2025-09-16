@@ -41,7 +41,7 @@ public interface RoomQueryPort {
 
     List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime now, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit);
     /**
      * 임시 메서드
      * TODO 리펙토링 대상

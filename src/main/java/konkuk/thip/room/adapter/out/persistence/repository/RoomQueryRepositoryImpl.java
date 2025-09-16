@@ -363,7 +363,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime now, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime createdAfter, int limit) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -376,8 +376,10 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .where(findDeadlinePopularRecentRoomCondition(category)
-                        .and(room.createdAt.goe(now.minusHours(72))))
+                .where(
+                        findDeadlinePopularRecentRoomCondition(category)
+                                .and(room.createdAt.goe(createdAfter))
+                )
                 .orderBy(room.createdAt.desc(), room.roomId.desc())
                 .limit(limit)
                 .fetch();

@@ -83,9 +83,7 @@ public class RoomSearchService implements RoomSearchUseCase {
     ) {
         return switch (mode) {
             case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByDeadline(keyword, cursor);
-            case CATEGORY_ALL -> roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline("", category, cursor);
-            case CATEGORY_BY_KEYWORD ->
-                    roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(keyword, category, cursor);
+            case CATEGORY_ALL, CATEGORY_BY_KEYWORD -> roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(keyword, category, cursor);
         };
     }
 
@@ -94,9 +92,7 @@ public class RoomSearchService implements RoomSearchUseCase {
     ) {
         return switch (mode) {
             case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByMemberCount(keyword, cursor);
-            case CATEGORY_ALL -> roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount("", category, cursor);
-            case CATEGORY_BY_KEYWORD ->
-                    roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(keyword, category, cursor);
+            case CATEGORY_ALL, CATEGORY_BY_KEYWORD -> roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(keyword, category, cursor);
         };
     }
 
