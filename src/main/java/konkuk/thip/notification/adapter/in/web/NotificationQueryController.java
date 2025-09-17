@@ -48,7 +48,7 @@ public class NotificationQueryController {
     @ExceptionDescription(NOTIFICATION_SHOW)
     @GetMapping("/notifications")
     public BaseResponse<NotificationShowResponse> showNotifications(
-            @UserId final Long userId,
+            @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor,
             @Parameter(description = "알림 타입. 해당 파라미터 값이 null인 경우에는 알림 타입을 구분하지 않고 조회합니다.", example = "feed or room")
