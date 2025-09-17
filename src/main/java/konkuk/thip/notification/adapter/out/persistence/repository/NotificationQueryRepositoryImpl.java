@@ -17,10 +17,10 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
 
     private final JPAQueryFactory queryFactory;
 
+    private final QNotificationJpaEntity notification = QNotificationJpaEntity.notificationJpaEntity;
+
     @Override
     public List<NotificationQueryDto> findFeedNotificationsOrderByCreatedAtDesc(Long userId, Long lastNotificationId, int pageSize) {
-        QNotificationJpaEntity notification = QNotificationJpaEntity.notificationJpaEntity;
-
         var where = notification.userJpaEntity.userId.eq(userId)
                 .and(notification.notificationCategory.eq(NotificationCategory.FEED));
 
@@ -31,8 +31,6 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
 
     @Override
     public List<NotificationQueryDto> findRoomNotificationsOrderByCreatedAtDesc(Long userId, Long lastNotificationId, int pageSize) {
-        QNotificationJpaEntity notification = QNotificationJpaEntity.notificationJpaEntity;
-
         var where = notification.userJpaEntity.userId.eq(userId)
                 .and(notification.notificationCategory.eq(NotificationCategory.ROOM));
         where = applyCursor(lastNotificationId, where, notification);
@@ -42,8 +40,6 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
 
     @Override
     public List<NotificationQueryDto> findFeedAndRoomNotificationsOrderByCreatedAtDesc(Long userId, Long lastNotificationId, int pageSize) {
-        QNotificationJpaEntity notification = QNotificationJpaEntity.notificationJpaEntity;
-
         var where = notification.userJpaEntity.userId.eq(userId)
                 .and(notification.notificationCategory.in(NotificationCategory.FEED, NotificationCategory.ROOM));
         where = applyCursor(lastNotificationId, where, notification);
