@@ -1,7 +1,6 @@
 package konkuk.thip.config.properties;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -10,12 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @Component
 @ConfigurationProperties(prefix = "server")
 public class WebDomainProperties {
 
-    private List<String> webDomainUrls = new ArrayList<>();
+    private final List<String> webDomainUrls = new ArrayList<>();
 
     public boolean isAllowed(String target) {
         try {
