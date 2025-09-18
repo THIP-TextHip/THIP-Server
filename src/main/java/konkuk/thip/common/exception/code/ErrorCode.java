@@ -27,6 +27,7 @@ public enum ErrorCode implements ResponseCode {
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
     AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
+    WEB_DOMAIN_ORIGIN_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, 50102, "허용된 웹 도메인 설정이 비어있습니다."),
 
     PERSISTENCE_TRANSACTION_REQUIRED(HttpStatus.INTERNAL_SERVER_ERROR, 50110, "@Transactional 컨텍스트가 필요합니다. 트랜잭션 범위 내에서만 사용할 수 있습니다."),
 
