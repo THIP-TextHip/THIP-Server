@@ -3,7 +3,6 @@ package konkuk.thip.common.security.resolver;
 import jakarta.servlet.http.HttpServletRequest;
 import konkuk.thip.config.properties.WebDomainProperties;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
@@ -16,7 +15,6 @@ import java.util.Map;
 import static konkuk.thip.common.security.constant.AuthParameters.REDIRECT_SESSION_KEY;
 import static konkuk.thip.common.security.constant.AuthParameters.REDIRECT_URL_KEY;
 
-@Slf4j
 @RequiredArgsConstructor
 public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
 
