@@ -1,9 +1,10 @@
-package konkuk.thip.common.security.argument_resolver;
+package konkuk.thip.common.security.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import konkuk.thip.common.exception.AuthException;
-import konkuk.thip.common.security.annotation.UserId;
+import konkuk.thip.common.security.annotation.AuthToken;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -14,25 +15,26 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import static konkuk.thip.common.exception.code.ErrorCode.AUTH_TOKEN_NOT_FOUND;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
-public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(UserId.class)
-                && parameter.getParameterType().equals(Long.class);
+        return parameter.hasParameterAnnotation(AuthToken.class)
+            && parameter.getParameterType().equals(String.class);
     }
 
     @Override
-    public Long resolveArgument(MethodParameter parameter,
+    public String resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) {
 
-        Object userId = ((HttpServletRequest) webRequest.getNativeRequest()).getAttribute("userId");
-        if (userId == null) {
+        Object token = ((HttpServletRequest) webRequest.getNativeRequest()).getAttribute("token");
+        if (token == null) {
             throw new AuthException(AUTH_TOKEN_NOT_FOUND);
         }
-        return (Long) userId;
+        return (String) token;
     }
 }
