@@ -16,5 +16,10 @@ public enum RoomRecordCreatedTemplate implements NotificationTemplate<RoomRecord
         return "@" + args.actorUsername() + " 님이 새로운 독서 기록을 작성했어요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.ROOM;
+    }
+
     public record Args(String roomTitle, String actorUsername) {}
 }

@@ -4,6 +4,7 @@ import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.notification.application.port.out.NotificationCommandPort;
 import konkuk.thip.notification.application.service.template.NotificationTemplate;
 import konkuk.thip.notification.domain.Notification;
+import konkuk.thip.notification.domain.value.NotificationCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,9 +23,10 @@ public class NotificationSyncExecutor {
     ) {
         String title = template.title(args);
         String content = template.content(args);
+        NotificationCategory notificationCategory = template.notificationCategory(args);
 
         // 1. DB 저장
-        saveNotification(title, content, targetUserId);
+        saveNotification(title, content, notificationCategory, targetUserId);
 
         // 2. 이벤트 퍼블리시
         try {
@@ -37,8 +39,8 @@ public class NotificationSyncExecutor {
         }
     }
 
-    private void saveNotification(String title, String content, Long targetUserId) {
-        Notification notification = Notification.withoutId(title, content, targetUserId);
+    private void saveNotification(String title, String content, NotificationCategory category, Long targetUserId) {
+        Notification notification = Notification.withoutId(title, content, category, targetUserId);
         notificationCommandPort.save(notification);
     }
 }

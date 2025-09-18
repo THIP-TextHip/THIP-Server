@@ -1,6 +1,6 @@
-package konkuk.thip.notification.application.service;
+package konkuk.thip.notification.application.service.fcm;
 
-import konkuk.thip.notification.application.port.in.FcmDeleteUseCase;
+import konkuk.thip.notification.application.port.in.fcm.FcmDeleteUseCase;
 import konkuk.thip.notification.application.port.in.dto.FcmTokenDeleteCommand;
 import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;

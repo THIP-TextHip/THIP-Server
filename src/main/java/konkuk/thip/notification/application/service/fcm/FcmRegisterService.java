@@ -1,6 +1,6 @@
-package konkuk.thip.notification.application.service;
+package konkuk.thip.notification.application.service.fcm;
 
-import konkuk.thip.notification.application.port.in.FcmRegisterUseCase;
+import konkuk.thip.notification.application.port.in.fcm.FcmRegisterUseCase;
 import konkuk.thip.notification.application.port.in.dto.FcmTokenRegisterCommand;
 import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;

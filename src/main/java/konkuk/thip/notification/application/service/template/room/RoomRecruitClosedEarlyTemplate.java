@@ -16,5 +16,10 @@ public enum RoomRecruitClosedEarlyTemplate implements NotificationTemplate<RoomR
         return "모임방 활동이 시작되었어요. 모임방에서 독서 기록을 시작해보세요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.ROOM;
+    }
+
     public record Args(String roomTitle) {}
 }

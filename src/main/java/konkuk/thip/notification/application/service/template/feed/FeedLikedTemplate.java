@@ -16,5 +16,10 @@ public enum FeedLikedTemplate implements NotificationTemplate<FeedLikedTemplate.
         return "@" + args.actorUsername() + " 님이 내 글에 좋아요를 눌렀어요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.FEED;
+    }
+
     public record Args(String actorUsername) {}
 }

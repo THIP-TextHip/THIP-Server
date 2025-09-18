@@ -18,5 +18,10 @@ public enum FollowedTemplate implements NotificationTemplate<FollowedTemplate.Ar
         return "@" + args.actorUsername() + " 님이 나를 띱했어요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.FEED;
+    }
+
     public record Args(String actorUsername) {}
 }
