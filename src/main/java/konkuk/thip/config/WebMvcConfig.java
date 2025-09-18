@@ -1,8 +1,8 @@
 package konkuk.thip.config;
 
-import konkuk.thip.common.security.argument_resolver.AuthTokenArgumentResolver;
-import konkuk.thip.common.security.argument_resolver.Oauth2IdArgumentResolver;
-import konkuk.thip.common.security.argument_resolver.UserIdArgumentResolver;
+import konkuk.thip.common.security.resolver.AuthTokenArgumentResolver;
+import konkuk.thip.common.security.resolver.Oauth2IdArgumentResolver;
+import konkuk.thip.common.security.resolver.UserIdArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
