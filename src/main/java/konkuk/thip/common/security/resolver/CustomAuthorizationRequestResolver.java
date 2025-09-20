@@ -45,10 +45,12 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
 
         String redirectUrl = request.getParameter(REDIRECT_URL_KEY.getValue());
         Map<String, Object> additional = new HashMap<>(base.getAdditionalParameters());
+        var session = request.getSession(true);
         if (StringUtils.hasText(redirectUrl) && webDomainProperties.isAllowed(redirectUrl)) {
-            request.getSession(true).setAttribute(REDIRECT_SESSION_KEY.getValue(), redirectUrl);
+            session.setAttribute(REDIRECT_SESSION_KEY.getValue(), redirectUrl);
+        } else {
+            session.removeAttribute(REDIRECT_SESSION_KEY.getValue());
         }
-
         return OAuth2AuthorizationRequest.from(base)
                 .additionalParameters(additional)
                 .build();
