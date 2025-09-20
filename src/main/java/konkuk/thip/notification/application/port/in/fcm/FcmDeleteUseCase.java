@@ -1,4 +1,4 @@
-package konkuk.thip.notification.application.port.in;
+package konkuk.thip.notification.application.port.in.fcm;
 
 import konkuk.thip.notification.application.port.in.dto.FcmTokenDeleteCommand;
 

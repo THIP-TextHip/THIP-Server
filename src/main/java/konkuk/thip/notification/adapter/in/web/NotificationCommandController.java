@@ -11,9 +11,9 @@ import konkuk.thip.notification.adapter.in.web.request.FcmTokenDeleteRequest;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenEnableStateChangeRequest;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenRegisterRequest;
 import konkuk.thip.notification.adapter.in.web.response.FcmTokenEnableStateChangeResponse;
-import konkuk.thip.notification.application.port.in.FcmDeleteUseCase;
-import konkuk.thip.notification.application.port.in.FcmEnableStateChangeUseCase;
-import konkuk.thip.notification.application.port.in.FcmRegisterUseCase;
+import konkuk.thip.notification.application.port.in.fcm.FcmDeleteUseCase;
+import konkuk.thip.notification.application.port.in.fcm.FcmEnableStateChangeUseCase;
+import konkuk.thip.notification.application.port.in.fcm.FcmRegisterUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

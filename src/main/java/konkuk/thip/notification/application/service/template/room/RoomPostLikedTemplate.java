@@ -16,5 +16,10 @@ public enum RoomPostLikedTemplate implements NotificationTemplate<RoomPostLikedT
         return "@" + args.actorUsername() + " 님이 내 독서기록에 좋아요를 눌렀어요!";
     }
 
+    @Override
+    public NotificationCategory notificationCategory(Args args) {
+        return NotificationCategory.ROOM;
+    }
+
     public record Args(String actorUsername) {}
 }

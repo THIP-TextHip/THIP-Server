@@ -10,6 +10,7 @@ import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.adapter.in.web.response.*;
 import konkuk.thip.room.application.port.in.*;
+import konkuk.thip.room.application.port.in.dto.MyRoomType;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
 import konkuk.thip.room.application.port.in.dto.RoomSearchQuery;
 import lombok.RequiredArgsConstructor;
@@ -132,7 +133,7 @@ public class RoomQueryController {
             @RequestParam(value = "type", required = false, defaultValue = "playingAndRecruiting") final String type,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
-        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
+        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, MyRoomType.from(type), cursor));
     }
 
     @Operation(

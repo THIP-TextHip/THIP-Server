@@ -1,6 +1,6 @@
-package konkuk.thip.notification.application.service;
+package konkuk.thip.notification.application.service.fcm;
 
-import konkuk.thip.notification.application.port.in.FcmEnableStateChangeUseCase;
+import konkuk.thip.notification.application.port.in.fcm.FcmEnableStateChangeUseCase;
 import konkuk.thip.notification.application.port.in.dto.FcmEnableStateChangeCommand;
 import konkuk.thip.notification.application.port.out.FcmTokenPersistencePort;
 import konkuk.thip.notification.domain.FcmToken;
