@@ -24,9 +24,11 @@ public enum ErrorCode implements ResponseCode {
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
     AUTH_INVALID_LOGIN_TOKEN_KEY(HttpStatus.UNAUTHORIZED, 40106, "유효하지 않은 로그인 토큰 키입니다."),
     AUTH_BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, 40107, "블랙리스트에 등록된 토큰입니다."),
+    AUTH_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 40108, "인증 처리 중 서버 오류가 발생했습니다."),
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
     AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
+    WEB_DOMAIN_ORIGIN_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, 50102, "허용된 웹 도메인 설정이 비어있습니다."),
 
     PERSISTENCE_TRANSACTION_REQUIRED(HttpStatus.INTERNAL_SERVER_ERROR, 50110, "@Transactional 컨텍스트가 필요합니다. 트랜잭션 범위 내에서만 사용할 수 있습니다."),
 
