@@ -34,8 +34,8 @@ public class MessageFeedEventListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onFolloweeNewPost(FeedEvents.FolloweeNewPostEvent e) {
-        feedUseCase.handleFolloweeNewPost(e);
+    public void onFolloweeNewPost(FeedEvents.FolloweeNewFeedEvent e) {
+        feedUseCase.handleFolloweeNewFeed(e);
     }
 
     @Async
