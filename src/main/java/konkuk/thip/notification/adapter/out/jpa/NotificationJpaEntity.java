@@ -2,7 +2,10 @@ package konkuk.thip.notification.adapter.out.jpa;
 
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
+import konkuk.thip.notification.domain.Notification;
 import konkuk.thip.notification.domain.value.NotificationCategory;
+import konkuk.thip.notification.domain.value.NotificationRedirectSpecConverter;
+import konkuk.thip.notification.domain.value.NotificationRedirectSpec;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 
@@ -34,4 +37,12 @@ public class NotificationJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
+
+    @Convert(converter = NotificationRedirectSpecConverter.class)
+    @Column(name = "redirect_spec", columnDefinition = "TEXT")  // nullable
+    private NotificationRedirectSpec redirectSpec;
+
+    public void updateFrom(Notification notification) {
+        this.isChecked = notification.isChecked();  // 현재는 isChecked만 업데이트 가능
+    }
 }
