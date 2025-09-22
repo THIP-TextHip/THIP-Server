@@ -1,4 +1,4 @@
-package konkuk.thip.common.security.argument_resolver;
+package konkuk.thip.common.security.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import konkuk.thip.common.exception.AuthException;

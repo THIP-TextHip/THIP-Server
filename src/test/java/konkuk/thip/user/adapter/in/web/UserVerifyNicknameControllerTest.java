@@ -147,7 +147,7 @@ class UserVerifyNicknameControllerTest {
     }
 
     @Test
-    @DisplayName("회원 탈퇴한(= soft delete 처리된) 유저의 닉네임 정보를 포함해서 중복 검증을 수행한다.")
+    @DisplayName("회원 탈퇴한(= soft delete 처리된) 유저의 닉네임 정보를 포함하지않고 중복 검증을 수행한다.")
     void verify_nickname_with_soft_delete_users() throws Exception {
         //given
         UserJpaEntity deleteUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "노성준"));
@@ -170,6 +170,6 @@ class UserVerifyNicknameControllerTest {
         JsonNode jsonNode = objectMapper.readTree(json);
         boolean isVerified = jsonNode.path("data").path("isVerified").asBoolean();
 
-        assertThat(isVerified).isFalse();       // 닉네임 중복으로 인해 isVerified == false
+        assertThat(isVerified).isTrue();
     }
 }

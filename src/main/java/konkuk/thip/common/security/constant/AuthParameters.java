@@ -19,6 +19,9 @@ public enum AuthParameters {
     COOKIE_ACCESS_TOKEN("access_token"),
     COOKIE_TEMP_TOKEN("temp_token"),
 
+    REDIRECT_URL_KEY("redirect_url"),
+    REDIRECT_SESSION_KEY("oauth2_return_to"),
+
     ;
 
     private final String value;
