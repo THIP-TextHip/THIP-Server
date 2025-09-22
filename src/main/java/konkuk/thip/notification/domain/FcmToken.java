@@ -3,7 +3,7 @@ package konkuk.thip.notification.domain;
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.notification.domain.value.PlatformType;
+import konkuk.thip.common.util.PlatformType;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
