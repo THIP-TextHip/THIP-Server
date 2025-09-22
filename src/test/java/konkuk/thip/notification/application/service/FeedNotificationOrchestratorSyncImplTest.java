@@ -106,14 +106,14 @@ class FeedNotificationOrchestratorSyncImplTest {
                 ArgumentCaptor.forClass(FeedEvents.FeedCommentedEvent.class);
         verify(feedNotificationDispatchUseCase).handleFeedCommented(captor.capture());
 
+        NotificationJpaEntity saved = notificationJpaRepository.findAll().get(0);
+
         FeedEvents.FeedCommentedEvent event = captor.getValue();
         assertThat(event).isNotNull();
         assertThat(event.title()).isNotBlank();
         assertThat(event.content()).contains(actorUsername);
         assertThat(event.targetUserId()).isEqualTo(targetUserId);
-        assertThat(event.actorUserId()).isEqualTo(actorUserId);
-        assertThat(event.actorUsername()).isEqualTo(actorUsername);
-        assertThat(event.feedId()).isEqualTo(feedId);
+        assertThat(event.notificationId()).isEqualTo(saved.getNotificationId());    // 퍼블리시되는 이벤트에는 저장된 notificationId 값이 포함됨
     }
 
     @Test
