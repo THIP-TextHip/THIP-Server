@@ -9,19 +9,17 @@ import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
-import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteItemJpaRepository;
-import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteCreateCommand;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +28,7 @@ import static org.assertj.core.api.Assertions.within;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 투표 생성 service 통합 테스트")
 class VoteCreateServiceTest {
@@ -47,23 +46,7 @@ class VoteCreateServiceTest {
     private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @Autowired
-    private VoteJpaRepository voteJpaRepository;
-
-    @Autowired
-    private VoteItemJpaRepository voteItemJpaRepository;
-
-    @Autowired
     private VoteCreateService voteCreateService;
-
-    @AfterEach
-    void tearDown() {
-        voteItemJpaRepository.deleteAllInBatch();
-        voteJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("유저가 투표를 생성하면, 해당 유저의 [RoomParticipant의 currentPage, userPercentage]와 해당 방의 [Room의 roomPercentage] 값이 변경된다.")

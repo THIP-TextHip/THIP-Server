@@ -12,7 +12,7 @@ import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
-import konkuk.thip.message.application.port.out.FeedEventCommandPort;
+import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.domain.User;
@@ -33,7 +33,7 @@ public class FeedCreateService implements FeedCreateUseCase {
     private final UserCommandPort userCommandPort;
 
     private final ImageUrlValidationService imageUrlValidationService;
-    private final FeedEventCommandPort feedEventCommandPort;
+    private final FeedNotificationOrchestrator feedNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -71,7 +71,7 @@ public class FeedCreateService implements FeedCreateUseCase {
         List<User> targetUsers = userQueryPort.getAllFollowersByUserId(command.userId());
         User actorUser = userCommandPort.findById(command.userId());
         for (User targetUser : targetUsers) {
-            feedEventCommandPort.publishFolloweeNewPostEvent(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
+            feedNotificationOrchestrator.notifyFolloweeNewPost(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
         }
     }
 

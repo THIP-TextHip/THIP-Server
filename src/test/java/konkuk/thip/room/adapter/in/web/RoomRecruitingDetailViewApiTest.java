@@ -6,15 +6,15 @@ import konkuk.thip.common.util.DateUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
-import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
-import konkuk.thip.room.domain.value.Category;
-import konkuk.thip.user.adapter.out.jpa.*;
-import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
+import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
+import konkuk.thip.room.domain.value.RoomStatus;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import konkuk.thip.user.domain.value.UserRole;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 모집 중인 방 상세조회 api 통합 테스트")
 class RoomRecruitingDetailViewApiTest {
@@ -45,17 +47,7 @@ class RoomRecruitingDetailViewApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-    }
-
-    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
-        Alias alias = TestEntityFactory.createScienceAlias();
-
+    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount, RoomStatus roomStatus) {
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
                 .isbn(isbn)
@@ -79,12 +71,11 @@ class RoomRecruitingDetailViewApiTest {
                 .recruitCount(recruitCount)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build());
     }
 
-    private RoomJpaEntity saveLiteratureRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount) {
-        Alias alias = TestEntityFactory.createLiteratureAlias();
-
+    private RoomJpaEntity saveLiteratureRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, int recruitCount, RoomStatus roomStatus) {
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
                 .isbn(isbn)
@@ -108,6 +99,7 @@ class RoomRecruitingDetailViewApiTest {
                 .recruitCount(recruitCount)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build());
     }
 
@@ -143,23 +135,23 @@ class RoomRecruitingDetailViewApiTest {
     @DisplayName("모집중인 모임방 상세조회할 경우, 해당 모임방의 정보, 책 정보, 추천할 모임방의 정보를 반환한다.")
     void get_recruiting_room_detail() throws Exception {
         //given
-        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(targetRoom, 4);
         UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
-        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), 8);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_4, 1);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8, RoomStatus.IN_PROGRESS);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when
@@ -191,7 +183,7 @@ class RoomRecruitingDetailViewApiTest {
     @DisplayName("모임방의 호스트가 조회할 경우, 유저가 해당 방의 호스트임을 응답값으로 보여준다. (나머지 응답값은 동일)")
     void get_recruiting_room_detail_host() throws Exception {
         //given
-        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(targetRoom, 4);
         RoomParticipantJpaEntity firstMember = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1);
         roomParticipantJpaRepository.delete(firstMember);
@@ -201,19 +193,19 @@ class RoomRecruitingDetailViewApiTest {
                 .roomParticipantRole(RoomParticipantRole.HOST)
                 .build());      // firstMember 을 MEMBER -> HOST 로 수정
 
-        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), 8);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_4, 1);
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8, RoomStatus.IN_PROGRESS);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when
@@ -244,26 +236,26 @@ class RoomRecruitingDetailViewApiTest {
     @DisplayName("추천하는 다른 모집중인 모임방이 많을 경우, 모집 기한 마감임박 순으로 최대 5개만 반환한다.")
     void get_recruiting_room_detail_too_many_recommend_rooms() throws Exception {
         //given
-        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(targetRoom, 4);
         UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
-        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_2, 5);
 
-        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8);
+        RoomJpaEntity science_room_3 = saveScienceRoom("과학-책", "isbn3", "무슨방일까요??", LocalDate.now().plusDays(5), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_3, 2);
 
-        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), 8);
+        RoomJpaEntity science_room_4 = saveScienceRoom("과학-책", "isbn4", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_4, 1);
 
-        RoomJpaEntity science_room_5 = saveScienceRoom("과학-책", "isbn5", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity science_room_5 = saveScienceRoom("과학-책", "isbn5", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_5, 1);
 
-        RoomJpaEntity science_room_6 = saveScienceRoom("과학-책", "isbn6", "과학-방-15일뒤-활동시작", LocalDate.now().plusDays(15), 8);
+        RoomJpaEntity science_room_6 = saveScienceRoom("과학-책", "isbn6", "과학-방-15일뒤-활동시작", LocalDate.now().plusDays(15), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_6, 1);
 
-        RoomJpaEntity science_room_7 = saveScienceRoom("과학-책", "isbn7", "과학-방-20일뒤-활동시작", LocalDate.now().plusDays(20), 8);
+        RoomJpaEntity science_room_7 = saveScienceRoom("과학-책", "isbn7", "과학-방-20일뒤-활동시작", LocalDate.now().plusDays(20), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_7, 1);
 
         //when
@@ -296,14 +288,14 @@ class RoomRecruitingDetailViewApiTest {
     @DisplayName("추천하는 다른 모집중인 모임방이 없을 경우, 해당 데이터를 빈 배열로 반환한다.")
     void get_recruiting_room_detail_no_recommend_rooms() throws Exception {
         //given
-        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(targetRoom, 4);
         UserJpaEntity joiningUser = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1).getUserJpaEntity();
 
-        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8);
+        RoomJpaEntity room_3 = saveLiteratureRoom("문학-책", "isbn5", "방제목에-과학-포함된-문학방", LocalDate.now().plusDays(10), 8, RoomStatus.RECRUITING);
         saveUsersToRoom(room_3, 6);
 
-        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8);
+        RoomJpaEntity recruit_expired_room_4 = saveScienceRoom("과학-책", "isbn6", "모집기한-지난-과학방", LocalDate.now().minusDays(1), 8, RoomStatus.IN_PROGRESS);
         saveUsersToRoom(recruit_expired_room_4, 6);
 
         //when

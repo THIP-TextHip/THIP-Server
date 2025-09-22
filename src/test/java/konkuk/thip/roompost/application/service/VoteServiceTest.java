@@ -3,8 +3,9 @@ package konkuk.thip.roompost.application.service;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
-import konkuk.thip.roompost.application.service.VoteService;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteCommand;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteResult;
 import konkuk.thip.roompost.application.port.out.VoteCommandPort;
@@ -30,13 +31,20 @@ class VoteServiceTest {
     private VoteQueryPort voteQueryPort;
     private RoomParticipantValidator roomParticipantValidator;
     private VoteService voteService;
+    private RoomCommandPort roomCommandPort;
 
     @BeforeEach
     void setUp() {
         voteCommandPort = mock(VoteCommandPort.class);
         voteQueryPort = mock(VoteQueryPort.class);
         roomParticipantValidator = mock(RoomParticipantValidator.class);
-        voteService = new VoteService(voteCommandPort, voteQueryPort, roomParticipantValidator);
+        roomCommandPort = mock(RoomCommandPort.class);
+
+        Room mockRoom = mock(Room.class);
+        doNothing().when(mockRoom).validateRoomInProgress();
+        when(roomCommandPort.getByIdOrThrow(anyLong())).thenReturn(mockRoom);
+
+        voteService = new VoteService(voteCommandPort, voteQueryPort, roomParticipantValidator, roomCommandPort);
     }
 
     private void mockVoteQueryResult(Long voteId, Long voteItemId, String itemName, boolean isVoted, int count) {

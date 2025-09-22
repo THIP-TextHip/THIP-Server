@@ -2,10 +2,9 @@ package konkuk.thip.room.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -106,10 +105,6 @@ public class Room extends BaseDomainEntity {
         }
     }
 
-    public boolean isExpired() {
-        return this.getStatus() == StatusType.EXPIRED;
-    }
-
     public void updateRoomPercentage(double roomPercentage) {
         this.roomPercentage = roomPercentage;
     }
@@ -146,9 +141,7 @@ public class Room extends BaseDomainEntity {
     }
 
     public boolean isRecruitmentPeriodExpired() {
-        LocalDate today = LocalDate.now();
-        // 모집 마감일: startDate.minusDays(1)
-        return today.isAfter(this.startDate.minusDays(1));
+        return this.roomStatus != RoomStatus.RECRUITING;
     }
 
     public void increaseMemberCount() {
@@ -175,16 +168,18 @@ public class Room extends BaseDomainEntity {
 
     public void startRoomProgress() {
         validateRoomRecruitExpired();
-        validateRoomExpired();
 
         startDate = LocalDate.now();
+        roomStatus = RoomStatus.IN_PROGRESS;
     }
 
-    public void validateRoomExpired() {
-        if (this.isExpired()) {
+    public void validateRoomInProgress() {
+        if (this.roomStatus == RoomStatus.EXPIRED) {
             throw new InvalidStateException(ErrorCode.ROOM_IS_EXPIRED);
         }
+        if (this.roomStatus != RoomStatus.IN_PROGRESS) {
+            throw new InvalidStateException(ErrorCode.ROOM_NOT_IN_PROGRESS);
+        }
     }
-
 
 }

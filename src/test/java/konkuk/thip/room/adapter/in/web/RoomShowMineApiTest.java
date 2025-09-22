@@ -10,10 +10,10 @@ import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -34,6 +35,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 내 방 목록 조회 api 통합 테스트")
 class RoomShowMineApiTest {
@@ -45,17 +47,7 @@ class RoomShowMineApiTest {
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
 
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
-
-    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, LocalDate endDate, int recruitCount) {
-        Alias alias = TestEntityFactory.createScienceAlias();
-
+    private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, LocalDate endDate, int recruitCount, RoomStatus roomStatus) {
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()
                 .title(bookTitle)
                 .isbn(isbn)
@@ -79,6 +71,7 @@ class RoomShowMineApiTest {
                 .recruitCount(recruitCount)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build());
     }
 
@@ -105,16 +98,16 @@ class RoomShowMineApiTest {
     @DisplayName("type 으로 playing 을 받을 경우, 해당 유저가 참여중인 방 중 [현재 진행중인 모임방]의 정보를 [활동 마감일 임박순] 으로 반환한다.")
     void get_my_playing_rooms() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn2", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn2", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom1, 6);
 
-        RoomJpaEntity playingRoom2 = saveScienceRoom("진행중인방-책-2", "isbn3", "과학-방-10일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(10), 10);
+        RoomJpaEntity playingRoom2 = saveScienceRoom("진행중인방-책-2", "isbn3", "과학-방-10일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(10), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom2, 3);
 
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
+        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10, RoomStatus.EXPIRED);
         changeRoomMemberCount(expiredRoom1, 7);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -144,16 +137,16 @@ class RoomShowMineApiTest {
     @DisplayName("type 으로 recruiting 을 받을 경우, 해당 유저가 참여중인 방 중 [모집중인 모임방]의 정보를 [모집 마감일 임박순] 으로 반환한다.")
     void get_my_recruiting_rooms() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom2, 8);
 
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom1, 6);
 
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
+        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10, RoomStatus.EXPIRED);
         changeRoomMemberCount(expiredRoom1, 7);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -183,16 +176,16 @@ class RoomShowMineApiTest {
     @DisplayName("type 이 주어지지 않을 경우, 해당 유저가 참여중인 방 중 [현재 진행중 + 모집중인 모임방]의 정보를 [현재 진행중 -> 모집중] 순 으로 반환한다.")
     void get_my_playing_and_recruiting_rooms() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom2, 8);
 
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom1, 6);
 
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
+        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10, RoomStatus.EXPIRED);
         changeRoomMemberCount(expiredRoom1, 7);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -223,16 +216,16 @@ class RoomShowMineApiTest {
     @DisplayName("type 으로 expired 을 받을 경우, 해당 유저가 참여중인 방 중 [만료된 모임방]의 정보를 [활동 마감일 최신순] 으로 반환한다.")
     void get_my_expired_rooms() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn2", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn2", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom1, 6);
 
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn3", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
+        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn3", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10, RoomStatus.EXPIRED);
         changeRoomMemberCount(expiredRoom1, 7);
 
-        RoomJpaEntity expiredRoom2 = saveScienceRoom("만료된방-책-2", "isbn4", "과학-방-10일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(10), 10);
+        RoomJpaEntity expiredRoom2 = saveScienceRoom("만료된방-책-2", "isbn4", "과학-방-10일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(10), 10, RoomStatus.EXPIRED);
         changeRoomMemberCount(expiredRoom2, 1);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -262,16 +255,16 @@ class RoomShowMineApiTest {
     @DisplayName("유효하지 않은 type 을 받을 경우, 400 error 를 반환한다.")
     void get_my_rooms_wrong_type() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom2, 8);
 
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom1, 6);
 
-        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10);
+        RoomJpaEntity expiredRoom1 = saveScienceRoom("만료된방-책-1", "isbn4", "과학-방-5일전-활동마감", LocalDate.now().minusDays(30), LocalDate.now().minusDays(5), 10, RoomStatus.EXPIRED);
         changeRoomMemberCount(expiredRoom1, 7);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -298,40 +291,40 @@ class RoomShowMineApiTest {
     @DisplayName("한번에 최대 10개의 데이터만을 반환한다. 다음 페이지에 해당하는 데이터가 있을 경우, 다음 페이지의 cursor 값을 반환한다.")
     void get_my_rooms_page_1() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom2, 8);
 
-        RoomJpaEntity recruitingRoom3 = saveScienceRoom("모집중인방-책-3", "isbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom3 = saveScienceRoom("모집중인방-책-3", "isbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom3, 8);
 
-        RoomJpaEntity recruitingRoom4 = saveScienceRoom("모집중인방-책-4", "isbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom4 = saveScienceRoom("모집중인방-책-4", "isbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom4, 8);
 
-        RoomJpaEntity recruitingRoom5 = saveScienceRoom("모집중인방-책-5", "isbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom5 = saveScienceRoom("모집중인방-책-5", "isbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom5, 8);
 
-        RoomJpaEntity recruitingRoom6 = saveScienceRoom("모집중인방-책-6", "isbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom6 = saveScienceRoom("모집중인방-책-6", "isbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom6, 8);
 
-        RoomJpaEntity recruitingRoom7 = saveScienceRoom("모집중인방-책-7", "isbn7", "과학-방-7일뒤-활동시작", LocalDate.now().plusDays(7), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom7 = saveScienceRoom("모집중인방-책-7", "isbn7", "과학-방-7일뒤-활동시작", LocalDate.now().plusDays(7), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom7, 8);
 
-        RoomJpaEntity recruitingRoom8 = saveScienceRoom("모집중인방-책-8", "isbn8", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom8 = saveScienceRoom("모집중인방-책-8", "isbn8", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom8, 8);
 
-        RoomJpaEntity recruitingRoom9 = saveScienceRoom("모집중인방-책-9", "isbn9", "과학-방-9일뒤-활동시작", LocalDate.now().plusDays(9), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom9 = saveScienceRoom("모집중인방-책-9", "isbn9", "과학-방-9일뒤-활동시작", LocalDate.now().plusDays(9), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom9, 8);
 
-        RoomJpaEntity recruitingRoom10 = saveScienceRoom("모집중인방-책-10", "isbn10", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom10 = saveScienceRoom("모집중인방-책-10", "isbn10", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom10, 8);
 
-        RoomJpaEntity recruitingRoom11 = saveScienceRoom("모집중인방-책-11", "isbn11", "과학-방-11일뒤-활동시작", LocalDate.now().plusDays(11), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom11 = saveScienceRoom("모집중인방-책-11", "isbn11", "과학-방-11일뒤-활동시작", LocalDate.now().plusDays(11), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom11, 8);
 
-        RoomJpaEntity recruitingRoom12 = saveScienceRoom("모집중인방-책-12", "isbn12", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom12 = saveScienceRoom("모집중인방-책-12", "isbn12", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom12, 8);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -377,40 +370,40 @@ class RoomShowMineApiTest {
     @DisplayName("cursor 값을 기준으로 해당 페이지의 데이터를 반환한다.")
     void get_my_rooms_page_2() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom2 = saveScienceRoom("모집중인방-책-2", "isbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom2, 8);
 
-        RoomJpaEntity recruitingRoom3 = saveScienceRoom("모집중인방-책-3", "isbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom3 = saveScienceRoom("모집중인방-책-3", "isbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom3, 8);
 
-        RoomJpaEntity recruitingRoom4 = saveScienceRoom("모집중인방-책-4", "isbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom4 = saveScienceRoom("모집중인방-책-4", "isbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom4, 8);
 
-        RoomJpaEntity recruitingRoom5 = saveScienceRoom("모집중인방-책-5", "isbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom5 = saveScienceRoom("모집중인방-책-5", "isbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom5, 8);
 
-        RoomJpaEntity recruitingRoom6 = saveScienceRoom("모집중인방-책-6", "isbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom6 = saveScienceRoom("모집중인방-책-6", "isbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom6, 8);
 
-        RoomJpaEntity recruitingRoom7 = saveScienceRoom("모집중인방-책-7", "isbn7", "과학-방-7일뒤-활동시작", LocalDate.now().plusDays(7), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom7 = saveScienceRoom("모집중인방-책-7", "isbn7", "과학-방-7일뒤-활동시작", LocalDate.now().plusDays(7), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom7, 8);
 
-        RoomJpaEntity recruitingRoom8 = saveScienceRoom("모집중인방-책-8", "isbn8", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom8 = saveScienceRoom("모집중인방-책-8", "isbn8", "과학-방-8일뒤-활동시작", LocalDate.now().plusDays(8), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom8, 8);
 
-        RoomJpaEntity recruitingRoom9 = saveScienceRoom("모집중인방-책-9", "isbn9", "과학-방-9일뒤-활동시작", LocalDate.now().plusDays(9), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom9 = saveScienceRoom("모집중인방-책-9", "isbn9", "과학-방-9일뒤-활동시작", LocalDate.now().plusDays(9), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom9, 8);
 
-        RoomJpaEntity recruitingRoom10 = saveScienceRoom("모집중인방-책-10", "isbn10", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom10 = saveScienceRoom("모집중인방-책-10", "isbn10", "과학-방-10일뒤-활동시작", LocalDate.now().plusDays(10), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom10, 8);
 
-        RoomJpaEntity recruitingRoom11 = saveScienceRoom("모집중인방-책-11", "isbn11", "과학-방-11일뒤-활동시작", LocalDate.now().plusDays(11), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom11 = saveScienceRoom("모집중인방-책-11", "isbn11", "과학-방-11일뒤-활동시작", LocalDate.now().plusDays(11), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom11, 8);
 
-        RoomJpaEntity recruitingRoom12 = saveScienceRoom("모집중인방-책-12", "isbn12", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom12 = saveScienceRoom("모집중인방-책-12", "isbn12", "과학-방-12일뒤-활동시작", LocalDate.now().plusDays(12), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom12, 8);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -450,16 +443,16 @@ class RoomShowMineApiTest {
     @DisplayName("유저가 나간 방(= 모집기간 중 참여 취소한 경우, 진행기간 중 방 나간 경우) 은 조회되지 않는다.")
     void get_my_rooms_about_exit_rooms() throws Exception {
         //given
-        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruitingRoom1 = saveScienceRoom("모집중인방-책-1", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruitingRoom1, 5);
 
-        RoomJpaEntity exitRecruitingRoom = saveScienceRoom("모집중인방-책-2", "isbn2", "참여신청하고-나간-모집중인-과학-방", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity exitRecruitingRoom = saveScienceRoom("모집중인방-책-2", "isbn2", "참여신청하고-나간-모집중인-과학-방", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(exitRecruitingRoom, 8);
 
-        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playingRoom1 = saveScienceRoom("진행중인방-책-1", "isbn3", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playingRoom1, 6);
 
-        RoomJpaEntity exitPlayingRoom = saveScienceRoom("진행중인방-책-2", "isbn4", "모임진행중-나간-진행중인-과학-방", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity exitPlayingRoom = saveScienceRoom("진행중인방-책-2", "isbn4", "모임진행중-나간-진행중인-과학-방", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(exitPlayingRoom, 6);
 
         Alias scienceAlias = TestEntityFactory.createScienceAlias();
@@ -497,31 +490,31 @@ class RoomShowMineApiTest {
     void get_my_playing_and_recruiting_rooms_pagination() throws Exception {
         // given
         // 진행중인 방 6개 (endDate 임박 순서: +1d ~ +6d)
-        RoomJpaEntity playing1 = saveScienceRoom("진행중인방-책-P1", "pisbn1", "과학-방-1일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(1), 10);
+        RoomJpaEntity playing1 = saveScienceRoom("진행중인방-책-P1", "pisbn1", "과학-방-1일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(1), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playing1, 3);
-        RoomJpaEntity playing2 = saveScienceRoom("진행중인방-책-P2", "pisbn2", "과학-방-2일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(2), 10);
+        RoomJpaEntity playing2 = saveScienceRoom("진행중인방-책-P2", "pisbn2", "과학-방-2일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(2), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playing2, 4);
-        RoomJpaEntity playing3 = saveScienceRoom("진행중인방-책-P3", "pisbn3", "과학-방-3일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(3), 10);
+        RoomJpaEntity playing3 = saveScienceRoom("진행중인방-책-P3", "pisbn3", "과학-방-3일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(3), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playing3, 5);
-        RoomJpaEntity playing4 = saveScienceRoom("진행중인방-책-P4", "pisbn4", "과학-방-4일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(4), 10);
+        RoomJpaEntity playing4 = saveScienceRoom("진행중인방-책-P4", "pisbn4", "과학-방-4일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(4), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playing4, 6);
-        RoomJpaEntity playing5 = saveScienceRoom("진행중인방-책-P5", "pisbn5", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), 10);
+        RoomJpaEntity playing5 = saveScienceRoom("진행중인방-책-P5", "pisbn5", "과학-방-5일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playing5, 7);
-        RoomJpaEntity playing6 = saveScienceRoom("진행중인방-책-P6", "pisbn6", "과학-방-6일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(6), 10);
+        RoomJpaEntity playing6 = saveScienceRoom("진행중인방-책-P6", "pisbn6", "과학-방-6일뒤-활동마감", LocalDate.now().minusDays(10), LocalDate.now().plusDays(6), 10, RoomStatus.IN_PROGRESS);
         changeRoomMemberCount(playing6, 8);
 
         // 모집중인 방 6개 (startDate 임박 순서: +1d ~ +6d)
-        RoomJpaEntity recruiting1 = saveScienceRoom("모집중인방-책-R1", "risbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruiting1 = saveScienceRoom("모집중인방-책-R1", "risbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruiting1, 3);
-        RoomJpaEntity recruiting2 = saveScienceRoom("모집중인방-책-R2", "risbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruiting2 = saveScienceRoom("모집중인방-책-R2", "risbn2", "과학-방-2일뒤-활동시작", LocalDate.now().plusDays(2), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruiting2, 4);
-        RoomJpaEntity recruiting3 = saveScienceRoom("모집중인방-책-R3", "risbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruiting3 = saveScienceRoom("모집중인방-책-R3", "risbn3", "과학-방-3일뒤-활동시작", LocalDate.now().plusDays(3), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruiting3, 5);
-        RoomJpaEntity recruiting4 = saveScienceRoom("모집중인방-책-R4", "risbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruiting4 = saveScienceRoom("모집중인방-책-R4", "risbn4", "과학-방-4일뒤-활동시작", LocalDate.now().plusDays(4), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruiting4, 6);
-        RoomJpaEntity recruiting5 = saveScienceRoom("모집중인방-책-R5", "risbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruiting5 = saveScienceRoom("모집중인방-책-R5", "risbn5", "과학-방-5일뒤-활동시작", LocalDate.now().plusDays(5), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruiting5, 7);
-        RoomJpaEntity recruiting6 = saveScienceRoom("모집중인방-책-R6", "risbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10);
+        RoomJpaEntity recruiting6 = saveScienceRoom("모집중인방-책-R6", "risbn6", "과학-방-6일뒤-활동시작", LocalDate.now().plusDays(6), LocalDate.now().plusDays(30), 10, RoomStatus.RECRUITING);
         changeRoomMemberCount(recruiting6, 8);
 
         Alias alias = TestEntityFactory.createScienceAlias();

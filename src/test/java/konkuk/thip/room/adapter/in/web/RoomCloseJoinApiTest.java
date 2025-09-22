@@ -9,11 +9,11 @@ import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,14 +96,6 @@ class RoomCloseJoinApiTest {
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, member, RoomParticipantRole.MEMBER, 0.0));
     }
 
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
-
     @Test
     @DisplayName("모집 마감 성공 - 방 시작일이 오늘로 바뀜")
     void closeRoomRecruit_success() throws Exception {
@@ -138,9 +130,9 @@ class RoomCloseJoinApiTest {
     @DisplayName("이미 시작된 방은 모집 마감 요청 시 실패")
     void closeRoomRecruit_fail_already_started() throws Exception {
         // startDate를 오늘로 설정해서 이미 시작된 상태로 만듦
-        Field field = RoomJpaEntity.class.getDeclaredField("startDate");
+        Field field = RoomJpaEntity.class.getDeclaredField("roomStatus");
         field.setAccessible(true);
-        field.set(room, LocalDate.now());
+        field.set(room, RoomStatus.IN_PROGRESS);
         roomJpaRepository.save(room);
 
         mockMvc.perform(post("/rooms/" + room.getRoomId() + "/close")

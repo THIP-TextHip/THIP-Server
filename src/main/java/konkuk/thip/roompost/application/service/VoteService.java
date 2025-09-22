@@ -2,7 +2,9 @@ package konkuk.thip.roompost.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
+import konkuk.thip.room.domain.Room;
 import konkuk.thip.roompost.application.port.in.VoteUseCase;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteCommand;
 import konkuk.thip.roompost.application.port.in.dto.vote.VoteResult;
@@ -25,12 +27,17 @@ public class VoteService implements VoteUseCase {
     private final VoteCommandPort voteCommandPort;
     private final VoteQueryPort voteQueryPort;
     private final RoomParticipantValidator roomParticipantValidator;
+    private final RoomCommandPort roomCommandPort;
 
     @Override
     @Transactional
     public VoteResult vote(VoteCommand command) {
         // 1. 방 참가자 검증
         roomParticipantValidator.validateUserIsRoomMember(command.roomId(), command.userId());
+
+        // 1.1 방 존재 여부 및 만료 검증
+        Room room = roomCommandPort.getByIdOrThrow(command.roomId());
+        room.validateRoomInProgress();
 
         if (command.type()) {
             // 투표하기

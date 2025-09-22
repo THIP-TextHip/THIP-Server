@@ -13,9 +13,13 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public void publishRoomPostCommentedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                              Long roomId, Integer page, Long postId, String postType) {
+    public void publishRoomPostCommentedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long roomId, Integer page, Long postId, String postType) {
         publisher.publishEvent(RoomEvents.RoomPostCommentedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -27,9 +31,13 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomVoteStartedEvent(Long targetUserId, Long roomId, String roomTitle,
-                                            Integer page, Long postId) {
+    public void publishRoomVoteStartedEvent(
+            String title, String content,
+            Long targetUserId, Long roomId, String roomTitle,
+            Integer page, Long postId) {
         publisher.publishEvent(RoomEvents.RoomVoteStartedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .roomId(roomId)
                 .roomTitle(roomTitle)
@@ -39,9 +47,13 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomRecordCreatedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                              Long roomId, String roomTitle, Integer page, Long postId) {
+    public void publishRoomRecordCreatedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long roomId, String roomTitle, Integer page, Long postId) {
         publisher.publishEvent(RoomEvents.RoomRecordCreatedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -53,8 +65,12 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomRecruitClosedEarlyEvent(Long targetUserId, Long roomId, String roomTitle) {
+    public void publishRoomRecruitClosedEarlyEvent(
+            String title, String content,
+            Long targetUserId, Long roomId, String roomTitle) {
         publisher.publishEvent(RoomEvents.RoomRecruitClosedEarlyEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .roomId(roomId)
                 .roomTitle(roomTitle)
@@ -62,8 +78,12 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomActivityStartedEvent(Long targetUserId, Long roomId, String roomTitle) {
+    public void publishRoomActivityStartedEvent(
+            String title, String content,
+            Long targetUserId, Long roomId, String roomTitle) {
         publisher.publishEvent(RoomEvents.RoomActivityStartedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .roomId(roomId)
                 .roomTitle(roomTitle)
@@ -71,9 +91,13 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomJoinEventToHost(Long hostUserId, Long roomId, String roomTitle,
-                                           Long actorUserId, String actorUsername) {
+    public void publishRoomJoinEventToHost(
+            String title, String content,
+            Long hostUserId, Long roomId, String roomTitle,
+            Long actorUserId, String actorUsername) {
         publisher.publishEvent(RoomEvents.RoomJoinRequestedToOwnerEvent.builder()
+                .title(title)
+                .content(content)
                 .ownerUserId(hostUserId)
                 .roomId(roomId)
                 .roomTitle(roomTitle)
@@ -83,9 +107,13 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomCommentLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                             Long roomId, Integer page, Long postId, String postType) {
+    public void publishRoomCommentLikedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long roomId, Integer page, Long postId, String postType) {
         publisher.publishEvent(RoomEvents.RoomCommentLikedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -97,9 +125,13 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomPostLikedEvent(Long targetUserId, Long actorUserId, String actorUsername,
-                                          Long roomId, Integer page, Long postId, String postType) {
+    public void publishRoomPostLikedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername,
+            Long roomId, Integer page, Long postId, String postType) {
         publisher.publishEvent(RoomEvents.RoomPostLikedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)
@@ -111,8 +143,12 @@ public class RoomEventPublisherAdapter implements RoomEventCommandPort {
     }
 
     @Override
-    public void publishRoomPostCommentRepliedEvent(Long targetUserId, Long actorUserId, String actorUsername, Long roomId, Integer page, Long postId, String postType) {
+    public void publishRoomPostCommentRepliedEvent(
+            String title, String content,
+            Long targetUserId, Long actorUserId, String actorUsername, Long roomId, Integer page, Long postId, String postType) {
         publisher.publishEvent(RoomEvents.RoomPostCommentRepliedEvent.builder()
+                .title(title)
+                .content(content)
                 .targetUserId(targetUserId)
                 .actorUserId(actorUserId)
                 .actorUsername(actorUsername)

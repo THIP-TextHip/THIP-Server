@@ -13,6 +13,7 @@ public class NotificationMapper {
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .isChecked(notification.isChecked())
+                .notificationCategory(notification.getNotificationCategory())
                 .userJpaEntity(userJpaEntity)
                 .build();
     }
@@ -23,6 +24,7 @@ public class NotificationMapper {
                 .title(notificationJpaEntity.getTitle())
                 .content(notificationJpaEntity.getContent())
                 .isChecked(notificationJpaEntity.isChecked())
+                .notificationCategory(notificationJpaEntity.getNotificationCategory())
                 .targetUserId(notificationJpaEntity.getUserJpaEntity().getUserId())
                 .createdAt(notificationJpaEntity.getCreatedAt())
                 .modifiedAt(notificationJpaEntity.getModifiedAt())

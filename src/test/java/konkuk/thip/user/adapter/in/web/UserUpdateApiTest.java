@@ -7,7 +7,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 사용자 정보 수정 API 통합 테스트")
 class UserUpdateApiTest {
@@ -38,11 +39,6 @@ class UserUpdateApiTest {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        userJpaRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("사용자 닉네임과 별칭이 정상적으로 업데이트된다.")

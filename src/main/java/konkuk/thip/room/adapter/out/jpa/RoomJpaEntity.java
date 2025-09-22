@@ -100,4 +100,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
 
     @VisibleForTesting
     public void updateRoomPercentage(double roomPercentage) {this.roomPercentage = roomPercentage;}
+
+    @VisibleForTesting
+    public void updateRoomStatus(RoomStatus roomStatus) {this.roomStatus = roomStatus;}
 }

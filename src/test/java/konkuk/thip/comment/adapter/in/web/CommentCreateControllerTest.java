@@ -3,7 +3,6 @@ package konkuk.thip.comment.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
-import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
@@ -58,7 +57,6 @@ class CommentCreateControllerTest {
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private VoteJpaRepository voteJpaRepository;
     @Autowired private RecordJpaRepository recordJpaRepository;
-    @Autowired private CommentJpaRepository commentJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 

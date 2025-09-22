@@ -13,7 +13,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 피드 전체 조회(최신순 조회) api 통합 테스트")
 class BasicFeedShowAllApiTest {
     @Autowired
@@ -63,16 +64,6 @@ class BasicFeedShowAllApiTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        postLikeJpaRepository.deleteAllInBatch();
-        savedFeedJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        followingJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("피드 조회를 요청할 경우, [feedId, 작성자 닉네임, ,,] 의 피드 정보를 최신순으로 정렬해서 반환한다.")

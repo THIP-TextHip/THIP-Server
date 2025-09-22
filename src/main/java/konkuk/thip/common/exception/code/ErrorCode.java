@@ -24,9 +24,11 @@ public enum ErrorCode implements ResponseCode {
     AUTH_UNSUPPORTED_SOCIAL_LOGIN(HttpStatus.UNAUTHORIZED, 40105, "지원하지 않는 소셜 로그인입니다."),
     AUTH_INVALID_LOGIN_TOKEN_KEY(HttpStatus.UNAUTHORIZED, 40106, "유효하지 않은 로그인 토큰 키입니다."),
     AUTH_BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, 40107, "블랙리스트에 등록된 토큰입니다."),
+    AUTH_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 40108, "인증 처리 중 서버 오류가 발생했습니다."),
 
     JSON_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "JSON 직렬화/역직렬화에 실패했습니다."),
     AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
+    WEB_DOMAIN_ORIGIN_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, 50102, "허용된 웹 도메인 설정이 비어있습니다."),
 
     PERSISTENCE_TRANSACTION_REQUIRED(HttpStatus.INTERNAL_SERVER_ERROR, 50110, "@Transactional 컨텍스트가 필요합니다. 트랜잭션 범위 내에서만 사용할 수 있습니다."),
 
@@ -99,8 +101,9 @@ public enum ErrorCode implements ResponseCode {
     INVALID_ROOM_SEARCH_SORT(HttpStatus.BAD_REQUEST, 100005, "방 검색 시 정렬 조건이 잘못되었습니다."),
     ROOM_MEMBER_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, 100006, "방의 최대 인원 수를 초과했습니다."),
     ROOM_MEMBER_COUNT_UNDERFLOW(HttpStatus.BAD_REQUEST, 100007, "방의 인원 수가 1 이하(방장 포함)입니다."),
-    ROOM_IS_EXPIRED(HttpStatus.BAD_REQUEST, 100008, "방이 만료되었습니다."),
+    ROOM_IS_EXPIRED(HttpStatus.BAD_REQUEST, 100008, " 완료된 모임방에서는 기존 기록에 대한 조회만 가능해요."),
     ROOM_POST_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, 100009, "일치하는 방 게시물 타입 이름이 없습니다. [RECORD, VOTE] 중 하나여야 합니다."),
+    ROOM_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, 100010, "진행 중인 방이 아닙니다."),
 
     /**
      * 110000 : vote error
@@ -221,7 +224,13 @@ public enum ErrorCode implements ResponseCode {
     FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 200000, "존재하지 않는 FCM TOKEN 입니다."),
     FCM_TOKEN_ENABLED_STATE_ALREADY(HttpStatus.BAD_REQUEST, 200001, "요청한 상태로 이미 푸쉬 알림 여부가 설정되어 있습니다."),
     FCM_TOKEN_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 200002, "토큰을 소유하고 있는 계정이 아닙니다."),
-    FIREBASE_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 200003, "FCM 푸쉬 알림 전송에 실패했습니다.")
+    FIREBASE_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 200003, "FCM 푸쉬 알림 전송에 실패했습니다."),
+
+
+    /**
+     * 205000 : notification error
+     */
+    INVALID_NOTIFICATION_TYPE(HttpStatus.BAD_REQUEST, 205000, "유효하지 않은 알림 타입입니다."),
 
     ;
 

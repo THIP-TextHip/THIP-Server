@@ -113,9 +113,8 @@ public class BookSearchService implements BookSearchUseCase {
     }
 
     private int getRecruitingRoomCount(Book book) {
-        //오늘 날짜 기준으로 방 활동 시작 기간이 이후인 방 찾기(모집중인 방)
-        LocalDate today = LocalDate.now();
-        return roomQueryPort.countRecruitingRoomsByBookAndStartDateAfter(book.getIsbn(), today);
+        // 모집 중인 방 개수
+        return roomQueryPort.countRecruitingRoomsByBookIsbn(book.getIsbn());
     }
 
     private int getReadCount(Book book) {

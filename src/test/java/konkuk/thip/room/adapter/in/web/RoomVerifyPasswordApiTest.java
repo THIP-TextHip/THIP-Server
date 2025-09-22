@@ -6,12 +6,12 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 비공개 방 비밀번호 입력 검증 api 통합 테스트")
 class RoomVerifyPasswordApiTest {
@@ -99,13 +101,6 @@ class RoomVerifyPasswordApiTest {
         publicRoomId = publicRoom.getRoomId();
     }
 
-    @AfterEach
-    void tearDown() {
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("모집기간이 만료되지 않은 비공개 방의 비밀번호 입력 검증에 [성공]한다")
     void verifyRoomPassword_success() throws Exception {
@@ -162,6 +157,7 @@ class RoomVerifyPasswordApiTest {
                         .startDate(LocalDate.now()) // 오늘 시작이므로 모집기간은 어제까지
                         .endDate(LocalDate.now().plusDays(5))
                         .recruitCount(3)
+                        .roomStatus(RoomStatus.IN_PROGRESS) // 이미 시작된 방
                         .build()
         );
         Long expiredRoomId = expiredRoom.getRoomId();

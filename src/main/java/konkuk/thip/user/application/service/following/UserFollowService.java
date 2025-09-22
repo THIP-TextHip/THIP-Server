@@ -1,7 +1,7 @@
 package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.message.application.port.out.FeedEventCommandPort;
+import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
@@ -23,7 +23,7 @@ public class UserFollowService implements UserFollowUsecase {
     private final FollowingCommandPort followingCommandPort;
     private final UserCommandPort userCommandPort;
 
-    private final FeedEventCommandPort feedEventCommandPort;
+    private final FeedNotificationOrchestrator feedNotificationOrchestrator;
 
     @Override
     @Transactional
@@ -55,7 +55,7 @@ public class UserFollowService implements UserFollowUsecase {
 
     private void sendNotifications(Long userId, Long targetUserId) {
         User actorUser = userCommandPort.findById(userId);
-        feedEventCommandPort.publishFollowEvent(targetUserId, actorUser.getId(), actorUser.getNickname());
+        feedNotificationOrchestrator.notifyFollowed(targetUserId, actorUser.getId(), actorUser.getNickname());
     }
 
     private void validateParams(Long userId, Long targetUserId) {

@@ -9,6 +9,8 @@ import konkuk.thip.feed.adapter.out.jpa.SavedFeedJpaEntity;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
+import konkuk.thip.notification.adapter.out.jpa.NotificationJpaEntity;
+import konkuk.thip.notification.domain.value.NotificationCategory;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
@@ -18,6 +20,7 @@ import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -140,10 +143,11 @@ public class TestEntityFactory {
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(RoomStatus.IN_PROGRESS)
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, LocalDate startDate, LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, LocalDate startDate, LocalDate endDate, RoomStatus roomStatus) {
         return RoomJpaEntity.builder()
                 .title("방이름")
                 .description("설명")
@@ -153,10 +157,11 @@ public class TestEntityFactory {
                 .recruitCount(3)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build();
     }
 
-    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, String roomName, LocalDate startDate, LocalDate endDate) {
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, String roomName, LocalDate startDate, LocalDate endDate, RoomStatus roomStatus) {
         return RoomJpaEntity.builder()
                 .title(roomName)
                 .description("설명")
@@ -166,6 +171,7 @@ public class TestEntityFactory {
                 .recruitCount(20)
                 .bookJpaEntity(book)
                 .category(category)
+                .roomStatus(roomStatus)
                 .build();
     }
 
@@ -367,4 +373,13 @@ public class TestEntityFactory {
                 .build();
     }
 
+    public static NotificationJpaEntity createNotification(UserJpaEntity user, String title, NotificationCategory category) {
+        return NotificationJpaEntity.builder()
+                .title(title)
+                .content("알림 내용")
+                .isChecked(false)
+                .notificationCategory(category)
+                .userJpaEntity(user)
+                .build();
+    }
 }

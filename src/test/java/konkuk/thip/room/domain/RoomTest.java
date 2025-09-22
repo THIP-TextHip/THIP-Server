@@ -3,6 +3,7 @@ package konkuk.thip.room.domain;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -187,7 +188,8 @@ class RoomTest {
                 "제목", "설명", false, "1234",
                 start, start.plusDays(10), 5, 123L, validCategory
         );
-        setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
+        setField(room, "startDate", today);
+        setField(room, "roomStatus", RoomStatus.IN_PROGRESS); // 모집기간 만료 상태를 강제로 만든 후 검증
         assertTrue(room.isRecruitmentPeriodExpired());
     }
 
@@ -199,7 +201,8 @@ class RoomTest {
                 "제목", "설명", false, "1234",
                 startExpired, END, 5, 123L, validCategory
         );
-        setField(room, "startDate", today); // 모집기간 만료 상태를 강제로 만든 후 검증
+        setField(room, "startDate", today);
+        setField(room, "roomStatus", RoomStatus.IN_PROGRESS); // 모집기간 만료 상태를 강제로 만든 후 검증
         InvalidStateException ex = assertThrows(InvalidStateException.class,
                 () -> room.verifyPassword("1234"));
         assertEquals(ErrorCode.ROOM_RECRUITMENT_PERIOD_EXPIRED, ex.getErrorCode());

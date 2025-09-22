@@ -8,12 +8,12 @@ import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 모임 홈 참여중인 내 모임방 조회 api 통합 테스트")
 class RoomGetHomeJoinedRoomsApiTest {
 
@@ -62,8 +64,13 @@ class RoomGetHomeJoinedRoomsApiTest {
         bookJpaRepository.save(book);
 
         category = TestEntityFactory.createLiteratureCategory();
-        room1 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
-        room2 = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+        room1 = TestEntityFactory.createRoom(book, category);
+        room1.updateRoomStatus(RoomStatus.IN_PROGRESS);
+        roomJpaRepository.save(room1);
+
+        room2 = TestEntityFactory.createRoom(book, category);
+        room2.updateRoomStatus(RoomStatus.IN_PROGRESS);
+        roomJpaRepository.save(room2);
 
         // 1번방에 유저 1이 호스트, 유저2가 멤버
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room1,user1, RoomParticipantRole.HOST, 80.0));
@@ -71,14 +78,6 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // 2번방에 유저 1이 호스트
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room2,user1, RoomParticipantRole.HOST,60.0));
-    }
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAll();
-        bookJpaRepository.deleteAll();
-        userJpaRepository.deleteAll();
     }
 
     private RoomJpaEntity saveScienceRoom(String bookTitle, String isbn, String roomName, LocalDate startDate, LocalDate endDate, int recruitCount) {
@@ -161,15 +160,15 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // 방1: 시작일 오늘-2
         RoomJpaEntity room1 = roomJpaRepository.save(
-                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(2), LocalDate.now().plusDays(10))
+                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(2), LocalDate.now().plusDays(10), RoomStatus.IN_PROGRESS)
         );
         // 방2: 시작일 오늘-1
         RoomJpaEntity room2 = roomJpaRepository.save(
-                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(1), LocalDate.now().plusDays(8))
+                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(1), LocalDate.now().plusDays(8), RoomStatus.IN_PROGRESS)
         );
         // 방3: 시작일 오늘
         RoomJpaEntity room3 = roomJpaRepository.save(
-                TestEntityFactory.createCustomRoom(book, category, LocalDate.now(), LocalDate.now().plusDays(9))
+                TestEntityFactory.createCustomRoom(book, category, LocalDate.now(), LocalDate.now().plusDays(9), RoomStatus.IN_PROGRESS)
         );
 
         // 모두 동일한 진행률(70%)로 참여
@@ -199,8 +198,8 @@ class RoomGetHomeJoinedRoomsApiTest {
     }
 
     @Test
-    @DisplayName("사용자가 참여중인 방 목록 중 모집중(시작 전)인 방은 참여중 목록에 포함되지 않는다.")
-    void getHomeJoinedRooms_excludeRecruitingRooms() throws Exception {
+    @DisplayName("사용자가 참여중인 방 목록 중 모집중(시작 전)인 방도 참여중 목록에 포함된다.")
+    void getHomeJoinedRooms_includeRecruitingRooms() throws Exception {
 
         // given
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -208,11 +207,11 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // 모집중(시작일 미래)
         RoomJpaEntity recruitRoom = roomJpaRepository.save(
-                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().plusDays(2), LocalDate.now().plusDays(5))
+                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().plusDays(2), LocalDate.now().plusDays(5), RoomStatus.RECRUITING)
         );
         // 활동중(시작일 오늘-1, 종료일 오늘+2)
         RoomJpaEntity activeRoom = roomJpaRepository.save(
-                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(1), LocalDate.now().plusDays(2))
+                TestEntityFactory.createCustomRoom(book, category, LocalDate.now().minusDays(1), LocalDate.now().plusDays(2), RoomStatus.IN_PROGRESS)
         );
 
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(recruitRoom, newUser, RoomParticipantRole.MEMBER, 20.0));
@@ -225,11 +224,13 @@ class RoomGetHomeJoinedRoomsApiTest {
 
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.roomList", hasSize(1)))
+                .andExpect(jsonPath("$.data.roomList", hasSize(2)))
                 .andExpect(jsonPath("$.data.nextCursor").value(Matchers.nullValue()))
                 .andExpect(jsonPath("$.data.isLast", is(true)))
                 .andExpect(jsonPath("$.data.roomList[0].roomId", is(activeRoom.getRoomId().intValue())))
-                .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(50)));
+                .andExpect(jsonPath("$.data.roomList[0].userPercentage", is(50)))
+                .andExpect(jsonPath("$.data.roomList[1].roomId", is(recruitRoom.getRoomId().intValue())))
+                .andExpect(jsonPath("$.data.roomList[1].userPercentage", is(-1)));
     }
 
 
@@ -267,6 +268,7 @@ class RoomGetHomeJoinedRoomsApiTest {
             LocalDate end = LocalDate.now().plusDays(30);
 
             RoomJpaEntity room = saveScienceRoom("모집중인방-책-" + (i + 1), isbn, title, start, end, 10);
+            room.updateRoomStatus(RoomStatus.IN_PROGRESS);
             changeRoomMemberCount(room, 8);
 
             double userPercentage = 89.6 - i; // 진행률은 방번호가 작을수록 높음

@@ -1,5 +1,6 @@
 package konkuk.thip.feed.adapter.in.web;
 
+import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
@@ -9,7 +10,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("[통합] 피드 화면에서의 유저 정보 조회 api 통합 테스트")
 class FeedShowUserInfoApiTest {
 
@@ -40,14 +42,7 @@ class FeedShowUserInfoApiTest {
     @Autowired private FollowingJpaRepository followingJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        feedJpaRepository.deleteAllInBatch();
-        followingJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-    }
+    @Autowired private EntityManager em;
 
     @Test
     @DisplayName("내 피드에서의 유저 정보를 조회할 경우, 내 개인 정보, 나의 팔로워 정보, 내가 작성한 모든 피드 개수 를 반환한다.")
@@ -73,6 +68,9 @@ class FeedShowUserInfoApiTest {
         jdbcTemplate.update(
                 "UPDATE users SET follower_count = ? WHERE user_id = ?",
                 2, me.getUserId());      // me 의 followerCount 값을 2로 update
+
+        em.flush();
+        em.clear();
 
         // 피드 생성 및 생성일 직접 설정
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
@@ -144,6 +142,9 @@ class FeedShowUserInfoApiTest {
                 "UPDATE users SET follower_count = ? WHERE user_id = ?",
                 7, me.getUserId());      // me 의 followerCount 값을 7로 update
 
+        em.flush();
+        em.clear();
+
         //when //then
         mockMvc.perform(get("/feeds/mine/info")
                         .requestAttr("userId", me.getUserId()))
@@ -190,6 +191,9 @@ class FeedShowUserInfoApiTest {
         feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, true));        // 공개글
         feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, false));       // 비공개글
         feedJpaRepository.save(TestEntityFactory.createFeed(anotherUser, book, false));       // 비공개글
+
+        em.flush();
+        em.clear();
 
         //when //then
         mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId())
@@ -283,6 +287,9 @@ class FeedShowUserInfoApiTest {
         jdbcTemplate.update(
                 "UPDATE users SET follower_count = ? WHERE user_id = ?",
                 7, anotherUser.getUserId());      // anotherUser 의 followerCount 값을 7로 update
+
+        em.flush();
+        em.clear();
 
         //when //then
         mockMvc.perform(get("/feeds/users/{userId}/info", anotherUser.getUserId())

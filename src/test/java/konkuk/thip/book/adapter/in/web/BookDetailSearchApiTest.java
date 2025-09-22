@@ -1,5 +1,6 @@
 package konkuk.thip.book.adapter.in.web;
 
+import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.application.service.BookSearchService;
@@ -14,11 +15,11 @@ import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomP
 import konkuk.thip.book.adapter.out.jpa.SavedBookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -34,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("[통합] 책 상세보기 api 통합 테스트")
 class BookDetailSearchApiTest {
 
@@ -51,6 +54,8 @@ class BookDetailSearchApiTest {
     private FeedJpaRepository feedJpaRepository;
     @Autowired
     private SavedBookJpaRepository savedBookJpaRepository;
+    @Autowired
+    EntityManager em;
 
     @BeforeEach
     void setup() {
@@ -89,6 +94,9 @@ class BookDetailSearchApiTest {
                 .category(category)
                 .build());
 
+        em.flush();
+        em.clear();
+
         roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
                 .currentPage(10)
                 .userPercentage(10.0)
@@ -109,16 +117,6 @@ class BookDetailSearchApiTest {
                 .userJpaEntity(user)
                 .bookJpaEntity(book)
                 .build());
-    }
-
-    @AfterEach
-    void tearDown() {
-        savedBookJpaRepository.deleteAllInBatch();
-        feedJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
     }
 
     @Test
@@ -155,6 +153,7 @@ class BookDetailSearchApiTest {
                 .roomPercentage(0.0)
                 .startDate(LocalDate.now().minusDays(10))
                 .endDate(LocalDate.now().minusDays(5))
+                .roomStatus(RoomStatus.IN_PROGRESS)
                 .recruitCount(10)
                 .bookJpaEntity(book)
                 .category(Category.LITERATURE)

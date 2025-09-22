@@ -8,6 +8,7 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.persistence.repository.RoomJpaRepository;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -85,6 +86,7 @@ class BookRecruitingRoomApiTest {
                 .roomPercentage(0.0)
                 .startDate(LocalDate.now().plusDays(1))
                 .endDate(LocalDate.now().plusDays(30))
+                .roomStatus(RoomStatus.RECRUITING)
                 .recruitCount(5)
                 .bookJpaEntity(book)
                 .category(category)
@@ -97,6 +99,7 @@ class BookRecruitingRoomApiTest {
                 .roomPercentage(0.0)
                 .startDate(LocalDate.now().minusDays(30))
                 .endDate(LocalDate.now().minusDays(1))
+                .roomStatus(RoomStatus.IN_PROGRESS)
                 .recruitCount(5)
                 .bookJpaEntity(book)
                 .category(category)
@@ -139,7 +142,8 @@ class BookRecruitingRoomApiTest {
                     book,
                     category,
                     LocalDate.now().plusDays(i + 1),
-                    LocalDate.now().plusDays(i + 2)
+                    LocalDate.now().plusDays(i + 2),
+                    RoomStatus.RECRUITING
             ));
         }
 

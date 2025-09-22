@@ -10,6 +10,7 @@ import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.room.adapter.in.web.request.RoomVerifyPasswordRequest;
 import konkuk.thip.room.adapter.in.web.response.*;
 import konkuk.thip.room.application.port.in.*;
+import konkuk.thip.room.application.port.in.dto.MyRoomType;
 import konkuk.thip.room.application.port.in.dto.RoomGetHomeJoinedListQuery;
 import konkuk.thip.room.application.port.in.dto.RoomSearchQuery;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,10 @@ public class RoomQueryController {
     private final RoomVerifyPasswordUseCase roomVerifyPasswordUseCase;
     private final RoomShowRecruitingDetailViewUseCase roomShowRecruitingDetailViewUseCase;
     private final RoomGetMemberListUseCase roomGetMemberListUseCase;
-    private final RoomShowPlayingDetailViewUseCase roomShowPlayingDetailViewUseCase;
+    private final RoomShowPlayingOrExpiredDetailViewUseCase roomShowPlayingOrExpiredDetailViewUseCase;
     private final RoomShowMineUseCase roomShowMineUseCase;
     private final RoomGetBookPageUseCase roomGetBookPageUseCase;
-    private final RoomGetDeadlinePopularUseCase roomGetDeadlinePopularUsecase;
+    private final RoomGetDeadlinePopularRecentUseCase roomGetDeadlinePopularRecentUseCase;
 
     @Operation(
             summary = "모집중인 방 검색",
@@ -41,6 +42,7 @@ public class RoomQueryController {
     public BaseResponse<RoomSearchResponse> searchRecruitingRooms(
             @Parameter(description = "검색 키워드 (책 이름 or 방 이름)", example = "해리") @RequestParam(value = "keyword", required = false, defaultValue = "") final String keyword,
             @Parameter(description = "모임방 카테고리", example = "문학") @RequestParam(value = "category", required = false, defaultValue = "") final String category,
+            @Parameter(description = "전체검색여부 (전체 검색에 해당할때만 true로 보내주세요) ", example = "true") @RequestParam(value = "isAllCategory", required = false, defaultValue = "false") final boolean isAllCategory,
             @Parameter(description = "정렬 방식 (마감 임박 : deadline, 신청 인원 : memberCount)", example = "deadline") @RequestParam("sort") final String sort,
             @Parameter(description = "사용자가 검색어 입력을 '확정'했는지 여부 (입력 중: false, 입력 확정: true)", example = "false") @RequestParam(name = "isFinalized") final boolean isFinalized,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
@@ -48,7 +50,7 @@ public class RoomQueryController {
             @Parameter(hidden = true) @UserId final Long userId
     ) {
         return BaseResponse.ok(roomSearchUseCase.searchRecruitingRooms(
-                RoomSearchQuery.of(keyword, category, sort, isFinalized, cursor, userId)
+                RoomSearchQuery.of(keyword, category, sort, isFinalized, cursor, userId,isAllCategory)
         ));
     }
 
@@ -79,7 +81,7 @@ public class RoomQueryController {
 
     @Operation(
             summary = "[모임 홈] 참여중인 내 모임방 조회",
-            description = "사용자가 참여중인 모임방 목록을 조회합니다."
+            description = "사용자가 참여중인 (모집중/진행중인 방) 모임방 목록을 조회합니다."
     )
     @ExceptionDescription(ROOM_GET_HOME_JOINED_LIST)
     @GetMapping("/rooms/home/joined")
@@ -105,18 +107,18 @@ public class RoomQueryController {
         return BaseResponse.ok(roomGetMemberListUseCase.getRoomMemberList(userId, roomId));
     }
 
-    // 진행중인 방 상세보기
+    // 진행중인/완료된 방 상세보기
     @Operation(
-            summary = "진행중인 방 상세보기",
-            description = "진행중인 방의 상세 정보를 조회합니다."
+            summary = "진행중인/완료된 방 상세보기",
+            description = "진행중인/완료된 방의 상세 정보를 조회합니다."
     )
-    @ExceptionDescription(ROOM_PLAYING_DETAIL)
-    @GetMapping("/rooms/{roomId}/playing")
-    public BaseResponse<RoomPlayingDetailViewResponse> getPlayingRoomDetailView(
+    @ExceptionDescription(ROOM_PLAYING_OR_EXPIRED_DETAIL)
+    @GetMapping("/rooms/{roomId}")
+    public BaseResponse<RoomPlayingOrExpiredDetailViewResponse> getPlayingOrExpiredRoomDetailView(
             @Parameter(hidden = true) @UserId final Long userId,
             @PathVariable("roomId") final Long roomId
     ) {
-        return BaseResponse.ok(roomShowPlayingDetailViewUseCase.getPlayingRoomDetailView(userId, roomId));
+        return BaseResponse.ok(roomShowPlayingOrExpiredDetailViewUseCase.getPlayingOrExpiredRoomDetailView(userId, roomId));
     }
 
     // 내 모임방 리스트 조회
@@ -131,7 +133,7 @@ public class RoomQueryController {
             @RequestParam(value = "type", required = false, defaultValue = "playingAndRecruiting") final String type,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
-        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, type, cursor));
+        return BaseResponse.ok(roomShowMineUseCase.getMyRooms(userId, MyRoomType.from(type), cursor));
     }
 
     @Operation(
@@ -148,16 +150,15 @@ public class RoomQueryController {
     }
 
     @Operation(
-            summary = "마감 임박 및 인기 방 조회",
-            description = "카테고리별로 마감 임박 방과 인기 방을 조회합니다."
+            summary = "마감 임박/인기 방/최근 생성된 방 조회",
+            description = "카테고리별로 마감 임박 방, 인기 방, 최근 생성된 방을 조회합니다."
     )
-    @ExceptionDescription(ROOM_GET_DEADLINE_POPULAR)
+    @ExceptionDescription(ROOM_GET_DEADLINE_POPULAR_RECENT)
     @GetMapping("/rooms")
-    public BaseResponse<RoomGetDeadlinePopularResponse> getDeadlineAndPopularRoomList(
+    public BaseResponse<RoomGetDeadlinePopularRecentResponse> getDeadlineAndPopularAndRecentRoomList(
             @Parameter(description = "카테고리 이름 (default : 문학)", example = "과학/IT")
-            @RequestParam(value = "category", defaultValue = "문학") final String category,
-            @Parameter(hidden = true) @UserId final Long userId
+            @RequestParam(value = "category", defaultValue = "문학") final String category
     ) {
-        return BaseResponse.ok(roomGetDeadlinePopularUsecase.getDeadlineAndPopularRoomList(category, userId));
+        return BaseResponse.ok(roomGetDeadlinePopularRecentUseCase.getDeadlineAndPopularAndRecentRoomList(category));
     }
 }

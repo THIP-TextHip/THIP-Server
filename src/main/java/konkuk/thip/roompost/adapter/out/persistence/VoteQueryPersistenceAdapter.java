@@ -1,6 +1,6 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
-import konkuk.thip.room.adapter.in.web.response.RoomPlayingDetailViewResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomPlayingOrExpiredDetailViewResponse;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.roompost.application.port.out.VoteQueryPort;
@@ -23,7 +23,7 @@ public class VoteQueryPersistenceAdapter implements VoteQueryPort {
     private final VoteJpaRepository voteJpaRepository;
 
     @Override
-    public List<RoomPlayingDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count) {
+    public List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count) {
         return voteJpaRepository.findTopParticipationVotesByRoom(room.getId(), count);
     }
 

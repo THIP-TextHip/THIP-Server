@@ -8,7 +8,6 @@ import konkuk.thip.user.adapter.in.web.request.UserVerifyNicknameRequest;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 닉네임 중복 검증 api 테스트")
 class UserVerifyNicknameControllerTest {
@@ -44,11 +45,6 @@ class UserVerifyNicknameControllerTest {
 
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        userJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("[닉네임]값이 unique 할 경우, true를 반환한다.")
@@ -151,7 +147,7 @@ class UserVerifyNicknameControllerTest {
     }
 
     @Test
-    @DisplayName("회원 탈퇴한(= soft delete 처리된) 유저의 닉네임 정보를 포함해서 중복 검증을 수행한다.")
+    @DisplayName("회원 탈퇴한(= soft delete 처리된) 유저의 닉네임 정보를 포함하지않고 중복 검증을 수행한다.")
     void verify_nickname_with_soft_delete_users() throws Exception {
         //given
         UserJpaEntity deleteUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER, "노성준"));
@@ -174,6 +170,6 @@ class UserVerifyNicknameControllerTest {
         JsonNode jsonNode = objectMapper.readTree(json);
         boolean isVerified = jsonNode.path("data").path("isVerified").asBoolean();
 
-        assertThat(isVerified).isFalse();       // 닉네임 중복으로 인해 isVerified == false
+        assertThat(isVerified).isTrue();
     }
 }

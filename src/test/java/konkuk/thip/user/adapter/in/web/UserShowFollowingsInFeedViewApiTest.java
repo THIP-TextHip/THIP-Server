@@ -10,7 +10,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 피드 조회 화면에서, 내 띱 목록 조회 api 통합 테스트")
 class UserShowFollowingsInFeedViewApiTest {
@@ -42,14 +43,6 @@ class UserShowFollowingsInFeedViewApiTest {
     @Autowired private FollowingJpaRepository followingJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        feedJpaRepository.deleteAllInBatch();
-        followingJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("전체 피드 조회 화면에서, 내가 팔로잉 하는 사람들의 [userId, 닉네임, 프로필 이미지] 정보를 1.최근 공개 피드를 작성한 사람 -> 2.최근 팔로잉 맺은 사람 순으로 반환합니다.")

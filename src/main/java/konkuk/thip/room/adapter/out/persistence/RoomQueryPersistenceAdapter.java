@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -25,8 +26,8 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     private final RoomJpaRepository roomJpaRepository;
 
     @Override
-    public int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate) {
-        return roomJpaRepository.countActiveRoomsByBookIdAndStartDateAfter(isbn, currentDate);
+    public int countRecruitingRoomsByBookIsbn(String isbn) {
+        return roomJpaRepository.countRecruitingRoomsByBookIsbn(isbn);
     }
 
     @Override
@@ -169,13 +170,18 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId) {
-        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category, limit, userId);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit) {
+        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category, limit);
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId) {
-        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category, limit, userId);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit) {
+        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category, limit);
+    }
+
+    @Override
+    public List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit) {
+        return roomJpaRepository.findRoomsByCategoryOrderByCreatedAtDesc(category, createdAfter, limit);
     }
 
     @Override

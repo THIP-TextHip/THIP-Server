@@ -5,6 +5,7 @@ import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.value.Category;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.time.LocalDate;
@@ -31,9 +32,11 @@ public interface RoomQueryRepository {
 
     List<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(Category category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(Category category, int limit);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit);
+
+    List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime createdAfter, int limit);
 
     List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize);
 }

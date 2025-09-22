@@ -15,7 +15,6 @@ public class UserVerifyNicknameService implements UserVerifyNicknameUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    @Unfiltered     // soft delete 된 유저의 닉네임을 포함해서 중복 검증
     public boolean isNicknameUnique(String nickname) {
         return !userQueryPort.existsByNickname(nickname);
     }

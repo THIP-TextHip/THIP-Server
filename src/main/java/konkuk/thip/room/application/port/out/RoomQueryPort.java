@@ -5,15 +5,15 @@ import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse;
 import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
-import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.room.domain.value.Category;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomQueryPort {
 
-    int countRecruitingRoomsByBookAndStartDateAfter(String isbn, LocalDate currentDate);
+    int countRecruitingRoomsByBookIsbn(String isbn);
 
     /**
      * 방 검색
@@ -37,10 +37,11 @@ public interface RoomQueryPort {
 
     CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long userId);
+    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
 
+    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit);
     /**
      * 임시 메서드
      * TODO 리펙토링 대상

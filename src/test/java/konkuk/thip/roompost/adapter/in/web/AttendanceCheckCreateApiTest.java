@@ -14,7 +14,6 @@ import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomP
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 오늘의 한마디 생성 api 통합 테스트")
 class AttendanceCheckCreateApiTest {
@@ -50,15 +51,6 @@ class AttendanceCheckCreateApiTest {
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private AttendanceCheckJpaRepository attendanceCheckJpaRepository;
-
-    @AfterEach
-    void tearDown() {
-        attendanceCheckJpaRepository.deleteAllInBatch();
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     @Test
     @DisplayName("방의 참석자는 출석체크(= 오늘의 한마디) 를 작성할 수 있다.")

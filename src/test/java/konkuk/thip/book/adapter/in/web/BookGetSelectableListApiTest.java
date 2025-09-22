@@ -15,7 +15,6 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -39,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@Transactional
 @DisplayName("[통합] 저장한 책 및 참여 중 책 리스트 조회 API 통합 테스트")
 class BookGetSelectableListApiTest {
 
@@ -51,15 +52,6 @@ class BookGetSelectableListApiTest {
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    void tearDown() {
-        roomParticipantJpaRepository.deleteAllInBatch();
-        roomJpaRepository.deleteAllInBatch();
-        savedBookJpaRepository.deleteAllInBatch();
-        bookJpaRepository.deleteAllInBatch();
-        userJpaRepository.deleteAllInBatch();
-    }
 
     private RoomJpaEntity saveScienceRoomWithBookIsbn(String isbn, String roomName, double roomPercentage) {
         BookJpaEntity book = bookJpaRepository.save(BookJpaEntity.builder()

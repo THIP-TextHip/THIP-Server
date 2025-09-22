@@ -10,7 +10,7 @@ import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.annotation.Oauth2Id;
-import konkuk.thip.common.security.oauth2.LoginTokenStorage;
+import konkuk.thip.common.security.oauth2.tokenstorage.LoginTokenStorage;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieRequest;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieResponse;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthTokenRequest;
@@ -92,11 +92,11 @@ public class AuthController {
         String token;
         boolean isNewUser;
 
-        if (entry.getType() == ACCESS) {
-            token = entry.getToken();
+        if (entry.type() == ACCESS) {
+            token = entry.token();
             isNewUser = false;
         } else {
-            token = entry.getToken();
+            token = entry.token();
             isNewUser = true;
         }
 
@@ -127,8 +127,8 @@ public class AuthController {
         ResponseCookie cookie;
         String type;
 
-        if (entry.getType() == ACCESS) {
-            cookie = ResponseCookie.from(COOKIE_ACCESS_TOKEN.getValue(), entry.getToken())
+        if (entry.type() == ACCESS) {
+            cookie = ResponseCookie.from(COOKIE_ACCESS_TOKEN.getValue(), entry.token())
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("None")
@@ -137,7 +137,7 @@ public class AuthController {
                     .build();
             type = ACCESS.getValue();
         } else {
-            cookie = ResponseCookie.from(COOKIE_TEMP_TOKEN.getValue(), entry.getToken())
+            cookie = ResponseCookie.from(COOKIE_TEMP_TOKEN.getValue(), entry.token())
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("None")

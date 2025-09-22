@@ -2,7 +2,7 @@ package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
-import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.notification.application.service.RoomNotificationOrchestratorSyncImpl;
 import konkuk.thip.room.application.port.in.dto.RoomJoinCommand;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
@@ -32,7 +32,7 @@ class RoomJoinServiceTest {
     private RoomParticipantCommandPort roomParticipantCommandPort;
     private RoomJoinService roomJoinService;
     private UserCommandPort userCommandPort;
-    private RoomEventCommandPort roomEventCommandPort;
+    private RoomNotificationOrchestratorSyncImpl roomNotificationOrchestratorSyncImpl;
 
     private final Long ROOM_ID = 1L;
     private final Long USER_ID = 2L;
@@ -46,13 +46,13 @@ class RoomJoinServiceTest {
         roomCommandPort = mock(RoomCommandPort.class);
         roomParticipantCommandPort = mock(RoomParticipantCommandPort.class);
         userCommandPort = mock(UserCommandPort.class);
-        roomEventCommandPort = mock(RoomEventCommandPort.class);
+        roomNotificationOrchestratorSyncImpl = mock(RoomNotificationOrchestratorSyncImpl.class);
 
         roomJoinService = new RoomJoinService(
                 roomCommandPort,
                 roomParticipantCommandPort,
                 userCommandPort,
-                roomEventCommandPort
+                roomNotificationOrchestratorSyncImpl
         );
     }
 

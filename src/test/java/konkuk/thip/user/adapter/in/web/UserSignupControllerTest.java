@@ -8,7 +8,6 @@ import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static konkuk.thip.common.exception.code.ErrorCode.AUTH_TOKEN_NOT_FOUND;
@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@Transactional
 @DisplayName("[통합] 회원가입 api 테스트")
 class UserSignupControllerTest {
 
@@ -44,11 +45,6 @@ class UserSignupControllerTest {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @AfterEach
-    void tearDown() {
-        userJpaRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("[칭호id, 닉네임] 정보를 바탕으로 회원가입을 진행한다.")
