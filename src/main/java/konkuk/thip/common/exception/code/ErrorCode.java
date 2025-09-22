@@ -229,6 +229,17 @@ public enum ErrorCode implements ResponseCode {
      * 205000 : notification error
      */
     INVALID_NOTIFICATION_TYPE(HttpStatus.BAD_REQUEST, 205000, "유효하지 않은 알림 타입입니다."),
+    NOTIFICATION_REDIRECT_DATA_SERIALIZE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 205001, "알림 리다이렉트 데이터 직렬화에 실패했습니다."),
+    NOTIFICATION_REDIRECT_DATA_DESERIALIZE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 205002, "알림 리다이렉트 데이터 역직렬화에 실패했습니다."),
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, 205003, "존재하지 않는 NOTIFICATION 입니다."),
+    NOTIFICATION_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 205004, "알림 접근 권한이 없습니다."),
+    NOTIFICATION_ALREADY_CHECKED(HttpStatus.BAD_REQUEST, 205005, "이미 읽음 처리된 알림입니다."),
+
+
+    /**
+     * 300000 : util error
+     */
+    INVALID_FE_PLATFORM(HttpStatus.BAD_REQUEST, 300000, "유효하지 않은 FE 플랫폼입니다."),
 
     ;
 
