@@ -71,7 +71,7 @@ public class FeedCreateService implements FeedCreateUseCase {
         List<User> targetUsers = userQueryPort.getAllFollowersByUserId(command.userId());
         User actorUser = userCommandPort.findById(command.userId());
         for (User targetUser : targetUsers) {
-            feedNotificationOrchestrator.notifyFolloweeNewPost(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
+            feedNotificationOrchestrator.notifyFolloweeNewFeed(targetUser.getId(), actorUser.getId(), actorUser.getNickname(), savedFeedId);
         }
     }
 
