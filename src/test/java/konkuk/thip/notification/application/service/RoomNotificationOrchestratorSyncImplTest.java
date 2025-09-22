@@ -126,17 +126,14 @@ class RoomNotificationOrchestratorSyncImplTest {
                 ArgumentCaptor.forClass(RoomEvents.RoomPostCommentedEvent.class);
         verify(roomNotificationDispatchUseCase).handleRoomPostCommented(captor.capture());
 
+        NotificationJpaEntity saved = notificationJpaRepository.findAll().get(0);
+
         RoomEvents.RoomPostCommentedEvent event = captor.getValue();
         assertThat(event).isNotNull();
         assertThat(event.title()).isNotBlank();
         assertThat(event.content()).contains(actorUsername);
         assertThat(event.targetUserId()).isEqualTo(targetUserId);
-        assertThat(event.actorUserId()).isEqualTo(actorUserId);
-        assertThat(event.actorUsername()).isEqualTo(actorUsername);
-        assertThat(event.roomId()).isEqualTo(roomId);
-        assertThat(event.page()).isEqualTo(page);
-        assertThat(event.postId()).isEqualTo(postId);
-        assertThat(event.postType()).isEqualTo(postType);
+        assertThat(event.notificationId()).isEqualTo(saved.getNotificationId());
     }
 
     @Test
