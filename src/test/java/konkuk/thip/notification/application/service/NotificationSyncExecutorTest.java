@@ -20,6 +20,8 @@ class NotificationSyncExecutorTest {
     void execute_publish_failure_does_not_throw() {
         // given
         NotificationCommandPort commandPort = mock(NotificationCommandPort.class);
+        when(commandPort.save(any(Notification.class))).thenReturn(42L);    // save 시 생성된 notificationId 를 리턴하도록 스텁
+
         NotificationSyncExecutor executor = new NotificationSyncExecutor(commandPort);
 
         // 간단한 템플릿 스텁 (title/content 고정)
@@ -33,7 +35,7 @@ class NotificationSyncExecutorTest {
         };
 
         // publish 호출 시 강제로 예외를 던지는 invoker
-        EventCommandInvoker invoker = (title, content) -> {
+        EventCommandInvoker invoker = (title, content, notificationId) -> {
             throw new RuntimeException("강제 퍼블리시 실패");
         };
 
@@ -51,5 +53,6 @@ class NotificationSyncExecutorTest {
         assertThat(saved.getTitle()).isEqualTo("테스트제목");
         assertThat(saved.getContent()).isEqualTo("테스트내용");
         assertThat(saved.getTargetUserId()).isEqualTo(123L);
+        assertThat(saved.getNotificationCategory()).isEqualTo(NotificationCategory.FEED);
     }
 }
