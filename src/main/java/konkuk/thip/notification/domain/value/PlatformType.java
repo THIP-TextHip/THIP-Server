@@ -1,4 +1,4 @@
-package konkuk.thip.common.util;
+package konkuk.thip.notification.domain.value;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import lombok.Getter;
