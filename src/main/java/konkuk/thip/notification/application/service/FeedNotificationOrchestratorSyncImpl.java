@@ -93,7 +93,7 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFolloweeNewFeed(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
-        var args = new FolloweeNewPostTemplate.Args(actorUsername);
+        var args = new FolloweeNewFeedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
                 MessageRoute.FEED_DETAIL,
@@ -101,7 +101,7 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
         );
 
         notificationSyncExecutor.execute(
-                FolloweeNewPostTemplate.INSTANCE,
+                FolloweeNewFeedTemplate.INSTANCE,
                 args,
                 targetUserId,
                 redirectSpec,
