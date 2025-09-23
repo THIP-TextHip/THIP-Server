@@ -33,7 +33,11 @@ class MessageFeedEventListenerTest {
     void follower_isHandled_afterCommit() {
         // given
         var e = FeedEvents.FollowerEvent.builder()
-                .targetUserId(1L).actorUserId(2L).actorUsername("bob").build();
+                .title("title")
+                .content("content")
+                .notificationId(1L)
+                .targetUserId(1L)
+                .build();
 
         // when: 트랜잭션 안에서 이벤트 발행
         publisher.publishEvent(e);

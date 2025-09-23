@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,17 +37,18 @@ class FeedNotificationOrchestratorSyncImplUnitTest {
         // then: NotificationSyncExecutor 가 올바르게 호출되었는지 검증
         ArgumentCaptor<EventCommandInvoker> invokerCaptor = ArgumentCaptor.forClass(EventCommandInvoker.class);
         verify(notificationSyncExecutor).execute(
-                org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.eq(targetUserId),
-                invokerCaptor.capture()
+                any(),                // template
+                any(),                // args
+                eq(targetUserId),     // targetUserId
+                any(),                // redirectSpec
+                invokerCaptor.capture() // invoker
         );
 
         // then: invoker 가 EventCommandPort 메서드를 올바르게 호출하는지 검증
         EventCommandInvoker invoker = invokerCaptor.getValue();
-        invoker.publish("title", "content");
+        invoker.publish("title", "content", 123L);
         verify(feedEventCommandPort).publishFeedCommentedEvent(
-                "title", "content", targetUserId, actorUserId, actorUsername, feedId
+                "title", "content", 123L, targetUserId
         );
     }
 }

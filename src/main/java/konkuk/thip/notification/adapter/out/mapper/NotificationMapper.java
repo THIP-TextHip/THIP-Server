@@ -15,6 +15,7 @@ public class NotificationMapper {
                 .isChecked(notification.isChecked())
                 .notificationCategory(notification.getNotificationCategory())
                 .userJpaEntity(userJpaEntity)
+                .redirectSpec(notification.getRedirectSpec())
                 .build();
     }
 
@@ -26,6 +27,7 @@ public class NotificationMapper {
                 .isChecked(notificationJpaEntity.isChecked())
                 .notificationCategory(notificationJpaEntity.getNotificationCategory())
                 .targetUserId(notificationJpaEntity.getUserJpaEntity().getUserId())
+                .redirectSpec(notificationJpaEntity.getRedirectSpec())
                 .createdAt(notificationJpaEntity.getCreatedAt())
                 .modifiedAt(notificationJpaEntity.getModifiedAt())
                 .status(notificationJpaEntity.getStatus())

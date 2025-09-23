@@ -10,7 +10,10 @@ import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenDeleteRequest;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenEnableStateChangeRequest;
 import konkuk.thip.notification.adapter.in.web.request.FcmTokenRegisterRequest;
+import konkuk.thip.notification.adapter.in.web.request.NotificationMarkToCheckedRequest;
 import konkuk.thip.notification.adapter.in.web.response.FcmTokenEnableStateChangeResponse;
+import konkuk.thip.notification.adapter.in.web.response.NotificationMarkToCheckedResponse;
+import konkuk.thip.notification.application.port.in.NotificationMarkUseCase;
 import konkuk.thip.notification.application.port.in.fcm.FcmDeleteUseCase;
 import konkuk.thip.notification.application.port.in.fcm.FcmEnableStateChangeUseCase;
 import konkuk.thip.notification.application.port.in.fcm.FcmRegisterUseCase;
@@ -27,6 +30,7 @@ public class NotificationCommandController {
     private final FcmRegisterUseCase fcmRegisterUseCase;
     private final FcmEnableStateChangeUseCase fcmEnableStateChangeUseCase;
     private final FcmDeleteUseCase fcmDeleteUseCase;
+    private final NotificationMarkUseCase notificationMarkUseCase;
 
     @Operation(summary = "FCM 토큰 등록", description = "사용자의 FCM 토큰을 서버에 등록합니다. 기존 토큰이 있다면 deviceId 기준으로 토큰을 갱신합니다.")
     @PostMapping("/notifications/fcm-tokens")
@@ -59,5 +63,17 @@ public class NotificationCommandController {
     ) {
         fcmDeleteUseCase.deleteToken(request.toCommand(userId));
         return BaseResponse.ok(null);
+    }
+
+    @Operation(
+            summary = "유저의 특정 알림 읽음 처리",
+            description = "유저가 특정 알림을 읽음 처리합니다 (푸시알림, 알림센터의 알림 모두 포함). 읽음 처리 후, 해당 알림의 페이지로 리다이렉트를 위한 데이터를 응답합니다."
+    )
+    @ExceptionDescription(NOTIFICATION_MARK_TO_CHECKED)
+    @PostMapping("/notifications/check")
+    public BaseResponse<NotificationMarkToCheckedResponse> markNotificationToChecked(
+            @RequestBody @Valid NotificationMarkToCheckedRequest request,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(notificationMarkUseCase.markToChecked(request.notificationId(), userId));
     }
 }

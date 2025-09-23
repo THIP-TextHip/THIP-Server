@@ -4,9 +4,13 @@ import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.message.application.port.out.FeedEventCommandPort;
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.notification.application.service.template.feed.*;
+import konkuk.thip.notification.domain.value.MessageRoute;
+import konkuk.thip.notification.domain.value.NotificationRedirectSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @HelperService
 @RequiredArgsConstructor
@@ -27,12 +31,19 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFollowed(Long targetUserId, Long actorUserId, String actorUsername) {
         var args = new FollowedTemplate.Args(actorUsername);
+
+        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
+                MessageRoute.FEED_USER,
+                Map.of("userId", actorUserId)
+        );
+
         notificationSyncExecutor.execute(
                 FollowedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                (title, content) -> feedEventCommandPort.publishFollowEvent(
-                        title, content, targetUserId, actorUserId, actorUsername
+                redirectSpec,
+                (title, content, notificationId) -> feedEventCommandPort.publishFollowEvent(
+                        title, content, notificationId, targetUserId
                 )
         );
     }
@@ -41,12 +52,19 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedCommented(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
         var args = new FeedCommentedTemplate.Args(actorUsername);
+
+        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
+                MessageRoute.FEED_DETAIL,
+                Map.of("feedId", feedId)
+        );
+
         notificationSyncExecutor.execute(
                 FeedCommentedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                (title, content) -> feedEventCommandPort.publishFeedCommentedEvent(
-                        title, content, targetUserId, actorUserId, actorUsername, feedId
+                redirectSpec,
+                (title, content, notificationId) -> feedEventCommandPort.publishFeedCommentedEvent(
+                        title, content, notificationId, targetUserId
                 )
         );
     }
@@ -55,26 +73,40 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedReplied(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
         var args = new FeedRepliedTemplate.Args(actorUsername);
+
+        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
+                MessageRoute.FEED_DETAIL,
+                Map.of("feedId", feedId)
+        );
+
         notificationSyncExecutor.execute(
                 FeedRepliedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                (title, content) -> feedEventCommandPort.publishFeedRepliedEvent(
-                        title, content, targetUserId, actorUserId, actorUsername, feedId
+                redirectSpec,
+                (title, content, notificationId) -> feedEventCommandPort.publishFeedRepliedEvent(
+                        title, content, notificationId, targetUserId
                 )
         );
     }
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public void notifyFolloweeNewPost(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
-        var args = new FolloweeNewPostTemplate.Args(actorUsername);
+    public void notifyFolloweeNewFeed(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
+        var args = new FolloweeNewFeedTemplate.Args(actorUsername);
+
+        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
+                MessageRoute.FEED_DETAIL,
+                Map.of("feedId", feedId)
+        );
+
         notificationSyncExecutor.execute(
-                FolloweeNewPostTemplate.INSTANCE,
+                FolloweeNewFeedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                (title, content) -> feedEventCommandPort.publishFolloweeNewPostEvent(
-                        title, content, targetUserId, actorUserId, actorUsername, feedId
+                redirectSpec,
+                (title, content, notificationId) -> feedEventCommandPort.publishFolloweeNewFeedEvent(
+                        title, content, notificationId, targetUserId
                 )
         );
     }
@@ -83,12 +115,19 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedLiked(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
         var args = new FeedLikedTemplate.Args(actorUsername);
+
+        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
+                MessageRoute.FEED_DETAIL,
+                Map.of("feedId", feedId)
+        );
+
         notificationSyncExecutor.execute(
                 FeedLikedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                (title, content) -> feedEventCommandPort.publishFeedLikedEvent(
-                        title, content, targetUserId, actorUserId, actorUsername, feedId
+                redirectSpec,
+                (title, content, notificationId) -> feedEventCommandPort.publishFeedLikedEvent(
+                        title, content, notificationId, targetUserId
                 )
         );
     }
@@ -97,12 +136,19 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedCommentLiked(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
         var args = new FeedCommentLikedTemplate.Args(actorUsername);
+
+        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
+                MessageRoute.FEED_DETAIL,
+                Map.of("feedId", feedId)
+        );
+
         notificationSyncExecutor.execute(
                 FeedCommentLikedTemplate.INSTANCE,
                 args,
                 targetUserId,
-                (title, content) -> feedEventCommandPort.publishFeedCommentLikedEvent(
-                        title, content, targetUserId, actorUserId, actorUsername, feedId
+                redirectSpec,
+                (title, content, notificationId) -> feedEventCommandPort.publishFeedCommentLikedEvent(
+                        title, content, notificationId, targetUserId
                 )
         );
     }

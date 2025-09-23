@@ -37,14 +37,18 @@ class RoomNotificationOrchestratorSyncImplUnitTest {
         // then: NotificationSyncExecutor 가 올바르게 호출되었는지 검증
         ArgumentCaptor<EventCommandInvoker> invokerCaptor = ArgumentCaptor.forClass(EventCommandInvoker.class);
         verify(notificationSyncExecutor).execute(
-                any(), any(), eq(targetUserId), invokerCaptor.capture()
+                any(),                // template
+                any(),                // args
+                eq(targetUserId),     // targetUserId
+                any(),                // redirectSpec
+                invokerCaptor.capture() // invoker
         );
 
         // then: invoker 가 EventCommandPort 메서드를 올바르게 호출하는지 검증
         EventCommandInvoker invoker = invokerCaptor.getValue();
-        invoker.publish("title", "content");
+        invoker.publish("title", "content", 123L);
         verify(roomEventCommandPort).publishRoomPostCommentedEvent(
-                "title", "content", targetUserId, actorUserId, actorUsername, roomId, page, postId, postType
+                "title", "content", 123L, targetUserId
         );
     }
 }
