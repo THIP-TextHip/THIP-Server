@@ -23,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
-import static konkuk.thip.common.exception.code.ErrorCode.NOTIFICATION_ALREADY_CHECKED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,13 +92,17 @@ class NotificationMarkToCheckedApiTest {
     }
 
     @Test
-    @DisplayName("이미 읽음 처리된 알림을 다시 읽음 처리하면, 400 에러를 반환한다.")
+    @DisplayName("이미 읽음 처리된 알림을 다시 읽음 처리하더라도, 에러를 반환하지 않고 알림의 리다이렉트를 위한 데이터를 반환한다.")
     void mark_notification_to_checked_already_checked() throws Exception {
         // given: owner의 알림을 미리 is_checked=true 상태로 만들어 둔다
         UserJpaEntity owner = userJpaRepository.save(TestEntityFactory.createUser(Alias.WRITER));
 
+        NotificationRedirectSpec redirectSpec = TestEntityFactory.createNotificationRedirectSpec(
+                MessageRoute.FEED_USER, Map.of("userId", 123L)    // 특정 유저의 피드 페이지로 이동
+        );
+
         NotificationJpaEntity notification = notificationJpaRepository.save(
-                TestEntityFactory.createNotification(owner, "이미 읽은 알림", NotificationCategory.FEED));
+                TestEntityFactory.createNotification(owner, "이미 읽은 알림", NotificationCategory.FEED, redirectSpec));
 
         // is_checked=true 로 강제 세팅
         jdbcTemplate.update(
@@ -116,8 +118,8 @@ class NotificationMarkToCheckedApiTest {
                         .contentType(APPLICATION_JSON)
                         .content(body)
                         .requestAttr("userId", owner.getUserId()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(NOTIFICATION_ALREADY_CHECKED.getCode()))
-                .andExpect(jsonPath("$.message", containsString(NOTIFICATION_ALREADY_CHECKED.getMessage())));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.route").value(MessageRoute.FEED_USER.name()))
+                .andExpect(jsonPath("$.data.params.userId").value(123));
     }
 }

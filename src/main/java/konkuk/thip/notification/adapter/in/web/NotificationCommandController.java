@@ -67,7 +67,8 @@ public class NotificationCommandController {
 
     @Operation(
             summary = "유저의 특정 알림 읽음 처리",
-            description = "유저가 특정 알림을 읽음 처리합니다 (푸시알림, 알림센터의 알림 모두 포함). 읽음 처리 후, 해당 알림의 페이지로 리다이렉트를 위한 데이터를 응답합니다."
+            description = "유저가 특정 알림을 읽음 처리합니다 (푸시알림, 알림센터의 알림 모두 포함). 읽음 처리 후, 해당 알림의 페이지로 리다이렉트를 위한 데이터를 응답합니다. " +
+                    "이미 읽음처리가 된 알림에 대해서는 리다이렉트를 위한 데이터만 응답합니다."
     )
     @ExceptionDescription(NOTIFICATION_MARK_TO_CHECKED)
     @PostMapping("/notifications/check")

@@ -379,8 +379,7 @@ public enum SwaggerResponseDescription {
     ))),
     NOTIFICATION_MARK_TO_CHECKED(new LinkedHashSet<>(Set.of(
             NOTIFICATION_NOT_FOUND,
-            NOTIFICATION_ACCESS_FORBIDDEN,
-            NOTIFICATION_ALREADY_CHECKED
+            NOTIFICATION_ACCESS_FORBIDDEN
     ))),
 
   ;
