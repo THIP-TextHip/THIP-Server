@@ -1,6 +1,7 @@
 package konkuk.thip.notification.application.service;
 
 import konkuk.thip.message.application.port.out.RoomEventCommandPort;
+import konkuk.thip.post.domain.PostType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ class RoomNotificationOrchestratorSyncImplUnitTest {
         Long targetUserId = 10L;
         Long actorUserId = 20L;
         String actorUsername = "alice";
-        Long roomId = 1L; int page = 2; Long postId = 3L; String postType = "RECORD";
+        Long roomId = 1L; int page = 2; Long postId = 3L; PostType postType = PostType.RECORD;
 
         // when
         sut.notifyRoomPostCommented(targetUserId, actorUserId, actorUsername, roomId, page, postId, postType);

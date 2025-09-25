@@ -6,6 +6,7 @@ import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator
 import konkuk.thip.notification.application.service.template.room.*;
 import konkuk.thip.notification.domain.value.MessageRoute;
 import konkuk.thip.notification.domain.value.NotificationRedirectSpec;
+import konkuk.thip.post.domain.PostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,18 +31,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomPostCommented(Long targetUserId, Long actorUserId, String actorUsername,
-                                        Long roomId, Integer page, Long postId, String postType) {
+                                        Long roomId, Integer page, Long postId, PostType postType) {
         var args = new RoomPostCommentedTemplate.Args(actorUsername);
 
-        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
-                MessageRoute.ROOM_POST_DETAIL,
-                Map.of(
-                        "roomId", roomId,
-                        "page", page,
-                        "postId", postId,
-                        "postType", postType
-                )
-        );
+        NotificationRedirectSpec redirectSpec = createRoomPostWithCommentsRedirectSpec(roomId, page, postId, postType);
 
         notificationSyncExecutor.execute(
                 RoomPostCommentedTemplate.INSTANCE,
@@ -59,15 +52,7 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     public void notifyRoomVoteStarted(Long targetUserId, Long roomId, String roomTitle, Integer page, Long postId) {
         var args = new RoomVoteStartedTemplate.Args(roomTitle);
 
-        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
-                MessageRoute.ROOM_VOTE_DETAIL,
-                Map.of(
-                        "roomId", roomId,
-                        "page", page,
-                        "postId", postId,
-                        "postType", "VOTE"
-                )
-        );
+        NotificationRedirectSpec redirectSpec = createRoomPostRedirectSpec(roomId, page, postId, PostType.VOTE);
 
         notificationSyncExecutor.execute(
                 RoomVoteStartedTemplate.INSTANCE,
@@ -86,15 +71,7 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
                                         Long roomId, String roomTitle, Integer page, Long postId) {
         var args = new RoomRecordCreatedTemplate.Args(roomTitle, actorUsername);
 
-        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
-                MessageRoute.ROOM_RECORD_DETAIL,
-                Map.of(
-                        "roomId", roomId,
-                        "page", page,
-                        "postId", postId,
-                        "postType", "RECORD"
-                )
-        );
+        NotificationRedirectSpec redirectSpec = createRoomPostRedirectSpec(roomId, page, postId, PostType.RECORD);
 
         notificationSyncExecutor.execute(
                 RoomRecordCreatedTemplate.INSTANCE,
@@ -173,18 +150,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomCommentLiked(Long targetUserId, Long actorUserId, String actorUsername,
-                                       Long roomId, Integer page, Long postId, String postType) {
+                                       Long roomId, Integer page, Long postId, PostType postType) {
         var args = new RoomCommentLikedTemplate.Args(actorUsername);
 
-        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
-                MessageRoute.ROOM_POST_DETAIL,
-                Map.of(
-                        "roomId", roomId,
-                        "page", page,
-                        "postId", postId,
-                        "postType", postType
-                )
-        );
+        NotificationRedirectSpec redirectSpec = createRoomPostWithCommentsRedirectSpec(roomId, page, postId, postType);
 
         notificationSyncExecutor.execute(
                 RoomCommentLikedTemplate.INSTANCE,
@@ -200,18 +169,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomPostLiked(Long targetUserId, Long actorUserId, String actorUsername,
-                                    Long roomId, Integer page, Long postId, String postType) {
+                                    Long roomId, Integer page, Long postId, PostType postType) {
         var args = new RoomPostLikedTemplate.Args(actorUsername);
 
-        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
-                MessageRoute.ROOM_POST_DETAIL,
-                Map.of(
-                        "roomId", roomId,
-                        "page", page,
-                        "postId", postId,
-                        "postType", postType
-                )
-        );
+        NotificationRedirectSpec redirectSpec = createRoomPostRedirectSpec(roomId, page, postId, postType);
 
         notificationSyncExecutor.execute(
                 RoomPostLikedTemplate.INSTANCE,
@@ -227,18 +188,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomPostCommentReplied(Long targetUserId, Long actorUserId, String actorUsername,
-                                             Long roomId, Integer page, Long postId, String postType) {
+                                             Long roomId, Integer page, Long postId, PostType postType) {
         var args = new RoomPostCommentRepliedTemplate.Args(actorUsername);
 
-        NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
-                MessageRoute.ROOM_POST_DETAIL,
-                Map.of(
-                        "roomId", roomId,
-                        "page", page,
-                        "postId", postId,
-                        "postType", postType
-                )
-        );
+        NotificationRedirectSpec redirectSpec = createRoomPostWithCommentsRedirectSpec(roomId, page, postId, postType);
 
         notificationSyncExecutor.execute(
                 RoomPostCommentRepliedTemplate.INSTANCE,
@@ -247,6 +200,32 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
                 redirectSpec,
                 (title, content, notificationId) -> roomEventCommandPort.publishRoomPostCommentRepliedEvent(
                         title, content, notificationId, targetUserId
+                )
+        );
+    }
+
+    private NotificationRedirectSpec createRoomPostWithCommentsRedirectSpec(Long roomId, Integer page, Long postId, PostType postType) {
+        return new NotificationRedirectSpec(
+                MessageRoute.ROOM_POST_DETAIL,
+                Map.of(
+                        "roomId", roomId,
+                        "page", page,
+                        "postId", postId,
+                        "postType", postType,
+                        "openComments", true
+                )
+        );
+    }
+
+    private NotificationRedirectSpec createRoomPostRedirectSpec(Long roomId, Integer page, Long postId, PostType postType) {
+        return new NotificationRedirectSpec(
+                MessageRoute.ROOM_POST_DETAIL,
+                Map.of(
+                        "roomId", roomId,
+                        "page", page,
+                        "postId", postId,
+                        "postType", postType,
+                        "openComments", false
                 )
         );
     }

@@ -1,5 +1,7 @@
 package konkuk.thip.notification.application.port.in;
 
+import konkuk.thip.post.domain.PostType;
+
 public interface RoomNotificationOrchestrator {
 
     /**
@@ -9,7 +11,7 @@ public interface RoomNotificationOrchestrator {
 
     // ===== Room 영역 =====
     void notifyRoomPostCommented(Long targetUserId, Long actorUserId, String actorUsername,
-                                 Long roomId, Integer page, Long postId, String postType);
+                                 Long roomId, Integer page, Long postId, PostType postType);
 
     void notifyRoomVoteStarted(Long targetUserId, Long roomId, String roomTitle, Integer page, Long postId);
 
@@ -24,11 +26,11 @@ public interface RoomNotificationOrchestrator {
                               Long actorUserId, String actorUsername);
 
     void notifyRoomCommentLiked(Long targetUserId, Long actorUserId, String actorUsername,
-                                Long roomId, Integer page, Long postId, String postType);
+                                Long roomId, Integer page, Long postId, PostType postType);
 
     void notifyRoomPostLiked(Long targetUserId, Long actorUserId, String actorUsername,
-                             Long roomId, Integer page, Long postId, String postType);
+                             Long roomId, Integer page, Long postId, PostType postType);
 
     void notifyRoomPostCommentReplied(Long targetUserId, Long actorUserId, String actorUsername,
-                                      Long roomId, Integer page, Long postId, String postType);
+                                      Long roomId, Integer page, Long postId, PostType postType);
 }
