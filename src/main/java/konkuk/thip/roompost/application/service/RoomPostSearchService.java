@@ -48,7 +48,7 @@ public class RoomPostSearchService implements RoomPostSearchUseCase {
     private final RoomPostAccessValidator roomPostAccessValidator;
     private final RoomPostQueryMapper roomPostQueryMapper;
 
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int DEFAULT_PAGE_SIZE = 20;
 
     @Override
     @Transactional(readOnly = true)
