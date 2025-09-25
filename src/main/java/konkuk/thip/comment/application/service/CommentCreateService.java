@@ -93,24 +93,34 @@ public class CommentCreateService implements CommentCreateUseCase {
     private void sendNotificationsToPostWriter(PostQueryDto postQueryDto, User actorUser) {
         if (postQueryDto.creatorId().equals(actorUser.getId())) return; // 자신이 작성한 게시글 제외
 
-        if (postQueryDto.postType().equals(FEED.getType())) {
-            // 피드 댓글 알림 이벤트 발행
-            feedNotificationOrchestrator.notifyFeedCommented(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
-        } else if (postQueryDto.postType().equals(RECORD.getType()) || postQueryDto.postType().equals(VOTE.getType())) {
-            // 모임방 게시글 댓글 알림 이벤트 발행
-            roomNotificationOrchestrator.notifyRoomPostCommented(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+        PostType postType = PostType.from(postQueryDto.postType());
+        switch (postType) {
+            case FEED ->    // 피드 댓글 알림 이벤트 발행
+                    feedNotificationOrchestrator.notifyFeedCommented(
+                            postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId()
+                    );
+            case RECORD, VOTE ->    // 모임방 게시글 댓글 알림 이벤트 발행
+                    roomNotificationOrchestrator.notifyRoomPostCommented(
+                            postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(),
+                            postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postType
+                    );
         }
     }
 
     private void sendNotificationsToParentCommentWriter(PostQueryDto postQueryDto, CommentQueryDto parentCommentDto, User actorUser) {
         if (parentCommentDto.creatorId().equals(actorUser.getId())) return; // 자신이 작성한 댓글 제외
 
-        if (postQueryDto.postType().equals(FEED.getType())) {
-            // 피드 답글 알림 이벤트 발행
-            feedNotificationOrchestrator.notifyFeedReplied(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
-        } else if (postQueryDto.postType().equals(RECORD.getType()) || postQueryDto.postType().equals(VOTE.getType())) {
-            // 모임방 게시글 답글 알림 이벤트 발행
-            roomNotificationOrchestrator.notifyRoomPostCommentReplied(parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+        PostType postType = PostType.from(postQueryDto.postType());
+        switch (postType) {
+            case FEED ->    // 피드 답글 알림 이벤트 발행
+                    feedNotificationOrchestrator.notifyFeedReplied(
+                            parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId()
+                    );
+            case RECORD, VOTE ->    // 모임방 게시글 답글 알림 이벤트 발행
+                    roomNotificationOrchestrator.notifyRoomPostCommentReplied(
+                            parentCommentDto.creatorId(), actorUser.getId(), actorUser.getNickname(),
+                            postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postType
+                    );
         }
     }
 

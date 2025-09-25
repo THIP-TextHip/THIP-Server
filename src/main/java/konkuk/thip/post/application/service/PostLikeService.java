@@ -11,7 +11,6 @@ import konkuk.thip.post.application.port.in.PostLikeUseCase;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.post.application.service.validator.PostLikeAuthorizationValidator;
-import konkuk.thip.post.domain.PostType;
 import konkuk.thip.post.domain.service.PostCountService;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
@@ -69,15 +68,20 @@ public class PostLikeService implements PostLikeUseCase {
     private void sendNotifications(PostIsLikeCommand command) {
         PostQueryDto postQueryDto = postHandler.getPostQueryDto(command.postType(), command.postId());
 
-        if(command.userId().equals(postQueryDto.creatorId())) return; // 자신의 게시글에 좋아요 누르는 경우 제외
+        if (command.userId().equals(postQueryDto.creatorId())) return; // 자신의 게시글에 좋아요 누르는 경우 제외
 
         User actorUser = userCommandPort.findById(command.userId());
-        // 좋아요 푸쉬알림 전송
-        if (command.postType() == PostType.FEED) {
-            feedNotificationOrchestrator.notifyFeedLiked(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId());
-        }
-        if (command.postType() == PostType.RECORD || command.postType() == PostType.VOTE) {
-            roomNotificationOrchestrator.notifyRoomPostLiked(postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+
+        switch (command.postType()) {
+            case FEED ->
+                    feedNotificationOrchestrator.notifyFeedLiked(
+                            postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.postId()
+                    );
+            case RECORD, VOTE ->
+                    roomNotificationOrchestrator.notifyRoomPostLiked(
+                            postQueryDto.creatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), command.postType()
+                    );
+
         }
     }
 }

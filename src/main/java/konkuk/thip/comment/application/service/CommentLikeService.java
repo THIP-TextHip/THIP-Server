@@ -71,13 +71,19 @@ public class CommentLikeService implements CommentLikeUseCase {
         if (command.userId().equals(comment.getCreatorId())) return; // 자신의 댓글에 좋아요 누르는 경우 제외
 
         User actorUser = userCommandPort.findById(command.userId());
-        // 좋아요 푸쉬알림 전송
-        if (comment.getPostType() == PostType.FEED) {
-            feedNotificationOrchestrator.notifyFeedCommentLiked(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), comment.getTargetPostId());
-        }
-        if (comment.getPostType() == PostType.RECORD || comment.getPostType() == PostType.VOTE) {
-            PostQueryDto postQueryDto = postHandler.getPostQueryDto(comment.getPostType(), comment.getTargetPostId());
-            roomNotificationOrchestrator.notifyRoomCommentLiked(comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postQueryDto.postType());
+        PostType postType = comment.getPostType();
+
+        switch (postType) {
+            case FEED ->
+                    feedNotificationOrchestrator.notifyFeedCommentLiked(
+                            comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(),comment.getTargetPostId()
+                    );
+            case RECORD, VOTE -> {
+                    PostQueryDto postQueryDto = postHandler.getPostQueryDto(comment.getPostType(), comment.getTargetPostId());
+                    roomNotificationOrchestrator.notifyRoomCommentLiked(
+                            comment.getCreatorId(), actorUser.getId(), actorUser.getNickname(), postQueryDto.roomId(), postQueryDto.page(), postQueryDto.postId(), postType
+                    );
+            }
         }
     }
 }
