@@ -9,7 +9,7 @@ public interface FeedNotificationDispatchUseCase {
 
     void handleFeedCommentReplied(FeedEvents.FeedCommentRepliedEvent e);
 
-    void handleFolloweeNewPost(FeedEvents.FolloweeNewPostEvent e);
+    void handleFolloweeNewFeed(FeedEvents.FolloweeNewFeedEvent e);
 
     void handleFeedLiked(FeedEvents.FeedLikedEvent e);
 

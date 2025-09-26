@@ -14,89 +14,73 @@ public class FeedEventPublisherAdapter implements FeedEventCommandPort {
 
     @Override
     public void publishFollowEvent(
-            String title, String content,
-            Long targetUserId, Long actorUserId, String actorUsername) {
+            String title, String content, Long notificationId,
+            Long targetUserId) {
         publisher.publishEvent(FeedEvents.FollowerEvent.builder()
                 .title(title)
                 .content(content)
+                .notificationId(notificationId)
                 .targetUserId(targetUserId)
-                .actorUserId(actorUserId)
-                .actorUsername(actorUsername)
                 .build());
     }
 
     @Override
     public void publishFeedCommentedEvent(
-            String title, String content,
-            Long targetUserId, Long actorUserId, String actorUsername,
-            Long feedId) {
+            String title, String content, Long notificationId,
+            Long targetUserId) {
         publisher.publishEvent(FeedEvents.FeedCommentedEvent.builder()
                 .title(title)
                 .content(content)
+                .notificationId(notificationId)
                 .targetUserId(targetUserId)
-                .actorUserId(actorUserId)
-                .actorUsername(actorUsername)
-                .feedId(feedId)
                 .build());
     }
 
     @Override
     public void publishFeedRepliedEvent(
-            String title, String content,
-            Long targetUserId, Long actorUserId, String actorUsername,
-            Long feedId) {
+            String title, String content, Long notificationId,
+            Long targetUserId) {
         publisher.publishEvent(FeedEvents.FeedCommentRepliedEvent.builder()
                 .title(title)
                 .content(content)
+                .notificationId(notificationId)
                 .targetUserId(targetUserId)
-                .actorUserId(actorUserId)
-                .actorUsername(actorUsername)
-                .feedId(feedId)
                 .build());
     }
 
     @Override
-    public void publishFolloweeNewPostEvent(
-            String title, String content,
-            Long targetUserId, Long actorUserId, String actorUsername,
-            Long feedId) {
-        publisher.publishEvent(FeedEvents.FolloweeNewPostEvent.builder()
+    public void publishFolloweeNewFeedEvent(
+            String title, String content, Long notificationId,
+            Long targetUserId) {
+        publisher.publishEvent(FeedEvents.FolloweeNewFeedEvent.builder()
                 .title(title)
                 .content(content)
+                .notificationId(notificationId)
                 .targetUserId(targetUserId)
-                .actorUserId(actorUserId)
-                .actorUsername(actorUsername)
-                .feedId(feedId)
                 .build());
     }
 
     @Override
     public void publishFeedLikedEvent(
-            String title, String content,
-            Long targetUserId, Long actorUserId, String actorUsername,
-            Long feedId) {
+            String title, String content, Long notificationId,
+            Long targetUserId) {
         publisher.publishEvent(FeedEvents.FeedLikedEvent.builder()
                 .title(title)
                 .content(content)
+                .notificationId(notificationId)
                 .targetUserId(targetUserId)
-                .actorUserId(actorUserId)
-                .actorUsername(actorUsername)
-                .feedId(feedId)
                 .build());
     }
 
     @Override
     public void publishFeedCommentLikedEvent(
-            String title, String content,
-            Long targetUserId, Long actorUserId, String actorUsername,
-            Long feedId) {
+            String title, String content, Long notificationId,
+            Long targetUserId) {
         publisher.publishEvent(FeedEvents.FeedCommentLikedEvent.builder()
                 .title(title)
                 .content(content)
+                .notificationId(notificationId)
                 .targetUserId(targetUserId)
-                .actorUserId(actorUserId)
-                .actorUsername(actorUsername)
-                .feedId(feedId)
                 .build());
     }
 }

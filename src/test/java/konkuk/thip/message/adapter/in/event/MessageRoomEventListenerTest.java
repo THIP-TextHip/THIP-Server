@@ -31,8 +31,10 @@ class MessageRoomEventListenerTest {
     @DisplayName("RoomPostCommentedEvent 발행 → 커밋 시 이벤트 리스너가 useCase.handleRoomPostCommented 호출")
     void roomPostCommented_isHandled_afterCommit() {
         var e = RoomEvents.RoomPostCommentedEvent.builder()
-                .targetUserId(10L).actorUserId(20L).actorUsername("alice")
-                .roomId(100L).page(12).postId(999L).postType("RECORD")
+                .title("title")
+                .content("content")
+                .notificationId(1L)
+                .targetUserId(10L)
                 .build();
 
         publisher.publishEvent(e);

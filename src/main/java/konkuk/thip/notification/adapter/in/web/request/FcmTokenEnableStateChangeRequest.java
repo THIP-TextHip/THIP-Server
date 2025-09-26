@@ -7,11 +7,11 @@ import konkuk.thip.notification.application.port.in.dto.FcmEnableStateChangeComm
 
 @Schema(description = "푸시 알림 설정 변경 요청 DTO")
 public record FcmTokenEnableStateChangeRequest(
-        @NotNull
+        @NotNull(message = "푸시 알림 수신 여부는 필수입니다.")
         @Schema(description = "푸시 알림 수신 여부", example = "true")
         Boolean enable,
 
-        @NotBlank
+        @NotBlank(message = "디바이스 ID는 필수입니다.")
         @Schema(description = "디바이스 고유 ID", example = "device12345")
         String deviceId
 ) {

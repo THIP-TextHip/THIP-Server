@@ -17,6 +17,7 @@ public enum SecurityWhitelist {
     OAUTH2_AUTHORIZATION("/oauth2/authorization/**"),
     LOGIN_OAUTH2_CODE("/login/oauth2/code/**"),
     ACTUATOR_HEALTH("/actuator/health"),
+    ACTUATOR_PROMETHEUS("/actuator/prometheus"),
     AUTH_USERS("/auth/users"),
     AUTH_TOKEN("/auth/token"),
     API_TEST("/api/test/**"),

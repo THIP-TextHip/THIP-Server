@@ -3,7 +3,7 @@ package konkuk.thip.notification.application.service.template.feed;
 import konkuk.thip.notification.application.service.template.NotificationTemplate;
 import konkuk.thip.notification.domain.value.NotificationCategory;
 
-public enum FolloweeNewPostTemplate implements NotificationTemplate<FolloweeNewPostTemplate.Args> {
+public enum FolloweeNewFeedTemplate implements NotificationTemplate<FolloweeNewFeedTemplate.Args> {
     INSTANCE;
 
     @Override

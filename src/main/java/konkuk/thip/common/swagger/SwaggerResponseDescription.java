@@ -358,7 +358,8 @@ public enum SwaggerResponseDescription {
     // Notiification
     FCM_TOKEN_REGISTER(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
-            FCM_TOKEN_NOT_FOUND
+            FCM_TOKEN_NOT_FOUND,
+            INVALID_FE_PLATFORM
     ))),
     FCM_TOKEN_ENABLE_STATE_CHANGE(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
@@ -375,6 +376,10 @@ public enum SwaggerResponseDescription {
     ))),
     NOTIFICATION_SHOW(new LinkedHashSet<>(Set.of(
             INVALID_NOTIFICATION_TYPE
+    ))),
+    NOTIFICATION_MARK_TO_CHECKED(new LinkedHashSet<>(Set.of(
+            NOTIFICATION_NOT_FOUND,
+            NOTIFICATION_ACCESS_FORBIDDEN
     ))),
 
   ;

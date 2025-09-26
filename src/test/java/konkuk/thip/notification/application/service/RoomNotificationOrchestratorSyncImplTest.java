@@ -6,6 +6,7 @@ import konkuk.thip.message.application.port.in.RoomNotificationDispatchUseCase;
 import konkuk.thip.notification.adapter.out.jpa.NotificationJpaEntity;
 import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJpaRepository;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
+import konkuk.thip.post.domain.PostType;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
@@ -63,7 +64,7 @@ class RoomNotificationOrchestratorSyncImplTest {
         Long roomId = 11L;
         Integer page = 1;
         Long postId = 22L;
-        String postType = "RECORD";
+        PostType postType = PostType.RECORD;
 
         // when & then
         assertThatThrownBy(() ->
@@ -83,7 +84,7 @@ class RoomNotificationOrchestratorSyncImplTest {
         Long roomId = 12L;
         Integer page = 3;
         Long postId = 33L;
-        String postType = "RECORD";
+        PostType postType = PostType.RECORD;
 
         // when
         orchestrator.notifyRoomPostCommented(
@@ -110,7 +111,7 @@ class RoomNotificationOrchestratorSyncImplTest {
         Long roomId = 1001L;
         Integer page = 7;
         Long postId = 5001L;
-        String postType = "RECORD";
+        PostType postType = PostType.RECORD;
 
         // when (트랜잭션 안)
         orchestrator.notifyRoomPostCommented(
@@ -126,17 +127,14 @@ class RoomNotificationOrchestratorSyncImplTest {
                 ArgumentCaptor.forClass(RoomEvents.RoomPostCommentedEvent.class);
         verify(roomNotificationDispatchUseCase).handleRoomPostCommented(captor.capture());
 
+        NotificationJpaEntity saved = notificationJpaRepository.findAll().get(0);
+
         RoomEvents.RoomPostCommentedEvent event = captor.getValue();
         assertThat(event).isNotNull();
         assertThat(event.title()).isNotBlank();
         assertThat(event.content()).contains(actorUsername);
         assertThat(event.targetUserId()).isEqualTo(targetUserId);
-        assertThat(event.actorUserId()).isEqualTo(actorUserId);
-        assertThat(event.actorUsername()).isEqualTo(actorUsername);
-        assertThat(event.roomId()).isEqualTo(roomId);
-        assertThat(event.page()).isEqualTo(page);
-        assertThat(event.postId()).isEqualTo(postId);
-        assertThat(event.postType()).isEqualTo(postType);
+        assertThat(event.notificationId()).isEqualTo(saved.getNotificationId());
     }
 
     @Test
@@ -149,7 +147,7 @@ class RoomNotificationOrchestratorSyncImplTest {
         Long roomId = 1002L;
         Integer page = 2;
         Long postId = 5002L;
-        String postType = "RECORD";
+        PostType postType = PostType.RECORD;
 
         // when
         orchestrator.notifyRoomPostCommented(

@@ -2,14 +2,11 @@ package konkuk.thip.post.adapter.out.persistence;
 
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.post.domain.PostType;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.mapper.PostLikeMapper;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
-import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
-import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -17,11 +14,7 @@ import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepos
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.common.exception.code.ErrorCode.RECORD_NOT_FOUND;

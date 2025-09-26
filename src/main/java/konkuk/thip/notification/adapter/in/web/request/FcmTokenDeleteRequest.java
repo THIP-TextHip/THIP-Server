@@ -6,7 +6,7 @@ import konkuk.thip.notification.application.port.in.dto.FcmTokenDeleteCommand;
 
 @Schema(description = "푸시 알림 설정 삭제 요청 DTO")
 public record FcmTokenDeleteRequest(
-        @NotBlank
+        @NotBlank(message = "디바이스 ID는 필수입니다.")
         @Schema(description = "디바이스 고유 ID", example = "device12345")
         String deviceId
 ) {

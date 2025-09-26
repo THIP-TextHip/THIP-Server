@@ -10,7 +10,9 @@ import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import konkuk.thip.notification.adapter.out.jpa.NotificationJpaEntity;
+import konkuk.thip.notification.domain.value.MessageRoute;
 import konkuk.thip.notification.domain.value.NotificationCategory;
+import konkuk.thip.notification.domain.value.NotificationRedirectSpec;
 import konkuk.thip.post.adapter.out.jpa.PostJpaEntity;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.domain.PostType;
@@ -28,9 +30,7 @@ import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.domain.value.Alias;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TestEntityFactory {
 
@@ -381,5 +381,23 @@ public class TestEntityFactory {
                 .notificationCategory(category)
                 .userJpaEntity(user)
                 .build();
+    }
+
+    /**
+     * redirectSpec 데이터도 함께 저장하는 팩토리 메서드
+     */
+    public static NotificationJpaEntity createNotification(UserJpaEntity user, String title, NotificationCategory category, NotificationRedirectSpec redirectSpec) {
+        return NotificationJpaEntity.builder()
+                .title(title)
+                .content("알림 내용")
+                .isChecked(false)
+                .notificationCategory(category)
+                .userJpaEntity(user)
+                .redirectSpec(redirectSpec)
+                .build();
+    }
+
+    public static NotificationRedirectSpec createNotificationRedirectSpec(MessageRoute route, Map<String, Object> params) {
+        return new NotificationRedirectSpec(route, params);
     }
 }

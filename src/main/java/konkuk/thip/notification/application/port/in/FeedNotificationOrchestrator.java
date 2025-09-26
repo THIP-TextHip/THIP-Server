@@ -14,7 +14,7 @@ public interface FeedNotificationOrchestrator {
 
     void notifyFeedReplied(Long targetUserId, Long actorUserId, String actorUsername, Long feedId);
 
-    void notifyFolloweeNewPost(Long targetUserId, Long actorUserId, String actorUsername, Long feedId);
+    void notifyFolloweeNewFeed(Long targetUserId, Long actorUserId, String actorUsername, Long feedId);
 
     void notifyFeedLiked(Long targetUserId, Long actorUserId, String actorUsername, Long feedId);
 
