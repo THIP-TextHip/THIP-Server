@@ -11,4 +11,6 @@ public interface NotificationQueryPort {
     CursorBasedList<NotificationQueryDto> findRoomNotificationsByUserId(Long userId, Cursor cursor);
 
     CursorBasedList<NotificationQueryDto> findFeedAndRoomNotificationsByUserId(Long userId, Cursor cursor);
+
+    boolean existsUnchecked(Long userId);
 }
