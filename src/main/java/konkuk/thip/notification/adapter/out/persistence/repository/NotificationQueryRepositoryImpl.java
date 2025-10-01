@@ -47,6 +47,17 @@ public class NotificationQueryRepositoryImpl implements NotificationQueryReposit
         return getNotificationQueryDtos(pageSize, notification, where);
     }
 
+    @Override
+    public boolean existsByUserIdAndIsCheckedFalse(Long userId) {
+        Integer result = queryFactory.selectOne()
+                .from(notification)
+                .where(notification.userJpaEntity.userId.eq(userId)
+                        .and(notification.isChecked.eq(false)))
+                .fetchFirst();
+
+        return result != null;
+    }
+
     private static BooleanExpression applyCursor(Long lastNotificationId, BooleanExpression where, QNotificationJpaEntity notification) {
         if (lastNotificationId != null) {
             where = where.and(notification.notificationId.lt(lastNotificationId));
