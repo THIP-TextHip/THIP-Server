@@ -132,7 +132,11 @@ public class GlobalExceptionHandler {
         String userId = "dummyUserId";
 
         // Discord 웹훅 전송
-        discordClient.sendErrorMessage(combinedMessage, stackSummary, requestId, userId);
+        try {
+            discordClient.sendErrorMessage(combinedMessage, stackSummary, requestId, userId);
+        } catch (Exception sendException) {
+            log.error("[ServerErrorHandler] -> [Discord] 전송 실패", sendException);
+        }
 
         return ResponseEntity
                 .status(API_SERVER_ERROR.getHttpStatus())
