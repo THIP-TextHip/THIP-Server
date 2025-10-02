@@ -8,6 +8,8 @@ import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
 import konkuk.thip.notification.adapter.in.web.response.NotificationShowEnableStateResponse;
 import konkuk.thip.notification.adapter.in.web.response.NotificationShowResponse;
+import konkuk.thip.notification.adapter.in.web.response.NotificationUncheckedExistsResponse;
+import konkuk.thip.notification.application.port.in.NotificationExistsUncheckedUseCase;
 import konkuk.thip.notification.application.port.in.NotificationShowEnableStateUseCase;
 import konkuk.thip.notification.application.port.in.NotificationShowUseCase;
 import konkuk.thip.notification.application.port.in.dto.NotificationType;
@@ -26,6 +28,7 @@ public class NotificationQueryController {
 
     private final NotificationShowEnableStateUseCase notificationShowEnableStateUseCase;
     private final NotificationShowUseCase notificationShowUseCase;
+    private final NotificationExistsUncheckedUseCase notificationExistsUncheckedUseCase;
 
     @Operation(
             summary = "사용자 푸시알림 수신여부 조회 (마이페이지 -> 알림설정)",
@@ -55,5 +58,15 @@ public class NotificationQueryController {
             @RequestParam(value = "type", required = false, defaultValue = "feedAndRoom") final String type
     ) {
         return BaseResponse.ok(notificationShowUseCase.showNotifications(userId, cursor, NotificationType.from(type)));
+    }
+
+    @Operation(
+            summary = "유저의 안읽은 알림 존재 여부 확인",
+            description = "유저가 읽지 않은 알림이 존재하는지 여부를 확인합니다."
+    )
+    @GetMapping("/notifications/exists-unchecked")
+    public BaseResponse<NotificationUncheckedExistsResponse> existsUnchecked(@Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(NotificationUncheckedExistsResponse.of(
+                        notificationExistsUncheckedUseCase.existsUnchecked(userId)));
     }
 }
