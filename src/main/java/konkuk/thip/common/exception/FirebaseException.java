@@ -2,20 +2,16 @@ package konkuk.thip.common.exception;
 
 import konkuk.thip.common.exception.code.ErrorCode;
 
-public class FirebaseException extends BusinessException {
+public class FirebaseException extends RuntimeException {
+
+    private final ErrorCode errorCode;
+
     public FirebaseException(ErrorCode errorCode) {
-        super(errorCode);
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
-
     public FirebaseException(ErrorCode errorCode, Exception e) {
-        super(errorCode, e);
-    }
-
-    public FirebaseException(Exception e) {
-        super(ErrorCode.FIREBASE_SEND_ERROR, e);
-    }
-
-    public FirebaseException() {
-        super(ErrorCode.FIREBASE_SEND_ERROR);
+        super(errorCode.getMessage(), e);
+        this.errorCode = errorCode;
     }
 }
