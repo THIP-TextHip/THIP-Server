@@ -11,4 +11,6 @@ public interface NotificationQueryRepository {
     List<NotificationQueryDto> findRoomNotificationsOrderByCreatedAtDesc(Long userId, Long lastNotificationId, int pageSize);
 
     List<NotificationQueryDto> findFeedAndRoomNotificationsOrderByCreatedAtDesc(Long userId, Long lastNotificationId, int pageSize);
+
+    boolean existsByUserIdAndIsCheckedFalse(Long userId);
 }

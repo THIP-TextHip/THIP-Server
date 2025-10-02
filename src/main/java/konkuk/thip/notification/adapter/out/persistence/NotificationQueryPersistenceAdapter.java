@@ -40,6 +40,11 @@ public class NotificationQueryPersistenceAdapter implements NotificationQueryPor
         ));
     }
 
+    @Override
+    public boolean existsUnchecked(Long userId) {
+        return notificationJpaRepository.existsByUserIdAndIsCheckedFalse(userId);
+    }
+
     private CursorBasedList<NotificationQueryDto> findNotificationsByPrimaryKeyCursor(Cursor cursor, PrimaryKeyNotificationQueryFunction queryFunction) {
         Long lastNotificationId = cursor.isFirstRequest() ? null : cursor.getLong(0);
         int pageSize = cursor.getPageSize();
