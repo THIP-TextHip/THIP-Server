@@ -1,7 +1,7 @@
 package konkuk.thip.config;
 
 import jakarta.annotation.PostConstruct;
-import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InternalServerException;
 import konkuk.thip.config.properties.AwsS3Properties;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.domain.value.Alias;
@@ -20,7 +20,7 @@ public class AwsS3ImageUrlInitializer {
     void bindCloudFrontBaseUrl() {
         String baseUrl = awsS3Properties.cloudFrontBaseUrl();
         if (baseUrl == null || baseUrl.isEmpty()) {
-            throw new BusinessException(AWS_BUCKET_BASE_URL_NOT_CONFIGURED);
+            throw new InternalServerException(AWS_BUCKET_BASE_URL_NOT_CONFIGURED);
         }
 
         Alias.registerBaseUrlSupplier(awsS3Properties::cloudFrontBaseUrl);

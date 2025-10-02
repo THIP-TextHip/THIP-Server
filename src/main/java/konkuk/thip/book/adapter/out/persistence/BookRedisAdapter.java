@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.application.port.in.dto.BookMostSearchResult;
 import konkuk.thip.book.application.port.out.BookRedisCommandPort;
 import konkuk.thip.book.application.port.out.BookRedisQueryPort;
-import konkuk.thip.common.exception.ExternalApiException;
+import konkuk.thip.common.exception.InternalServerException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,7 +80,7 @@ public class BookRedisAdapter implements BookRedisQueryPort, BookRedisCommandPor
                     new TypeReference<List<BookMostSearchResult.BookRankInfo>>() {}
             );
         } catch (JsonProcessingException e) {
-            throw new ExternalApiException(ErrorCode.JSON_PROCESSING_ERROR);
+            throw new InternalServerException(ErrorCode.JSON_PROCESSING_ERROR);
         }
     }
 
@@ -106,7 +106,7 @@ public class BookRedisAdapter implements BookRedisQueryPort, BookRedisCommandPor
         try {
             detailJson = objectMapper.writeValueAsString(bookRankDetails);
         } catch (JsonProcessingException e) {
-            throw new ExternalApiException(JSON_PROCESSING_ERROR);
+            throw new InternalServerException(JSON_PROCESSING_ERROR);
         }
         redisTemplate.opsForValue().set(redisKey, detailJson);
     }

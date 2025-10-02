@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import konkuk.thip.common.exception.ExternalApiException;
+import konkuk.thip.common.exception.InternalServerException;
 import konkuk.thip.common.security.oauth2.LoginUser;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.application.port.UserTokenBlacklistCommandPort;
@@ -52,7 +52,7 @@ public class UserTokenBlacklistRedisAdapter implements UserTokenBlacklistQueryPo
             mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             valueJson = mapper.writeValueAsString(valueMap);
         } catch (JsonProcessingException e) {
-            throw new ExternalApiException(JSON_PROCESSING_ERROR);
+            throw new InternalServerException(JSON_PROCESSING_ERROR);
         }
         redisTemplate.opsForValue().set(key, valueJson);
         log.info("블랙리스트에 탈퇴한 회원 토큰 및 관련 정보 추가 - userId: {}, withdrawalTime: {}, expiration: {}",
