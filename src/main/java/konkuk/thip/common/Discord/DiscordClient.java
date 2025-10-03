@@ -14,14 +14,14 @@ import java.util.Map;
 @Component
 public class DiscordClient {
 
-    @Value("$(discord.env")
+    @Value("${discord.env}")
     private String env;
 
     @Value("${discord.webhook-url}")
     private String webhookUrl;
 
     public void sendErrorMessage(String message, String stackTrace, String requestId, String userId) {
-        if(env.equals("test")) return;
+        if("test".equals(env)) return;
 
         WebClient webClient = WebClient.create();
 
