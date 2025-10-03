@@ -2,7 +2,7 @@ package konkuk.thip.common.exception.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import konkuk.thip.common.Discord.DiscordClient;
+import konkuk.thip.common.discord.DiscordClient;
 import konkuk.thip.common.dto.ErrorResponse;
 import konkuk.thip.common.exception.*;
 import lombok.RequiredArgsConstructor;

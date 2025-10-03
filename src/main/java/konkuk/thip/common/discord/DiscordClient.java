@@ -1,4 +1,4 @@
-package konkuk.thip.common.Discord;
+package konkuk.thip.common.discord;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
