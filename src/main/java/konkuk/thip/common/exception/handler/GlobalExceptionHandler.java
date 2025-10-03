@@ -7,6 +7,7 @@ import konkuk.thip.common.dto.ErrorResponse;
 import konkuk.thip.common.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +20,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.logging.LoggingConstant.REQUEST_ID;
+import static konkuk.thip.common.logging.LoggingConstant.USER_ID;
 
 @Slf4j
 @RestControllerAdvice
@@ -123,13 +126,9 @@ public class GlobalExceptionHandler {
             stackSummary = lines[1] + "\n" + lines[2] + "\n" + lines[lines.length - 1];
         }
 
-//        // MDC에서 requestId, userId 추출
-//        String requestId = MDC.get("requestId");
-//        String userId = MDC.get("userId");
-
         // MDC에서 requestId, userId 추출
-        String requestId = "dummyRequestId";
-        String userId = "dummyUserId";
+        String requestId = MDC.get(REQUEST_ID.getValue());
+        String userId = MDC.get(USER_ID.getValue());
 
         // Discord 웹훅 전송
         discordClient.sendErrorMessage(combinedMessage, stackSummary, requestId, userId);
