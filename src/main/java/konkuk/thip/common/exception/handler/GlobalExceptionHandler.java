@@ -22,6 +22,7 @@ import java.util.Optional;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.common.logging.LoggingConstant.REQUEST_ID;
 import static konkuk.thip.common.logging.LoggingConstant.USER_ID;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 @Slf4j
 @RestControllerAdvice
@@ -115,7 +116,7 @@ public class GlobalExceptionHandler {
 
         String exceptionClassName = e.getClass().getSimpleName(); // 예외 클래스명
         String combinedMessage = "[" + exceptionClassName + "] " + e.getMessage(); // 메시지에 예외 클래스명 포함
-        String stackTrace = org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace(e);
+        String stackTrace = getStackTrace(e);
 
         // 스택트레이스 요약: 두,세번째 줄 + 마지막줄
         String[] lines = stackTrace.split("\n");
