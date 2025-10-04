@@ -104,12 +104,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new AuthException(AUTH_BLACKLIST_TOKEN);
         }
 
-        if (!jwtUtil.validateToken(token)) {
-            throw new AuthException(AUTH_INVALID_TOKEN);
-        }
-
         if (jwtUtil.isExpired(token)) {
             throw new AuthException(AUTH_EXPIRED_TOKEN);
+        }
+
+        if (!jwtUtil.validateToken(token)) {
+            throw new AuthException(AUTH_INVALID_TOKEN);
         }
     }
 
