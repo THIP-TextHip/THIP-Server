@@ -78,11 +78,10 @@ public enum ErrorCode implements ResponseCode {
     BOOK_NAVER_API_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80009, "네이버 API 에서 ISBN으로 검색한 결과가 존재하지 않습니다."),
     BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, 80010, "존재하지 않는 BOOK 입니다."),
     BOOK_ALREADY_SAVED(HttpStatus.BAD_REQUEST, 80011, "사용자가 이미 저장한 책입니다."),
-    DUPLICATED_BOOKS_IN_COLLECTION(HttpStatus.INTERNAL_SERVER_ERROR, 80012, "중복된 책이 존재합니다."),
     BOOK_NOT_SAVED_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80013, "사용자가 저장하지 않은 책은 저장삭제 할 수 없습니다."),
     BOOK_NOT_SAVED_DB_CANNOT_DELETE(HttpStatus.BAD_REQUEST, 80014, "DB에 존재하지 않은 책은 저장삭제 할 수 없습니다."),
     BOOK_ALADIN_API_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 80015, "알라딘 API 응답 파싱에 실패하였습니다."),
-    BOOK_ALADIN_API_ISBN_NOT_FOUND(HttpStatus.BAD_REQUEST, 80016, "알라딘 API 에서 ISBN으로 검색한 결과가 존재하지 않습니다."),
+    BOOK_ALADIN_API_ISBN_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, 80016, "알라딘 API 에서 ISBN으로 검색한 결과가 존재하지 않습니다."),
 
     /**
      * 90000 : recentSearch error
@@ -225,6 +224,7 @@ public enum ErrorCode implements ResponseCode {
     FCM_TOKEN_ENABLED_STATE_ALREADY(HttpStatus.BAD_REQUEST, 200001, "요청한 상태로 이미 푸쉬 알림 여부가 설정되어 있습니다."),
     FCM_TOKEN_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 200002, "토큰을 소유하고 있는 계정이 아닙니다."),
     FIREBASE_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 200003, "FCM 푸쉬 알림 전송에 실패했습니다."),
+    FCM_TOKEN_DEVICE_ARRAY_MISMATCH(HttpStatus.INTERNAL_SERVER_ERROR, 200004, "메시지, FCM 토큰, 디바이스 ID 리스트의 크기는 같아야 합니다."),
 
 
     /**

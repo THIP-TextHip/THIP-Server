@@ -2,11 +2,12 @@ package konkuk.thip.common.exception.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import konkuk.thip.common.discord.DiscordClient;
 import konkuk.thip.common.dto.ErrorResponse;
-import konkuk.thip.common.exception.AuthException;
-import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,11 +20,16 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.logging.LoggingConstant.REQUEST_ID;
+import static konkuk.thip.common.logging.LoggingConstant.USER_ID;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 @Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final DiscordClient discordClient;
 
     // 요청한 API가 없는 경우
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -102,19 +108,36 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(e.getErrorCode(), detail));
     }
 
-    // 서버 내부 오류 예외 처리
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> runtimeExceptionHandler(RuntimeException e) {
-        log.error("[RuntimeExceptionHandler] {}", e.getMessage(), e); // 메시지와 스택트레이스 출력
-        return ResponseEntity
-                .status(API_SERVER_ERROR.getHttpStatus())
-                .body(ErrorResponse.of(API_SERVER_ERROR));
-    }
+    // 서버 내부 오류 예외 (500) 처리
+    @ExceptionHandler({RuntimeException.class, IllegalStateException.class,
+            FirebaseException.class, InternalServerException.class, ExternalApiException.class})
+    public ResponseEntity<ErrorResponse> handleServerErrors(Exception e) {
+        log.error("[ServerErrorHandler] {}", e.getMessage(), e);
 
-    // IllegalStateException 예외 처리
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ErrorResponse> illegalStateExceptionHandler(IllegalStateException e) {
-        log.error("[IllegalStateExceptionHandler] {}", e.getMessage());
+        String exceptionClassName = e.getClass().getSimpleName(); // 예외 클래스명
+        String combinedMessage = "[" + exceptionClassName + "] " + e.getMessage(); // 메시지에 예외 클래스명 포함
+        String stackTrace = getStackTrace(e);
+
+        // 스택트레이스 요약: 두,세번째 줄 + 마지막줄
+        String[] lines = stackTrace.split("\n");
+        String stackSummary;
+        if (lines.length <= 3) {
+            stackSummary = stackTrace; // 짧으면 다 보여줌
+        } else {
+            stackSummary = lines[1] + "\n" + lines[2] + "\n" + lines[lines.length - 1];
+        }
+
+        // MDC에서 requestId, userId 추출
+        String requestId = MDC.get(REQUEST_ID.getValue());
+        String userId = MDC.get(USER_ID.getValue());
+
+        // Discord 웹훅 전송
+        try {
+            discordClient.sendErrorMessage(combinedMessage, stackSummary, requestId, userId);
+        } catch (Exception sendException) {
+            log.error("[ServerErrorHandler] -> [Discord] 전송 실패", sendException);
+        }
+
         return ResponseEntity
                 .status(API_SERVER_ERROR.getHttpStatus())
                 .body(ErrorResponse.of(API_SERVER_ERROR));

@@ -1,6 +1,7 @@
 package konkuk.thip.book.adapter.out.api.naver;
 
-import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.ExternalApiException;
+import konkuk.thip.common.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -63,7 +64,7 @@ public class NaverApiUtil {
         try {
             text = URLEncoder.encode(keyword, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new BusinessException(BOOK_KEYWORD_ENCODING_FAILED);
+            throw new InternalServerException(BOOK_KEYWORD_ENCODING_FAILED);
         }
         return text;
     }
@@ -84,7 +85,7 @@ public class NaverApiUtil {
                 return readBody(con.getErrorStream());
             }
         } catch (IOException e) {
-            throw new BusinessException(BOOK_NAVER_API_REQUEST_ERROR);
+            throw new ExternalApiException(BOOK_NAVER_API_REQUEST_ERROR);
         } finally {
             con.disconnect();
         }
@@ -96,9 +97,9 @@ public class NaverApiUtil {
             URL url = new URL(apiUrl);
             return (HttpURLConnection)url.openConnection();
         } catch (MalformedURLException e) {
-            throw new BusinessException(BOOK_NAVER_API_URL_ERROR);
+            throw new InternalServerException(BOOK_NAVER_API_URL_ERROR);
         } catch (IOException e) {
-            throw new BusinessException(BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED);
+            throw new InternalServerException(BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED);
         }
     }
 
@@ -116,7 +117,7 @@ public class NaverApiUtil {
 
             return responseBody.toString();
         } catch (IOException e) {
-            throw new BusinessException(BOOK_NAVER_API_RESPONSE_ERROR);
+            throw new ExternalApiException(BOOK_NAVER_API_RESPONSE_ERROR);
         }
     }
 

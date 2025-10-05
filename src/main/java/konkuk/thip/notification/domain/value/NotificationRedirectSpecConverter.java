@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.InternalServerException;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class NotificationRedirectSpecConverter implements AttributeConverter<Not
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            throw new InvalidStateException(NOTIFICATION_REDIRECT_DATA_SERIALIZE_FAILED);
+            throw new InternalServerException(NOTIFICATION_REDIRECT_DATA_SERIALIZE_FAILED);
         }
     }
 
@@ -32,7 +32,7 @@ public class NotificationRedirectSpecConverter implements AttributeConverter<Not
         try {
             return objectMapper.readValue(dbData, NotificationRedirectSpec.class);
         } catch (IOException e) {
-            throw new InvalidStateException(NOTIFICATION_REDIRECT_DATA_DESERIALIZE_FAILED);
+            throw new InternalServerException(NOTIFICATION_REDIRECT_DATA_DESERIALIZE_FAILED);
         }
     }
 }

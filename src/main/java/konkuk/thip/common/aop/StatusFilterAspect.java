@@ -2,7 +2,7 @@ package konkuk.thip.common.aop;
 
 import jakarta.persistence.EntityManager;
 import konkuk.thip.common.entity.StatusType;
-import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.InternalServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -30,7 +30,7 @@ public class StatusFilterAspect {
      */
     private Session currentTxSession() {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            throw new InvalidStateException(PERSISTENCE_TRANSACTION_REQUIRED);
+            throw new InternalServerException(PERSISTENCE_TRANSACTION_REQUIRED);
         }
         return session();
     }

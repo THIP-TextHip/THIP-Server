@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static konkuk.thip.common.exception.code.ErrorCode.FCM_TOKEN_DEVICE_ARRAY_MISMATCH;
+import static konkuk.thip.common.exception.code.ErrorCode.FIREBASE_SEND_ERROR;
+
 @Slf4j
 @Component
 @Profile("!test & !local")
@@ -29,14 +32,14 @@ public class FirebaseAdapter implements FirebaseMessagingPort {
             log.debug("[FCM:SEND] ok id={} token={} device={}", messageId, maskDependingProfile(fcmToken), maskDependingProfile(deviceId));
         } catch (FirebaseMessagingException e) {
             log.warn("[FCM:SEND] fail token={} device={} code={} msg={}", maskDependingProfile(fcmToken), maskDependingProfile(deviceId), e.getMessagingErrorCode(), e.getMessage());
-            throw new FirebaseException(e);
+            throw new FirebaseException(FIREBASE_SEND_ERROR);
         }
     }
 
     @Override
     public void sendBatch(List<Message> messages, List<String> fcmTokens, List<String> deviceIds) {
         if (messages.size() != fcmTokens.size() || messages.size() != deviceIds.size()) {
-            throw new FirebaseException(new IllegalArgumentException("메시지, FCM 토큰, 디바이스 ID 리스트의 크기는 같아야 합니다."));
+            throw new FirebaseException(FCM_TOKEN_DEVICE_ARRAY_MISMATCH);
         }
 
         try {
@@ -62,11 +65,11 @@ public class FirebaseAdapter implements FirebaseMessagingPort {
 
             if (batchResponse.getFailureCount() > 0) {
                 log.warn("[FCM:BATCH] 일부 메시지 전송 실패: {}/{}", batchResponse.getFailureCount(), messages.size());
-                throw new FirebaseException();
+                throw new FirebaseException(FIREBASE_SEND_ERROR);
             }
         } catch (FirebaseMessagingException e) {
             log.warn("[FCM:BATCH] 메시지 전송 실패: code={} msg={}", e.getMessagingErrorCode(), e.getMessage());
-            throw new FirebaseException(e);
+            throw new FirebaseException(FIREBASE_SEND_ERROR);
         }
     }
 

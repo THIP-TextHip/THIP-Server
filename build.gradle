@@ -92,6 +92,12 @@ dependencies {
 
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.3.0'
+
+    // Webflux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // LogStash
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
