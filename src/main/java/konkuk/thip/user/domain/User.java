@@ -93,7 +93,7 @@ public class User extends BaseDomainEntity {
     }
 
     public void increaseRecordReviewCount() {
-        if(this.recordReviewCount > 5) {
+        if(this.recordReviewCount >= 5) {
             throw new InvalidStateException(ErrorCode.USER_RECORD_REVIEW_COUNT_EXCEEDS_LIMIT);
         }
         this.recordReviewCount++;
