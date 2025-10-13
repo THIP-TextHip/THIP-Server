@@ -6,14 +6,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
+import konkuk.thip.roompost.adapter.in.web.request.RecordAiUsageResponse;
 import konkuk.thip.roompost.adapter.in.web.response.AttendanceCheckShowResponse;
 import konkuk.thip.roompost.adapter.in.web.response.RecordPinResponse;
 import konkuk.thip.roompost.adapter.in.web.response.RoomPostSearchResponse;
 import konkuk.thip.roompost.application.port.in.AttendanceCheckShowUseCase;
+import konkuk.thip.roompost.application.port.in.RecordAiUsageUseCase;
 import konkuk.thip.roompost.application.port.in.RecordPinUseCase;
 import konkuk.thip.roompost.application.port.in.RoomPostSearchUseCase;
-import konkuk.thip.roompost.application.port.in.dto.record.RecordPinQuery;
 import konkuk.thip.roompost.application.port.in.dto.RoomPostSearchQuery;
+import konkuk.thip.roompost.application.port.in.dto.record.RecordPinQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,7 @@ public class RoomPostQueryController {
     private final RoomPostSearchUseCase roomPostSearchUseCase;
     private final RecordPinUseCase recordPinUseCase;
     private final AttendanceCheckShowUseCase attendanceCheckShowUseCase;
+    private final RecordAiUsageUseCase recordAiUsageUseCase;
 
     @Operation(
             summary = "방의 게시글(기록, 투표) 목록 조회",
@@ -99,5 +102,21 @@ public class RoomPostQueryController {
             @RequestParam(required = false) final String cursor,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(attendanceCheckShowUseCase.showDailyGreeting(userId, roomId, cursor));
+    }
+
+    @Operation(
+            summary = "사용자의 AI 이용 횟수 및 기록 작성 횟수 조회",
+            description = "사용자의 AI 이용 횟수 및 기록 작성 횟수를 조회합니다."
+    )
+    @ExceptionDescription(RECORD_AI_USAGE)
+    @GetMapping("/rooms/{roomId}/users/ai-usage")
+    public BaseResponse<RecordAiUsageResponse> getUserAiUsageCount(
+            @Parameter(description = "조회할 방 ID", example = "1") @PathVariable final Long roomId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(
+                RecordAiUsageResponse.of(
+                        recordAiUsageUseCase.getUserAiUsage(userId, roomId)
+                )
+        );
     }
 }
