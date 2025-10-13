@@ -54,6 +54,7 @@ public enum ErrorCode implements ResponseCode {
     USER_CANNOT_DELETE_ROOM_HOST(HttpStatus.BAD_REQUEST, 70009, "모집/진행 중인 방의 방장은 회원탈퇴를 할 수 없습니다."),
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 70010, "이미 삭제된 사용자 입니다."),
     USER_OAUTH2ID_CANNOT_BE_NULL(HttpStatus.INTERNAL_SERVER_ERROR, 70011, "유저의 OAuth2Id 값이 null일 수 없습니다."),
+    USER_RECORD_REVIEW_COUNT_EXCEEDS_LIMIT(HttpStatus.BAD_REQUEST, 70012, "사용자의 독후감 작성 수가 5회를 초과할 수 없습니다."),
 
     /**
      * 75000 : follow error
@@ -134,6 +135,7 @@ public enum ErrorCode implements ResponseCode {
     RECORD_CANNOT_BE_OVERVIEW(HttpStatus.BAD_REQUEST, 130001, "총평이 될 수 없는 RECORD 입니다."),
     INVALID_RECORD_PAGE_RANGE(HttpStatus.BAD_REQUEST, 130002, "RECORD의 page 값이 유효하지 않습니다."),
     RECORD_ACCESS_FORBIDDEN(HttpStatus.FORBIDDEN, 130003, "기록 접근 권한이 없습니다."),
+    RECORD_REVIEW_NOT_ENOUGH_RECORDS(HttpStatus.BAD_REQUEST, 130004, "독후감 생성을 위해서는 최소 2개의 기록이 필요합니다."),
 
     /**
      * 140000 : roomParticipant error
@@ -242,6 +244,13 @@ public enum ErrorCode implements ResponseCode {
      * 300000 : util error
      */
     INVALID_FE_PLATFORM(HttpStatus.BAD_REQUEST, 300000, "유효하지 않은 FE 플랫폼입니다."),
+
+
+    /**
+     * 310000 : gemini error
+     */
+    GEMINI_API_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 310000,"Gemini API 요청에 실패하였습니다."),
+    GEMINI_API_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 310001,"Gemini API 응답에 실패하였습니다."),
 
     ;
 

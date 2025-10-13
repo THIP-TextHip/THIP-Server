@@ -165,6 +165,20 @@ public enum SwaggerResponseDescription {
             ROOM_IS_EXPIRED,
             ROOM_NOT_IN_PROGRESS
     ))),
+    RECORD_AI_REVIEW_CREATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ROOM_NOT_FOUND,
+            RECORD_NOT_FOUND,
+            ROOM_ACCESS_FORBIDDEN,
+            RECORD_REVIEW_NOT_ENOUGH_RECORDS,
+            USER_RECORD_REVIEW_COUNT_EXCEEDS_LIMIT,
+            GEMINI_API_REQUEST_ERROR,
+            GEMINI_API_RESPONSE_ERROR
+    ))),
+    RECORD_AI_USAGE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            ROOM_ACCESS_FORBIDDEN
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(
