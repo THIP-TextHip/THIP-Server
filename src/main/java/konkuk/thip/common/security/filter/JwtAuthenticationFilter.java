@@ -13,6 +13,7 @@ import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.user.application.port.UserTokenBlacklistQueryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.server.PathContainer;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.logging.LoggingConstant.USER_ID;
 import static konkuk.thip.common.security.constant.AuthParameters.*;
 
 @Slf4j
@@ -67,24 +69,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = extractToken(request);
-            if (token == null) {
-                throw new AuthException(AUTH_TOKEN_NOT_FOUND);
-            }
 
-            if (userTokenBlacklistQueryPort.isTokenBlacklisted(token)) {
-                throw new AuthException(AUTH_BLACKLIST_TOKEN);
-            }
-
-            if (!jwtUtil.validateToken(token)) {
-                throw new AuthException(AUTH_INVALID_TOKEN);
-            }
-
-            if (jwtUtil.isExpired(token)) {
-                throw new AuthException(AUTH_EXPIRED_TOKEN);
-            }
+            validateToken(token);
 
             request.setAttribute(JWT_TOKEN_ATTRIBUTE.getValue(), token);
             LoginUser loginUser = jwtUtil.getLoginUser(token);
+            MDC.put(USER_ID.getValue(), String.valueOf(loginUser.userId()));
 
             if (loginUser.userId() != null) {
                 request.setAttribute(JWT_ACCESS_TOKEN_KEY.getValue(), loginUser.userId());
@@ -102,6 +92,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             request.setAttribute("exception", e);
         } finally {
             filterChain.doFilter(request, response);
+        }
+    }
+
+    private void validateToken(String token) {
+        if (token == null) {
+            throw new AuthException(AUTH_TOKEN_NOT_FOUND);
+        }
+
+        if (userTokenBlacklistQueryPort.isTokenBlacklisted(token)) {
+            throw new AuthException(AUTH_BLACKLIST_TOKEN);
+        }
+
+        if (jwtUtil.isExpired(token)) {
+            throw new AuthException(AUTH_EXPIRED_TOKEN);
+        }
+
+        if (!jwtUtil.validateToken(token)) {
+            throw new AuthException(AUTH_INVALID_TOKEN);
         }
     }
 

@@ -3,7 +3,7 @@ package konkuk.thip.common.security.oauth2;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import konkuk.thip.common.exception.AuthException;
+import konkuk.thip.common.exception.InternalServerException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.oauth2.tokenstorage.LoginTokenStorage;
 import konkuk.thip.common.security.util.JwtUtil;
@@ -51,7 +51,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (!webDomainProperties.isAllowed(Objects.toString(webRedirectDomain, ""))) {
             List<String> origins = webDomainProperties.getWebDomainUrls();
             if (origins == null || origins.isEmpty()) {
-                throw new AuthException(ErrorCode.WEB_DOMAIN_ORIGIN_EMPTY);
+                throw new InternalServerException(ErrorCode.WEB_DOMAIN_ORIGIN_EMPTY);
             }
             webRedirectDomain = origins.get(0);
         }

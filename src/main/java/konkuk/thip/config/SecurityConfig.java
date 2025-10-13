@@ -1,5 +1,6 @@
 package konkuk.thip.config;
 
+import konkuk.thip.common.logging.MdcLoggingFilter;
 import konkuk.thip.common.security.constant.SecurityWhitelist;
 import konkuk.thip.common.security.filter.JwtAuthenticationEntryPoint;
 import konkuk.thip.common.security.filter.JwtAuthenticationFilter;
@@ -46,6 +47,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final MdcLoggingFilter mdcLoggingFilter;
 
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final WebDomainProperties webDomainProperties;
@@ -69,6 +71,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(mdcLoggingFilter, JwtAuthenticationFilter.class)
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig
                                 .authorizationRequestResolver(resolver)

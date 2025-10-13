@@ -1,6 +1,7 @@
 package konkuk.thip.user.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
+import konkuk.thip.common.exception.InternalServerException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.user.domain.value.Alias;
@@ -80,7 +81,7 @@ public class User extends BaseDomainEntity {
 
     public void markAsDeleted() {
         if (this.oauth2Id == null) {
-            throw new InvalidStateException(USER_OAUTH2ID_CANNOT_BE_NULL);
+            throw new InternalServerException(USER_OAUTH2ID_CANNOT_BE_NULL);
         }
         if (this.oauth2Id.startsWith("deleted:")) {
             throw new InvalidStateException(USER_ALREADY_DELETED);

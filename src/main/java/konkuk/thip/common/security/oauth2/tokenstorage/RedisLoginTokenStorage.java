@@ -1,6 +1,6 @@
 package konkuk.thip.common.security.oauth2.tokenstorage;
 
-import konkuk.thip.common.exception.AuthException;
+import konkuk.thip.common.exception.InternalServerException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.oauth2.TokenType;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class RedisLoginTokenStorage implements LoginTokenStorage {
             return entry;
         }
 
-        throw new AuthException(ErrorCode.JSON_PROCESSING_ERROR);
+        throw new InternalServerException(ErrorCode.JSON_PROCESSING_ERROR);
     }
 
     private String toRedisKey(String key) {
