@@ -1,6 +1,7 @@
 
 package konkuk.thip.user.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.common.exception.InvalidStateException;
@@ -81,6 +82,11 @@ public class UserJpaEntity extends BaseJpaEntity {
         }
         this.status = INACTIVE;
         this.oauth2Id = user.getOauth2Id();
+    }
+
+    @VisibleForTesting
+    public void setRecordReviewCount(int count) {
+        this.recordReviewCount = count;
     }
 
 }
