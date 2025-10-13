@@ -2,9 +2,11 @@ package konkuk.thip.roompost.adapter.out.persistence;
 
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
+import konkuk.thip.roompost.adapter.out.mapper.RecordMapper;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
 import konkuk.thip.roompost.application.port.out.RecordQueryPort;
 import konkuk.thip.roompost.application.port.out.dto.RoomPostQueryDto;
+import konkuk.thip.roompost.domain.Record;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class RecordQueryPersistenceAdapter implements RecordQueryPort {
 
     private final RecordJpaRepository recordJpaRepository;
+    private final RecordMapper recordMapper;
 
     @Override
     public CursorBasedList<RoomPostQueryDto> searchMyRecords(Long roomId, Long userId, Cursor cursor) {
@@ -62,5 +65,17 @@ public class RecordQueryPersistenceAdapter implements RecordQueryPort {
                     postQueryDto.postId().toString()));
             return nextCursor.toEncodedString();
         });
+    }
+
+    @Override
+    public List<Record> findAllByRoomIdAndUserId(Long roomId, Long userId) {
+        return recordJpaRepository.findAllByRoomIdAndUserIdOrderByPageAsc(roomId, userId).stream()
+                .map(recordMapper::toDomainEntity)
+                .toList();
+    }
+
+    @Override
+    public Integer countAllByRoomIdAndUserId(Long roomId, Long userId) {
+        return recordJpaRepository.countAllByRoomIdAndUserId(roomId, userId);
     }
 }

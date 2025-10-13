@@ -22,4 +22,17 @@ public interface RecordJpaRepository extends JpaRepository<RecordJpaEntity, Long
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE RecordJpaEntity r SET r.status = 'INACTIVE' WHERE r.userJpaEntity.userId = :userId")
     void softDeleteAllByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT r FROM RecordJpaEntity r " +
+            "WHERE r.roomJpaEntity.roomId = :roomId " +
+            "AND r.userJpaEntity.userId = :userId " +
+            "AND r.isOverview = false " +
+            "ORDER BY r.page ASC")
+    List<RecordJpaEntity> findAllByRoomIdAndUserIdOrderByPageAsc(Long roomId, Long userId);
+
+    @Query("SELECT COUNT(r) FROM RecordJpaEntity r " +
+            "WHERE r.roomJpaEntity.roomId = :roomId " +
+            "AND r.userJpaEntity.userId = :userId " +
+            "AND r.isOverview = false")
+    Integer countAllByRoomIdAndUserId(Long roomId, Long userId);
 }
