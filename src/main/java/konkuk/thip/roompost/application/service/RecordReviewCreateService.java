@@ -14,6 +14,7 @@ import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class RecordReviewCreateService implements RecordReviewCreateUseCase {
     private final static int MAX_REVIEW_LENGTH = 900; // 독후감 최대 길이
 
     @Override
+    @Transactional
     public RecordReviewCreateResult createAiRecordReview(Long roomId, Long userId) {
         roomParticipantValidator.validateUserIsRoomMember(roomId, userId);
 
