@@ -126,7 +126,7 @@ class RecordAiReviewCreateApiTest {
 
         UserJpaEntity persisted = userJpaRepository.findById(user.getUserId()).orElseThrow();
         assertThat(returnedCount).isEqualTo(persisted.getRecordReviewCount());
-        assertThat(persisted.getRecordReviewCount()).isGreaterThanOrEqualTo(1);
+        assertThat(persisted.getRecordReviewCount()).isEqualTo(1);
     }
 
     @Test
