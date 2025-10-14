@@ -39,17 +39,19 @@ public class RecordReviewCreateService implements RecordReviewCreateUseCase {
         User user = userCommandPort.findById(userId);
         Book book = bookCommandPort.findBookByRoomId(roomId);
 
-        // 2. 유저가 독후감 생성이 가능한 상태인지 유효성 검증 (기록 개수는 2개 이상, 독후감 생성 횟수는 5회 이하)
+        // 2. 유저가 독후감 생성이 가능한 상태인지 유효성 검증 (기록 개수는 2개 이상
         if(records.size() < 2) {
             throw new BusinessException(ErrorCode.RECORD_REVIEW_NOT_ENOUGH_RECORDS,
                     new IllegalArgumentException("현재 기록 개수: " + records.size()));
         }
+
+        // 3. 독후감 생성 횟수 증가 (독후감 생성 횟수는 5회 이하일 경우만)
         user.increaseRecordReviewCount();
 
-        // 3. 독후감 생성
+        // 4. 독후감 생성
         String reviewContent = geminiQueryPort.generateRecordReview(user, records, book, MIN_REVIEW_LENGTH, MAX_REVIEW_LENGTH);
 
-        // 4. 독후감 생성 횟수 갱신
+        // 5. 독후감 생성 횟수 갱신
         userCommandPort.update(user);
 
         return new RecordReviewCreateResult(reviewContent, user.getRecordReviewCount());
