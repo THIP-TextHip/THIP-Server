@@ -1,6 +1,7 @@
 package konkuk.thip.config.properties;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,14 @@ public class WebDomainProperties {
 
     private final List<String> webDomainUrls = new ArrayList<>();
 
+    @Setter
+    private String profile;
+
     public boolean isAllowed(String target) {
+        if(!profile.equals("prod")) {
+            return true;
+        }
+
         try {
             URI uri = URI.create(target);
             String origin = uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "");
