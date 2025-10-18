@@ -20,7 +20,12 @@ public class WebDomainProperties {
     private String profile;
 
     public boolean isAllowed(String target) {
-        if(!profile.equals("prod")) {
+        if (target == null || target.isBlank()) {
+            return false;
+        }
+
+        // 운영환경이 아닐 경우: target이 비어있지 않다면 전부 허용
+        if (!"prod".equals(profile)) {
             return true;
         }
 
