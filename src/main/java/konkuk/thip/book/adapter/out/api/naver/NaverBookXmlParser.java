@@ -68,7 +68,14 @@ public class NaverBookXmlParser {
                     String author = getTagValue(item, "author");
                     String publisher = getTagValue(item, "publisher");
                     String isbn = getTagValue(item, "isbn");
-                    String description =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
+                    String rawDescription =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
+                    String description;
+                    String suffix = "...";
+                    if (rawDescription.length() > 3000) {
+                        description = rawDescription.substring(0, 3000 - suffix.length()) + suffix;
+                    } else {
+                        description = rawDescription;
+                    }
 
                     return NaverDetailBookParseResult.builder()
                             .title(title)
