@@ -57,6 +57,12 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
     }
 
     @Override
+    public Optional<Record> findByIdWithLock(Long id) {
+        return recordJpaRepository.findByPostIdWithPessimisticLock(id)
+                .map(recordMapper::toDomainEntity);
+    }
+
+    @Override
     public void delete(Record record) {
         RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostId(record.getId()).orElseThrow(
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
