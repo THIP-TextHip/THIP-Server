@@ -1,6 +1,7 @@
 // cd ./src/test/java/konkuk/thip/k6
 // k6 run --out influxdb=http://localhost:8086/k6 feed-like-concurrency-test.js
 // k6 run feed-like-concurrency-test.js
+//테스트 코드랑 비슷한테스트 유저 2명이서 동시에 좋아요요청
 import http from 'k6/http';
 import { sleep,check } from 'k6'; // sleep 기능 사용 시 추가 (sleep(n) -> 지정한 n 기간 동한 VU 실행을 일시 중지)
 
@@ -9,6 +10,12 @@ const FEED_ID = 1; // 테스트할 피드 ID
 const VUS = 2; // 원하는 VU 수
 
 export let options = {
+    thresholds: {
+        // 요청 95%가 500ms 이내 응답을 받아야 함
+        http_req_duration: ['p(95)<500'],
+        // 전체 요청 중 실패율 1% 미만이어야 함
+        http_req_failed: ['rate<0.01'],
+    },
     vus: VUS,
     duration: '30s', // 30초동안 테스트
 };
