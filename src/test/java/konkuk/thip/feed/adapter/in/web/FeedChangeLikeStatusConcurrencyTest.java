@@ -5,7 +5,6 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeCommand;
 import konkuk.thip.post.application.service.PostLikeService;
 import konkuk.thip.post.domain.PostType;
@@ -41,18 +40,19 @@ class FeedChangeLikeStatusConcurrencyTest {
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
-    @Autowired private PostLikeJpaRepository postLikeJpaRepository;
 
-    private UserJpaEntity user;
+    private UserJpaEntity user1;
+    private UserJpaEntity user2;
     private BookJpaEntity book;
     private FeedJpaEntity feed;
 
     @BeforeEach
     void setUp() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
-        user = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        user1 = userJpaRepository.save(TestEntityFactory.createUser(alias));
+        user2 = userJpaRepository.save(TestEntityFactory.createUser(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
+        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user1,book, true));
     }
 
 
@@ -77,8 +77,11 @@ class FeedChangeLikeStatusConcurrencyTest {
                 for (int r = 0; r < repeat; r++) {
                     boolean isLike = likeStatus[userIndex];
                     try {
+                        // 각 스레드별로 서로 다른 user를 사용하도록 user1, user2 분기 처리
+                        Long userId = (userIndex == 0) ? user1.getUserId() : user2.getUserId();
+
                         postLikeService.changeLikeStatusPost(
-                                new PostIsLikeCommand(user.getUserId(), feed.getPostId(), PostType.FEED, isLike)
+                                new PostIsLikeCommand(userId, feed.getPostId(), PostType.FEED, isLike)
                         );
                         successCount.getAndIncrement();
                         // 성공했을 때만 현재 상태를 반전
