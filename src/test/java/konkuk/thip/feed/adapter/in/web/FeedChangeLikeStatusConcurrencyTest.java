@@ -1,7 +1,5 @@
 package konkuk.thip.feed.adapter.in.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
@@ -22,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -35,17 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Slf4j
-@Transactional
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[단위] 피드 좋아요 상태변경 다중 스레드 테스트")
 class FeedChangeLikeStatusConcurrencyTest {
 
-    @Autowired private MockMvc mockMvc;
     @Autowired private PostLikeService postLikeService;
-    @Autowired private EntityManager em;
 
-    @Autowired private ObjectMapper objectMapper;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
@@ -63,20 +55,14 @@ class FeedChangeLikeStatusConcurrencyTest {
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        postLikeJpaRepository.deleteAllInBatch();
-//        feedJpaRepository.deleteAllInBatch();
-//        bookJpaRepository.deleteAllInBatch();
-//        userJpaRepository.deleteAllInBatch();
-//    }
 
     @Test
     public void concurrentLikeToggleTest() throws InterruptedException {
+
         int threadCount = 2;
         int repeat = 10; // 스레드별 몇 번 반복할지
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount * repeat);
 
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger failCount = new AtomicInteger();
@@ -112,7 +98,7 @@ class FeedChangeLikeStatusConcurrencyTest {
 
         // then
         assertAll(
-                () -> assertThat(successCount.get()).isEqualTo(10),
+                () -> assertThat(successCount.get()).isEqualTo(threadCount * repeat),
                 () -> assertThat(failCount.get()).isEqualTo(0)
         );
     }
