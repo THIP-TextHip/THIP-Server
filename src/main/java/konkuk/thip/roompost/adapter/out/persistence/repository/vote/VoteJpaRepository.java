@@ -1,8 +1,10 @@
 package konkuk.thip.roompost.adapter.out.persistence.repository.vote;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import jakarta.persistence.LockModeType;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,6 +17,10 @@ public interface VoteJpaRepository extends JpaRepository<VoteJpaEntity, Long>, V
      * 소프트 딜리트 적용 대상 entity 단건 조회 메서드
      */
     Optional<VoteJpaEntity> findByPostId(Long postId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT v FROM VoteJpaEntity v WHERE v.postId = :postId")
+    Optional<VoteJpaEntity> findByPostIdWithPessimisticLock(@Param("postId") Long postId);
 
     @Query("SELECT v.postId FROM VoteJpaEntity v WHERE v.userJpaEntity.userId = :userId")
     List<Long> findVoteIdsByUserId(@Param("userId") Long userId);

@@ -20,9 +20,13 @@ public interface VoteCommandPort {
     void saveAllVoteItems(List<VoteItem> voteItems);
 
     Optional<Vote> findById(Long id);
-
+    Optional<Vote> findByIdWithLock(Long id);
     default Vote getByIdOrThrow(Long id) {
         return findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
+    }
+    default Vote getByIdOrThrowWithLock(Long id) {
+        return findByIdWithLock(id)
                 .orElseThrow(() -> new EntityNotFoundException(VOTE_NOT_FOUND));
     }
 
