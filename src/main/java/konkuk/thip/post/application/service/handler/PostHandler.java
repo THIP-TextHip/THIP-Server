@@ -31,6 +31,14 @@ public class PostHandler {
         };
     }
 
+    public CountUpdatable findPostWithLock(PostType type, Long postId) {
+        return switch (type) {
+            case FEED -> feedCommandPort.getByIdOrThrowWithLock(postId);
+            case RECORD -> recordCommandPort.getByIdOrThrowWithLock(postId);
+            case VOTE -> voteCommandPort.getByIdOrThrowWithLock(postId);
+        };
+    }
+
     public void updatePost(PostType type, CountUpdatable post) {
         switch (type) {
             case FEED -> feedCommandPort.update((Feed) post);
