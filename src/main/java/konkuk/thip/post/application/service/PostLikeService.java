@@ -38,15 +38,18 @@ public class PostLikeService implements PostLikeUseCase {
     public PostIsLikeResult changeLikeStatusPost(PostIsLikeCommand command) {
 
         // 1. 게시물 타입에 맞게 검증 및 조회
-        CountUpdatable post = postHandler.findPost(command.postType(), command.postId());
+        CountUpdatable post = postHandler.findPostWithLock(command.postType(), command.postId());
         // 1-1. 게시글 타입에 따른 게시물 좋아요 권한 검증
         postLikeAuthorizationValidator.validateUserCanAccessPostLike(command.postType(), post, command.userId());
 
         // 2. 유저가 해당 게시물에 대해 좋아요 했는지 조회
         boolean alreadyLiked = postLikeQueryPort.isLikedPostByUser(command.userId(), command.postId());
 
-        // 3. 좋아요 상태변경
-        //TODO 게시물의 좋아요 수 증가/감소 동시성 제어 로직 추가해야됨
+        // 3. 게시물 좋아요 수 업데이트
+        post.updateLikeCount(postCountService,command.isLike());
+        postHandler.updatePost(command.postType(), post);
+
+        // 4. 좋아요 상태변경
         if (command.isLike()) {
             postLikeAuthorizationValidator.validateUserCanLike(alreadyLiked); // 좋아요 가능 여부 검증
             postLikeCommandPort.save(command.userId(), command.postId(),command.postType());
@@ -57,10 +60,6 @@ public class PostLikeService implements PostLikeUseCase {
             postLikeAuthorizationValidator.validateUserCanUnLike(alreadyLiked); // 좋아요 취소 가능 여부 검증
             postLikeCommandPort.delete(command.userId(), command.postId());
         }
-
-        // 4. 게시물 좋아요 수 업데이트
-        post.updateLikeCount(postCountService,command.isLike());
-        postHandler.updatePost(command.postType(), post);
 
         return PostIsLikeResult.of(post.getId(), command.isLike());
     }
