@@ -1,7 +1,9 @@
 package konkuk.thip.feed.adapter.out.persistence.repository;
 
+import jakarta.persistence.LockModeType;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +17,10 @@ public interface FeedJpaRepository extends JpaRepository<FeedJpaEntity, Long>, F
      * 소프트 딜리트 적용 대상 entity 단건 조회 메서드
      */
     Optional<FeedJpaEntity> findByPostId(Long postId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT f FROM FeedJpaEntity f WHERE f.postId = :postId")
+    Optional<FeedJpaEntity> findByPostIdWithPessimisticLock(@Param("postId") Long postId);
 
     @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId")
     long countAllFeedsByUserId(@Param("userId") Long userId);

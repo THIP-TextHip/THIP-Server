@@ -12,8 +12,13 @@ public interface FeedCommandPort {
     Long save(Feed feed);
     Long update(Feed feed);
     Optional<Feed> findById(Long id);
+    Optional<Feed> findByIdWithLock(Long id);
     default Feed getByIdOrThrow(Long id) {
         return findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
+    }
+    default Feed getByIdOrThrowWithLock(Long id) {
+        return findByIdWithLock(id)
                 .orElseThrow(() -> new EntityNotFoundException(FEED_NOT_FOUND));
     }
     void delete(Feed feed);
