@@ -116,4 +116,38 @@ public class JpaRepositoryMethodTest {
         //when //then
         assertThat(testUserRepository.findById(id)).isEmpty();
     }
+
+    @Test
+    @DisplayName("flush 시점에 dirty 엔티티에 대하여 어떤 SQL이 실행되는지 확인")
+    void check_dirty_entity_sql_query_when_flush() throws Exception {
+        //given
+        TestUser u1 = new TestUser("노성준");
+        em.persist(u1);     // u1 엔티티 영속화
+        Long id = u1.getUserId();
+        em.flush();     // insert 쿼리 즉시 반영
+
+        //when
+        TestUser loaded = testUserRepository.findByUserId(id).orElseThrow();
+        loaded.setNickname("김희용");      // dirty 상태
+
+        //then
+        em.flush();
+        /**
+         * flush 시점에 영속성 컨텍스트 상에 dirty 상태인 엔티티에 대하여 UPDATE 쿼리가 발생하는 것 확인
+         */
+    }
+
+    @Test
+    @DisplayName("flush 시점에 신규 엔티티에 대하여 어떤 SQL이 실행되는지 확인")
+    void check_new_entity_sql_query_when_flush() throws Exception {
+        //given
+        TestUser u2 = new TestUser("노성준");
+        em.persist(u2);     // u2 엔티티 영속화
+
+        //when //then
+        em.flush();
+        /**
+         * flush 시점에 영속성 컨텍스트 상에 새로 추가된 엔티티에 대하여 INSERT 쿼리가 발생하는 것 확인
+         */
+    }
 }
