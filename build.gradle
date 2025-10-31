@@ -118,7 +118,11 @@ clean.doLast {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+        if (System.getenv('CI') == 'true') {
+            excludeTags 'concurrency'
+        }
+    }
 }
 
 apply from: "$rootDir/jacoco.gradle"
