@@ -85,7 +85,7 @@ public class RoomJoinConcurrencyTest {
                             .andExpect(status().isOk());
                     return 200;
                 } catch (AssertionError e) {
-                    return 400;
+                    return -1;  // 응답이 200이 아닌 경우 (4xx, 5xx error 모두)
                 } finally {
                     finish.countDown();
                 }
