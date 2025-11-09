@@ -1,6 +1,7 @@
 package konkuk.thip.room.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
@@ -14,7 +15,11 @@ import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -30,13 +35,21 @@ public class RoomJoinService implements RoomJoinUseCase {
     private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
     @Override
-    @Transactional
+    @Retryable(
+            noRetryFor = {InvalidStateException.class, BusinessException.class},  // 재시도 제외 예외
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100, multiplier = 2)
+    )
+    @Transactional(propagation = Propagation.REQUIRES_NEW)  // 재시도마다 새로운 트랜잭션
     public RoomJoinResult changeJoinState(RoomJoinCommand roomJoinCommand) {
         RoomJoinType type = roomJoinCommand.type();
 
         // 방이 존재하지 않거나 모집기간이 만료된 경우 예외 처리
-        Room room = roomCommandPort.findById(roomJoinCommand.roomId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL));
+//        Room room = roomCommandPort.findById(roomJoinCommand.roomId())
+//                .orElseThrow(() -> new BusinessException(ErrorCode.USER_CANNOT_JOIN_OR_CANCEL));
+
+        /** 락 타잉아웃 발생 포인트 **/
+        Room room = roomCommandPort.getByIdForUpdate(roomJoinCommand.roomId());
 
         room.validateRoomRecruitExpired();
 
@@ -57,6 +70,11 @@ public class RoomJoinService implements RoomJoinUseCase {
         }
 
         return RoomJoinResult.of(room.getId(), type.getType());
+    }
+
+    @Recover
+    public RoomJoinResult recover(Exception e, RoomJoinCommand roomJoinCommand) {
+        throw new BusinessException(ErrorCode.RESOURCE_LOCKED);
     }
 
     private void sendNotifications(RoomJoinCommand roomJoinCommand, Room room) {
