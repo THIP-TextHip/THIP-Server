@@ -101,6 +101,9 @@ dependencies {
 
 	// Spring AI - Google AI(Gemini) 연동
 	implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.1'
+
+    // spring Retry
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
