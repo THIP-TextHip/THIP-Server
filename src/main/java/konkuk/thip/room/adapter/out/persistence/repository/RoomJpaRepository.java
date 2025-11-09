@@ -1,9 +1,9 @@
 package konkuk.thip.room.adapter.out.persistence.repository;
 
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -15,6 +15,13 @@ public interface RoomJpaRepository extends JpaRepository<RoomJpaEntity, Long>, R
      * 소프트 딜리트 적용 대상 entity 단건 조회 메서드
      */
     Optional<RoomJpaEntity> findByRoomId(Long roomId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT r FROM RoomJpaEntity r WHERE r.roomId = :roomId")
+    @QueryHints(
+            @QueryHint(name = "jakarta.persistence.lock.timeout", value = "5000")
+    )
+    Optional<RoomJpaEntity> findByRoomIdForUpdate(@Param("roomId") Long roomId);
 
     @Query("SELECT COUNT(r) FROM RoomJpaEntity r " +
             "WHERE r.bookJpaEntity.isbn = :isbn " +
