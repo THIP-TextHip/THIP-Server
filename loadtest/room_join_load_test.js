@@ -20,11 +20,13 @@ const http4xx     = new Counter('rooms_join_4xx');   // 4xx 개수
 const token_issue_failed                = new Counter('token_issue_failed');
 const fail_ROOM_MEMBER_COUNT_EXCEEDED   = new Counter('fail_ROOM_MEMBER_COUNT_EXCEEDED');
 const fail_USER_ALREADY_PARTICIPATE     = new Counter('fail_USER_ALREADY_PARTICIPATE');
+const fail_RESOURCE_LOCKED              = new Counter('fail_RESOURCE_LOCKED');  // 423 Locked error
 const fail_OTHER_4XX                    = new Counter('fail_OTHER_4XX');
 
 const ERR = {   // THIP error code
   ROOM_MEMBER_COUNT_EXCEEDED: 100006,
   USER_ALREADY_PARTICIPATE: 140005,
+  RESOURCE_LOCKED: 50200,
 };
 
 function parseError(res) {
@@ -132,6 +134,9 @@ export default function (data) {
         break;
       case ERR.USER_ALREADY_PARTICIPATE:
         fail_USER_ALREADY_PARTICIPATE.add(1);
+        break;
+      case ERR.RESOURCE_LOCKED:
+        fail_RESOURCE_LOCKED.add(1);
         break;
       default:
         fail_OTHER_4XX.add(1);
