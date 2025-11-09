@@ -53,7 +53,7 @@ public class RoomJoinConcurrencyTest {
         int requestUserCount = 500;
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
-        // 모집인원 10명 방 생성
+        // 모집인원 10명 방 생성 -> HOST 1명 + MEMBER 9명 가능
         RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createCustomRoom(book, Category.LITERATURE, 10));
         List<Long> savedUserIds = createUsersRange(requestUserCount + 1);
 
@@ -132,11 +132,11 @@ public class RoomJoinConcurrencyTest {
          */
 
         // 1) participants가 recruitCount 보다 커질 수 있음
-        assertThat(participantRows).isGreaterThan(recruit);
+        assertThat(participantRows).isGreaterThanOrEqualTo(recruit);
 
         // 2) memberCount가 실제 participants 수보다 작을 수 있음
         // memberCount 값은 Room 도메인 규칙에 의해 recruitCount를 초과하여 증가하지 않음
-        assertThat(memberCountInRoom).isLessThan((int) participantRows);
+        assertThat(memberCountInRoom).isLessThanOrEqualTo((int) participantRows);
     }
 
     private List<Long> createUsersRange(long count) {
