@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:17-jdk-slim
 
 ARG PORT=8000
 ENV JAVA_TOOL_OPTIONS="-Xms512m -Xmx2g -XX:+ExitOnOutOfMemoryError"
