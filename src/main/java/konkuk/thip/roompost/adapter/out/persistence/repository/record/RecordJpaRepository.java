@@ -20,7 +20,7 @@ public interface RecordJpaRepository extends JpaRepository<RecordJpaEntity, Long
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM RecordJpaEntity r WHERE r.postId = :postId")
-    Optional<RecordJpaEntity> findByPostIdWithPessimisticLock(@Param("postId") Long postId);
+    Optional<RecordJpaEntity> findByPostIdForUpdate(@Param("postId") Long postId);
 
     @Query("SELECT r.postId FROM RecordJpaEntity r WHERE r.userJpaEntity.userId = :userId")
     List<Long> findRecordIdsByUserId(@Param("userId") Long userId);

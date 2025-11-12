@@ -38,7 +38,7 @@ public class PostLikeService implements PostLikeUseCase {
     public PostIsLikeResult changeLikeStatusPost(PostIsLikeCommand command) {
 
         // 1. 게시물 타입에 맞게 검증 및 조회
-        CountUpdatable post = postHandler.findPostWithLock(command.postType(), command.postId());
+        CountUpdatable post = postHandler.findPostForUpdate(command.postType(), command.postId());
         // 1-1. 게시글 타입에 따른 게시물 좋아요 권한 검증
         postLikeAuthorizationValidator.validateUserCanAccessPostLike(command.postType(), post, command.userId());
 

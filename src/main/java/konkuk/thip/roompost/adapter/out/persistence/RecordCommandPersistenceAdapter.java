@@ -57,8 +57,8 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
     }
 
     @Override
-    public Optional<Record> findByIdWithLock(Long id) {
-        return recordJpaRepository.findByPostIdWithPessimisticLock(id)
+    public Optional<Record> findByIdForUpdate(Long id) {
+        return recordJpaRepository.findByPostIdForUpdate(id)
                 .map(recordMapper::toDomainEntity);
     }
 

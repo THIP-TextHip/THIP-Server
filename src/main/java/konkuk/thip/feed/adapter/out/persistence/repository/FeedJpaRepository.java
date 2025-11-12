@@ -20,7 +20,7 @@ public interface FeedJpaRepository extends JpaRepository<FeedJpaEntity, Long>, F
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT f FROM FeedJpaEntity f WHERE f.postId = :postId")
-    Optional<FeedJpaEntity> findByPostIdWithPessimisticLock(@Param("postId") Long postId);
+    Optional<FeedJpaEntity> findByPostIdForUpdate(@Param("postId") Long postId);
 
     @Query("SELECT COUNT(f) FROM FeedJpaEntity f WHERE f.userJpaEntity.userId = :userId")
     long countAllFeedsByUserId(@Param("userId") Long userId);

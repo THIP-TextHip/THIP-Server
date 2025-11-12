@@ -45,8 +45,8 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     }
 
     @Override
-    public Optional<Feed> findByIdWithLock(Long id) {
-        return feedJpaRepository.findByPostIdWithPessimisticLock(id)
+    public Optional<Feed> findByIdForUpdate(Long id) {
+        return feedJpaRepository.findByPostIdForUpdate(id)
                 .map(feedMapper::toDomainEntity);
     }
 

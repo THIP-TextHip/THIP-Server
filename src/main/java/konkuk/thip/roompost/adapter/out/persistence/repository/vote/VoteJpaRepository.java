@@ -20,7 +20,7 @@ public interface VoteJpaRepository extends JpaRepository<VoteJpaEntity, Long>, V
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT v FROM VoteJpaEntity v WHERE v.postId = :postId")
-    Optional<VoteJpaEntity> findByPostIdWithPessimisticLock(@Param("postId") Long postId);
+    Optional<VoteJpaEntity> findByPostIdForUpdate(@Param("postId") Long postId);
 
     @Query("SELECT v.postId FROM VoteJpaEntity v WHERE v.userJpaEntity.userId = :userId")
     List<Long> findVoteIdsByUserId(@Param("userId") Long userId);

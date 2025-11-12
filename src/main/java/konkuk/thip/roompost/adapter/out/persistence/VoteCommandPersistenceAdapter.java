@@ -82,8 +82,8 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
                 .map(voteMapper::toDomainEntity);
     }
     @Override
-    public Optional<Vote> findByIdWithLock(Long id) {
-        return voteJpaRepository.findByPostIdWithPessimisticLock(id)
+    public Optional<Vote> findByIdForUpdate(Long id) {
+        return voteJpaRepository.findByPostIdForUpdate(id)
                 .map(voteMapper::toDomainEntity);
     }
 

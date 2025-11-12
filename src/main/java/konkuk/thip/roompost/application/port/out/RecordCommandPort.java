@@ -15,13 +15,13 @@ public interface RecordCommandPort {
     void update(Record record);
 
     Optional<Record> findById(Long id);
-    Optional<Record> findByIdWithLock(Long id);
+    Optional<Record> findByIdForUpdate(Long id);
     default Record getByIdOrThrow(Long id) {
         return findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(RECORD_NOT_FOUND));
     }
-    default Record getByIdOrThrowWithLock(Long id) {
-        return findByIdWithLock(id)
+    default Record getByIdOrThrowForUpdate(Long id) {
+        return findByIdForUpdate(id)
                 .orElseThrow(() -> new EntityNotFoundException(RECORD_NOT_FOUND));
     }
     void delete(Record record);
