@@ -29,6 +29,8 @@ public class User extends BaseDomainEntity {
 
     private Integer followerCount; // 팔로워 수
 
+    private Integer recordReviewCount; // 생성한 독후감 수
+
     private Alias alias;
 
     public static User withoutId(String nickname, String userRole, String oauth2Id, Alias alias) {
@@ -39,6 +41,7 @@ public class User extends BaseDomainEntity {
                 .userRole(userRole)
                 .oauth2Id(oauth2Id)
                 .followerCount(0)
+                .recordReviewCount(0)
                 .alias(alias)
                 .build();
     }
@@ -87,6 +90,13 @@ public class User extends BaseDomainEntity {
             throw new InvalidStateException(USER_ALREADY_DELETED);
         }
         this.oauth2Id = "deleted:" + this.oauth2Id;
+    }
+
+    public void increaseRecordReviewCount() {
+        if(this.recordReviewCount >= 5) {
+            throw new InvalidStateException(ErrorCode.USER_RECORD_REVIEW_COUNT_EXCEEDS_LIMIT);
+        }
+        this.recordReviewCount++;
     }
 
 }

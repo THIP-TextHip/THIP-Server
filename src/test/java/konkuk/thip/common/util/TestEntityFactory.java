@@ -147,6 +147,20 @@ public class TestEntityFactory {
                 .build();
     }
 
+    public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, int recruitCount) {
+        return RoomJpaEntity.builder()
+                .title("방이름")
+                .description("설명")
+                .isPublic(true)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(5))
+                .recruitCount(recruitCount)
+                .bookJpaEntity(book)
+                .category(category)
+                .roomStatus(RoomStatus.RECRUITING)
+                .build();
+    }
+
     public static RoomJpaEntity createCustomRoom(BookJpaEntity book, Category category, LocalDate startDate, LocalDate endDate, RoomStatus roomStatus) {
         return RoomJpaEntity.builder()
                 .title("방이름")

@@ -15,6 +15,7 @@ public class UserMapper {
                 .role(UserRole.from(user.getUserRole()))
                 .oauth2Id(user.getOauth2Id())
                 .followerCount(user.getFollowerCount())
+                .recordReviewCount(user.getRecordReviewCount())
                 .alias(user.getAlias())
                 .build();
     }
@@ -27,6 +28,7 @@ public class UserMapper {
                 .userRole(userJpaEntity.getRole().getType())
                 .oauth2Id(userJpaEntity.getOauth2Id())
                 .followerCount(userJpaEntity.getFollowerCount())
+                .recordReviewCount(userJpaEntity.getRecordReviewCount())
                 .alias(userJpaEntity.getAlias())
                 .createdAt(userJpaEntity.getCreatedAt())
                 .modifiedAt(userJpaEntity.getModifiedAt())

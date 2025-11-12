@@ -33,6 +33,8 @@ public class RoomPostCommandController {
     private final AttendanceCheckCreateUseCase attendanceCheckCreateUseCase;
     private final AttendanceCheckDeleteUseCase attendanceCheckDeleteUseCase;
 
+    private final RecordReviewCreateUseCase recordReviewCreateUseCase;
+
     /**
      * 기록 관련
      */
@@ -178,5 +180,21 @@ public class RoomPostCommandController {
         return BaseResponse.ok(AttendanceCheckDeleteResponse.of(
                 attendanceCheckDeleteUseCase.delete(userId, roomId, attendanceCheckId)
         ));
+    }
+
+    @Operation(
+            summary = "AI 기반 기록 독후감 생성",
+            description = "AI를 활용하여 사용자가 작성한 기록을 바탕으로 독후감을 생성합니다."
+    )
+    @ExceptionDescription(RECORD_AI_REVIEW_CREATE)
+    @PostMapping("/rooms/{roomId}/record/ai-review")
+    public BaseResponse<RecordReviewCreateResponse> createAIRecordReview(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "독후감을 생성할 방 ID", example = "1") @PathVariable final Long roomId
+    ) {
+        return BaseResponse.ok(
+                RecordReviewCreateResponse.of(
+                        recordReviewCreateUseCase.createAiRecordReview(roomId, userId)
+                ));
     }
 }
