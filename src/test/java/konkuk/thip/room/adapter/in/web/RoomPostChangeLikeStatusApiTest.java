@@ -154,6 +154,8 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("좋아요 하지 않은 기록 게시물을 좋아요 취소하면 [400 에러 발생]")
     void unlikeRecordPost_NotLiked_Fail() throws Exception {
         //given
+        // 다른 유저가 해당 게시글에 좋아요한 상태(좋아요 0 이하 오버플로우 예외 피하기위해서 해당피드에 이미 좋아요 1이상이라고 가정)
+        record.updateLikeCount(1);
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(false, "RECORD");
 
         //when & then
@@ -235,6 +237,8 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("좋아요 하지 않은 투표 게시물을 좋아요 취소하면 [400 에러 발생]")
     void unlikeVotePost_NotLiked_Fail() throws Exception {
         //given
+        // 다른 유저가 해당 게시글에 좋아요한 상태(좋아요 0 이하 오버플로우 예외 피하기위해서 해당피드에 이미 좋아요 1이상이라고 가정)
+        vote.updateLikeCount(1);
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(false, "VOTE");
 
         //when & then

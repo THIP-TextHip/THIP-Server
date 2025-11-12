@@ -135,7 +135,10 @@ class FeedChangeLikeStatusApiTest {
     @Test
     @DisplayName("좋아요 하지 않은 피드를 좋아요 취소하면 [400 에러 발생]")
     void unlikeFeed_NotLiked_Fail() throws Exception {
-        // given: 좋아요 없음
+
+        // 다른 유저가 해당 게시글에 좋아요한 상태(좋아요 0 이하 오버플로우 예외 피하기위해서 해당피드에 이미 좋아요 1이상이라고 가정)
+        feed.updateLikeCount(1);
+        // given
         FeedIsLikeRequest request = new FeedIsLikeRequest(false);
 
         // when & then
