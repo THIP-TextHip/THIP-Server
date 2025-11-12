@@ -1,4 +1,4 @@
-package konkuk.thip.feed.adapter.in.web;
+package konkuk.thip.feed.concurrency;
 
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
@@ -14,6 +14,7 @@ import konkuk.thip.user.domain.value.Alias;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Slf4j
+@Tag("concurrency")
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[단위] 피드 좋아요 상태변경 다중 스레드 테스트")
