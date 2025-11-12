@@ -1,30 +1,33 @@
-// feed-like-concurrency-test9.js
-// 낮은 동시성 20명이서 동시성 기능 안전성 테스트
+// 점진적 부하 증가 (Ramp-up)  VU: 20 → 50 → 100 → 150 (1분 단위로 증가)
 import http from 'k6/http';
 import { sleep,check } from 'k6'; // sleep 기능 사용 시 추가 (sleep(n) -> 지정한 n 기간 동한 VU 실행을 일시 중지)
 
 const BASE_URL = 'http://localhost:8080';
 const FEED_ID = 1; // 테스트할 피드 ID
-const VUS = 20; // 원하는 VU 수
 
 export let options = {
     thresholds: {
-        // 요청 95%가 500ms 이내 응답을 받아야 함
         http_req_duration: ['p(95)<500'],
-        // 전체 요청 중 실패율 1% 미만이어야 함
         http_req_failed: ['rate<0.01'],
     },
-    vus: VUS,
-    duration: '30s', // 30초동안 테스트
+    stages: [
+        { duration: '1m', target: 20 },   // 1분간 VU 20명으로 점진적 증가
+        { duration: '1m', target: 50 },   // 1분간 VU 50명으로 증가
+        { duration: '1m', target: 100 },  // 1분간 VU 100명으로 증가
+        { duration: '1m', target: 150 },  // 1분간 VU 150명으로 증가
+        { duration: '30s', target: 0 },   // 30초 동안 VU 0명으로 줄이며 테스트 종료
+    ],
 };
 
 // 테스트 전 사용자 별 토큰 발급
 export function setup() {
+    // 점진적 증가하는 최대 VU 수 계산
+    const maxVUs = 150;
     let tokens = [];
     let likeStatus = [];
 
     // 유저 ID에 대해 토큰을 미리 발급
-    for (let userId = 1; userId <= VUS; userId++) {
+    for (let userId = 1; userId <= maxVUs; userId++) {
         const res = http.get(`${BASE_URL}/api/test/token/access?userId=${userId}`);
         check(res, { 'token received': (r) => r.status === 200 && r.body.length > 0 });
         tokens.push(res.body);
