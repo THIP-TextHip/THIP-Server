@@ -5,7 +5,15 @@ import konkuk.thip.common.entity.BaseJpaEntity;
 import lombok.*;
 
 @Entity
-@Table(name = "followings")
+@Table(
+        name = "followings",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uq_followings_user_target",
+                        columnNames = {"user_id", "following_user_id"}
+                )
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
