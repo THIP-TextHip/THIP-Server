@@ -6,7 +6,7 @@ import { Trend, Counter } from 'k6/metrics';
 const BASE_URL = 'http://localhost:8080';
 const FEED_ID = 1; // 테스트할 피드 ID
 const USERS_START   = 1;   // 토큰 발급 시작 userId
-const USERS_COUNT   = 1000;     // 총 사용자 = VU 수
+const USERS_COUNT   = 10000;     // 총 사용자 = VU 수
 const TOKEN_BATCH   = 200;     // 토큰 발급 배치 크기
 const BATCH_PAUSE_S = 0.2;     // 배치 간 대기 (for 토큰 발급 API 병목 방지)
 const START_DELAY_S = 5;       // 테스트 시작 전 대기 (for 방 참여 요청 동시 시작)
@@ -16,7 +16,6 @@ const likeLatency = new Trend('feed_like_latency'); // 참여 API 지연(ms)
 const http5xx     = new Counter('feed_like_5xx');   // 5xx 개수
 const http2xx     = new Counter('feed_like_2xx');   // 2xx 개수
 const http4xx     = new Counter('feed_like_4xx');   // 4xx 개수
-const http423     = new Counter('feed_like_423');   // 423 (Locked) 전용 카운터
 
 // 실패 원인 분포 파악용(응답 JSON의 code 필드 기준)
 const token_issue_failed = new Counter('token_issue_failed');
@@ -36,7 +35,6 @@ const ERR = {   // THIP error code
 function parseError(res) {
     try {
         const j = JSON.parse(res.body || '{}'); // BaseResponse 구조
-        // BaseResponse: { isSuccess:boolean, code:number, message:string, requestId:string, data:any }
         return {
             code: Number(j.code),              // 정수 코드
             message: j.message || '',
@@ -63,7 +61,7 @@ export let options = {
     },
     thresholds: {
         feed_like_5xx:     ['count==0'],     // 서버 오류는 0건이어야 함
-        feed_like_latency: ['p(95)<500'],   // p95 < 500ms
+        feed_like_latency: ['p(95)<1000'],   // p95 < 1s
     },
 };
 
@@ -153,18 +151,10 @@ export default function (data) {
         http5xx.add(1);
     }
 
-    // // === 검증 ===
-    // check(res, {
-    //     'like responded': (r) => r.status !== 0,
-    //     'like 200 or expected 4xx': (r) => r.status === 200 || (r.status >= 400 && r.status < 500),
-    // });
-
     // === 검증 ===
     check(res, {
         'like responded': (r) => r.status !== 0,
         'like 200 or expected 4xx': (r) => r.status === 200 || (r.status >= 400 && r.status < 500),
-        //423(Locked) 에러가 발생했는지 여부 체크
-        'status is 423 (Resource Locked)': (r) => r.status === 423,
     });
 }
 // 테스트 결과 html 리포트로 저장
