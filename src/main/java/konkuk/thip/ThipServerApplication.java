@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableScheduling
 @ConfigurationPropertiesScan
-@EnableRetry
 @SpringBootApplication
 public class ThipServerApplication {
 
