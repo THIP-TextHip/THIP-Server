@@ -1,7 +1,7 @@
 package konkuk.thip.post.application.service;
 
-import jakarta.persistence.PessimisticLockException;
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
@@ -18,7 +18,6 @@ import konkuk.thip.post.domain.service.PostCountService;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -43,9 +42,9 @@ public class PostLikeService implements PostLikeUseCase {
 
     @Override
     @Retryable(
-            retryFor = {PessimisticLockException.class, PessimisticLockingFailureException.class},
+            notRecoverable = { BusinessException.class, InvalidStateException.class},
             maxAttempts = 3,
-            backoff = @Backoff(delay = 100, multiplier = 2, maxDelay = 1000, random = true)
+            backoff = @Backoff(delay = 100, multiplier = 2, maxDelay = 500, random = true)
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PostIsLikeResult changeLikeStatusPost(PostIsLikeCommand command) {
@@ -78,7 +77,7 @@ public class PostLikeService implements PostLikeUseCase {
     }
 
     @Recover
-    public void recover(Exception e, PostIsLikeCommand command) {
+    public PostIsLikeResult recover(Exception e, PostIsLikeCommand command) {
         throw new BusinessException(ErrorCode.RESOURCE_LOCKED);
     }
 
