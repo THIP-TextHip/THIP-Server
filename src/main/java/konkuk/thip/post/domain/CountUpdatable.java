@@ -5,6 +5,7 @@ import konkuk.thip.post.domain.service.PostCountService;
 public interface CountUpdatable {
     void increaseCommentCount();
     void decreaseCommentCount();
-    void updateLikeCount(PostCountService postCountService, boolean isLike);
+    void updateLikeCount(PostCountService postCountService, boolean isLike, int newLikeCount);
     Long getId();
+    Integer getLikeCount();
 }
