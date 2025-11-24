@@ -155,8 +155,8 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
     }
 
     @Override
-    public void updateLikeCount(PostCountService postCountService, boolean isLike) {
-        likeCount = postCountService.updatePostLikeCount(isLike, likeCount);
+    public void updateLikeCount(PostCountService postCountService, boolean isLike, int newLikeCount) {
+        likeCount = postCountService.updatePostLikeCount(isLike, newLikeCount);
     }
 
     private void checkCommentCountNotUnderflow() {
