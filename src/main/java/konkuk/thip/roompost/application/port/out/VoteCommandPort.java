@@ -1,5 +1,6 @@
 package konkuk.thip.roompost.application.port.out;
 
+import java.util.Map;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.roompost.domain.Vote;
 import konkuk.thip.roompost.domain.VoteItem;
@@ -20,6 +21,8 @@ public interface VoteCommandPort {
     void saveAllVoteItems(List<VoteItem> voteItems);
 
     Optional<Vote> findById(Long id);
+
+    List<Long> findByIds(List<Long> ids);
 
     default Vote getByIdOrThrow(Long id) {
         return findById(id)
@@ -50,4 +53,6 @@ public interface VoteCommandPort {
     void deleteAllVoteParticipantByUserId(Long userId);
 
     void deleteAllVoteByUserId(Long userId);
+
+    void batchUpdateLikeCounts(Map<Long, Integer> idToLikeCount);
 }
