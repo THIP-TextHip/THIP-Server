@@ -1,5 +1,9 @@
 package konkuk.thip.roompost.adapter.out.persistence;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.exception.EntityNotFoundException;
@@ -14,6 +18,8 @@ import konkuk.thip.roompost.domain.Record;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +30,8 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 @Repository
 @RequiredArgsConstructor
 public class RecordCommandPersistenceAdapter implements RecordCommandPort {
+
+    private final JdbcTemplate jdbcTemplate;
 
     private final RecordJpaRepository recordJpaRepository;
     private final UserJpaRepository userJpaRepository;
@@ -57,6 +65,11 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
     }
 
     @Override
+    public List<Long> findByIds(List<Long> ids) {
+        return recordJpaRepository.findByPostIds(ids);
+    }
+
+    @Override
     public void delete(Record record) {
         RecordJpaEntity recordJpaEntity = recordJpaRepository.findByPostId(record.getId()).orElseThrow(
                 () -> new EntityNotFoundException(RECORD_NOT_FOUND)
@@ -81,6 +94,26 @@ public class RecordCommandPersistenceAdapter implements RecordCommandPort {
         postLikeJpaRepository.deleteAllByPostIds(recordIds);
         // 4. 탈퇴한 유저가 작성한 기록 soft delete 일괄 처리
         recordJpaRepository.softDeleteAllByUserId(userId);
+    }
+
+    @Override
+    public void batchUpdateLikeCounts(Map<Long, Integer> idToLikeCount) {
+        String sql = "UPDATE posts SET like_count = like_count + ? WHERE post_id = ?";
+        List<Map.Entry<Long, Integer>> entries = new ArrayList<>(idToLikeCount.entrySet());
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Map.Entry<Long, Integer> entry = entries.get(i);
+                ps.setInt(1, entry.getValue());
+                ps.setLong(2, entry.getKey());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return entries.size();
+            }
+        });
     }
 
     @Override
