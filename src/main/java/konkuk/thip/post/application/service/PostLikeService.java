@@ -2,6 +2,8 @@ package konkuk.thip.post.application.service;
 
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
+import konkuk.thip.post.application.port.out.PostLikeCountRedisCommandPort;
+import konkuk.thip.post.application.port.out.PostLikeCountRedisQueryPort;
 import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.CountUpdatable;
@@ -25,6 +27,8 @@ public class PostLikeService implements PostLikeUseCase {
     private final PostLikeQueryPort postLikeQueryPort;
     private final PostLikeCommandPort postLikeCommandPort;
     private final UserCommandPort userCommandPort;
+    private final PostLikeCountRedisCommandPort postLikeCountRedisCommandPort;
+    private final PostLikeCountRedisQueryPort postLikeCountRedisQueryPort;
 
     private final PostHandler postHandler;
     private final PostCountService postCountService;
@@ -45,21 +49,23 @@ public class PostLikeService implements PostLikeUseCase {
         // 2. 유저가 해당 게시물에 대해 좋아요 했는지 조회
         boolean alreadyLiked = postLikeQueryPort.isLikedPostByUser(command.userId(), command.postId());
 
-        // 3. 게시물 좋아요 수 업데이트
-        post.updateLikeCount(postCountService,command.isLike());
-        postHandler.updatePost(command.postType(), post);
-
-        // 4. 좋아요 상태변경
+        // 3. 좋아요 상태변경
         if (command.isLike()) {
             postLikeAuthorizationValidator.validateUserCanLike(alreadyLiked); // 좋아요 가능 여부 검증
             postLikeCommandPort.save(command.userId(), command.postId(),command.postType());
 
             // 좋아요 푸쉬알림 전송
-            sendNotifications(command);
+            //sendNotifications(command);
         } else {
             postLikeAuthorizationValidator.validateUserCanUnLike(alreadyLiked); // 좋아요 취소 가능 여부 검증
             postLikeCommandPort.delete(command.userId(), command.postId());
         }
+
+        // 4. 게시물 좋아요 수
+        int redisLikeCount = postLikeCountRedisQueryPort.getLikeCount(command.postType(),post.getId(), post.getLikeCount());
+        post.updateLikeCount(postCountService,command.isLike(), redisLikeCount); // 도메인 상태 갱신 (외부에서 읽은 최신값 주입)
+        // 4-1. 좋아요 수를 Redis INCR/DECR 이용해 원자적으로 갱신
+        postLikeCountRedisCommandPort.updateLikeCount(command.postType(),post.getId(),post.getLikeCount(),command.isLike());
 
         return PostIsLikeResult.of(post.getId(), command.isLike());
     }
