@@ -1,6 +1,8 @@
 package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.InvalidStateException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
@@ -9,12 +11,15 @@ import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.Following;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static konkuk.thip.common.exception.code.ErrorCode.*;
+import static konkuk.thip.common.exception.code.ErrorCode.USER_CANNOT_FOLLOW_SELF;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,18 @@ public class UserFollowService implements UserFollowUsecase {
 
     @Override
     @Transactional
+    @Retryable(
+            notRecoverable = {
+                    BusinessException.class,
+                    InvalidStateException.class
+            },
+            noRetryFor = {
+                    BusinessException.class,
+                    InvalidStateException.class
+            },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100, maxDelay = 500, multiplier = 2)
+    )
     public Boolean changeFollowingState(UserFollowCommand followCommand) {
         Long userId = followCommand.userId();
         Long targetUserId = followCommand.targetUserId();
@@ -35,7 +52,7 @@ public class UserFollowService implements UserFollowUsecase {
         validateParams(userId, targetUserId);
 
         Optional<Following> optionalFollowing = followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId);
-        User targetUser = userCommandPort.findById(targetUserId);
+        User targetUser = userCommandPort.findByIdWithLock(targetUserId);
 
         boolean isFollowRequest = Following.validateFollowingState(optionalFollowing.isPresent(), type);
 
@@ -51,6 +68,11 @@ public class UserFollowService implements UserFollowUsecase {
             followingCommandPort.deleteFollowing(optionalFollowing.get(), targetUser);
             return false;
         }
+    }
+
+    @Recover
+    public Boolean recoverChangeFollowingState(Exception e, UserFollowCommand followCommand) {
+        throw new BusinessException(ErrorCode.RESOURCE_LOCKED);
     }
 
     private void sendNotifications(Long userId, Long targetUserId) {
