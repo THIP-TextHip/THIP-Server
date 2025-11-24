@@ -1,6 +1,8 @@
 package konkuk.thip.roompost.application.port.out;
 
 
+import java.util.List;
+import java.util.Map;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.roompost.domain.Record;
 
@@ -15,6 +17,7 @@ public interface RecordCommandPort {
     void update(Record record);
 
     Optional<Record> findById(Long id);
+    List<Long> findByIds(List<Long> ids);
 
     default Record getByIdOrThrow(Long id) {
         return findById(id)
@@ -24,4 +27,6 @@ public interface RecordCommandPort {
     void delete(Record record);
 
     void deleteAllByUserId(Long userId);
+
+    void batchUpdateLikeCounts(Map<Long, Integer> idToLikeCount);
 }
