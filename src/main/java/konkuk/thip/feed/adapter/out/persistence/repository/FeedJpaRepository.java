@@ -29,4 +29,6 @@ public interface FeedJpaRepository extends JpaRepository<FeedJpaEntity, Long>, F
     @Query("UPDATE FeedJpaEntity f SET f.status = 'INACTIVE' WHERE f.userJpaEntity.userId = :userId")
     void softDeleteAllByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT f.postId FROM FeedJpaEntity f WHERE f.postId IN :postIds")
+    List<Long> findByPostIds(@Param("postIds") List<Long> postIds);
 }
