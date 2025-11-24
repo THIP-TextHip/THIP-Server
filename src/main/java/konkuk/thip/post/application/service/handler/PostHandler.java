@@ -1,5 +1,7 @@
 package konkuk.thip.post.application.service.handler;
 
+import java.util.List;
+import java.util.Map;
 import konkuk.thip.common.annotation.application.HelperService;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
@@ -46,4 +48,22 @@ public class PostHandler {
             case VOTE -> postQueryPort.getPostQueryDtoByVoteId(postId);
         };
     }
+
+    public List<Long> findPostIdsByIds(PostType type, List<Long> postIds) {
+        return switch(type) {
+            case FEED -> feedCommandPort.findByIds(postIds);
+            case RECORD -> recordCommandPort.findByIds(postIds);
+            case VOTE -> voteCommandPort.findByIds(postIds);
+        };
+    }
+
+    public void batchUpdateLikeCounts(PostType type, Map<Long, Integer> idToLikeCount) {
+        switch(type) {
+            case FEED -> feedCommandPort.batchUpdateLikeCounts(idToLikeCount);
+            case RECORD -> recordCommandPort.batchUpdateLikeCounts(idToLikeCount);
+            case VOTE -> voteCommandPort.batchUpdateLikeCounts(idToLikeCount);
+        }
+    }
+
+
 }
