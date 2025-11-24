@@ -1,5 +1,9 @@
 package konkuk.thip.feed.adapter.out.persistence;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
@@ -16,6 +20,8 @@ import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +32,8 @@ import static konkuk.thip.common.exception.code.ErrorCode.*;
 @Repository
 @RequiredArgsConstructor
 public class FeedCommandPersistenceAdapter implements FeedCommandPort {
+
+    private final JdbcTemplate jdbcTemplate;
 
     private final FeedJpaRepository feedJpaRepository;
     private final UserJpaRepository userJpaRepository;
@@ -42,6 +50,11 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     public Optional<Feed> findById(Long id) {
         return feedJpaRepository.findByPostId(id)
                 .map(feedMapper::toDomainEntity);
+    }
+
+    @Override
+    public List<Long> findByIds(List<Long> ids) {
+        return feedJpaRepository.findByPostIds(ids);
     }
 
 
@@ -112,6 +125,26 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         savedFeedJpaRepository.deleteAllByFeedIds(feedIds);
         // 5. 탈퇴한 유저가 작성한 피드 게시글 soft delete 일괄 처리
         feedJpaRepository.softDeleteAllByUserId(userId);
+    }
+
+    @Override
+    public void batchUpdateLikeCounts(Map<Long, Integer> idToLikeCount) {
+        String sql = "UPDATE posts SET like_count = like_count + ? WHERE post_id = ?";
+        List<Map.Entry<Long, Integer>> entries = new ArrayList<>(idToLikeCount.entrySet());
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Map.Entry<Long, Integer> entry = entries.get(i);
+                ps.setInt(1, entry.getValue());  // Redis에서 가져온 좋아요 수 (증분 값)
+                ps.setLong(2, entry.getKey());   //게시글 ID
+            }
+
+            @Override
+            public int getBatchSize() {
+                return entries.size();
+            }
+        });
     }
 
     @Override
