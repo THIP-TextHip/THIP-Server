@@ -80,8 +80,6 @@ public class PostLikeCountRedisAdapter implements PostLikeCountRedisCommandPort,
         // Pipeline을 사용하여 일괄적으로 값을 0으로 설정
         redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             for (String key : keysToReset) {
-                // connection.set(key.getBytes(StandardCharsets.UTF_8), "0".getBytes(StandardCharsets.UTF_8));
-                // RedisTemplate<String, Integer>를 사용하므로 OpsForValue().set 사용
                 redisTemplate.opsForValue().set(key, 0);
             }
             return null;
