@@ -67,6 +67,7 @@ public class PostLikeCountSyncToDBService {
 
             // 도메인별 id 리스트 중 실제 존재하는 id만 필터링
             List<Long> existingIds = postHandler.findPostIdsByIds(type, ids);
+            if (existingIds.isEmpty()) continue;
             // 해당 id와 좋아요 수만 맵으로 생성
             Map<Long, Integer> idToLikeCount = existingIds.stream()
                     .collect(Collectors.toMap(id -> id, id -> {
