@@ -92,6 +92,8 @@ public class VoteCommandPersistenceAdapter implements VoteCommandPort {
 
     @Override
     public List<Long> findByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty())
+            return new ArrayList<>();
         return voteJpaRepository.findByPostIds(ids);
     }
 
