@@ -1,7 +1,6 @@
 package konkuk.thip.feed.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Set;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
