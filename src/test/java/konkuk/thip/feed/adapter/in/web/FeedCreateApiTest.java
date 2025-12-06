@@ -72,7 +72,7 @@ class FeedCreateApiTest {
     void createFeedWithBookExistsInDB() throws Exception {
 
         // given
-        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("3788954682152"));
 
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152"); // 책 ISBN
@@ -158,7 +158,7 @@ class FeedCreateApiTest {
     void createFeedWithImages_createsContentEntities() throws Exception {
 
         // given
-        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("1788954682152"));
 
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152"); // 책 ISBN
@@ -206,7 +206,7 @@ class FeedCreateApiTest {
     @DisplayName("이미지가 없는 피드를 생성하면 Feed의 contentList는 비어 있어야 한다.")
     void createFeedWithoutImages_shouldHaveEmptyContentList() throws Exception {
         // given
-        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("4788954682152"));
 
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152");
@@ -239,7 +239,7 @@ class FeedCreateApiTest {
     void createFeedWithTags_createsFeedTagMappings() throws Exception {
 
         // given
-        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("2788954682152"));
 
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152");
@@ -279,7 +279,7 @@ class FeedCreateApiTest {
     @DisplayName("태그가 없는 피드는 태그가 없는 채로 DB에 저장된다.")
     void createFeedWithoutTags_shouldNotHaveFeedTags() throws Exception {
         // given
-        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("5788954682152"));
 
         Map<String, Object> request = new HashMap<>();
         request.put("isbn", "9788954682152");

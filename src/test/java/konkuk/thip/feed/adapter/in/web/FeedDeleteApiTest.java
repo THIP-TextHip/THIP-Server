@@ -59,7 +59,7 @@ class FeedDeleteApiTest {
     @BeforeEach
     void setUp() {
         user = userJpaRepository.save(TestEntityFactory.createUser(Alias.ARTIST));
-        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("6788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true,1,1,List.of("url1", "url2", "url3")));
         postLikeJpaRepository.save(TestEntityFactory.createPostLike(user,feed));
         comment = commentJpaRepository.save(TestEntityFactory.createComment(feed, user, FEED));

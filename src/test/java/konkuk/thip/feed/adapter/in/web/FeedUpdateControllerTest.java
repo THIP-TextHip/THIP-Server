@@ -1,6 +1,7 @@
 package konkuk.thip.feed.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
@@ -46,6 +47,7 @@ class FeedUpdateControllerTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
 
+
     private Long savedFeedId;
     private Long creatorUserId;
 
@@ -53,7 +55,7 @@ class FeedUpdateControllerTest {
     void setUp() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("8788954682152"));
         savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE))).getPostId();
         creatorUserId = user.getUserId();
     }
