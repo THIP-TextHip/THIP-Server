@@ -143,10 +143,10 @@ class RecordTest {
     void updateLikeCount_likeTrue_increments() {
         konkuk.thip.roompost.domain.Record record = createWithCommentRecord();
 
-        record.updateLikeCount(postCountService,true);
+        record.updateLikeCount(postCountService,true,record.getLikeCount());
         assertEquals(1, record.getLikeCount());
 
-        record.updateLikeCount(postCountService,true);
+        record.updateLikeCount(postCountService,true,record.getLikeCount());
         assertEquals(2, record.getLikeCount());
     }
 
@@ -156,14 +156,14 @@ class RecordTest {
         konkuk.thip.roompost.domain.Record record = createWithCommentRecord();
 
         // 먼저 likeCount 증가 셋업
-        record.updateLikeCount(postCountService,true);
-        record.updateLikeCount(postCountService,true);
+        record.updateLikeCount(postCountService,true,record.getLikeCount());
+        record.updateLikeCount(postCountService,true,record.getLikeCount());
         assertEquals(2, record.getLikeCount());
 
-        record.updateLikeCount(postCountService,false);
+        record.updateLikeCount(postCountService,false,record.getLikeCount());
         assertEquals(1, record.getLikeCount());
 
-        record.updateLikeCount(postCountService,false);
+        record.updateLikeCount(postCountService,false,record.getLikeCount());
         assertEquals(0, record.getLikeCount());
     }
 
@@ -174,7 +174,7 @@ class RecordTest {
         assertEquals(0, record.getLikeCount());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            record.updateLikeCount(postCountService,false);
+            record.updateLikeCount(postCountService,false,record.getLikeCount()-1);
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());

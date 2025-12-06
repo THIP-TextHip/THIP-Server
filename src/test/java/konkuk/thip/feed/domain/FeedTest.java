@@ -227,10 +227,10 @@ class FeedTest {
     void updateLikeCount_likeTrue_increments() {
         Feed feed = createPublicFeed();
 
-        feed.updateLikeCount(postCountService, true);
+        feed.updateLikeCount(postCountService, true,feed.getLikeCount());
         assertEquals(1, feed.getLikeCount());
 
-        feed.updateLikeCount(postCountService, true);
+        feed.updateLikeCount(postCountService, true,feed.getLikeCount());
         assertEquals(2, feed.getLikeCount());
     }
 
@@ -239,14 +239,14 @@ class FeedTest {
     void updateLikeCount_likeFalse_decrements() {
         Feed feed = createPublicFeed();
         // 먼저 likeCount 증가 셋업
-        feed.updateLikeCount(postCountService, true);
-        feed.updateLikeCount(postCountService, true);
+        feed.updateLikeCount(postCountService, true,feed.getLikeCount());
+        feed.updateLikeCount(postCountService, true,feed.getLikeCount());
         assertEquals(2, feed.getLikeCount());
 
-        feed.updateLikeCount(postCountService, false);
+        feed.updateLikeCount(postCountService, false,feed.getLikeCount());
         assertEquals(1, feed.getLikeCount());
 
-        feed.updateLikeCount(postCountService, false);
+        feed.updateLikeCount(postCountService, false,feed.getLikeCount());
         assertEquals(0, feed.getLikeCount());
     }
 
@@ -257,7 +257,7 @@ class FeedTest {
         assertEquals(0, feed.getLikeCount());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            feed.updateLikeCount(postCountService, false);
+            feed.updateLikeCount(postCountService, false,feed.getLikeCount()-1);
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
