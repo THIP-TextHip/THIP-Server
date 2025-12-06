@@ -5,6 +5,8 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
+import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
+import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.post.application.port.in.dto.PostIsLikeCommand;
 import konkuk.thip.post.application.service.PostLikeService;
 import konkuk.thip.post.domain.PostType;
@@ -42,6 +44,7 @@ class FeedChangeLikeStatusConcurrencyTest {
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
+    @Autowired private PostLikeJpaRepository postLikeJpaRepository;
 
     private UserJpaEntity user1;
     private UserJpaEntity user2;
@@ -101,10 +104,20 @@ class FeedChangeLikeStatusConcurrencyTest {
         latch.await();
         executor.shutdown();
 
+        // 좋아요 저장 여부 확인
+        boolean user1Liked = postLikeJpaRepository.existsByUserIdAndPostId(user1.getUserId(),feed.getPostId());
+        boolean user2Liked = postLikeJpaRepository.existsByUserIdAndPostId(user2.getUserId(),feed.getPostId());
+
+        // 좋아요 카운트 증가 확인
+        FeedJpaEntity updatedFeed = feedJpaRepository.findById(feed.getPostId()).orElseThrow();
+
         // then
         assertAll(
                 () -> assertThat(successCount.get()).isEqualTo(threadCount * repeat),
-                () -> assertThat(failCount.get()).isEqualTo(0)
+                () -> assertThat(failCount.get()).isEqualTo(0),
+                () -> assertThat(updatedFeed.getLikeCount()).isEqualTo(0),
+                () -> assertThat(user1Liked).isFalse(),
+                () -> assertThat(user2Liked).isFalse()
         );
     }
 
