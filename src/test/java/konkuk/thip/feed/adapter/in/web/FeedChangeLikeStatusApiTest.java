@@ -11,6 +11,7 @@ import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.POST_ALREADY_LIKED;
 import static konkuk.thip.common.exception.code.ErrorCode.POST_NOT_LIKED_CANNOT_CANCEL;
@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@Transactional
 @DisplayName("[통합] 피드 좋아요 api 통합 테스트")
 class FeedChangeLikeStatusApiTest {
 
@@ -57,6 +56,14 @@ class FeedChangeLikeStatusApiTest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
+    }
+
+    @AfterEach
+    void tearDown(){
+        postLikeJpaRepository.deleteAllInBatch();
+        feedJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test
@@ -138,6 +145,7 @@ class FeedChangeLikeStatusApiTest {
 
         // 다른 유저가 해당 게시글에 좋아요한 상태(좋아요 0 이하 언더플로우 예외 피하기위해서 해당피드에 이미 좋아요 1이상이라고 가정)
         feed.updateLikeCount(1);
+        feedJpaRepository.save(feed); //영속성 바로 반영
         // given
         FeedIsLikeRequest request = new FeedIsLikeRequest(false);
 

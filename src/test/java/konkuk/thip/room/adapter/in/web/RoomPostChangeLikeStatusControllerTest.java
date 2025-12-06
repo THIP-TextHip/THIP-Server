@@ -14,6 +14,7 @@ import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomP
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@Transactional
 @DisplayName("[단위] 방 게시물(기록,투표) 좋아요 api controller 단위 테스트")
 class RoomPostChangeLikeStatusControllerTest {
 
@@ -71,6 +70,15 @@ class RoomPostChangeLikeStatusControllerTest {
         // 1번방에 유저 1이 호스트
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room,user1, RoomParticipantRole.HOST, 80.0));
         record = recordJpaRepository.save(TestEntityFactory.createRecord(user1,room));
+    }
+
+    @AfterEach
+    void tearDown(){
+        roomParticipantJpaRepository.deleteAllInBatch();
+        recordJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     private Map<String, Object> buildValidLikeRequest(Boolean isLike, String postType) {
