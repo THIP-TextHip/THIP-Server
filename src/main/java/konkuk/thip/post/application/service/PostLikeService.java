@@ -67,7 +67,7 @@ public class PostLikeService implements PostLikeUseCase {
             postLikeCommandPort.save(command.userId(), command.postId(),command.postType());
 
             // 좋아요 푸쉬알림 전송
-            //sendNotifications(command);
+            sendNotifications(command);
         } else {
             postLikeAuthorizationValidator.validateUserCanUnLike(alreadyLiked); // 좋아요 취소 가능 여부 검증
             postLikeCommandPort.delete(command.userId(), command.postId());
