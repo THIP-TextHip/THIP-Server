@@ -5,12 +5,14 @@ import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeQueueConsumerPort;
 import konkuk.thip.post.application.port.out.dto.PostLikeQueueMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Service
 @RequiredArgsConstructor
+@Profile("!test")
 public class PostLikeRecordSyncToDBService {
 
     private final PostLikeCommandPort postLikeCommandPort;
