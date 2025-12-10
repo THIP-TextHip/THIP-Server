@@ -142,10 +142,10 @@ class VoteTest {
     void updateLikeCount_likeTrue_increments() {
         Vote vote = createWithCommentVote();
 
-        vote.updateLikeCount(postCountService,true);
+        vote.updateLikeCount(postCountService,true,vote.getLikeCount());
         assertEquals(1, vote.getLikeCount());
 
-        vote.updateLikeCount(postCountService,true);
+        vote.updateLikeCount(postCountService,true,vote.getLikeCount());
         assertEquals(2, vote.getLikeCount());
     }
 
@@ -155,14 +155,14 @@ class VoteTest {
         Vote vote = createWithCommentVote();
 
         // 먼저 likeCount 증가 셋업
-        vote.updateLikeCount(postCountService,true);
-        vote.updateLikeCount(postCountService,true);
+        vote.updateLikeCount(postCountService,true,vote.getLikeCount());
+        vote.updateLikeCount(postCountService,true,vote.getLikeCount());
         assertEquals(2, vote.getLikeCount());
 
-        vote.updateLikeCount(postCountService,false);
+        vote.updateLikeCount(postCountService,false,vote.getLikeCount());
         assertEquals(1, vote.getLikeCount());
 
-        vote.updateLikeCount(postCountService,false);
+        vote.updateLikeCount(postCountService,false,vote.getLikeCount());
         assertEquals(0, vote.getLikeCount());
     }
 
@@ -173,7 +173,7 @@ class VoteTest {
         assertEquals(0, vote.getLikeCount());
 
         InvalidStateException ex = assertThrows(InvalidStateException.class, () -> {
-            vote.updateLikeCount(postCountService,false);
+            vote.updateLikeCount(postCountService,false,vote.getLikeCount());
         });
 
         assertEquals(POST_LIKE_COUNT_UNDERFLOW, ex.getErrorCode());
