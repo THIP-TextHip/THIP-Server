@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
+import konkuk.thip.book.application.port.out.BookApiQueryPort;
+import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,6 +54,7 @@ class RoomCreateApiTest {
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
+    @MockBean private BookApiQueryPort mockBookApiQueryPort;
 
     private void saveUserAndLiteratureCategory() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -158,6 +164,8 @@ class RoomCreateApiTest {
 
         Map<String, Object> request = buildRoomCreateRequest();
 
+        when(mockBookApiQueryPort.findPageCountByIsbn(anyString())).thenReturn(296);
+
         //when
         ResultActions result = mockMvc.perform(post("/rooms")
                 .requestAttr("userId", userId)
@@ -203,6 +211,17 @@ class RoomCreateApiTest {
         Long userId = userJpaRepository.findAll().get(0).getUserId();
 
         Map<String, Object> request = buildRoomCreateRequest();
+
+        Book mockBook = Book.withoutId(
+                "작별하지 않는다",
+                "9791168342941",
+                "박곰희",
+                false,
+                "문학동네",
+                "https://image1.jpg",
+                296,
+                "한강의 소설");
+        when(mockBookApiQueryPort.loadBookWithPageByIsbn(anyString())).thenReturn(mockBook);
 
         //when
         ResultActions result = mockMvc.perform(post("/rooms")
