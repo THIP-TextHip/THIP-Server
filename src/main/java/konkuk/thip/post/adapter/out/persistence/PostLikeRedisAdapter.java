@@ -92,11 +92,9 @@ public class PostLikeRedisAdapter implements PostLikeRedisCommandPort, PostLikeR
 
     @Override
     public boolean isLikedPostByUser(Long userId, Long postId) {
-        // Post ID별로 Set을 구성하고, Set 안에 userId가 있는지 확인합니다.
         String recordKey = makeRecordRedisKey(postId);
 
-        // SISMEMBER 명령어 실행: Set 안에 userId(멤버)가 존재하는지 확인
-        // redisTemplate.opsForSet().isMember(key, member)는 Boolean을 반환합니다.
+        // SISMEMBER : Set 안에 userId(멤버)가 존재하는지 확인
         Boolean isMember = stringRedisTemplate.opsForSet().isMember(recordKey, userId.toString());
 
         return isMember != null && isMember;
