@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import konkuk.thip.post.application.port.out.PostLikeCountRedisCommandPort;
-import konkuk.thip.post.application.port.out.PostLikeCountRedisQueryPort;
+import konkuk.thip.post.application.port.out.PostLikeRedisCommandPort;
+import konkuk.thip.post.application.port.out.PostLikeRedisQueryPort;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.PostType;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PostLikeCountSyncToDBService {
 
-    private final PostLikeCountRedisQueryPort redisQueryPort;
-    private final PostLikeCountRedisCommandPort redisCommandPort;
+    private final PostLikeRedisQueryPort redisQueryPort;
+    private final PostLikeRedisCommandPort redisCommandPort;
     private final PostHandler postHandler;
 
     @Value("${app.redis.post-like-count-prefix}")
