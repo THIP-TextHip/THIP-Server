@@ -5,9 +5,8 @@ import java.util.Set;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
-import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
-import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
+import konkuk.thip.post.application.port.out.PostLikeRedisCommandPort;
+import konkuk.thip.post.application.port.out.PostLikeRedisQueryPort;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.record.RecordJpaRepository;
@@ -30,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,17 +53,16 @@ class RoomPostChangeLikeStatusApiTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
-    @Autowired private FeedJpaRepository feedJpaRepository;
-    @Autowired private PostLikeJpaRepository postLikeJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
     @Autowired private RecordJpaRepository recordJpaRepository;
     @Autowired private VoteJpaRepository voteJpaRepository;
     @Autowired private RedisTemplate<String, Integer> redisTemplate;
+    @Autowired private PostLikeRedisCommandPort postLikeRedisCommandPort;
+    @Autowired private PostLikeRedisQueryPort postLikeRedisQueryPort;
 
     private UserJpaEntity user;
     private BookJpaEntity book;
-    private FeedJpaEntity feed;
     private Category category;
     private RoomJpaEntity room;
     private RecordJpaEntity record;
@@ -81,7 +80,6 @@ class RoomPostChangeLikeStatusApiTest {
         Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
         category = TestEntityFactory.createLiteratureCategory();
         room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
         // 1번방에 유저 1이 호스트
@@ -105,9 +103,23 @@ class RoomPostChangeLikeStatusApiTest {
                 .andExpect(jsonPath("$.data.postId").value(record.getPostId()))
                 .andExpect(jsonPath("$.data.isLiked").value(true));
 
+        // 트랜잭션을 강제로 커밋 (리스너 실행을 유발)
+        TestTransaction.flagForCommit();
+        TestTransaction.end(); // AFTER_COMMIT 리스너 실행
+
+        // 트랜잭션이 커밋되었으므로, DB에 영구적으로 남은 데이터 수동 정리
+        roomParticipantJpaRepository.deleteAllInBatch();
+        recordJpaRepository.deleteAllInBatch();
+        voteJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+
+        TestTransaction.start(); // 다음 테스트를 위해 새 트랜잭션 시작
+
         //then
         // 좋아요 저장 확인
-        boolean liked = postLikeJpaRepository.existsByUserIdAndPostId(user.getUserId(), record.getPostId());
+        boolean liked = postLikeRedisQueryPort.isLikedPostByUser(user.getUserId(),record.getPostId());
         assertThat(liked).isTrue();
 
 //        // 좋아요 카운트 증가 확인
@@ -120,7 +132,7 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("이미 좋아요한 기록 게시물을 다시 좋아요하면 [400 에러 발생]")
     void likeRecordPost_AlreadyLiked_Fail() throws Exception {
         //given
-        postLikeJpaRepository.save(TestEntityFactory.createPostLike(user, record));
+        postLikeRedisCommandPort.addLikeRecordToSet(user.getUserId(),record.getPostId());
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(true, "RECORD");
 
         //when & then
@@ -136,7 +148,7 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("좋아요한 기록 게시물 좋아요 취소하면 좋아요 삭제 및 카운트 감소 [성공]")
     void unlikeRecordPost_Success() throws Exception {
         //given
-        postLikeJpaRepository.save(TestEntityFactory.createPostLike(user, record));
+        postLikeRedisCommandPort.addLikeRecordToSet(user.getUserId(),record.getPostId());
         record.updateLikeCount(1);
         recordJpaRepository.save(record);
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(false, "RECORD");
@@ -150,8 +162,22 @@ class RoomPostChangeLikeStatusApiTest {
                 .andExpect(jsonPath("$.data.postId").value(record.getPostId()))
                 .andExpect(jsonPath("$.data.isLiked").value(false));
 
+        // 트랜잭션을 강제로 커밋 (리스너 실행을 유발)
+        TestTransaction.flagForCommit();
+        TestTransaction.end(); // AFTER_COMMIT 리스너 실행
+
+        // 트랜잭션이 커밋되었으므로, DB에 영구적으로 남은 데이터 수동 정리
+        roomParticipantJpaRepository.deleteAllInBatch();
+        recordJpaRepository.deleteAllInBatch();
+        voteJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+
+        TestTransaction.start(); // 다음 테스트를 위해 새 트랜잭션 시작
+
         //then
-        boolean liked = postLikeJpaRepository.existsByUserIdAndPostId(user.getUserId(), record.getPostId());
+        boolean liked = postLikeRedisQueryPort.isLikedPostByUser(user.getUserId(),record.getPostId());
         assertThat(liked).isFalse();
 
 //        RecordJpaEntity updatedRecord = recordJpaRepository.findById(record.getPostId()).orElseThrow();
@@ -190,8 +216,22 @@ class RoomPostChangeLikeStatusApiTest {
                 .andExpect(jsonPath("$.data.postId").value(vote.getPostId()))
                 .andExpect(jsonPath("$.data.isLiked").value(true));
 
+        // 트랜잭션을 강제로 커밋 (리스너 실행을 유발)
+        TestTransaction.flagForCommit();
+        TestTransaction.end(); // AFTER_COMMIT 리스너 실행
+
+        // 트랜잭션이 커밋되었으므로, DB에 영구적으로 남은 데이터 수동 정리
+        roomParticipantJpaRepository.deleteAllInBatch();
+        recordJpaRepository.deleteAllInBatch();
+        voteJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+
+        TestTransaction.start(); // 다음 테스트를 위해 새 트랜잭션 시작
+
         //then
-        boolean liked = postLikeJpaRepository.existsByUserIdAndPostId(user.getUserId(), vote.getPostId());
+        boolean liked = postLikeRedisQueryPort.isLikedPostByUser(user.getUserId(),vote.getPostId());
         assertThat(liked).isTrue();
 
 //        VoteJpaEntity updatedVote = voteJpaRepository.findById(vote.getPostId()).orElseThrow();
@@ -202,7 +242,7 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("이미 좋아요한 투표 게시물을 다시 좋아요하면 [400 에러 발생]")
     void likeVotePost_AlreadyLiked_Fail() throws Exception {
         //given
-        postLikeJpaRepository.save(TestEntityFactory.createPostLike(user, vote));
+        postLikeRedisCommandPort.addLikeRecordToSet(user.getUserId(),vote.getPostId());
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(true, "VOTE");
 
         //when & then
@@ -218,7 +258,7 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("좋아요한 투표 게시물 좋아요 취소하면 좋아요 삭제 및 카운트 감소 [성공]")
     void unlikeVotePost_Success() throws Exception {
         //given
-        postLikeJpaRepository.save(TestEntityFactory.createPostLike(user, vote));
+        postLikeRedisCommandPort.addLikeRecordToSet(user.getUserId(),vote.getPostId());
         vote.updateLikeCount(1);
         voteJpaRepository.save(vote);
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(false, "VOTE");
@@ -232,7 +272,21 @@ class RoomPostChangeLikeStatusApiTest {
                 .andExpect(jsonPath("$.data.postId").value(vote.getPostId()))
                 .andExpect(jsonPath("$.data.isLiked").value(false));
 
-        boolean liked = postLikeJpaRepository.existsByUserIdAndPostId(user.getUserId(), vote.getPostId());
+        // 트랜잭션을 강제로 커밋 (리스너 실행을 유발)
+        TestTransaction.flagForCommit();
+        TestTransaction.end(); // AFTER_COMMIT 리스너 실행
+
+        // 트랜잭션이 커밋되었으므로, DB에 영구적으로 남은 데이터 수동 정리
+        roomParticipantJpaRepository.deleteAllInBatch();
+        recordJpaRepository.deleteAllInBatch();
+        voteJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+
+        TestTransaction.start(); // 다음 테스트를 위해 새 트랜잭션 시작
+
+        boolean liked = postLikeRedisQueryPort.isLikedPostByUser(user.getUserId(),vote.getPostId());
         assertThat(liked).isFalse();
 
 //        VoteJpaEntity updatedVote = voteJpaRepository.findById(vote.getPostId()).orElseThrow();

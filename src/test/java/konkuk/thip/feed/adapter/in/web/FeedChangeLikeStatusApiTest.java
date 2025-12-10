@@ -8,7 +8,8 @@ import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.in.web.request.FeedIsLikeRequest;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
-import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
+import konkuk.thip.post.application.port.out.PostLikeRedisCommandPort;
+import konkuk.thip.post.application.port.out.PostLikeRedisQueryPort;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +47,9 @@ class FeedChangeLikeStatusApiTest {
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
-    @Autowired private PostLikeJpaRepository postLikeJpaRepository;
     @Autowired private RedisTemplate<String, Integer> redisTemplate;
+    @Autowired private PostLikeRedisCommandPort postLikeRedisCommandPort;
+    @Autowired private PostLikeRedisQueryPort postLikeRedisQueryPort;
 
 
     private UserJpaEntity user;
@@ -85,8 +88,19 @@ class FeedChangeLikeStatusApiTest {
                 .andExpect(jsonPath("$.data.feedId").value(feed.getPostId()))
                 .andExpect(jsonPath("$.data.isLiked").value(true));
 
+        // 트랜잭션을 강제로 커밋 (리스너 실행을 유발)
+        TestTransaction.flagForCommit();
+        TestTransaction.end(); // AFTER_COMMIT 리스너 실행
+
+        // 트랜잭션이 커밋되었으므로, DB에 영구적으로 남은 데이터 수동 정리
+        feedJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+
+        TestTransaction.start(); // 다음 테스트를 위해 새 트랜잭션 시작
+
         // 좋아요 저장 여부 확인
-        boolean liked = postLikeJpaRepository.existsByUserIdAndPostId(user.getUserId(),feed.getPostId());
+        boolean liked = postLikeRedisQueryPort.isLikedPostByUser(user.getUserId(),feed.getPostId());
         assertThat(liked).isTrue();
 
 //        // 좋아요 카운트 증가 확인
@@ -99,7 +113,7 @@ class FeedChangeLikeStatusApiTest {
     void likeFeed_AlreadyLiked_Fail() throws Exception {
 
         // given: 미리 좋아요 저장
-        postLikeJpaRepository.save(TestEntityFactory.createPostLike(user, feed));
+        postLikeRedisCommandPort.addLikeRecordToSet(user.getUserId(),feed.getPostId());
         FeedIsLikeRequest request = new FeedIsLikeRequest(true);
 
         // when & then
@@ -116,7 +130,7 @@ class FeedChangeLikeStatusApiTest {
     void unlikeFeed_Success() throws Exception {
 
         // given: 좋아요가 저장되어 있고, likeCount도 1 반영
-        postLikeJpaRepository.save(TestEntityFactory.createPostLike(user, feed));
+        postLikeRedisCommandPort.addLikeRecordToSet(user.getUserId(),feed.getPostId());
         feed.updateLikeCount(1); // 좋아요 1개로 세팅
         feedJpaRepository.save(feed);
 
@@ -132,8 +146,19 @@ class FeedChangeLikeStatusApiTest {
                 .andExpect(jsonPath("$.data.feedId").value(feed.getPostId()))
                 .andExpect(jsonPath("$.data.isLiked").value(false));
 
+        // 트랜잭션을 강제로 커밋 (리스너 실행을 유발)
+        TestTransaction.flagForCommit();
+        TestTransaction.end(); // AFTER_COMMIT 리스너 실행
+
+        // 트랜잭션이 커밋되었으므로, DB에 영구적으로 남은 데이터 수동 정리
+        feedJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+
+        TestTransaction.start(); // 다음 테스트를 위해 새 트랜잭션 시작
+
         // 좋아요 삭제 확인
-        boolean liked = postLikeJpaRepository.existsByUserIdAndPostId(user.getUserId(),feed.getPostId());
+        boolean liked = postLikeRedisQueryPort.isLikedPostByUser(user.getUserId(),feed.getPostId());
         assertThat(liked).isFalse();
 
 //        // 좋아요 카운트 감소 확인
