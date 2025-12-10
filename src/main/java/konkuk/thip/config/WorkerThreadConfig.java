@@ -13,7 +13,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 @Profile("!test")
 public class WorkerThreadConfig implements AsyncConfigurer {
 
@@ -50,6 +50,23 @@ public class WorkerThreadConfig implements AsyncConfigurer {
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(120);  // 배치작업 완료 대기시간
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+
+    /**
+     * PostLike 이벤트 전용 실행기
+     * - 좋아요/취소 시 Redis Set/Count 갱신 및 큐 발행 처리
+     * - 순간적인 높은 트래픽에 대비하여 큐 용량 확보
+     */
+    @Bean(name = "postLikeAsyncExecutor")
+    public Executor postLikeAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(30);
+        executor.setQueueCapacity(300);
+        executor.setThreadNamePrefix("like-async-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.initialize();
         return executor;
     }
