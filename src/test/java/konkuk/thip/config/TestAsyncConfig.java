@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import java.util.concurrent.Executor;
 
 // 테스트용: 동기 실행 강제
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 @Configuration
 @Profile("test")
 public class TestAsyncConfig implements AsyncConfigurer {
@@ -22,6 +22,11 @@ public class TestAsyncConfig implements AsyncConfigurer {
 
     @Bean(name = "schedulerAsyncExecutor")
     public Executor schedulerAsyncExecutor() {
+        return new SyncTaskExecutor();
+    }
+
+    @Bean(name = "postLikeAsyncExecutor")
+    public Executor postLikeAsyncExecutor() {
         return new SyncTaskExecutor();
     }
 
