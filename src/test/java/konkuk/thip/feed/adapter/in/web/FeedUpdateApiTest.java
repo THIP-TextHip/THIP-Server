@@ -58,7 +58,7 @@ class FeedUpdateApiTest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         Category category = TestEntityFactory.createLiteratureCategory();
 
-        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("7788954682152"));
 
         tags = List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE);
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, tags));

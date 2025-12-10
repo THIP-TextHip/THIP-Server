@@ -2,7 +2,6 @@ package konkuk.thip.roompost.domain;
 
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.post.domain.service.PostCountService;
-import konkuk.thip.roompost.domain.Record;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

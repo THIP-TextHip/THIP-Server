@@ -59,7 +59,7 @@ class FeedChangeSavedApiTest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         Category category = TestEntityFactory.createLiteratureCategory();
 
-        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682151"));
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
     }
 
