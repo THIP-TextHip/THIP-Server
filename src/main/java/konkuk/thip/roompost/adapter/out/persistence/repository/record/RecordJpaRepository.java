@@ -25,4 +25,17 @@ public interface RecordJpaRepository extends JpaRepository<RecordJpaEntity, Long
 
     @Query("SELECT r.postId FROM RecordJpaEntity r WHERE r.postId IN :postIds")
     List<Long> findByPostIds(List<Long> postIds);
+
+    @Query("SELECT r FROM RecordJpaEntity r " +
+            "WHERE r.roomJpaEntity.roomId = :roomId " +
+            "AND r.userJpaEntity.userId = :userId " +
+            "AND r.isOverview = false " +
+            "ORDER BY r.page ASC")
+    List<RecordJpaEntity> findAllByRoomIdAndUserIdOrderByPageAsc(Long roomId, Long userId);
+
+    @Query("SELECT COUNT(r) FROM RecordJpaEntity r " +
+            "WHERE r.roomJpaEntity.roomId = :roomId " +
+            "AND r.userJpaEntity.userId = :userId " +
+            "AND r.isOverview = false")
+    Integer countAllByRoomIdAndUserId(Long roomId, Long userId);
 }
