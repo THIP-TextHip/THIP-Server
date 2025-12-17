@@ -16,6 +16,8 @@ import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_ISBN_NO
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_PARSING_ERROR;
 
 public class NaverBookXmlParser {
+    private static final int MAX_DESCRIPTION_LENGTH = 3000;
+    private static final String DESCRIPTION_SUFFIX = "...";
 
     public static NaverBookParseResult parseBookList(String xml) {
         List<NaverBookParseResult.NaverBook> naverBooks = new ArrayList<>();
@@ -68,7 +70,13 @@ public class NaverBookXmlParser {
                     String author = getTagValue(item, "author");
                     String publisher = getTagValue(item, "publisher");
                     String isbn = getTagValue(item, "isbn");
-                    String description =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
+                    String rawDescription =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
+                    String description;
+                    if (rawDescription.length() > MAX_DESCRIPTION_LENGTH) {
+                        description = rawDescription.substring(0, MAX_DESCRIPTION_LENGTH - DESCRIPTION_SUFFIX.length()) + DESCRIPTION_SUFFIX;
+                    } else {
+                        description = rawDescription;
+                    }
 
                     return NaverDetailBookParseResult.builder()
                             .title(title)

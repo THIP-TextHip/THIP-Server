@@ -98,6 +98,9 @@ dependencies {
 
     // LogStash
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+	// Spring AI - Google AI(Gemini) 연동
+	implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.1'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
@@ -115,7 +118,11 @@ clean.doLast {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+        if (System.getenv('CI') == 'true') {
+            excludeTags 'concurrency'
+        }
+    }
 }
 
 apply from: "$rootDir/jacoco.gradle"

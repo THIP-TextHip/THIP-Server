@@ -1,6 +1,7 @@
 
 package konkuk.thip.user.adapter.out.jpa;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.common.exception.InvalidStateException;
@@ -46,6 +47,10 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Builder.Default
     private Integer followerCount = 0; // 팔로워 수
 
+    @Builder.Default
+    @Column(name = "record_review_count", nullable = false)
+    private Integer recordReviewCount = 0;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
@@ -59,6 +64,7 @@ public class UserJpaEntity extends BaseJpaEntity {
         this.nicknameUpdatedAt = user.getNicknameUpdatedAt();
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
+        this.recordReviewCount = user.getRecordReviewCount();
         this.alias = user.getAlias();
     }
 
@@ -67,6 +73,7 @@ public class UserJpaEntity extends BaseJpaEntity {
         this.nicknameUpdatedAt = user.getNicknameUpdatedAt();
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
+        this.recordReviewCount = user.getRecordReviewCount();
     }
 
     public void softDelete(User user) {
@@ -75,6 +82,11 @@ public class UserJpaEntity extends BaseJpaEntity {
         }
         this.status = INACTIVE;
         this.oauth2Id = user.getOauth2Id();
+    }
+
+    @VisibleForTesting
+    public void setRecordReviewCount(int count) {
+        this.recordReviewCount = count;
     }
 
 }
