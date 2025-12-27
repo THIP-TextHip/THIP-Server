@@ -4,6 +4,7 @@ import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.notification.application.service.FeedNotificationOrchestratorSyncImpl;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.FollowingEventCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.service.following.UserFollowService;
 import konkuk.thip.user.domain.Following;
@@ -30,13 +31,15 @@ class UserFollowServiceTest {
     private UserFollowService userFollowService;
 
     private FeedNotificationOrchestratorSyncImpl feedNotificationOrchestratorSyncImpl;
+    private FollowingEventCommandPort followingEventCommandPort;
 
     @BeforeEach
     void setUp() {
         followingCommandPort = mock(FollowingCommandPort.class);
         userCommandPort = mock(UserCommandPort.class);
         feedNotificationOrchestratorSyncImpl = mock(FeedNotificationOrchestratorSyncImpl.class);
-        userFollowService = new UserFollowService(followingCommandPort, userCommandPort, feedNotificationOrchestratorSyncImpl);
+        followingEventCommandPort = mock(FollowingEventCommandPort.class);
+        userFollowService = new UserFollowService(followingCommandPort, userCommandPort, feedNotificationOrchestratorSyncImpl, followingEventCommandPort);
     }
 
     @Nested
@@ -71,7 +74,7 @@ class UserFollowServiceTest {
                     .thenReturn(Optional.empty());
 
             User user = createUserWithFollowerCount(0);
-            when(userCommandPort.findByIdWithLock(targetUserId)).thenReturn(user);
+            when(userCommandPort.findById(targetUserId)).thenReturn(user);
             when(userCommandPort.findById(userId)).thenReturn(user); // 알림 전송용
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, true);
@@ -106,7 +109,7 @@ class UserFollowServiceTest {
 
             when(followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId))
                     .thenReturn(Optional.of(existing));
-            when(userCommandPort.findByIdWithLock(targetUserId)).thenReturn(user);
+            when(userCommandPort.findById(targetUserId)).thenReturn(user);
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, false);
 

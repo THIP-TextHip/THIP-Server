@@ -39,14 +39,16 @@ public class FollowingCommandPersistenceAdapter implements FollowingCommandPort 
         UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(following.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
-        UserJpaEntity targetUserJpaEntity = updateUserFollowerCount(targetUser);
-        followingJpaRepository.save(followingMapper.toJpaEntity(userJpaEntity, targetUserJpaEntity));
+//        UserJpaEntity targetUserJpaEntity = updateUserFollowerCount(targetUser);
+        UserJpaEntity targetUserJpaEntity = userJpaRepository.findByUserId(targetUser.getId()).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND));
 
+        followingJpaRepository.save(followingMapper.toJpaEntity(userJpaEntity, targetUserJpaEntity));
     }
 
     @Override
     public void deleteFollowing(Following following, User targetUser) {
-        updateUserFollowerCount(targetUser);
+//        updateUserFollowerCount(targetUser);
 
         FollowingJpaEntity followingJpaEntity = followingJpaRepository.findByUserAndTargetUser(following.getUserId(), following.getFollowingUserId())
                 .orElseThrow(() -> new EntityNotFoundException(FOLLOW_NOT_FOUND));

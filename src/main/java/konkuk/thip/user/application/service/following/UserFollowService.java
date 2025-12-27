@@ -1,19 +1,15 @@
 package konkuk.thip.user.application.service.following;
 
 import konkuk.thip.common.exception.BusinessException;
-import konkuk.thip.common.exception.InvalidStateException;
-import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.FollowingEventCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.Following;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,21 +25,22 @@ public class UserFollowService implements UserFollowUsecase {
     private final UserCommandPort userCommandPort;
 
     private final FeedNotificationOrchestrator feedNotificationOrchestrator;
+    private final FollowingEventCommandPort followingEventCommandPort;
 
     @Override
     @Transactional
-    @Retryable(
-            notRecoverable = {
-                    BusinessException.class,
-                    InvalidStateException.class
-            },
-            noRetryFor = {
-                    BusinessException.class,
-                    InvalidStateException.class
-            },
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 100, maxDelay = 500, multiplier = 2)
-    )
+//    @Retryable(
+//            notRecoverable = {
+//                    BusinessException.class,
+//                    InvalidStateException.class
+//            },
+//            noRetryFor = {
+//                    BusinessException.class,
+//                    InvalidStateException.class
+//            },
+//            maxAttempts = 3,
+//            backoff = @Backoff(delay = 100, maxDelay = 500, multiplier = 2)
+//    )
     public Boolean changeFollowingState(UserFollowCommand followCommand) {
         Long userId = followCommand.userId();
         Long targetUserId = followCommand.targetUserId();
@@ -52,28 +49,30 @@ public class UserFollowService implements UserFollowUsecase {
         validateParams(userId, targetUserId);
 
         Optional<Following> optionalFollowing = followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId);
-        User targetUser = userCommandPort.findByIdWithLock(targetUserId);
+        User targetUser = userCommandPort.findById(targetUserId);
 
         boolean isFollowRequest = Following.validateFollowingState(optionalFollowing.isPresent(), type);
 
         if (isFollowRequest) { // 팔로우 요청인 경우
-            targetUser.increaseFollowerCount();
+//            targetUser.increaseFollowerCount();
             followingCommandPort.save(Following.withoutId(userId, targetUserId), targetUser);
 
             // 팔로우 푸쉬알림 전송
-            sendNotifications(userId, targetUserId);
+//            sendNotifications(userId, targetUserId);
+            followingEventCommandPort.publishUserFollowedEvent(userId, targetUserId);
             return true;
         } else { // 언팔로우 요청인 경우
-            targetUser.decreaseFollowerCount();
+//            targetUser.decreaseFollowerCount();
             followingCommandPort.deleteFollowing(optionalFollowing.get(), targetUser);
+            followingEventCommandPort.publishUserUnfollowedEvent(userId, targetUserId);
             return false;
         }
     }
 
-    @Recover
-    public Boolean recoverChangeFollowingState(Exception e, UserFollowCommand followCommand) {
-        throw new BusinessException(ErrorCode.RESOURCE_LOCKED);
-    }
+//    @Recover
+//    public Boolean recoverChangeFollowingState(Exception e, UserFollowCommand followCommand) {
+//        throw new BusinessException(ErrorCode.RESOURCE_LOCKED);
+//    }
 
     private void sendNotifications(Long userId, Long targetUserId) {
         User actorUser = userCommandPort.findById(userId);

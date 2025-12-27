@@ -54,6 +54,19 @@ public class WorkerThreadConfig implements AsyncConfigurer {
         return executor;
     }
 
+    @Bean(name = "outboxAsyncExecutor")
+    public Executor outboxAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);        // 아웃박스 처리 기본량
+        executor.setMaxPoolSize(8);
+        executor.setQueueCapacity(2000);      // 적당한 큐 크기
+        executor.setThreadNamePrefix("outbox-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.initialize();
+        return executor;
+    }
+
     @Override
     public Executor getAsyncExecutor() {
         return fcmAsyncExecutor(); // 기본은 FCM 풀 사용
