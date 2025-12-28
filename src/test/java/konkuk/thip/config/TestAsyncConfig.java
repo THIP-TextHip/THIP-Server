@@ -20,13 +20,34 @@ public class TestAsyncConfig implements AsyncConfigurer {
         return new SyncTaskExecutor();
     }
 
-    @Bean(name = "schedulerAsyncExecutor")
-    public Executor schedulerAsyncExecutor() {
-        return new SyncTaskExecutor();
+        @Bean(name = "schedulerAsyncExecutor")
+
+        public Executor schedulerAsyncExecutor() {
+
+            return new SyncTaskExecutor();
+
+        }
+
+    
+
+        @Bean(name = "outboxAsyncExecutor")
+
+        public Executor outboxAsyncExecutor() {
+
+            return new SyncTaskExecutor();
+
+        }
+
+    
+
+        @Override
+
+        public Executor getAsyncExecutor() {
+
+            return new SyncTaskExecutor();
+
+        }
+
     }
 
-    @Override
-    public Executor getAsyncExecutor() {
-        return new SyncTaskExecutor();
-    }
-}
+    
