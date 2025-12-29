@@ -155,28 +155,22 @@ class RoomJoinApiTest {
         assertThat(room.getMemberCount()).isEqualTo(2); // 방 생성 시 1명 + 참여 1명
     }
 
-    /**
-     * 400 error 가 아니라 재시도 횟수 초과로 인해 423 error 발생
-     * H2 DB에서 select for update 패턴으로 락 획득할 시에 계속 예외 발생 -> 재시도 반복하여 테스트 의도대로 400 error 응답 X
-     * test yml에 LOCK_TIMEOUT 명시적으로 설정해도 해결 X
-     * 일단 주석 처리
-     */
-//    @Test
-//    @DisplayName("방 중복 참여 실패")
-//    void joinRoom_alreadyParticipated() throws Exception {
-//        // 이미 참여한 상태로 설정
-//        setUpWithParticipant();
-//
-//        Map<String, Object> request = new HashMap<>();
-//        request.put("type", JOIN.getType());
-//
-//        ResultActions result = mockMvc.perform(post("/rooms/" + room.getRoomId() + "/join")
-//                .requestAttr("userId", participant.getUserId())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(request)));
-//
-//        result.andExpect(status().isBadRequest());
-//    }
+    @Test
+    @DisplayName("방 중복 참여 실패")
+    void joinRoom_alreadyParticipated() throws Exception {
+        // 이미 참여한 상태로 설정
+        setUpWithParticipant();
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("type", JOIN.getType());
+
+        ResultActions result = mockMvc.perform(post("/rooms/" + room.getRoomId() + "/join")
+                .requestAttr("userId", participant.getUserId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        result.andExpect(status().isBadRequest());
+    }
 
     @Test
     @DisplayName("방 참여 취소 성공 - 참여자 제거 및 인원수 감소 확인")
@@ -205,25 +199,19 @@ class RoomJoinApiTest {
         assertThat(room.getMemberCount()).isEqualTo(1); // 다시 원래 인원
     }
 
-    /**
-     * 400 error 가 아니라 재시도 횟수 초과로 인해 423 error 발생
-     * H2 DB에서 select for update 패턴으로 락 획득할 시에 계속 예외 발생 -> 재시도 반복하여 테스트 의도대로 400 error 응답 X
-     * test yml에 LOCK_TIMEOUT 명시적으로 설정해도 해결 X
-     * 일단 주석 처리
-     */
-//    @Test
-//    @DisplayName("방 미참여자 취소 실패")
-//    void cancelJoin_notParticipated() throws Exception {
-//        setUpWithOnlyHost();
-//
-//        Map<String, Object> request = new HashMap<>();
-//        request.put("type", CANCEL.getType());
-//
-//        ResultActions result = mockMvc.perform(post("/rooms/" + room.getRoomId() + "/join")
-//                .requestAttr("userId", participant.getUserId())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(request)));
-//
-//        result.andExpect(status().isBadRequest());
-//    }
+    @Test
+    @DisplayName("방 미참여자 취소 실패")
+    void cancelJoin_notParticipated() throws Exception {
+        setUpWithOnlyHost();
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("type", CANCEL.getType());
+
+        ResultActions result = mockMvc.perform(post("/rooms/" + room.getRoomId() + "/join")
+                .requestAttr("userId", participant.getUserId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        result.andExpect(status().isBadRequest());
+    }
 }
