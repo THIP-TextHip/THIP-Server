@@ -1,5 +1,6 @@
 package konkuk.thip.post.application.service;
 
+import jakarta.persistence.LockTimeoutException;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
@@ -42,7 +43,8 @@ public class PostLikeService implements PostLikeUseCase {
 
     @Override
     @Retryable(
-            notRecoverable = { BusinessException.class, InvalidStateException.class},
+            retryFor = {LockTimeoutException.class},
+            noRetryFor = { BusinessException.class, InvalidStateException.class},
             maxAttempts = 3,
             backoff = @Backoff(delay = 100, multiplier = 2, maxDelay = 500, random = true)
     )
@@ -77,8 +79,18 @@ public class PostLikeService implements PostLikeUseCase {
     }
 
     @Recover
-    public PostIsLikeResult recover(Exception e, PostIsLikeCommand command) {
+    public PostIsLikeResult recoverLockTimeout(LockTimeoutException e, PostIsLikeCommand command) {
         throw new BusinessException(ErrorCode.RESOURCE_LOCKED);
+    }
+
+    @Recover
+    public PostIsLikeResult recoverInvalidStateException(InvalidStateException e, PostIsLikeCommand command) {
+        throw e;
+    }
+
+    @Recover
+    public PostIsLikeResult recoverBusinessException(BusinessException e, PostIsLikeCommand command) {
+        throw e;
     }
 
     private void sendNotifications(PostIsLikeCommand command) {
