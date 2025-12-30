@@ -1,11 +1,13 @@
 package konkuk.thip.roompost.adapter.out.persistence.repository.record;
 
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import konkuk.thip.roompost.adapter.out.jpa.RecordJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public interface RecordJpaRepository extends JpaRepository<RecordJpaEntity, Long
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM RecordJpaEntity r WHERE r.postId = :postId")
+    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})
     Optional<RecordJpaEntity> findByPostIdForUpdate(@Param("postId") Long postId);
 
     @Query("SELECT r.postId FROM RecordJpaEntity r WHERE r.userJpaEntity.userId = :userId")
