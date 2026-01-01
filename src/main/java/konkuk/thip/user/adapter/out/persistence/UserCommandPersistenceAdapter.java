@@ -21,7 +21,6 @@ import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 public class UserCommandPersistenceAdapter implements UserCommandPort {
 
     private final UserJpaRepository userJpaRepository;
-
     private final UserMapper userMapper;
 
     @Override
@@ -33,6 +32,14 @@ public class UserCommandPersistenceAdapter implements UserCommandPort {
     @Override
     public User findById(Long userId) {
         UserJpaEntity userJpaEntity = userJpaRepository.findByUserId(userId).orElseThrow(
+                () -> new EntityNotFoundException(USER_NOT_FOUND));
+
+        return userMapper.toDomainEntity(userJpaEntity);
+    }
+
+    @Override
+    public User findByIdWithLock(Long userId) {
+        UserJpaEntity userJpaEntity = userJpaRepository.findByUserIdWithLock(userId).orElseThrow(
                 () -> new EntityNotFoundException(USER_NOT_FOUND));
 
         return userMapper.toDomainEntity(userJpaEntity);

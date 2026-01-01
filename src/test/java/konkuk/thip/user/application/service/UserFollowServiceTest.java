@@ -71,7 +71,7 @@ class UserFollowServiceTest {
                     .thenReturn(Optional.empty());
 
             User user = createUserWithFollowerCount(0);
-            when(userCommandPort.findById(targetUserId)).thenReturn(user);
+            when(userCommandPort.findByIdWithLock(targetUserId)).thenReturn(user);
             when(userCommandPort.findById(userId)).thenReturn(user); // 알림 전송용
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, true);
@@ -106,7 +106,7 @@ class UserFollowServiceTest {
 
             when(followingCommandPort.findByUserIdAndTargetUserId(userId, targetUserId))
                     .thenReturn(Optional.of(existing));
-            when(userCommandPort.findById(targetUserId)).thenReturn(user);
+            when(userCommandPort.findByIdWithLock(targetUserId)).thenReturn(user);
 
             UserFollowCommand command = new UserFollowCommand(userId, targetUserId, false);
 

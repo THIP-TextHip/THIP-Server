@@ -9,6 +9,7 @@ public interface UserCommandPort {
 
     Long save(User user);
     User findById(Long userId);
+    User findByIdWithLock(Long userId);
     Map<Long, User> findByIds(List<Long> userIds);
     void update(User user);
     void delete(User user);

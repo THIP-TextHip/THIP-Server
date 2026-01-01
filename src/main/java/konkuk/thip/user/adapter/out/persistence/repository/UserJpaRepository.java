@@ -1,8 +1,12 @@
 package konkuk.thip.user.adapter.out.persistence.repository;
 
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -14,6 +18,13 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, Long>, U
      * 소프트 딜리트 적용 대상 entity 단건 조회 메서드
      */
     Optional<UserJpaEntity> findByUserId(Long userId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints({
+        @QueryHint(name = "jakarta.persistence.lock.timeout", value = "5000") // 5초
+    })
+    @Query("select u from UserJpaEntity u where u.userId = :userId")
+    Optional<UserJpaEntity> findByUserIdWithLock(@Param("userId") Long userId);
 
     Optional<UserJpaEntity> findByOauth2Id(String oauth2Id);
 
