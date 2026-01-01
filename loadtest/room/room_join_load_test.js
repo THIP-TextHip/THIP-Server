@@ -14,33 +14,8 @@ const START_DELAY_S = 5;       // 테스트 시작 전 대기 (for 방 참여 �
 const joinLatency = new Trend('rooms_join_latency'); // 참여 API 지연(ms)
 const http5xx     = new Counter('rooms_join_5xx');   // 5xx 개수
 const http2xx     = new Counter('rooms_join_2xx');   // 2xx 개수
-const http4xx     = new Counter('rooms_join_4xx');   // 4xx 개수
-
-// 실패 원인 분포 파악용(응답 JSON의 code 필드 기준)
-const token_issue_failed                = new Counter('token_issue_failed');
-const fail_ROOM_MEMBER_COUNT_EXCEEDED   = new Counter('fail_ROOM_MEMBER_COUNT_EXCEEDED');
-const fail_USER_ALREADY_PARTICIPATE     = new Counter('fail_USER_ALREADY_PARTICIPATE');
-const fail_OTHER_4XX                    = new Counter('fail_OTHER_4XX');
-
-const ERR = {   // THIP error code
-  ROOM_MEMBER_COUNT_EXCEEDED: 100006,
-  USER_ALREADY_PARTICIPATE: 140005,
-};
-
-function parseError(res) {
-  try {
-    const j = JSON.parse(res.body || '{}'); // BaseResponse 구조
-    // BaseResponse: { isSuccess:boolean, code:number, message:string, requestId:string, data:any }
-    return {
-      code: Number(j.code),              // 정수 코드
-      message: j.message || '',
-      requestId: j.requestId || '',
-      isSuccess: !!j.isSuccess
-    };
-  } catch (e) {
-    return { code: NaN, message: '', requestId: '', isSuccess: false };
-  }
-}
+const http400     = new Counter('rooms_join_400');   // 400 개수
+const http423     = new Counter('rooms_join_423');   // 423 개수
 
 // ------------ 시나리오 ------------
 // [인기 작가가 만든 모임방에 THIP의 수많은 유저들이 '모임방 참여' 요청을 보내는 상황 가정]
@@ -57,6 +32,8 @@ export const options = {
   },
   thresholds: {
     rooms_join_5xx:     ['count==0'],     // 서버 오류는 0건이어야 함
+    rooms_join_423:     ['count>=0'],     // 기록용
+    rooms_join_400:     ['count>=0'],     // 기록용
     rooms_join_latency: ['p(95)<1000'],   // p95 < 1s
   },
 };
@@ -83,7 +60,6 @@ export function setup() {
       }
       else {
         tokens.push(''); // 실패한 자리도 인덱스 유지
-        token_issue_failed.add(1);
       }
     }
     sleep(BATCH_PAUSE_S);
@@ -124,21 +100,10 @@ export default function (data) {
   joinLatency.add(res.timings.duration);
   if (res.status >= 200 && res.status < 300) http2xx.add(1);
   else if (res.status >= 400 && res.status < 500) {
-    http4xx.add(1);
-    const err = parseError(res);
-    switch (err.code) {
-      case ERR.ROOM_MEMBER_COUNT_EXCEEDED:
-        fail_ROOM_MEMBER_COUNT_EXCEEDED.add(1);
-        break;
-      case ERR.USER_ALREADY_PARTICIPATE:
-        fail_USER_ALREADY_PARTICIPATE.add(1);
-        break;
-      default:
-        fail_OTHER_4XX.add(1);
-    }
-  } else if (res.status >= 500) {
-    http5xx.add(1);
+    if (res.status === 400) http400.add(1);
+    else if (res.status === 423) http423.add(1);
   }
+  else if (res.status >= 500) http5xx.add(1);
 
   // === 검증 ===
   check(res, {
