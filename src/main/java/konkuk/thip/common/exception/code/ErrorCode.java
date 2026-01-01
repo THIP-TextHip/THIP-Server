@@ -33,8 +33,6 @@ public enum ErrorCode implements ResponseCode {
     PERSISTENCE_TRANSACTION_REQUIRED(HttpStatus.INTERNAL_SERVER_ERROR, 50110, "@Transactional 컨텍스트가 필요합니다. 트랜잭션 범위 내에서만 사용할 수 있습니다."),
     RESOURCE_LOCKED(HttpStatus.LOCKED, 50200, "자원이 잠겨 있어 요청을 처리할 수 없습니다."),
 
-    RESOURCE_LOCKED(HttpStatus.LOCKED, 50200, "자원이 잠겨 있어 요청을 처리할 수 없습니다."),
-
     /* 60000부터 비즈니스 예외 */
     /**
      * 60000 : alias error
