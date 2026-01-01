@@ -185,13 +185,9 @@ class RoomRecruitingDetailViewApiTest {
         //given
         RoomJpaEntity targetRoom = saveScienceRoom("과학-책", "isbn1", "과학-방-1일뒤-활동시작", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(targetRoom, 4);
-        RoomParticipantJpaEntity firstMember = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1);
-        roomParticipantJpaRepository.delete(firstMember);
-        RoomParticipantJpaEntity roomCreator = roomParticipantJpaRepository.save(RoomParticipantJpaEntity.builder()
-                .userJpaEntity(firstMember.getUserJpaEntity())
-                .roomJpaEntity(firstMember.getRoomJpaEntity())
-                .roomParticipantRole(RoomParticipantRole.HOST)
-                .build());      // firstMember 을 MEMBER -> HOST 로 수정
+
+        RoomParticipantJpaEntity roomHost = roomParticipantJpaRepository.findAllByRoomId(targetRoom.getRoomId()).get(1);
+        roomHost.updateRoleToHost();
 
         RoomJpaEntity science_room_2 = saveScienceRoom("과학-책", "isbn2", "방이름입니다", LocalDate.now().plusDays(1), 10, RoomStatus.RECRUITING);
         saveUsersToRoom(science_room_2, 5);
@@ -210,7 +206,7 @@ class RoomRecruitingDetailViewApiTest {
 
         //when
         ResultActions result = mockMvc.perform(get("/rooms/{roomId}/recruiting", targetRoom.getRoomId())
-                .requestAttr("userId", roomCreator.getUserJpaEntity().getUserId()));
+                .requestAttr("userId", roomHost.getUserJpaEntity().getUserId()));
 
         //then
         result.andExpect(status().isOk())

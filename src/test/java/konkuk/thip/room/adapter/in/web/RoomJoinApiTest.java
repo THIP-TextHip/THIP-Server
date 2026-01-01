@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomParticipantJpaEntity;
 import konkuk.thip.room.domain.value.RoomParticipantRole;
@@ -15,6 +16,8 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +25,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -34,17 +37,21 @@ import static konkuk.thip.common.entity.StatusType.INACTIVE;
 import static konkuk.thip.room.application.port.in.dto.RoomJoinType.CANCEL;
 import static konkuk.thip.room.application.port.in.dto.RoomJoinType.JOIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
+//@Transactional
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 방 참여/취소 API 통합 테스트")
 class RoomJoinApiTest {
 
     @Autowired private MockMvc mockMvc;
+    @MockitoBean private RoomNotificationOrchestrator roomNotificationOrchestrator;
     @Autowired private ObjectMapper objectMapper;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
@@ -56,6 +63,20 @@ class RoomJoinApiTest {
     private UserJpaEntity host;
     private UserJpaEntity participant;
     private RoomParticipantJpaEntity memberParticipation;
+
+    @BeforeEach
+    void mockNotification() {   // 알림 서비스 모킹
+        doNothing().when(roomNotificationOrchestrator)
+                .notifyRoomJoinToHost(anyLong(), anyLong(), anyString(), anyLong(), anyString());
+    }
+
+    @AfterEach
+    void tearDown() {
+        roomParticipantJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+    }
 
     private void setUpWithOnlyHost() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
@@ -134,7 +155,6 @@ class RoomJoinApiTest {
         assertThat(room.getMemberCount()).isEqualTo(2); // 방 생성 시 1명 + 참여 1명
     }
 
-
     @Test
     @DisplayName("방 중복 참여 실패")
     void joinRoom_alreadyParticipated() throws Exception {
@@ -167,8 +187,8 @@ class RoomJoinApiTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        em.flush();
-        em.clear();
+//        em.flush();
+//        em.clear();
 
         // 참여자 삭제 확인
         RoomParticipantJpaEntity member = roomParticipantJpaRepository.findById(memberParticipation.getRoomParticipantId()).orElse(null);

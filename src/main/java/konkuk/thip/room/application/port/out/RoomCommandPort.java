@@ -17,6 +17,8 @@ public interface RoomCommandPort {
                 .orElseThrow(() -> new EntityNotFoundException(ROOM_NOT_FOUND));
     }
 
+    Room getByIdForUpdate(Long id);
+
     Long save(Room room);
 
     void update(Room room);
