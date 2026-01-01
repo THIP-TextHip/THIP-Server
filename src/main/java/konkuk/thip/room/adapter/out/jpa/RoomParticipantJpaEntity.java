@@ -10,7 +10,17 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 @Entity
-@Table(name = "room_participants")
+@Table(
+        name = "room_participants",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        // TODO : room_participant가 soft delete 된 경우에도 unique 제약조건은 여전히 유효
+                        // room_participant가 삭제된 방에 다시 참여하는 경우는 일단 고려 X
+                        name = "uk_room_participant_user_room",
+                        columnNames = {"user_id", "room_id"}
+                )
+        }
+)
 @Getter
 @SQLDelete(sql = "UPDATE room_participants SET status = 'INACTIVE' WHERE room_participant_id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -51,6 +61,11 @@ public class RoomParticipantJpaEntity extends BaseJpaEntity {
     @VisibleForTesting
     public void updateUserPercentage(double userPercentage) {
         this.userPercentage = userPercentage;
+    }
+
+    @VisibleForTesting
+    public void updateRoleToHost() {
+        this.roomParticipantRole = RoomParticipantRole.HOST;
     }
 
     public void updateFrom(RoomParticipant roomParticipant) {

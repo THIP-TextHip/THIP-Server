@@ -65,7 +65,8 @@ class RoomJoinServiceTest {
         void alreadyParticipated() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, JOIN);
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+//            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.getByIdForUpdate(ROOM_ID)).willReturn(room);
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.of(RoomParticipant.memberWithoutId(USER_ID, ROOM_ID)));
 
@@ -79,7 +80,8 @@ class RoomJoinServiceTest {
         void successJoin() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, JOIN);
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+//            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.getByIdForUpdate(ROOM_ID)).willReturn(room);
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.empty());
             given(roomParticipantCommandPort.findHostByRoomId(any()))
@@ -110,7 +112,8 @@ class RoomJoinServiceTest {
         void notParticipated() {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, CANCEL);
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+//            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.getByIdForUpdate(ROOM_ID)).willReturn(room);
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.empty());
 
@@ -125,7 +128,8 @@ class RoomJoinServiceTest {
             RoomJoinCommand command = new RoomJoinCommand(USER_ID, ROOM_ID, CANCEL);
             RoomParticipant participant = RoomParticipant.memberWithoutId(USER_ID, ROOM_ID);
 
-            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+//            given(roomCommandPort.findById(ROOM_ID)).willReturn(Optional.of(room));
+            given(roomCommandPort.getByIdForUpdate(ROOM_ID)).willReturn(room);
             given(roomParticipantCommandPort.findByUserIdAndRoomIdOptional(USER_ID, ROOM_ID))
                     .willReturn(Optional.of(participant));
 
