@@ -44,6 +44,11 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
                 .map(feedMapper::toDomainEntity);
     }
 
+    @Override
+    public Optional<Feed> findByIdForUpdate(Long id) {
+        return feedJpaRepository.findByPostIdForUpdate(id)
+                .map(feedMapper::toDomainEntity);
+    }
 
     @Override
     public Long save(Feed feed) {

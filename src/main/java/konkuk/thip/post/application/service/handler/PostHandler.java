@@ -31,6 +31,14 @@ public class PostHandler {
         };
     }
 
+    public CountUpdatable findPostForUpdate(PostType type, Long postId) {
+        return switch (type) {
+            case FEED -> feedCommandPort.getByIdOrThrowForUpdate(postId);
+            case RECORD -> recordCommandPort.getByIdOrThrowForUpdate(postId);
+            case VOTE -> voteCommandPort.getByIdOrThrowForUpdate(postId);
+        };
+    }
+
     public void updatePost(PostType type, CountUpdatable post) {
         switch (type) {
             case FEED -> feedCommandPort.update((Feed) post);

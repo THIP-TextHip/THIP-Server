@@ -20,6 +20,7 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.roompost.adapter.out.jpa.VoteJpaEntity;
 import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.POST_ALREADY_LIKED;
 import static konkuk.thip.common.exception.code.ErrorCode.POST_NOT_LIKED_CANNOT_CANCEL;
@@ -41,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
-@Transactional
 @DisplayName("[통합] 방 게시물(기록,투표) 좋아요 api 통합 테스트")
 class RoomPostChangeLikeStatusApiTest {
 
@@ -80,6 +79,18 @@ class RoomPostChangeLikeStatusApiTest {
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room,user, RoomParticipantRole.HOST, 80.0));
         record = recordJpaRepository.save(TestEntityFactory.createRecord(user,room));
         vote = voteJpaRepository.save(TestEntityFactory.createVote(user,room));
+    }
+
+    @AfterEach
+    void tearDown(){
+        postLikeJpaRepository.deleteAllInBatch();
+        roomParticipantJpaRepository.deleteAllInBatch();
+        feedJpaRepository.deleteAllInBatch();
+        recordJpaRepository.deleteAllInBatch();
+        voteJpaRepository.deleteAllInBatch();
+        roomJpaRepository.deleteAllInBatch();
+        bookJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
     }
 
     @Test
@@ -154,6 +165,9 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("좋아요 하지 않은 기록 게시물을 좋아요 취소하면 [400 에러 발생]")
     void unlikeRecordPost_NotLiked_Fail() throws Exception {
         //given
+        // 다른 유저가 해당 게시글에 좋아요한 상태(좋아요 0 이하 언더플로우 예외 피하기위해서 해당피드에 이미 좋아요 1이상이라고 가정)
+        record.updateLikeCount(1);
+        recordJpaRepository.save(record);
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(false, "RECORD");
 
         //when & then
@@ -235,6 +249,9 @@ class RoomPostChangeLikeStatusApiTest {
     @DisplayName("좋아요 하지 않은 투표 게시물을 좋아요 취소하면 [400 에러 발생]")
     void unlikeVotePost_NotLiked_Fail() throws Exception {
         //given
+        // 다른 유저가 해당 게시글에 좋아요한 상태(좋아요 0 이하 언더플로우 예외 피하기위해서 해당피드에 이미 좋아요 1이상이라고 가정)
+        vote.updateLikeCount(1);
+        voteJpaRepository.save(vote);
         RoomPostIsLikeRequest request = new RoomPostIsLikeRequest(false, "VOTE");
 
         //when & then
