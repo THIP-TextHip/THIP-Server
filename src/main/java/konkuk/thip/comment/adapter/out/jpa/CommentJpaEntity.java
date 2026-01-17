@@ -11,7 +11,12 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 @Entity
-@Table(name = "comments")
+@Table(
+        name = "comments",
+        indexes = {
+                @Index(name = "idx_comments_post_parent", columnList = "post_id, parent_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
