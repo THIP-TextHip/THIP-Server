@@ -34,7 +34,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
     // 최상위 댓글 조회 (삭제된 댓글 포함, 최신순, 페이징)
     @Override
-    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size) {
+    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, Long lastRootCommentId, int size) {
         // 최상위 댓글(size+1) 프로젝션 생성
         QCommentQueryDto proj = new QCommentQueryDto(
                 comment.commentId,
@@ -49,11 +49,10 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
         // WHERE 절 분리
         BooleanExpression whereClause = comment.postJpaEntity.postId.eq(postId)
-                .and(comment.postJpaEntity.dtype.eq(postTypeStr))       // dType 필터링 추가
                 .and(comment.parent.isNull())       // 게시글의 최상위 댓글 조회
                 .and(commentCreator.status.eq(ACTIVE))  // 댓글 작성자 ACTIVE
-                .and(lastCreatedAt != null      // 최신순 정렬
-                        ? comment.createdAt.lt(lastCreatedAt)
+                .and(lastRootCommentId != null      // 최신순 정렬
+                        ? comment.commentId.lt(lastRootCommentId)
                         : Expressions.TRUE
                 );
 
@@ -63,7 +62,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                 .from(comment)
                 .join(comment.userJpaEntity, commentCreator)
                 .where(whereClause)
-                .orderBy(comment.createdAt.desc())
+                .orderBy(comment.commentId.desc())
                 .limit(size + 1)        // size + 1 개 조회
                 .fetch();
     }

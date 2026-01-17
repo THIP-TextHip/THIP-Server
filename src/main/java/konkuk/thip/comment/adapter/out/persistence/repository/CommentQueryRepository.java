@@ -9,7 +9,7 @@ import java.util.Set;
 
 public interface CommentQueryRepository {
 
-    List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size);
+    List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, Long lastRootCommentId, int size);
 
     List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId);
 
