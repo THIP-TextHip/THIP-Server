@@ -11,7 +11,6 @@ import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -116,6 +115,42 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         // 5) 전체 자손 댓글을 깊이와 상관없이 작성 순으로 재정렬
         allDescendants.sort(Comparator.comparing(CommentQueryDto::createdAt));
         return allDescendants;
+    }
+
+    @Override
+    public List<CommentQueryDto> findChildCommentsByCreatedAtAsc(Long rootCommentId, Long lastChildCommentId, int size) {
+        // 자식 댓글(size+1) 프로젝션 생성
+        QCommentQueryDto proj = new QCommentQueryDto(
+                comment.commentId,
+                comment.parent.commentId,
+                parentCommentCreator.nickname,
+                commentCreator.userId,
+                commentCreator.alias,
+                commentCreator.nickname,
+                comment.createdAt,
+                comment.content,
+                comment.likeCount,
+                comment.status.eq(StatusType.INACTIVE)
+        );
+
+        // WHERE 절 분리
+        BooleanExpression whereClause = comment.parent.commentId.eq(rootCommentId)
+                .and(lastChildCommentId != null
+                        ? comment.commentId.gt(lastChildCommentId)
+                        : Expressions.TRUE
+                );
+
+        // 조회 및 반환
+        return queryFactory
+                .select(proj)
+                .from(comment)
+                .join(comment.parent, parentComment)
+                .join(parentComment.userJpaEntity, parentCommentCreator)
+                .join(comment.userJpaEntity, commentCreator)
+                .where(whereClause)
+                .orderBy(comment.commentId.asc())
+                .limit(size + 1)
+                .fetch();
     }
 
     @Override

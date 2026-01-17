@@ -16,6 +16,8 @@ public interface CommentQueryPort {
 
     Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds);
 
+    CursorBasedList<CommentQueryDto> findChildComments(Long rootCommentId, Cursor cursor);
+
     CommentQueryDto findRootCommentById(Long rootCommentId);
 
     CommentQueryDto findChildCommentById(Long rootCommentId , Long replyCommentId);
