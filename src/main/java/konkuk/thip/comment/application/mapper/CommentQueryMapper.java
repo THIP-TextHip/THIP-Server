@@ -1,5 +1,6 @@
 package konkuk.thip.comment.application.mapper;
 
+import konkuk.thip.comment.adapter.in.web.response.ChildCommentsResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentCreateResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentForSinglePostResponse;
 import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
@@ -54,6 +55,15 @@ public interface CommentQueryMapper {
     CommentCreateResponse.ReplyCommentCreateDto toReply(CommentQueryDto child, @Context Long userId);
 
     /**
+     * 자식 댓글 조회 API용 매핑
+     */
+    @Mapping(target = "isLike", expression = "java(likedCommentIds.contains(child.commentId()))")
+    @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(child.createdAt()))")
+    @Mapping(target = "aliasName", source = "child.alias")
+    @Mapping(target = "isWriter", source = "child.creatorId", qualifiedByName = "isWriter")
+    ChildCommentsResponse.ChildCommentDto toChildComment(CommentQueryDto child, @Context Set<Long> likedCommentIds, @Context Long userId);
+
+    /**
      * 답글 리스트 헬퍼
      */
     default List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> mapReplies(List<CommentQueryDto> children, @Context Set<Long> likedCommentIds, @Context Long userId) {
@@ -80,7 +90,7 @@ public interface CommentQueryMapper {
 
     default CommentCreateResponse toRootCommentResponseWithChildren(
             CommentQueryDto root, CommentQueryDto children, boolean isLikedParentComment, @Context Long userId) {
-        CommentCreateResponse.ReplyCommentCreateDto replyDto = toReply(children,userId);
+        CommentCreateResponse.ReplyCommentCreateDto replyDto = toReply(children, userId);
 
         CommentCreateResponse rootDto = toRoot(root, isLikedParentComment, userId);
         rootDto.replyList().add(replyDto);
