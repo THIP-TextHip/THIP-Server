@@ -45,6 +45,14 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @Column(name = "like_count", nullable = false)
     private int likeCount = 0;
 
+    /**
+     * 루트 댓글의 자식 댓글 수 (루트 댓글만 사용)
+     * 자식 댓글인 경우 항상 0
+     */
+    @Builder.Default
+    @Column(name = "descendant_count", nullable = false)
+    private int descendantCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private PostJpaEntity postJpaEntity;
@@ -64,6 +72,15 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "parent_id")
     private CommentJpaEntity parent;
 
+    /**
+     * 루트 댓글 참조 (모든 자손 댓글이 루트를 직접 참조)
+     * 루트 댓글인 경우: null (nullable)
+     * 자식 댓글인 경우: 최상위 루트 댓글
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "root_comment_id")
+    private CommentJpaEntity root;
+
     public CommentJpaEntity updateFrom(Comment comment) {
         this.reportCount = comment.getReportCount();
         this.likeCount = comment.getLikeCount();
@@ -74,5 +91,21 @@ public class CommentJpaEntity extends BaseJpaEntity {
     @VisibleForTesting
     public void updateLikeCount(int likeCount) {
         this.likeCount = likeCount;
+    }
+
+    /**
+     * 자식 댓글 수 증가 (루트 댓글만 호출)
+     */
+    public void incrementDescendantCount() {
+        this.descendantCount++;
+    }
+
+    /**
+     * 자식 댓글 수 감소 (루트 댓글만 호출)
+     */
+    public void decrementDescendantCount() {
+        if (this.descendantCount > 0) {
+            this.descendantCount--;
+        }
     }
 }

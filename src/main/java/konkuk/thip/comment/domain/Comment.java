@@ -26,11 +26,24 @@ public class Comment extends BaseDomainEntity {
     @Builder.Default
     private int likeCount = 0;
 
+    /**
+     * 루트 댓글에서만 의미있는 값
+     */
+    @Builder.Default
+    private int descendantCount = 0;
+
     private Long targetPostId;
 
     private Long creatorId;
 
     private Long parentCommentId;
+
+    /**
+     * PersistenceAdapter 에서 Comment -> CommentJpaEntity 변환 시에 rootCommentId 값 세팅
+     * 코드 수정 최소화를 위해 Builder Default 로 null 설정
+     */
+    @Builder.Default
+    private Long rootCommentId = null;
 
     private PostType postType;
 

@@ -9,15 +9,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentMapper {
 
-    public CommentJpaEntity toJpaEntity(Comment comment, PostJpaEntity postJpaEntity, UserJpaEntity userJpaEntity, CommentJpaEntity commentJpaEntity) {
+    public CommentJpaEntity toJpaEntity(Comment comment, PostJpaEntity postJpaEntity, UserJpaEntity userJpaEntity, CommentJpaEntity parentCommentJpaEntity, CommentJpaEntity rootCommentJpaEntity) {
         return CommentJpaEntity.builder()
                 .content(comment.getContent())
                 .likeCount(comment.getLikeCount())
                 .reportCount(comment.getReportCount())
+                .descendantCount(comment.getDescendantCount())
                 .postJpaEntity(postJpaEntity)
                 .postType(comment.getPostType())
                 .userJpaEntity(userJpaEntity)
-                .parent(commentJpaEntity)
+                .parent(parentCommentJpaEntity)
+                .root(rootCommentJpaEntity)
                 .build();
     }
 
@@ -27,10 +29,12 @@ public class CommentMapper {
                 .content(commentJpaEntity.getContent())
                 .reportCount(commentJpaEntity.getReportCount())
                 .likeCount(commentJpaEntity.getLikeCount())
+                .descendantCount(commentJpaEntity.getDescendantCount())
                 .targetPostId(commentJpaEntity.getPostJpaEntity().getPostId())
                 .postType(commentJpaEntity.getPostType())
                 .creatorId(commentJpaEntity.getUserJpaEntity().getUserId())
                 .parentCommentId(commentJpaEntity.getParent() != null ? commentJpaEntity.getParent().getCommentId() : null)
+                .rootCommentId(commentJpaEntity.getRoot() != null ? commentJpaEntity.getRoot().getCommentId() : null)
                 .createdAt(commentJpaEntity.getCreatedAt())
                 .modifiedAt(commentJpaEntity.getModifiedAt())
                 .status(commentJpaEntity.getStatus())
