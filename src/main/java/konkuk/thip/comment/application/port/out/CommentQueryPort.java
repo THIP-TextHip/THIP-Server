@@ -4,19 +4,11 @@ import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 public interface CommentQueryPort {
 
     CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, Cursor cursor);
 
-    List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId);
-
-    Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds);
-
-    CursorBasedList<CommentQueryDto> findChildComments(Long rootCommentId, Cursor cursor);
+    CursorBasedList<CommentQueryDto> findAllDescendantComments(Long rootCommentId, Cursor cursor);
 
     CommentQueryDto findRootCommentById(Long rootCommentId);
 

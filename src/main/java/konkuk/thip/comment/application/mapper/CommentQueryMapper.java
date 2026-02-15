@@ -2,13 +2,11 @@ package konkuk.thip.comment.application.mapper;
 
 import konkuk.thip.comment.adapter.in.web.response.ChildCommentsResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentCreateResponse;
-import konkuk.thip.comment.adapter.in.web.response.CommentForSinglePostResponse;
+import konkuk.thip.comment.adapter.in.web.response.RootCommentsResponse;
 import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.common.util.DateUtil;
 import org.mapstruct.*;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 @Mapper(
@@ -19,15 +17,14 @@ import java.util.Set;
 public interface CommentQueryMapper {
 
     /**
-     * 정상(root) 댓글 매핑 (답글 제외)
+     * 루트 댓글 조회 API용 매핑
      */
-    @Mapping(target = "replyList", expression = "java(new java.util.ArrayList<>())")
     @Mapping(target = "isLike", expression = "java(likedCommentIds.contains(root.commentId()))")
     @Mapping(target = "isDeleted", constant = "false")
     @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(root.createdAt()))")
     @Mapping(target = "aliasName", source = "root.alias")
     @Mapping(target = "isWriter", source = "root.creatorId", qualifiedByName = "isWriter")
-    CommentForSinglePostResponse.RootCommentDto toRoot(CommentQueryDto root, @Context Set<Long> likedCommentIds, @Context Long userId);
+    RootCommentsResponse.RootCommentDto toRootCommentResponse(CommentQueryDto root, @Context Set<Long> likedCommentIds, @Context Long userId);
 
     // 댓글/답글 생성시 루트 댓글 매핑
     @Mapping(target = "replyList", expression = "java(new java.util.ArrayList<>())")
@@ -37,15 +34,6 @@ public interface CommentQueryMapper {
     @Mapping(target = "aliasName", source = "root.alias")
     @Mapping(target = "isWriter", source = "root.creatorId", qualifiedByName = "isWriter")
     CommentCreateResponse toRoot(CommentQueryDto root, boolean isLike, @Context Long userId);
-
-    /**
-     * 개별 답글 매핑
-     */
-    @Mapping(target = "isLike", expression = "java(likedCommentIds.contains(child.commentId()))")
-    @Mapping(target = "postDate", expression = "java(DateUtil.formatBeforeTime(child.createdAt()))")
-    @Mapping(target = "aliasName", source = "child.alias")
-    @Mapping(target = "isWriter", source = "child.creatorId", qualifiedByName = "isWriter")
-    CommentForSinglePostResponse.RootCommentDto.ReplyDto toReply(CommentQueryDto child, @Context Set<Long> likedCommentIds, @Context Long userId);
 
     // 답글 생성시 답글 매핑
     @Mapping(target = "isLike", constant = "false")
@@ -64,30 +52,8 @@ public interface CommentQueryMapper {
     ChildCommentsResponse.ChildCommentDto toChildComment(CommentQueryDto child, @Context Set<Long> likedCommentIds, @Context Long userId);
 
     /**
-     * 답글 리스트 헬퍼
+     * 댓글 생성 시 루트 댓글과 답글을 함께 반환
      */
-    default List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> mapReplies(List<CommentQueryDto> children, @Context Set<Long> likedCommentIds, @Context Long userId) {
-        if (children == null || children.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return children.stream()
-                .map(child -> toReply(child, likedCommentIds, userId))
-                .toList();
-    }
-
-    default CommentForSinglePostResponse.RootCommentDto toRootCommentResponseWithChildren(
-            CommentQueryDto root, List<CommentQueryDto> children, @Context Set<Long> likedCommentIds, @Context Long userId) {
-        List<CommentForSinglePostResponse.RootCommentDto.ReplyDto> replyDtos = mapReplies(children, likedCommentIds, userId);
-
-        if (root.isDeleted()) {     // 삭제된 루트 & children 이 존재하는 경우
-            return CommentForSinglePostResponse.RootCommentDto.createDeletedRootCommentDto(replyDtos);
-        }
-
-        CommentForSinglePostResponse.RootCommentDto rootDto = toRoot(root, likedCommentIds, userId);
-        rootDto.replyList().addAll(replyDtos);
-        return rootDto;
-    }
-
     default CommentCreateResponse toRootCommentResponseWithChildren(
             CommentQueryDto root, CommentQueryDto children, boolean isLikedParentComment, @Context Long userId) {
         CommentCreateResponse.ReplyCommentCreateDto replyDto = toReply(children, userId);
