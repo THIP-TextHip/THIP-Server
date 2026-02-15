@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import konkuk.thip.comment.adapter.in.web.response.ChildCommentsResponse;
-import konkuk.thip.comment.adapter.in.web.response.CommentForSinglePostResponse;
-import konkuk.thip.comment.application.port.in.ChildCommentsShowUseCase;
-import konkuk.thip.comment.application.port.in.CommentShowAllUseCase;
+import konkuk.thip.comment.adapter.in.web.response.RootCommentsResponse;
+import konkuk.thip.comment.application.port.in.ChildCommentShowUseCase;
+import konkuk.thip.comment.application.port.in.RootCommentShowUseCase;
 import konkuk.thip.comment.application.port.in.dto.ChildCommentsShowQuery;
 import konkuk.thip.comment.application.port.in.dto.CommentShowAllQuery;
 import konkuk.thip.common.dto.BaseResponse;
@@ -22,15 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CommentQueryController {
 
-    public final CommentShowAllUseCase commentShowAllUseCase;
-    public final ChildCommentsShowUseCase childCommentsShowUseCase;
+    public final RootCommentShowUseCase rootCommentShowUseCase;
+    public final ChildCommentShowUseCase childCommentShowUseCase;
 
     @Operation(
-            summary = "댓글 전체 조회",
-            description = "특정 게시글(= 피드, 기록, 투표) 의 댓글과 대댓글들을 전체 조회합니다."
+            summary = "루트 댓글 조회",
+            description = "특정 게시글(= 피드, 기록, 투표) 에 직접 달린 루트 댓글을 조회합니다."
     )
     @GetMapping("/comments/{postId}")
-    public BaseResponse<CommentForSinglePostResponse> showAllCommentsOfPost(
+    public BaseResponse<RootCommentsResponse> showRootCommentsOfPost(
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "댓글을 조회할 게시글(= FEED, RECORD, VOTE)의 id값")
             @PathVariable("postId") final Long postId,
@@ -38,7 +38,7 @@ public class CommentQueryController {
             @RequestParam(value = "postType") final String postType,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
-        return BaseResponse.ok(commentShowAllUseCase.showAllCommentsOfPost(
+        return BaseResponse.ok(rootCommentShowUseCase.showRootCommentsOfPost(
                 CommentShowAllQuery.of(postId, userId, postType, cursor)
         ));
     }
@@ -54,7 +54,7 @@ public class CommentQueryController {
             @PathVariable("rootCommentId") final Long rootCommentId,
             @Parameter(description = "커서 (첫번째 요청시 : null, 다음 요청시 : 이전 요청에서 반환받은 nextCursor 값)")
             @RequestParam(value = "cursor", required = false) final String cursor) {
-        return BaseResponse.ok(childCommentsShowUseCase.showChildComments(
+        return BaseResponse.ok(childCommentShowUseCase.showChildComments(
                 ChildCommentsShowQuery.of(rootCommentId, userId, cursor)
         ));
     }

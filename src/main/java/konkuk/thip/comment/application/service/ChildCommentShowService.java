@@ -2,7 +2,7 @@ package konkuk.thip.comment.application.service;
 
 import konkuk.thip.comment.adapter.in.web.response.ChildCommentsResponse;
 import konkuk.thip.comment.application.mapper.CommentQueryMapper;
-import konkuk.thip.comment.application.port.in.ChildCommentsShowUseCase;
+import konkuk.thip.comment.application.port.in.ChildCommentShowUseCase;
 import konkuk.thip.comment.application.port.in.dto.ChildCommentsShowQuery;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.comment.application.port.out.CommentQueryPort;
@@ -19,20 +19,23 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ChildCommentsShowService implements ChildCommentsShowUseCase {
+public class ChildCommentShowService implements ChildCommentShowUseCase {
 
     private static final int PAGE_SIZE = 10;
     private final CommentQueryPort commentQueryPort;
     private final CommentLikeQueryPort commentLikeQueryPort;
     private final CommentQueryMapper commentQueryMapper;
 
+    /**
+     * ACTIVE 인 comments 데이터만 조회 -> status filter 자동 적용
+     */
     @Override
     @Transactional(readOnly = true)
     public ChildCommentsResponse showChildComments(ChildCommentsShowQuery query) {
         Cursor cursor = Cursor.from(query.cursorStr(), PAGE_SIZE);
 
-        // 1. 특정 루트 댓글의 자식 댓글을 최신순으로 페이징 조회
-        CursorBasedList<CommentQueryDto> childCommentsCursorBasedList = commentQueryPort.findChildComments(query.rootCommentId(), cursor);
+        // root 댓글의 모든 자손 조회 (depth 상관없이)
+        CursorBasedList<CommentQueryDto> childCommentsCursorBasedList = commentQueryPort.findAllDescendantComments(query.rootCommentId(), cursor);
         List<CommentQueryDto> childComments = childCommentsCursorBasedList.contents();
 
         // 2. 유저가 좋아한 댓글 조회
