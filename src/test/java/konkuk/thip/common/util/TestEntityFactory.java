@@ -239,6 +239,8 @@ public class TestEntityFactory {
                 .likeCount(0)
                 .reportCount(0)
                 .postType(postType)
+                .parent(null)  // 루트 댓글이므로 parent는 null
+                .root(null)    // 루트 댓글이므로 root는 null
                 .build();
     }
 
@@ -253,10 +255,17 @@ public class TestEntityFactory {
                 .likeCount(likeCount)
                 .reportCount(0)
                 .postType(postType)
+                .parent(null)  // 루트 댓글이므로 parent는 null
+                .root(null)    // 루트 댓글이므로 root는 null
                 .build();
     }
 
     public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user,PostType postType,CommentJpaEntity parentComment) {
+        // [수정] 대댓글 생성 시 Root 댓글 자동 계산 로직
+        // 1. 부모가 이미 Root를 가지고 있다면(대댓글의 답글인 경우) -> 그 Root를 승계
+        // 2. 부모가 Root가 없다면(부모가 최상위 댓글인 경우) -> 부모 자체가 Root
+        CommentJpaEntity root = parentComment.getRoot() != null ? parentComment.getRoot() : parentComment;
+
         return CommentJpaEntity.builder()
                 .content("댓글 내용")
                 .postJpaEntity(post)
@@ -265,6 +274,7 @@ public class TestEntityFactory {
                 .reportCount(0)
                 .postType(postType)
                 .parent(parentComment)
+                .root(root) // [추가] root 필드 세팅
                 .build();
     }
 
@@ -272,6 +282,9 @@ public class TestEntityFactory {
      * 자식 댓글 내용, likeCount 커스텀
      */
     public static CommentJpaEntity createReplyComment(PostJpaEntity post, UserJpaEntity user, PostType postType, CommentJpaEntity parentComment, String content, int likeCount) {
+        // [수정] 동일한 Root 계산 로직 적용
+        CommentJpaEntity root = parentComment.getRoot() != null ? parentComment.getRoot() : parentComment;
+
         return CommentJpaEntity.builder()
                 .content(content)
                 .postJpaEntity(post)
@@ -280,6 +293,7 @@ public class TestEntityFactory {
                 .reportCount(0)
                 .postType(postType)
                 .parent(parentComment)
+                .root(root) // [추가] root 필드 세팅
                 .build();
     }
 

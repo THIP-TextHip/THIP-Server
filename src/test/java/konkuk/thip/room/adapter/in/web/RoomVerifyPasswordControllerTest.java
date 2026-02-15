@@ -34,15 +34,13 @@ class RoomVerifyPasswordControllerTest {
 
     private Map<String, Object> buildValidRequest() {
         Map<String, Object> request = new HashMap<>();
-        request.put("userId", 1L);
-        request.put("roomId", 1L);
         request.put("password", "1234");
         return request;
     }
 
     private void assertBad(Map<String, Object> req, String msg) throws Exception {
-        mockMvc.perform(post("/rooms/{roomId}/password", req.get("roomId"))
-                        .requestAttr("userId", req.get("userId"))
+        mockMvc.perform(post("/rooms/{roomId}/password", 1L)
+                        .requestAttr("userId", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
@@ -79,9 +77,8 @@ class RoomVerifyPasswordControllerTest {
         @DisplayName("roomId가 없을 때 400 error")
         void missing_roomId() throws Exception {
             Map<String, Object> req = buildValidRequest();
-            req.remove("roomId");
             mockMvc.perform(post("/rooms//password")
-                            .requestAttr("userId", req.get("userId"))
+                            .requestAttr("userId", 1L)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().is4xxClientError());

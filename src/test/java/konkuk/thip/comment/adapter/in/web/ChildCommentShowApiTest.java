@@ -49,6 +49,46 @@ class ChildCommentShowApiTest {
     @Autowired private JdbcTemplate jdbcTemplate;
 
     @Test
+    @DisplayName("Depth가 3단계 이상인 대댓글들도 모두 평탄화(Flat)되어 루트 댓글 하위로 조회된다.")
+    void child_comment_show_depth_test() throws Exception {
+        //given
+        Alias a0 = TestEntityFactory.createScienceAlias();
+        UserJpaEntity me = userJpaRepository.save(TestEntityFactory.createUser(a0, "me"));
+        UserJpaEntity user1 = userJpaRepository.save(TestEntityFactory.createUser(a0, "user1"));
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
+        FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, true, 10, 5, List.of()));
+
+        // 1. 루트 댓글 생성
+        CommentJpaEntity root = commentJpaRepository.save(TestEntityFactory.createComment(f1, user1, PostType.FEED, "ROOT", 0));
+
+        // 2. Depth 1 자식 생성 (Parent: Root)
+        CommentJpaEntity depth1 = commentJpaRepository.save(TestEntityFactory.createReplyComment(f1, me, PostType.FEED, root, "Depth1", 0));
+
+        // 3. Depth 2 자식 생성 (Parent: Depth1) -> Factory에 의해 Root는 'root'로 설정됨
+        CommentJpaEntity depth2 = commentJpaRepository.save(TestEntityFactory.createReplyComment(f1, user1, PostType.FEED, depth1, "Depth2", 0));
+
+        // 4. Depth 3 자식 생성 (Parent: Depth2) -> Factory에 의해 Root는 'root'로 설정됨
+        CommentJpaEntity depth3 = commentJpaRepository.save(TestEntityFactory.createReplyComment(f1, me, PostType.FEED, depth2, "Depth3", 0));
+
+        // 5. Depth 1 형제 생성 (Parent: Root)
+        CommentJpaEntity depth1_sibling = commentJpaRepository.save(TestEntityFactory.createReplyComment(f1, user1, PostType.FEED, root, "Depth1_Sibling", 0));
+
+        //when //then
+        mockMvc.perform(get("/comments/replies/{rootCommentId}", root.getCommentId().intValue())
+                        .requestAttr("userId", me.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.childComments", hasSize(4))) // 총 4개의 자손 댓글
+                // 순서 검증 (ID 생성순 = 작성순)
+                .andExpect(jsonPath("$.data.childComments[0].content", is("Depth1")))
+                .andExpect(jsonPath("$.data.childComments[1].content", is("Depth2")))
+                .andExpect(jsonPath("$.data.childComments[2].content", is("Depth3")))
+                .andExpect(jsonPath("$.data.childComments[3].content", is("Depth1_Sibling")))
+                // 계층 구조 검증 (평탄화되었지만 부모 닉네임은 직계 부모를 따라가야 함)
+                .andExpect(jsonPath("$.data.childComments[1].parentCommentCreatorNickname", is("me"))) // Depth2의 부모는 Depth1(me)
+                .andExpect(jsonPath("$.data.childComments[2].parentCommentCreatorNickname", is("user1"))); // Depth3의 부모는 Depth2(user1)
+    }
+
+    @Test
     @DisplayName("특정 루트 댓글의 자식 댓글을 조회할 수 있다.")
     void child_comment_show_test() throws Exception {
         //given
