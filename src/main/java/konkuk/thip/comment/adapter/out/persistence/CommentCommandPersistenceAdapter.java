@@ -46,15 +46,26 @@ public class CommentCommandPersistenceAdapter implements CommentCommandPort {
         // 2. 게시물(Post) 조회 및 존재 검증
         PostJpaEntity postJpaEntity = findPostJpaEntity(comment.getPostType(), comment.getTargetPostId());
 
-        // 3. 부모 댓글 조회 (있을 경우)
+        // 3. 부모, 루트 댓글 조회 (있을 경우)
         CommentJpaEntity parentCommentJpaEntity = null;
+        CommentJpaEntity rootCommentJpaEntity = null;
+
         if (comment.getParentCommentId() != null) {
             parentCommentJpaEntity = commentJpaRepository.findByCommentId(comment.getParentCommentId())
                     .orElseThrow(() -> new EntityNotFoundException(COMMENT_NOT_FOUND));
+
+            // 부모가 루트가 아닌 경우 : 부모의 root를 가져온다
+            // 부모가 루트 댓글인 경우 : 부모를 루트로 설정한다
+            rootCommentJpaEntity = parentCommentJpaEntity.getRoot() != null
+                ? parentCommentJpaEntity.getRoot()
+                : parentCommentJpaEntity;
+
+            // 루트의 descendant_count 컬럼 값 업데이트
+            rootCommentJpaEntity.incrementDescendantCount();
         }
 
         return commentJpaRepository.save(
-                commentMapper.toJpaEntity(comment, postJpaEntity, userJpaEntity,parentCommentJpaEntity)
+                commentMapper.toJpaEntity(comment, postJpaEntity, userJpaEntity, parentCommentJpaEntity, rootCommentJpaEntity)
         ).getCommentId();
     }
 
