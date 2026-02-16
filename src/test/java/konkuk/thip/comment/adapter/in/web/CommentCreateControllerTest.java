@@ -85,8 +85,6 @@ class CommentCreateControllerTest {
     private Map<String, Object> buildValidRequest() {
         Map<String, Object> req = new HashMap<>();
         req.put("content", "정상 댓글");
-        req.put("isReplyRequest", false);
-        req.put("parentId", null);
         req.put("postType", "feed");
         return req;
     }
@@ -101,16 +99,6 @@ class CommentCreateControllerTest {
                 .andExpect(jsonPath("$.message", containsString(expectedMessage)));
     }
 
-    private void assertBadCommentCreateRequest(Map<String, Object> req, String expectedMessage) throws Exception {
-        mockMvc.perform(post("/comments/{postId}", feed.getPostId())
-                        .requestAttr("userId", user.getUserId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(req)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(INVALID_COMMENT_CREATE.getCode()))
-                .andExpect(jsonPath("$.message", containsString(expectedMessage)));
-    }
-
     @Nested
     @DisplayName("댓글 내용(content) 검증")
     class ContentValidation {
@@ -120,18 +108,6 @@ class CommentCreateControllerTest {
             Map<String, Object> req = buildValidRequest();
             req.put("content", "");
             assertBadRequest(req, "댓글 내용은 필수입니다.");
-        }
-    }
-
-    @Nested
-    @DisplayName("isReplyRequest(답글 여부) 검증")
-    class IsReplyRequestValidation {
-        @Test
-        @DisplayName("누락될 경우 400 error")
-        void missingIsReplyRequest() throws Exception {
-            Map<String, Object> req = buildValidRequest();
-            req.remove("isReplyRequest");
-            assertBadRequest(req, "답글 여부는 필수입니다.");
         }
     }
 
