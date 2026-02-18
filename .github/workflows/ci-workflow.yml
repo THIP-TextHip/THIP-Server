@@ -19,6 +19,19 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # Redis를 서비스로 실행 (GitHub Runner -> Docker 컨테이너 통신)
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -45,11 +58,6 @@ jobs:
 
       - name: 👏🏻 grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: 🚀 Start Redis
-        uses: supercharge/redis-github-action@1.7.0
-        with:
-          redis-version: 7
 
       - name: 🐘 build with Gradle
         run: ./gradlew build --parallel --stacktrace
