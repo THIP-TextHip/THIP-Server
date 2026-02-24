@@ -1,6 +1,5 @@
 package konkuk.thip.feed.adapter.out.persistence;
 
-import konkuk.thip.common.entity.StatusType;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.feed.adapter.out.mapper.FeedMapper;
@@ -31,32 +30,36 @@ public class FeedQueryPersistenceAdapter implements FeedQueryPort {
     }
 
     @Override
+    public FeedQueryDto getFeedDetail(Long feedId) {
+        return feedJpaRepository.findFeedDetailById(feedId);
+    }
+
+    @Override
     public CursorBasedList<FeedQueryDto> findFeedsByFollowingPriority(Long userId, Cursor cursor) {
         Integer lastPriority = cursor.isFirstRequest() ? null : cursor.getInteger(0);
-        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(1);
+        Long lastPostId = cursor.isFirstRequest() ? null : cursor.getLong(1);
         int size = cursor.getPageSize();
 
-        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findFeedsByFollowingPriority(userId, lastPriority, lastCreatedAt, size);
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findFeedsByFollowingPriority(userId, lastPriority, lastPostId, size);
 
         return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(
                     Boolean.TRUE.equals(feedQueryDto.isPriorityFeed()) ? "1" : "0",
-                    feedQueryDto.createdAt().toString()
+                    feedQueryDto.feedId().toString()
             ));
             return nextCursor.toEncodedString();
         });
     }
 
     @Override
-    public CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, Cursor cursor) {
-        LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
+    public CursorBasedList<FeedQueryDto> findLatestFeedsByFeedId(Long userId, Cursor cursor) {
+        Long lastPostId = cursor.isFirstRequest() ? null : cursor.getLong(0);
         int size = cursor.getPageSize();
 
-        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findLatestFeedsByCreatedAt(userId, lastCreatedAt, size);
+        List<FeedQueryDto> feedQueryDtos = feedJpaRepository.findLatestFeedsByFeedId(userId, lastPostId, size);
 
         return CursorBasedList.of(feedQueryDtos, size, feedQueryDto -> {
-            Cursor nextCursor = new Cursor(List.of(feedQueryDto.createdAt().toString()));
-            return nextCursor.toEncodedString();
+            return new Cursor(List.of(feedQueryDto.feedId().toString())).toEncodedString();
         });
     }
 
