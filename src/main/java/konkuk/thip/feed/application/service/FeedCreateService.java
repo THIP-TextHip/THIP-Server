@@ -5,6 +5,7 @@ import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.s3.service.ImageUrlValidationService;
+import konkuk.thip.feed.adapter.out.event.dto.FeedCreatedEvent;
 import konkuk.thip.feed.application.port.in.FeedCreateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedCreateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
@@ -17,6 +18,7 @@ import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class FeedCreateService implements FeedCreateUseCase {
 
     private final ImageUrlValidationService imageUrlValidationService;
     private final FeedNotificationOrchestrator feedNotificationOrchestrator;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -63,6 +66,9 @@ public class FeedCreateService implements FeedCreateUseCase {
 
         // 5. 피드 작성 푸쉬 알림 전송
         sendNotifications(command, savedFeedId);
+
+        // 6. 캐시 갱신 이벤트 발행
+        eventPublisher.publishEvent(FeedCreatedEvent.from(savedFeedId));
 
         return savedFeedId;
     }
