@@ -6,6 +6,7 @@ import konkuk.thip.comment.adapter.out.jpa.CommentJpaEntity;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.feed.adapter.out.cache.FeedCacheHandler;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
@@ -19,7 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +45,10 @@ class FeedDeleteApiTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private CacheManager cacheManager;
+    @Autowired
+    private FeedCacheHandler feedCacheHandler;
 
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
@@ -59,7 +67,7 @@ class FeedDeleteApiTest {
     @BeforeEach
     void setUp() {
         user = userJpaRepository.save(TestEntityFactory.createUser(Alias.ARTIST));
-        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        book = bookJpaRepository.save(TestEntityFactory.createBook());
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true,1,1,List.of("url1", "url2", "url3")));
         postLikeJpaRepository.save(TestEntityFactory.createPostLike(user,feed));
         comment = commentJpaRepository.save(TestEntityFactory.createComment(feed, user, FEED));
@@ -96,5 +104,29 @@ class FeedDeleteApiTest {
 
         // 7) 게시글 좋아요(PostLike) 삭제
         assertThat(postLikeJpaRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("피드 삭제 시 삭제한 피드가 캐시에 적재되어있다면 해당하는 상세 캐시에 null이 저장된다.")
+    void deleteFeed_shouldPutNullInDetailCache() throws Exception {
+        // given
+        Long feedId = feed.getPostId();
+
+        feedCacheHandler.getFeedDetail(feedId);  //캐시에 먼저 적재
+
+        // when
+        mockMvc.perform(delete("/feeds/{feedId}", feedId)
+                        .requestAttr("userId", user.getUserId()))
+                .andExpect(status().isOk());
+
+        // 캐시 갱신 확인하기위해 강제 커밋
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        // then
+        Cache detailCache = cacheManager.getCache("feedDetail");
+        Object cachedObject = detailCache.get(feedId, Object.class);
+
+        assertThat(cachedObject).isNull();
     }
 }
