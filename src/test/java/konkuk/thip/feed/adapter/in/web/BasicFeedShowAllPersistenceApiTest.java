@@ -3,7 +3,9 @@ package konkuk.thip.feed.adapter.in.web;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.feed.adapter.out.cache.FeedQueryCacheAdapter;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
+import konkuk.thip.feed.adapter.out.persistence.FeedQueryPersistenceAdapter;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.post.adapter.out.jpa.PostLikeJpaEntity;
 import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
@@ -13,22 +15,23 @@ import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.adapter.out.persistence.repository.following.FollowingJpaRepository;
 import konkuk.thip.user.domain.value.Alias;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,8 +42,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-@DisplayName("[통합] 피드 전체 조회(최신순 조회) api 통합 테스트")
-class BasicFeedShowAllApiTest {
+@DisplayName("[통합] 피드 전체 조회(최신순 조회) api 통합 테스트 - Persistence 어댑터")
+class BasicFeedShowAllPersistenceApiTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -62,8 +66,31 @@ class BasicFeedShowAllApiTest {
     @Autowired
     private PostLikeJpaRepository postLikeJpaRepository;
 
+    @MockitoBean
+    private FeedQueryCacheAdapter feedQueryCacheAdapter;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private FeedQueryPersistenceAdapter persistenceAdapter;
+
+    @BeforeEach
+    void setup() {
+        // 캐시 어댑터 대신 실제 DB 어댑터 로직을 수행하도록 설정
+        given(feedQueryCacheAdapter.findLatestFeedsByFeedId(any(), any()))
+                .willAnswer(invocation -> {
+                    return persistenceAdapter.findLatestFeedsByFeedId(
+                            invocation.getArgument(0),
+                            invocation.getArgument(1)
+                    );
+                });
+
+        given(feedQueryCacheAdapter.findSavedFeedIdsByUserIdAndFeedIds(any(), any()))
+                .willAnswer(invocation -> {
+                    return persistenceAdapter.findSavedFeedIdsByUserIdAndFeedIds(
+                            invocation.getArgument(0),
+                            invocation.getArgument(1)
+                    );
+                });
+    }
 
     @Test
     @DisplayName("피드 조회를 요청할 경우, [feedId, 작성자 닉네임, ,,] 의 피드 정보를 최신순으로 정렬해서 반환한다.")
@@ -75,8 +102,7 @@ class BasicFeedShowAllApiTest {
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
 
-        // 피드 생성 및 생성일 직접 설정
-        LocalDateTime base = LocalDateTime.now();
+        // 피드 생성
         FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
         savedFeedJpaRepository.save(
                 SavedFeedJpaEntity.builder()
@@ -93,16 +119,6 @@ class BasicFeedShowAllApiTest {
                         .build()
         );
 
-        // JPA flush 후, native update 로 created_at 덮어쓰기
-        // feed 작성 순서 : f2 -> f1 (f1 이 가장 최신)
-        feedJpaRepository.flush();
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(1)), f1.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(10)), f2.getPostId());
-
         //when //then
         mockMvc.perform(get("/feeds")
                         .requestAttr("userId", me.getUserId()))
@@ -112,22 +128,22 @@ class BasicFeedShowAllApiTest {
                  * 정렬 조건
                  * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
                  */
-                // 1순위: 내 글 f1
-                .andExpect(jsonPath("$.data.feedList[0].feedId", is(f1.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[0].creatorNickname", is("me")))
-                .andExpect(jsonPath("$.data.feedList[0].contentUrls", hasSize(2)))
-                .andExpect(jsonPath("$.data.feedList[0].likeCount", is(10)))
-                .andExpect(jsonPath("$.data.feedList[0].commentCount", is(5)))
-                .andExpect(jsonPath("$.data.feedList[0].isSaved", is(true)))
-                .andExpect(jsonPath("$.data.feedList[0].isLiked", is(false)))
-                // 2순위: 팔로잉 글 f2
-                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f2.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[1].creatorNickname", is("user1")))
-                .andExpect(jsonPath("$.data.feedList[1].contentUrls", hasSize(0)))
-                .andExpect(jsonPath("$.data.feedList[1].likeCount", is(50)))
-                .andExpect(jsonPath("$.data.feedList[1].commentCount", is(10)))
-                .andExpect(jsonPath("$.data.feedList[1].isSaved", is(false)))
-                .andExpect(jsonPath("$.data.feedList[1].isLiked", is(true)));
+                // 1순위: 팔로잉 글 f2
+                .andExpect(jsonPath("$.data.feedList[0].feedId", is(f2.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[0].creatorNickname", is("user1")))
+                .andExpect(jsonPath("$.data.feedList[0].contentUrls", hasSize(0)))
+                .andExpect(jsonPath("$.data.feedList[0].likeCount", is(50)))
+                .andExpect(jsonPath("$.data.feedList[0].commentCount", is(10)))
+                .andExpect(jsonPath("$.data.feedList[0].isSaved", is(false)))
+                .andExpect(jsonPath("$.data.feedList[0].isLiked", is(true)))
+                // 2순위: 내 글 f1
+                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f1.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[1].creatorNickname", is("me")))
+                .andExpect(jsonPath("$.data.feedList[1].contentUrls", hasSize(2)))
+                .andExpect(jsonPath("$.data.feedList[1].likeCount", is(10)))
+                .andExpect(jsonPath("$.data.feedList[1].commentCount", is(5)))
+                .andExpect(jsonPath("$.data.feedList[1].isSaved", is(true)))
+                .andExpect(jsonPath("$.data.feedList[1].isLiked", is(false)));
     }
 
     @Test
@@ -145,37 +161,14 @@ class BasicFeedShowAllApiTest {
 
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
 
-        // 피드 생성 및 생성일 직접 설정 -> f1, f2, f4, f6 : 공개 글, f3, f5 : 비공개 글
+        // 피드 생성 -> f1, f2, f4, f6 : 공개 글, f3, f5 : 비공개 글
+        // feed 작성 순서 : f1 -> f2 -> f3 -> f4 -> f5 -> f6 (f6이 가장 최신)
         FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
         FeedJpaEntity f2 = feedJpaRepository.save(TestEntityFactory.createFeed(user1, book, true, 50, 10, List.of()));
         FeedJpaEntity f3 = feedJpaRepository.save(TestEntityFactory.createFeed(user1, book, false, 10, 5, List.of("contentUrl1", "contentUrl2")));
         FeedJpaEntity f4 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, true, 50, 10, List.of()));
         FeedJpaEntity f5 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, false, 10, 5, List.of("contentUrl1", "contentUrl2")));
         FeedJpaEntity f6 = feedJpaRepository.save(TestEntityFactory.createFeed(user3, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
-
-        // JPA flush 후, native update 로 created_at 덮어쓰기
-        // feed 작성 순서 : f5 -> f4 -> f3 -> f2 -> f1 -> f6 (f6이 가장 최신)
-        feedJpaRepository.flush();
-
-        LocalDateTime base = LocalDateTime.now();
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(5)), f1.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(10)), f2.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(15)), f3.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(20)), f4.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(25)), f5.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(1)), f6.getPostId());
 
         //when //then
         mockMvc.perform(get("/feeds")
@@ -187,9 +180,9 @@ class BasicFeedShowAllApiTest {
                  * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
                  */
                 .andExpect(jsonPath("$.data.feedList[0].feedId", is(f6.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f1.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f4.getPostId().intValue())))
                 .andExpect(jsonPath("$.data.feedList[2].feedId", is(f2.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[3].feedId", is(f4.getPostId().intValue())));
+                .andExpect(jsonPath("$.data.feedList[3].feedId", is(f1.getPostId().intValue())));
     }
 
     @Test
@@ -207,6 +200,7 @@ class BasicFeedShowAllApiTest {
         BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());        // 공통 Book
 
         // 피드 생성 및 생성일 직접 설정 -> 모두 공개 글
+        // feed 작성 순서 : f1 -> f2 -> ... f12
         FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
         FeedJpaEntity f2 = feedJpaRepository.save(TestEntityFactory.createFeed(user1, book, true, 50, 10, List.of()));
         FeedJpaEntity f3 = feedJpaRepository.save(TestEntityFactory.createFeed(user1, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
@@ -220,48 +214,6 @@ class BasicFeedShowAllApiTest {
         FeedJpaEntity f11 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
         FeedJpaEntity f12 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
 
-        // JPA flush 후, native update 로 created_at 덮어쓰기
-        // feed 작성 순서 : f12 -> f11 -> ,,, -> f1 순
-        feedJpaRepository.flush();
-
-        LocalDateTime base = LocalDateTime.now();
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(5)), f1.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(10)), f2.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(15)), f3.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(20)), f4.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(25)), f5.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(30)), f6.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(35)), f7.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(40)), f8.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(45)), f9.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(50)), f10.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(55)), f11.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(base.minusMinutes(60)), f12.getPostId());
-
         //when //then
         mockMvc.perform(get("/feeds")
                         .requestAttr("userId", me.getUserId()))
@@ -273,16 +225,16 @@ class BasicFeedShowAllApiTest {
                  * 정렬 조건
                  * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
                  */
-                .andExpect(jsonPath("$.data.feedList[0].feedId", is(f1.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f2.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[2].feedId", is(f3.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[3].feedId", is(f4.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[4].feedId", is(f5.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[5].feedId", is(f6.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[6].feedId", is(f7.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[7].feedId", is(f8.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[8].feedId", is(f9.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[9].feedId", is(f10.getPostId().intValue())));
+                .andExpect(jsonPath("$.data.feedList[0].feedId", is(f12.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f11.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[2].feedId", is(f10.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[3].feedId", is(f9.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[4].feedId", is(f8.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[5].feedId", is(f7.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[6].feedId", is(f6.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[7].feedId", is(f5.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[8].feedId", is(f4.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[9].feedId", is(f3.getPostId().intValue())));
     }
 
     @Test
@@ -313,36 +265,13 @@ class BasicFeedShowAllApiTest {
         FeedJpaEntity f11 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
         FeedJpaEntity f12 = feedJpaRepository.save(TestEntityFactory.createFeed(user2, book, true, 10, 5, List.of("contentUrl1", "contentUrl2")));
 
-        // JPA flush 후, native update 로 created_at 덮어쓰기
-        // feed 작성 순서 : f12 -> f11 -> ,,, -> f1 순
-        feedJpaRepository.flush();
-
-        LocalDateTime base = LocalDateTime.now();
-        LocalDateTime t10 = base.minusMinutes(50);
-        LocalDateTime t11 = base.minusMinutes(55);
-        LocalDateTime t12 = base.minusMinutes(60);
-
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(t10), f10.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(t11), f11.getPostId());
-        jdbcTemplate.update(
-                "UPDATE posts SET created_at = ? WHERE post_id = ?",
-                Timestamp.valueOf(t12), f12.getPostId());
-
-        // DB에 저장된 f10의 createdAt 값을 native query 로 조회
-        LocalDateTime nextCursorVal = jdbcTemplate.queryForObject(
-                "SELECT created_at FROM posts WHERE post_id = ?",
-                (rs, rowNum) -> rs.getTimestamp("created_at").toLocalDateTime(), f10.getPostId()
-        );
-        String nextCursor = nextCursorVal.toString();
+        // feed 작성 순서 : f1 -> f2 -> ,,, -> f12 순
+        String nextCursor = f3.getPostId().toString();
 
         //when //then
         mockMvc.perform(get("/feeds")
                         .requestAttr("userId", me.getUserId())
-                        .param("cursor", nextCursor))        // 이전에 f10 까지 조회 -> f10의 createdAt이 커서
+                        .param("cursor", nextCursor))        // 이전에 f3 까지 조회 -> f3의 postId가 커서
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nextCursor", nullValue()))      // nextCursor 는 null
                 .andExpect(jsonPath("$.data.isLast", is(true)))
@@ -351,7 +280,7 @@ class BasicFeedShowAllApiTest {
                  * 정렬 조건
                  * 내 글 & 다른 모든 유저의 공개 글을 최신순 조회
                  */
-                .andExpect(jsonPath("$.data.feedList[0].feedId", is(f11.getPostId().intValue())))
-                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f12.getPostId().intValue())));
+                .andExpect(jsonPath("$.data.feedList[0].feedId", is(f2.getPostId().intValue())))
+                .andExpect(jsonPath("$.data.feedList[1].feedId", is(f1.getPostId().intValue())));
     }
 }
