@@ -1,5 +1,6 @@
 package konkuk.thip.user.application.service;
 
+import java.util.List;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
@@ -11,12 +12,14 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.roompost.application.port.out.AttendanceCheckCommandPort;
 import konkuk.thip.roompost.application.port.out.RecordCommandPort;
 import konkuk.thip.roompost.application.port.out.VoteCommandPort;
+import konkuk.thip.user.adapter.out.event.dto.UserWithdrawnEvent;
 import konkuk.thip.user.application.port.UserTokenBlacklistCommandPort;
 import konkuk.thip.user.application.port.in.UserDeleteUseCase;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,7 @@ public class UserDeleteService implements UserDeleteUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
 
     private final UserTokenBlacklistCommandPort userTokenBlacklistCommandPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -77,7 +81,7 @@ public class UserDeleteService implements UserDeleteUseCase {
         postLikeCommandPort.deleteAllByUserId(userId);
 
         // 피드 삭제
-        feedCommandPort.deleteAllFeedByUserId(userId);
+        List<Long> deletedFeedIds = feedCommandPort.deleteAllFeedByUserId(userId);
         // 기록 삭제
         recordCommandPort.deleteAllByUserId(userId);
         // 투표 삭제
@@ -89,6 +93,7 @@ public class UserDeleteService implements UserDeleteUseCase {
         userCommandPort.delete(user);
         // 토큰 블랙리스트 추가
         userTokenBlacklistCommandPort.addTokenToBlacklist(authToken);
+        // 탈퇴 이벤트(캐시 갱신) 발행
+        eventPublisher.publishEvent(UserWithdrawnEvent.of(userId, deletedFeedIds));
     }
-
 }
