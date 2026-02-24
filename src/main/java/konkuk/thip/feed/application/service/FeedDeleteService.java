@@ -1,11 +1,13 @@
 package konkuk.thip.feed.application.service;
 
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
+import konkuk.thip.feed.adapter.out.event.dto.FeedDeletedEvent;
 import konkuk.thip.feed.application.port.in.FeedDeleteUseCase;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.domain.Feed;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,8 @@ public class FeedDeleteService implements FeedDeleteUseCase {
     private final FeedCommandPort feedCommandPort;
     private final CommentCommandPort commentCommandPort;
     private final PostLikeCommandPort postLikeCommandPort;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -35,5 +39,7 @@ public class FeedDeleteService implements FeedDeleteUseCase {
         postLikeCommandPort.deleteAllByPostId(feedId);
         // 3-3. 피드 삭제 및 관련 엔티티(피드_태그, 콘텐츠, 피드 저장) 삭제
         feedCommandPort.delete(feed);
+        // 4. 캐시 갱신 이벤트 발행
+        eventPublisher.publishEvent(FeedDeletedEvent.from(feedId));
     }
 }
