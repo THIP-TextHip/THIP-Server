@@ -1,6 +1,7 @@
 package konkuk.thip.user.adapter.in.web;
 
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
@@ -10,6 +11,7 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaReposito
 import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepository;
 import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.feed.adapter.out.cache.FeedCacheHandler;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
 import konkuk.thip.feed.adapter.out.persistence.repository.SavedFeedJpaRepository;
@@ -39,8 +41,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +57,7 @@ import static konkuk.thip.post.domain.PostType.*;
 import static konkuk.thip.room.domain.value.RoomParticipantRole.HOST;
 import static konkuk.thip.room.domain.value.RoomParticipantRole.MEMBER;
 import static konkuk.thip.room.domain.value.RoomStatus.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -88,6 +93,8 @@ public class UserDeleteApiTest {
 
     @Autowired private JwtUtil jwtUtil;
     @Autowired private EntityManager em;
+    @Autowired private CacheManager cacheManager;
+    @Autowired private FeedCacheHandler feedCacheHandler;
 
     @Test
     @DisplayName("회원탈퇴 성공시 모든 연관 엔티티가 각 엔티티 삭제 전략에 맞게 삭제되고 탈퇴한 회원의 토큰이 블랙리스트에 등록된다.")
@@ -418,6 +425,67 @@ public class UserDeleteApiTest {
 
     }
 
+    @Test
+    @DisplayName("회원탈퇴 시 탈퇴 유저의 피드가 캐시에 적재되어있다면 해당하는 캐시들이 삭제된다.")
+    void deleteUser_shouldRefreshFeedCache() throws Exception {
+
+        // given
+        UserJpaEntity withdrawUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.ARTIST));
+        UserJpaEntity otherUser = userJpaRepository.save(TestEntityFactory.createUser(Alias.ARTIST));
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
+
+        // 탈퇴 유저 피드 2개
+        FeedJpaEntity feed1 = feedJpaRepository.save(
+                TestEntityFactory.createFeed(withdrawUser, book, true)
+        );
+        FeedJpaEntity feed2 = feedJpaRepository.save(
+                TestEntityFactory.createFeed(withdrawUser, book, true)
+        );
+
+        // 다른 유저 피드 1개
+        FeedJpaEntity feed3 = feedJpaRepository.save(
+                TestEntityFactory.createFeed(otherUser, book, true)
+        );
+
+        // 캐시 강제 적재
+        feedCacheHandler.getTopIds();
+        feedCacheHandler.getFeedDetail(feed1.getPostId());
+        feedCacheHandler.getFeedDetail(feed2.getPostId());
+        feedCacheHandler.getFeedDetail(feed3.getPostId());
+
+
+        // when
+        String accessToken = jwtUtil.createAccessToken(withdrawUser.getUserId());
+        mockMvc.perform(delete("/users")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // 캐시 갱신 확인하기위해 강제 커밋
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        // then
+        Cache topCache = cacheManager.getCache("feedIdTop");
+        assertThat(topCache).isNotNull();
+        Cache detailCache = cacheManager.getCache("feedDetail");
+        assertThat(detailCache).isNotNull();
+
+        List<Long> topIds = topCache.get("top100", List.class);
+
+        // 1. 탈퇴 유저 피드 제거 확인
+        assertThat(topIds)
+                .doesNotContain(feed1.getPostId(), feed2.getPostId());
+        // 2. 다른 유저 피드는 유지
+        assertThat(topIds)
+                .contains(feed3.getPostId());
+        // 3. detail 캐시에서 탈퇴 유저 피드만 제거
+        assertThat(detailCache.get(feed1.getPostId())).isNull();
+        assertThat(detailCache.get(feed2.getPostId())).isNull();
+
+        // 4. 다른 유저 피드는 여전히 존재
+        assertThat(detailCache.get(feed3.getPostId())).isNotNull();
+    }
 
     private RoomJpaEntity createRoom(BookJpaEntity book, Category category, RoomStatus roomStatus) {
         return roomJpaRepository.save(RoomJpaEntity.builder()
