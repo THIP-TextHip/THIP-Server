@@ -1,6 +1,7 @@
 package konkuk.thip.feed.application.port.out;
 
 
+import java.util.List;
 import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.feed.domain.Feed;
 
@@ -25,5 +26,5 @@ public interface FeedCommandPort {
     void saveSavedFeed(Long userId, Long feedId);
     void deleteSavedFeed(Long userId, Long feedId);
     void deleteAllSavedFeedByUserId(Long userId);
-    void deleteAllFeedByUserId(Long userId);
+    List<Long> deleteAllFeedByUserId(Long userId);
 }
