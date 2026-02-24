@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
+import konkuk.thip.feed.adapter.out.cache.FeedCacheHandler;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
+import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
@@ -17,8 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +51,8 @@ class FeedUpdateApiTest {
     @Autowired private UserJpaRepository userJpaRepository;
     @Autowired private BookJpaRepository bookJpaRepository;
     @Autowired private FeedJpaRepository feedJpaRepository;
+    @Autowired private CacheManager cacheManager;
+    @Autowired private FeedCacheHandler feedCacheHandler;
 
     private UserJpaEntity user;
     private BookJpaEntity book;
@@ -58,7 +65,7 @@ class FeedUpdateApiTest {
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
         Category category = TestEntityFactory.createLiteratureCategory();
 
-        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        book = bookJpaRepository.save(TestEntityFactory.createBook());
 
         tags = List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE);
         feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, tags));
@@ -164,6 +171,42 @@ class FeedUpdateApiTest {
         // 4. 태그 갯수
         long tagCount = feedJpaRepository.findById(feedId).orElseThrow().getTagList().size();
         assertThat(tagCount).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("피드 수정 시 수정한 피드가 캐시에 적재되어있다면 해당하는 상세 캐시가 갱신된다.")
+    void updateFeed_shouldRefreshDetailCache() throws Exception {
+
+        // given
+        Long feedId = feed.getPostId();
+
+        feedCacheHandler.getFeedDetail(feedId); //캐시에 먼저 적재
+        Map<String, Object> request = new HashMap<>();
+        request.put("contentBody", "캐시 테스트용");
+        request.put("isPublic", true);
+
+
+        // when
+        ResultActions result = mockMvc.perform(patch("/feeds/{feedId}", feedId)
+                .requestAttr("userId", user.getUserId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+
+        result.andExpect(status().isOk());
+
+        // 캐시 갱신 확인하기위해 강제 커밋
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        // then
+        Cache detailCache = cacheManager.getCache("feedDetail");
+        assertThat(detailCache).isNotNull();
+
+        Object cachedObject = detailCache.get(feedId, Object.class);
+        assertThat(cachedObject).isNotNull();
+
+        FeedQueryDto cached = (FeedQueryDto) cachedObject;
+        assertThat(cached.contentBody()).isEqualTo("캐시 테스트용");
     }
 
 }
