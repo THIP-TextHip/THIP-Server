@@ -4,6 +4,7 @@ import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,4 +31,12 @@ public interface BookJpaRepository extends JpaRepository<BookJpaEntity, Long>, B
             ")"
     )
     Set<Long> findUnusedBookIds();
+
+    @Query(
+            "SELECT b FROM BookJpaEntity b " +
+            "WHERE b.pageCount IS NULL AND b.pageCountUnfindable = false " +
+            "AND EXISTS (SELECT r FROM RoomJpaEntity r WHERE r.bookJpaEntity = b) " +
+            "ORDER BY b.bookId ASC"
+    )
+    List<BookJpaEntity> findBooksWithNullPageCountLinkedToRooms();
 }
