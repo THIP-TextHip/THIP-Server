@@ -28,6 +28,8 @@ public class Book extends BaseDomainEntity {
 
     private String description;
 
+    private boolean pageCountUnfindable;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -61,5 +63,9 @@ public class Book extends BaseDomainEntity {
 
     public void changePageCount(Integer newPageCount) {
         this.pageCount = newPageCount;
+    }
+
+    public void markAsUnfindable() {
+        this.pageCountUnfindable = true;
     }
 }
