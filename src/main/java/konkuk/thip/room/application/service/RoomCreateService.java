@@ -11,8 +11,9 @@ import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -22,35 +23,36 @@ public class RoomCreateService implements RoomCreateUseCase {
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final BookCommandPort bookCommandPort;
     private final BookApiQueryPort bookApiQueryPort;
+    private final TransactionTemplate transactionTemplate;
 
     @Override
-    @Transactional
     public Long createRoom(RoomCreateCommand command, Long userId) {
         // 1. Category 생성
         Category category = Category.from(command.category());
 
-        // 2. Book 찾기, 없으면 Book 로드 및 저장
+        // 2. Book 찾기, 없으면 외부 API로 로드 및 저장 (트랜잭션 밖에서 수행)
         Long bookId = resolveBookAndEnsurePage(command.isbn());
 
-        // 3. Room 생성 및 저장
-        Room room = Room.withoutId(
-                command.roomName(),
-                command.description(),
-                command.isPublic(),
-                command.password(),
-                command.progressStartDate(),
-                command.progressEndDate(),
-                command.recruitCount(),
-                bookId,
-                category
-        );
-        Long savedRoomId = roomCommandPort.save(room);
+        // 3. Room + RoomParticipant 저장 (단일 트랜잭션으로 원자성 보장)
+        return transactionTemplate.execute(status -> {
+            Room room = Room.withoutId(
+                    command.roomName(),
+                    command.description(),
+                    command.isPublic(),
+                    command.password(),
+                    command.progressStartDate(),
+                    command.progressEndDate(),
+                    command.recruitCount(),
+                    bookId,
+                    category
+            );
+            Long savedRoomId = roomCommandPort.save(room);
 
-        // 4. 방장 RoomParticipant 생성 및 DB save
-        RoomParticipant roomParticipant = RoomParticipant.hostWithoutId(userId, savedRoomId);
-        roomParticipantCommandPort.save(roomParticipant);
+            RoomParticipant roomParticipant = RoomParticipant.hostWithoutId(userId, savedRoomId);
+            roomParticipantCommandPort.save(roomParticipant);
 
-        return savedRoomId;
+            return savedRoomId;
+        });
     }
 
     private Long resolveBookAndEnsurePage(String isbn) {
@@ -65,13 +67,23 @@ public class RoomCreateService implements RoomCreateUseCase {
     }
 
     private void updateBookPageCount(Book book) {
+        // 알라딘 API 실패 시 null 반환 (Discord 알림은 어댑터에서 처리)
         Integer pageCount = bookApiQueryPort.findPageCountByIsbn(book.getIsbn());
+        if (pageCount == null) return;
+
         book.changePageCount(pageCount);
         bookCommandPort.updateForPageCount(book);
     }
 
     private Long saveNewBookWithPageCount(String isbn) {
         Book loaded = bookApiQueryPort.loadBookWithPageByIsbn(isbn);
-        return bookCommandPort.save(loaded);
+        try {
+            return bookCommandPort.save(loaded);
+        } catch (DataIntegrityViolationException e) {
+            // 동일 ISBN 동시 요청으로 이미 저장된 경우 → 기존 Book ID 반환
+            return bookCommandPort.findByIsbn(isbn)
+                    .map(Book::getId)
+                    .orElseThrow(() -> e);
+        }
     }
 }
