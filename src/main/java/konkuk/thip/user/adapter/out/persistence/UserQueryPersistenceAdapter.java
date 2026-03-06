@@ -10,12 +10,14 @@ import konkuk.thip.user.application.port.out.UserQueryPort;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class UserQueryPersistenceAdapter implements UserQueryPort {

@@ -9,12 +9,14 @@ import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class BookQueryPersistenceAdapter implements BookQueryPort {

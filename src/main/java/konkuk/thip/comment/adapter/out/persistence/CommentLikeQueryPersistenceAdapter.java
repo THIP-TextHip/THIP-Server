@@ -6,10 +6,12 @@ import konkuk.thip.comment.adapter.out.persistence.repository.CommentLikeJpaRepo
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class CommentLikeQueryPersistenceAdapter implements CommentLikeQueryPort {

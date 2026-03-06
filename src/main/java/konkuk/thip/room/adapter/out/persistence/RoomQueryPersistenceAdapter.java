@@ -13,12 +13,14 @@ import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.Room;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class RoomQueryPersistenceAdapter implements RoomQueryPort {

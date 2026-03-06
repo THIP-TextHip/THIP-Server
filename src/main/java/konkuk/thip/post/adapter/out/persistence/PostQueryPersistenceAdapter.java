@@ -4,8 +4,10 @@ import konkuk.thip.post.adapter.out.persistence.repository.PostJpaRepository;
 import konkuk.thip.post.application.port.out.PostQueryPort;
 import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class PostQueryPersistenceAdapter implements PostQueryPort {

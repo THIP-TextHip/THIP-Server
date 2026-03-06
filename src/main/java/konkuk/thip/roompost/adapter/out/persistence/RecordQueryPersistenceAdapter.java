@@ -8,10 +8,12 @@ import konkuk.thip.roompost.application.port.out.RecordQueryPort;
 import konkuk.thip.roompost.application.port.out.dto.RoomPostQueryDto;
 import konkuk.thip.roompost.domain.Record;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class RecordQueryPersistenceAdapter implements RecordQueryPort {
