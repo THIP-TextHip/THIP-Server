@@ -7,12 +7,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.hibernate.Session;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import static konkuk.thip.common.aop.FilterContextHolder.FilterMode.ACTIVE_ONLY;
 import static konkuk.thip.common.aop.FilterContextHolder.FilterMode.UNFILTERED;
 
 @Slf4j
+@Order(Ordered.LOWEST_PRECEDENCE)       // aspect order 명시 (우선순위 최하위 -> transaction aspect 이후에 동작)
 @Aspect
 @Component
 @RequiredArgsConstructor
