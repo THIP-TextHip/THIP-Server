@@ -47,6 +47,10 @@ public class BookPageCountFillService implements BookPageCountFillUseCase {
         int transientFailCount = 0;
 
         for (Book book : books) {
+            // TODO: 알라딘 API 연속 실패 시 Circuit Breaker 패턴 적용 필요
+            // 현재: API 장애 상태에서도 전체 건수에 대해 호출 시도 → 타임아웃 × 건수만큼 스케줄러 점유
+            // 개선: 연속 실패 N회 초과 시 조기 종료 + Discord 알림
+
             try {
                 Integer pageCount = aladinApiClient.findPageCountByIsbn(book.getIsbn());
                 book.changePageCount(pageCount);
