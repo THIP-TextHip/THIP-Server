@@ -31,7 +31,7 @@ jobs:
       - name: 🧾 Create application.yml from secret (base64)
         run: |
           mkdir -p ${{ env.RESOURCE_PATH }}
-          echo "${{ secrets.APPLICATION_YML_DEV }}" | base64 --decode > ${{ env.RESOURCE_PATH }}/application.yml
+          echo "${{ secrets.APPLICATION_YML_PROD }}" | base64 --decode > ${{ env.RESOURCE_PATH }}/application.yml
         shell: bash
 
       - name: 🔐 Create Firebase Key from secret (base64)
@@ -73,16 +73,11 @@ jobs:
           script: |
             echo "🗂️ Change Directory to Compose Path"
             cd ${{ env.COMPOSE_PATH }}
-            
-            echo "✋🏻Stopping existing container and Cleaning up old images"
-            sudo docker-compose stop ${{ secrets.DOCKER_IMAGE }}
-            sudo docker rm -f ${{ secrets.DOCKER_IMAGE }}
-            
+
             sudo docker ps -a
-            
+
             echo "🥳 Pulling new image"
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}
-            
-            echo "🌱 Starting new container"
-            sudo docker-compose up -d
-            sudo docker image prune -a -f
+
+            echo "🚀 Run Blue-Green Deploy Script"
+            sudo bash deploy.sh
