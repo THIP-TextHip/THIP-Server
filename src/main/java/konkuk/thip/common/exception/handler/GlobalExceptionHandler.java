@@ -14,10 +14,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.common.logging.LoggingConstant.REQUEST_ID;
@@ -141,6 +143,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(API_SERVER_ERROR.getHttpStatus())
                 .body(ErrorResponse.of(API_SERVER_ERROR));
+    }
+
+    // Spring 6.1+ @Validated 컨트롤러 파라미터 검증 실패 예외처리
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handlerMethodValidationExceptionHandler(HandlerMethodValidationException e) {
+        log.warn("[HandlerMethodValidationExceptionHandler] {}", e.getMessage());
+        String errorMessage = Stream.concat(e.getBeanResults().stream(), e.getValueResults().stream())
+                .flatMap(result -> result.getResolvableErrors().stream())
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("유효성 검사에 실패했습니다.");
+
+        return ResponseEntity
+                .status(API_INVALID_PARAM.getHttpStatus())
+                .body(ErrorResponse.of(API_INVALID_PARAM, errorMessage));
     }
 
     // @validation 예외처리
