@@ -1,5 +1,7 @@
 package konkuk.thip.message.application.service;
 
+import com.google.firebase.messaging.ApnsConfig;
+import com.google.firebase.messaging.Aps;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import konkuk.thip.message.application.port.in.RoomNotificationDispatchUseCase;
@@ -86,6 +88,7 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
                     .putData("category", NotificationCategory.ROOM.getDisplay())
                     .putData("action", "OPEN_NOTIFICATION") // FE는 이 액션으로 알림 상세/라우팅을 BE api 요청으로 처리
                     .putData("notificationId", String.valueOf(notificationId))
+                    .setApnsConfig(buildApnsConfig())
                     .build();
             msgs.add(m); tk.add(t.getFcmToken()); dev.add(t.getDeviceId());
         }
@@ -97,6 +100,12 @@ public class RoomNotificationDispatchService implements RoomNotificationDispatch
         return Notification.builder()
                 .setTitle(title)
                 .setBody(body)
+                .build();
+    }
+
+    private ApnsConfig buildApnsConfig() {
+        return ApnsConfig.builder()
+                .setAps(Aps.builder().setSound("default").build())
                 .build();
     }
 }
