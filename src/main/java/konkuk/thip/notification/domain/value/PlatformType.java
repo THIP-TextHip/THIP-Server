@@ -10,7 +10,8 @@ import static konkuk.thip.common.exception.code.ErrorCode.INVALID_FE_PLATFORM;
 @RequiredArgsConstructor
 public enum PlatformType {
     ANDROID("ANDROID"),
-    WEB("WEB");
+    WEB("WEB"),
+    IOS("IOS");
 
     private final String value;
 
