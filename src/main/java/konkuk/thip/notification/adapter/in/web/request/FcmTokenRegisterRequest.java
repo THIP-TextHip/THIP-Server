@@ -16,7 +16,7 @@ public record FcmTokenRegisterRequest(
         String fcmToken,
 
         @NotBlank(message = "플랫폼 타입은 필수입니다.")
-        @Schema(description = "플랫폼 타입 (ANDROID 또는 WEB)", example = "ANDROID")
+        @Schema(description = "플랫폼 타입 (ANDROID, WEB 또는 IOS)", example = "ANDROID")
         String platformType
 ) {
     public FcmTokenRegisterCommand toCommand(Long userId) {
