@@ -104,6 +104,10 @@ dependencies {
 
     // spring Retry
     implementation 'org.springframework.retry:spring-retry'
+
+	// Caffeine Cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
 }
 
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile

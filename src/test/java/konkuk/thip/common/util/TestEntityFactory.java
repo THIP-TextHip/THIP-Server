@@ -62,7 +62,7 @@ public class TestEntityFactory {
         return UserJpaEntity.builder()
                 .nickname("테스터")
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
-                .oauth2Id("kakao_12345678")
+                .oauth2Id("kakao_" + UUID.randomUUID())
                 .alias(alias)
                 .role(UserRole.USER)
                 .build();
@@ -72,7 +72,7 @@ public class TestEntityFactory {
         return UserJpaEntity.builder()
                 .nickname(nickname)
                 .nicknameUpdatedAt(LocalDate.now().minusMonths(7))
-                .oauth2Id("kakao_12345678")
+                .oauth2Id("kakao_" + UUID.randomUUID())
                 .alias(alias)
                 .role(UserRole.USER)
                 .build();

@@ -100,12 +100,12 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
     }
 
     @Override
-    public void deleteAllFeedByUserId(Long userId) {
+    public List<Long> deleteAllFeedByUserId(Long userId) {
         // 1. 유저가 작성한 피드 게시글 ID 리스트 조회
         List<Long> feedIds = feedJpaRepository.findFeedIdsByUserId(userId);
         // 1. 유저가 작성한 피드 게시글 ID 리스트 조회
         if (feedIds == null || feedIds.isEmpty()) {
-            return; // early return
+            return null; // early return
         }
         // 2-1. 댓글 좋아요 일괄 삭제
         commentLikeJpaRepository.deleteAllByPostIds(feedIds);
@@ -117,6 +117,8 @@ public class FeedCommandPersistenceAdapter implements FeedCommandPort {
         savedFeedJpaRepository.deleteAllByFeedIds(feedIds);
         // 5. 탈퇴한 유저가 작성한 피드 게시글 soft delete 일괄 처리
         feedJpaRepository.softDeleteAllByUserId(userId);
+
+        return feedIds;
     }
 
     @Override

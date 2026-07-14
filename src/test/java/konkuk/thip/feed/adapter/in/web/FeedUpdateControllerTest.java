@@ -53,7 +53,7 @@ class FeedUpdateControllerTest {
     void setUp() {
         Alias alias = TestEntityFactory.createLiteratureAlias();
         UserJpaEntity user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBook());
         savedFeedId = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true, List.of(KOREAN_NOVEL, FOREIGN_NOVEL, CLASSIC_LITERATURE))).getPostId();
         creatorUserId = user.getUserId();
     }

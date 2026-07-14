@@ -42,7 +42,7 @@ public class BasicFeedShowAllService implements FeedShowAllUseCase {
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 
         // 2. [최신순으로] 피드 조회 with 페이징 처리
-        CursorBasedList<FeedQueryDto> result = feedQueryPort.findLatestFeedsByCreatedAt(userId, nextCursor);
+        CursorBasedList<FeedQueryDto> result = feedQueryPort.findLatestFeedsByFeedId(userId, nextCursor);
         Set<Long> feedIds = result.contents().stream()
                 .map(FeedQueryDto::feedId)
                 .collect(Collectors.toUnmodifiableSet());

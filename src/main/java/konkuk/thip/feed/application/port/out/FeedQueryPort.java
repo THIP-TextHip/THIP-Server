@@ -10,12 +10,13 @@ import java.util.Set;
 public interface FeedQueryPort {
 
     Set<Long> findUserIdsByBookId(Long bookId);
+    FeedQueryDto getFeedDetail(Long feedId);
 
     /**
      * 전체 피드 조회
      */
     CursorBasedList<FeedQueryDto> findFeedsByFollowingPriority(Long userId, Cursor cursor);
-    CursorBasedList<FeedQueryDto> findLatestFeedsByCreatedAt(Long userId, Cursor cursor);
+    CursorBasedList<FeedQueryDto> findLatestFeedsByFeedId(Long userId, Cursor cursor);
 
     /**
      * 내 피드 조회

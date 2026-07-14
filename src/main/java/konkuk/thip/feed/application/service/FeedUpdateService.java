@@ -1,5 +1,6 @@
 package konkuk.thip.feed.application.service;
 
+import konkuk.thip.feed.adapter.out.event.dto.FeedUpdatedEvent;
 import konkuk.thip.feed.application.port.in.FeedUpdateUseCase;
 import konkuk.thip.feed.application.port.in.dto.FeedUpdateCommand;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
@@ -8,6 +9,7 @@ import konkuk.thip.feed.domain.value.Tag;
 import konkuk.thip.feed.domain.value.TagList;
 import konkuk.thip.feed.domain.value.ContentList;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedUpdateService implements FeedUpdateUseCase {
 
     private final FeedCommandPort feedCommandPort;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -33,7 +37,12 @@ public class FeedUpdateService implements FeedUpdateUseCase {
         applyPartialFeedUpdate(feed, command);
 
         // 4. 업데이트
-        return feedCommandPort.update(feed);
+        Long updatedFeedId = feedCommandPort.update(feed);
+
+        // 5. 캐시 갱신 이벤트 발행
+        eventPublisher.publishEvent(FeedUpdatedEvent.from(updatedFeedId));
+
+        return updatedFeedId;
     }
 
     private void applyPartialFeedUpdate(Feed feed, FeedUpdateCommand command) {

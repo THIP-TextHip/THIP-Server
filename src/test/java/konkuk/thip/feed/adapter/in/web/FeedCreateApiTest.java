@@ -17,8 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,9 @@ class FeedCreateApiTest {
 
     @Value("${cloud.aws.s3.cloud-front-base-url}")
     private String cloudFrontBaseUrl;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -305,4 +311,53 @@ class FeedCreateApiTest {
         FeedJpaEntity feedJpaEntity = feedJpaRepository.findById(postId).orElse(null);
         assertThat(feedJpaEntity.getTagList().toUnmodifiableList().size()).isEqualTo(0);
     }
+
+    @Test
+    @DisplayName("피드 생성 후 캐시(feedIdTop, feedDetail)가 갱신된다.")
+    void createFeed_shouldRefreshCache() throws Exception {
+
+        // given
+        bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("isbn", "9788954682152");
+        request.put("contentBody", "캐시 갱신 테스트");
+        request.put("isPublic", true);
+        request.put("tagList", List.of());
+
+        // when
+        ResultActions result = mockMvc.perform(post("/feeds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .requestAttr("userId", user.getUserId())
+                .content(objectMapper.writeValueAsString(request)));
+
+        result.andExpect(status().isOk());
+
+        String json = result.andReturn().getResponse().getContentAsString();
+        Long feedId = objectMapper.readTree(json)
+                .path("data")
+                .path("feedId")
+                .asLong();
+
+        // 캐시 갱신 확인하기위해 강제 커밋
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        // then
+        // 1. feedDetail 캐시 확인
+        Cache detailCache = cacheManager.getCache("feedDetail");
+        assertThat(detailCache).isNotNull();
+        Object cachedDetail = detailCache.get(feedId, Object.class);
+        assertThat(cachedDetail).isNotNull();
+
+        // 2. feedIdTop 캐시 확인
+        Cache topCache = cacheManager.getCache("feedIdTop");
+        assertThat(topCache).isNotNull();
+
+        List<Long> topIds = topCache.get("top100", List.class);
+
+        assertThat(topIds).isNotNull();
+        assertThat(topIds).contains(feedId);
+    }
+
 }
