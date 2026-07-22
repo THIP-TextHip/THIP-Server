@@ -20,6 +20,7 @@ public enum SecurityWhitelist {
     ACTUATOR_PROMETHEUS("/actuator/prometheus"),
     AUTH_USERS("/auth/users"),
     AUTH_TOKEN("/auth/token"),
+    AUTH_APPLE("/auth/apple"),
     API_TEST("/api/test/**"),
     AUTH_EXCHANGE_TEMP_TOKEN("/auth/exchange-temp-token"),
     AUTH_SET_COOKIE("/auth/set-cookie");

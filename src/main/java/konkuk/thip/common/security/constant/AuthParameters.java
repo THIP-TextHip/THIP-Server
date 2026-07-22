@@ -8,6 +8,7 @@ public enum AuthParameters {
     JWT_PREFIX("Bearer "),
     KAKAO("kakao"),
     GOOGLE("google"),
+    APPLE("apple"),
     KAKAO_PROVIDER_ID_KEY("id"),
     GOOGLE_PROVIDER_ID_KEY("sub"),
     JWT_ACCESS_TOKEN_KEY("userId"),

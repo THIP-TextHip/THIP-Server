@@ -5,17 +5,23 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.exception.AuthException;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.security.annotation.Oauth2Id;
+import konkuk.thip.common.security.oauth2.apple.AppleIdentityTokenVerifier;
+import konkuk.thip.common.security.oauth2.apple.AppleLoginRequest;
+import konkuk.thip.common.security.oauth2.apple.AppleRefreshTokenStore;
+import konkuk.thip.common.security.oauth2.apple.AppleTokenClient;
 import konkuk.thip.common.security.oauth2.tokenstorage.LoginTokenStorage;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieRequest;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthSetCookieResponse;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthTokenRequest;
 import konkuk.thip.common.security.oauth2.auth.dto.AuthTokenResponse;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 
 import static konkuk.thip.common.exception.code.ErrorCode.API_INVALID_PARAM;
 import static konkuk.thip.common.exception.code.ErrorCode.AUTH_INVALID_LOGIN_TOKEN_KEY;
@@ -45,8 +52,10 @@ public class AuthController {
 
     private final UserJpaRepository userJpaRepository;
     private final JwtUtil jwtUtil;
-
     private final LoginTokenStorage loginTokenStorage;
+    private final AppleIdentityTokenVerifier appleIdentityTokenVerifier;
+    private final AppleTokenClient appleTokenClient;
+    private final AppleRefreshTokenStore appleRefreshTokenStore;
 
     @Operation(
             summary = "소셜 로그인 유저 확인",
@@ -66,6 +75,44 @@ public class AuthController {
                 .orElseGet(() -> {
                     // 신규 유저: SignupToken 발급
                     String tempToken = jwtUtil.createSignupToken(authTokenRequest.oauth2Id());
+                    return BaseResponse.ok(AuthTokenResponse.of(tempToken, true));
+                });
+    }
+
+    @Operation(
+            summary = "Apple 소셜 로그인 (iOS 네이티브)",
+            description = "iOS에서 Apple Sign In SDK로 받은 identityToken을 검증하여 AccessToken 또는 SignupToken을 발급합니다."
+    )
+    @PostMapping("/apple")
+    public BaseResponse<AuthTokenResponse> appleLogin(
+            @Valid @RequestBody AppleLoginRequest request
+    ) {
+        String appleUserId = appleIdentityTokenVerifier.verify(request.identityToken());
+        String oauth2Id = "apple_" + appleUserId;
+
+        Optional<UserJpaEntity> existingUser = userJpaRepository.findByOauth2Id(oauth2Id);
+
+        if (request.authorizationCode() != null) {
+            String refreshToken = appleTokenClient.exchangeAuthorizationCode(request.authorizationCode());
+            if (refreshToken != null) {
+                if (existingUser.isPresent()) {
+                    // 기존 유저: DB에 바로 저장
+                    existingUser.get().updateAppleRefreshToken(refreshToken);
+                    userJpaRepository.save(existingUser.get());
+                } else {
+                    // 신규 유저: 회원가입 완료 시 옮겨 저장하도록 Redis에 임시 보관 (TTL 30분)
+                    appleRefreshTokenStore.save(oauth2Id, refreshToken);
+                }
+            }
+        }
+
+        return existingUser
+                .map(user -> {
+                    String accessToken = jwtUtil.createAccessToken(user.getUserId());
+                    return BaseResponse.ok(AuthTokenResponse.of(accessToken, false));
+                })
+                .orElseGet(() -> {
+                    String tempToken = jwtUtil.createSignupToken(oauth2Id);
                     return BaseResponse.ok(AuthTokenResponse.of(tempToken, true));
                 });
     }

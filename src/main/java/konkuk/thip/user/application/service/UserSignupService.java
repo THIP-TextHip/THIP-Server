@@ -2,7 +2,9 @@ package konkuk.thip.user.application.service;
 
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.code.ErrorCode;
+import konkuk.thip.common.security.oauth2.apple.AppleRefreshTokenStore;
 import konkuk.thip.common.security.util.JwtUtil;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
 import konkuk.thip.user.application.port.in.dto.UserSignupCommand;
 import konkuk.thip.user.application.port.in.dto.UserSignupResult;
@@ -23,7 +25,8 @@ public class UserSignupService implements UserSignupUseCase {
 
     private final UserCommandPort userCommandPort;
     private final UserQueryPort userQueryPort;
-
+    private final UserJpaRepository userJpaRepository;
+    private final AppleRefreshTokenStore appleRefreshTokenStore;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -41,6 +44,19 @@ public class UserSignupService implements UserSignupUseCase {
         }
 
         Long userId = userCommandPort.save(user);
+
+        // Apple 유저라면 Redis에 임시 보관된 refresh_token을 DB로 옮김
+        if (command.oauth2Id().startsWith("apple_")) {
+            String refreshToken = appleRefreshTokenStore.pop(command.oauth2Id());
+            if (refreshToken != null) {
+                userJpaRepository.findByOauth2Id(command.oauth2Id())
+                        .ifPresent(entity -> {
+                            entity.updateAppleRefreshToken(refreshToken);
+                            userJpaRepository.save(entity);
+                        });
+            }
+        }
+
         String accessToken = jwtUtil.createAccessToken(userId);
         return UserSignupResult.of(userId, accessToken);
     }
