@@ -1,6 +1,7 @@
 package konkuk.thip.user.application.service;
 
 import konkuk.thip.common.security.oauth2.apple.AppleTokenClient;
+import konkuk.thip.common.security.util.JwtUtil;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -27,6 +28,9 @@ class UserDeleteServiceAppleTest {
     @Autowired
     private UserJpaRepository userJpaRepository;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @MockBean
     private AppleTokenClient appleTokenClient;
 
@@ -52,10 +56,10 @@ class UserDeleteServiceAppleTest {
         userJpaRepository.save(appleUser);
 
         Long userId = appleUser.getUserId();
-        String fakeAuthToken = "Bearer fake.access.token";
+        String authToken = jwtUtil.createAccessToken(userId);
 
         // when
-        userDeleteService.deleteUser(userId, fakeAuthToken);
+        userDeleteService.deleteUser(userId, authToken);
 
         // then
         verify(appleTokenClient, times(1)).revokeToken("apple_refresh_token_xyz");
@@ -75,7 +79,7 @@ class UserDeleteServiceAppleTest {
         Long userId = appleUser.getUserId();
 
         // when
-        userDeleteService.deleteUser(userId, "Bearer fake.token");
+        userDeleteService.deleteUser(userId, jwtUtil.createAccessToken(userId));
 
         // then
         verify(appleTokenClient, never()).revokeToken(any());
@@ -90,7 +94,7 @@ class UserDeleteServiceAppleTest {
         Long userId = kakaoUser.getUserId();
 
         // when
-        userDeleteService.deleteUser(userId, "Bearer fake.token");
+        userDeleteService.deleteUser(userId, jwtUtil.createAccessToken(userId));
 
         // then
         verify(appleTokenClient, never()).revokeToken(any());

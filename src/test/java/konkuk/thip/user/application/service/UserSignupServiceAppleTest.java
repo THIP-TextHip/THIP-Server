@@ -41,7 +41,7 @@ class UserSignupServiceAppleTest {
         UserSignupCommand command = UserSignupCommand.builder()
                 .oauth2Id(oauth2Id)
                 .nickname("테스트닉네임")
-                .aliasName(Alias.WRITER.name())
+                .aliasName(Alias.WRITER.getValue())
                 .build();
 
         // when
@@ -61,7 +61,7 @@ class UserSignupServiceAppleTest {
         UserSignupCommand command = UserSignupCommand.builder()
                 .oauth2Id(oauth2Id)
                 .nickname("테스트닉네임2")
-                .aliasName(Alias.WRITER.name())
+                .aliasName(Alias.WRITER.getValue())
                 .build();
 
         // when
@@ -79,7 +79,7 @@ class UserSignupServiceAppleTest {
         UserSignupCommand command = UserSignupCommand.builder()
                 .oauth2Id("kakao_99999")
                 .nickname("카카오유저")
-                .aliasName(Alias.WRITER.name())
+                .aliasName(Alias.WRITER.getValue())
                 .build();
 
         // when
