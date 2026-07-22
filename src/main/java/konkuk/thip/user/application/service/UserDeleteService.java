@@ -57,14 +57,15 @@ public class UserDeleteService implements UserDeleteUseCase {
 
         // 2. 유저 조회 및 검증
         User user = userCommandPort.findById(userId);
-        user.markAsDeleted();
 
-        // Apple 유저라면 Apple refresh_token 철회
+        // Apple 유저라면 markAsDeleted() 전에 oauth2Id 확인 후 refresh_token 철회
         if (user.getOauth2Id() != null && user.getOauth2Id().startsWith("apple_")) {
             userJpaRepository.findByOauth2Id(user.getOauth2Id())
                     .filter(entity -> entity.getAppleRefreshToken() != null)
                     .ifPresent(entity -> appleTokenClient.revokeToken(entity.getAppleRefreshToken()));
         }
+
+        user.markAsDeleted();
 
         // 3. 유저가 남긴 관련 정보들 삭제
         // 팔로잉 관계 삭제

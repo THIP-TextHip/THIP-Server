@@ -43,7 +43,7 @@ public class AppleTokenClient {
                     Map.class
             );
             if (response == null || !response.containsKey("refresh_token")) {
-                log.warn("[Apple] authorizationCode 교환 실패: refresh_token 없음, response={}", response);
+                log.warn("[Apple] authorizationCode 교환 실패: refresh_token 없음");
                 return null;
             }
             return (String) response.get("refresh_token");
