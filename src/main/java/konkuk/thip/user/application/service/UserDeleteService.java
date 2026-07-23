@@ -4,6 +4,7 @@ import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.comment.application.port.out.CommentCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.security.oauth2.apple.AppleTokenClient;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.recentSearch.application.port.out.RecentSearchCommandPort;
@@ -11,6 +12,7 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.roompost.application.port.out.AttendanceCheckCommandPort;
 import konkuk.thip.roompost.application.port.out.RecordCommandPort;
 import konkuk.thip.roompost.application.port.out.VoteCommandPort;
+import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.UserTokenBlacklistCommandPort;
 import konkuk.thip.user.application.port.in.UserDeleteUseCase;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
@@ -27,7 +29,9 @@ import static konkuk.thip.common.exception.code.ErrorCode.USER_CANNOT_DELETE_ROO
 public class UserDeleteService implements UserDeleteUseCase {
 
     private final UserCommandPort userCommandPort;
+    private final UserJpaRepository userJpaRepository;
     private final FollowingCommandPort followingCommandPort;
+    private final AppleTokenClient appleTokenClient;
     private final FeedCommandPort feedCommandPort;
     private final BookCommandPort bookCommandPort;
     private final VoteCommandPort voteCommandPort;
@@ -53,6 +57,14 @@ public class UserDeleteService implements UserDeleteUseCase {
 
         // 2. 유저 조회 및 검증
         User user = userCommandPort.findById(userId);
+
+        // Apple 유저라면 markAsDeleted() 전에 oauth2Id 확인 후 refresh_token 철회
+        if (user.getOauth2Id() != null && user.getOauth2Id().startsWith("apple_")) {
+            userJpaRepository.findByOauth2Id(user.getOauth2Id())
+                    .filter(entity -> entity.getAppleRefreshToken() != null)
+                    .ifPresent(entity -> appleTokenClient.revokeToken(entity.getAppleRefreshToken()));
+        }
+
         user.markAsDeleted();
 
         // 3. 유저가 남긴 관련 정보들 삭제

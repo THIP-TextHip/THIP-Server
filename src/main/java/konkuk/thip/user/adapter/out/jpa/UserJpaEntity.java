@@ -39,6 +39,9 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "oauth2_id", length = 50, nullable = false)
     private String oauth2Id;
 
+    @Column(name = "apple_refresh_token", length = 1000)
+    private String appleRefreshToken;
+
     /**
      * -- SETTER --
      *  회원 탈퇴용
@@ -74,6 +77,10 @@ public class UserJpaEntity extends BaseJpaEntity {
         this.role = UserRole.from(user.getUserRole());
         this.followerCount = user.getFollowerCount();
         this.recordReviewCount = user.getRecordReviewCount();
+    }
+
+    public void updateAppleRefreshToken(String token) {
+        this.appleRefreshToken = token;
     }
 
     public void softDelete(User user) {
