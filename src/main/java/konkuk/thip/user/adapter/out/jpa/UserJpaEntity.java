@@ -36,7 +36,7 @@ public class UserJpaEntity extends BaseJpaEntity {
     @Column(name = "nickname_updated_at", nullable = true) // 회원가입 시에는 null
     private LocalDate nicknameUpdatedAt; // 날짜 형식으로 저장 (예: "2023-10-01")
 
-    @Column(name = "oauth2_id", length = 50, nullable = false)
+    @Column(name = "oauth2_id", length = 100, nullable = false)
     private String oauth2Id;
 
     @Column(name = "apple_refresh_token", length = 1000)
