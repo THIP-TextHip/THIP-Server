@@ -30,6 +30,8 @@ public class NaverApiUtil {
     private String bookDetailSearchUrl;
 
     public static final int PAGE_SIZE = 10;
+    private static final int CONNECT_TIMEOUT_MS = 3_000;
+    private static final int READ_TIMEOUT_MS = 5_000;
 
     public String searchBook(String keyword, int start) {
         return callNaverApi(keyword, start, false);
@@ -50,13 +52,12 @@ public class NaverApiUtil {
         return get(url, requestHeaders);
     }
 
-
-    private String buildSearchApiUrl(String query,Integer start) {
-        return bookSearchUrl+query+"&display="+PAGE_SIZE+"&start="+start;
+    private String buildSearchApiUrl(String query, Integer start) {
+        return bookSearchUrl + query + "&display=" + PAGE_SIZE + "&start=" + start;
     }
 
     private String buildDetailSearchApiUrl(String query) {
-        return bookDetailSearchUrl+query;
+        return bookDetailSearchUrl + query;
     }
 
     private String keywordToEncoding(String keyword) {
@@ -69,12 +70,13 @@ public class NaverApiUtil {
         return text;
     }
 
-
-    String get(String apiUrl, Map<String, String> requestHeaders){
+    String get(String apiUrl, Map<String, String> requestHeaders) {
         HttpURLConnection con = connect(apiUrl);
         try {
+            con.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            con.setReadTimeout(READ_TIMEOUT_MS);
             con.setRequestMethod("GET");
-            for(Map.Entry<String, String> header :requestHeaders.entrySet()) {
+            for (Map.Entry<String, String> header : requestHeaders.entrySet()) {
                 con.setRequestProperty(header.getKey(), header.getValue());
             }
 
@@ -91,11 +93,10 @@ public class NaverApiUtil {
         }
     }
 
-
-    private HttpURLConnection connect(String apiUrl){
+    private HttpURLConnection connect(String apiUrl) {
         try {
             URL url = new URL(apiUrl);
-            return (HttpURLConnection)url.openConnection();
+            return (HttpURLConnection) url.openConnection();
         } catch (MalformedURLException e) {
             throw new InternalServerException(BOOK_NAVER_API_URL_ERROR);
         } catch (IOException e) {
@@ -103,8 +104,7 @@ public class NaverApiUtil {
         }
     }
 
-
-    private String readBody(InputStream body){
+    private String readBody(InputStream body) {
         InputStreamReader streamReader = new InputStreamReader(body);
 
         try (BufferedReader lineReader = new BufferedReader(streamReader)) {
@@ -120,5 +120,4 @@ public class NaverApiUtil {
             throw new ExternalApiException(BOOK_NAVER_API_RESPONSE_ERROR);
         }
     }
-
 }

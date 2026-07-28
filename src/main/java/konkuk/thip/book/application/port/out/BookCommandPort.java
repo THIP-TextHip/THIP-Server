@@ -31,4 +31,7 @@ public interface BookCommandPort {
     void deleteAllByIdInBatch(Set<Long> unusedBookIds);
 
     void deleteAllSavedBookByUserId(Long userId);
+
+    // 알라딘 미등록 book 영구 제외 처리 (스케줄러용)
+    void updateForUnfindable(Book book);
 }

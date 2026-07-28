@@ -5,6 +5,7 @@ import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
 import konkuk.thip.book.adapter.out.persistence.repository.SavedBookJpaRepository;
 import konkuk.thip.book.application.port.out.BookQueryPort;
 import konkuk.thip.book.application.port.out.dto.BookQueryDto;
+import konkuk.thip.book.domain.Book;
 import konkuk.thip.common.util.Cursor;
 import konkuk.thip.common.util.CursorBasedList;
 import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
@@ -67,5 +68,14 @@ public class BookQueryPersistenceAdapter implements BookQueryPort {
     @Override
     public Set<Long> findUnusedBookIds() {
         return bookJpaRepository.findUnusedBookIds();
+    }
+
+    @Override
+    public List<Book> findBooksWithNullPageCountLinkedToRooms() {
+        return bookJpaRepository
+                .findBooksWithNullPageCountLinkedToRooms()
+                .stream()
+                .map(bookMapper::toDomainEntity)
+                .toList();
     }
 }

@@ -1,7 +1,9 @@
 package konkuk.thip.common.exception;
 
 import konkuk.thip.common.exception.code.ErrorCode;
+import lombok.Getter;
 
+@Getter
 public class ExternalApiException extends RuntimeException {
 
     private final ErrorCode errorCode;

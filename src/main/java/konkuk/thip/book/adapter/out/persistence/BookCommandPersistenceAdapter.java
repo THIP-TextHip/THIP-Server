@@ -97,4 +97,13 @@ public class BookCommandPersistenceAdapter implements BookCommandPort {
     public void deleteAllSavedBookByUserId(Long userId) {
         savedBookJpaRepository.deleteAllByUserId(userId);
     }
+
+    @Override
+    public void updateForUnfindable(Book book) {
+        BookJpaEntity bookJpaEntity = bookJpaRepository.findById(book.getId()).orElseThrow(
+                () -> new EntityNotFoundException(BOOK_NOT_FOUND)
+        );
+        bookJpaEntity.markAsUnfindable();
+        bookJpaRepository.save(bookJpaEntity);
+    }
 }

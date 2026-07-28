@@ -39,7 +39,14 @@ public class BookJpaEntity extends BaseJpaEntity {
     @Column(length = 3000)
     private String description;
 
+    @Column(name = "page_count_unfindable", nullable = false)
+    private boolean pageCountUnfindable;
+
     public void changePageCount(Integer pageCount) {
         this.pageCount = pageCount;
+    }
+
+    public void markAsUnfindable() {
+        this.pageCountUnfindable = true;
     }
 }

@@ -1,11 +1,13 @@
 package konkuk.thip.book.adapter.out.api.naver;
 
 import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.ExternalApiException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
+import java.net.ServerSocket;
 
 import static konkuk.thip.common.exception.code.ErrorCode.BOOK_NAVER_API_REQUEST_ERROR;
 import static org.assertj.core.api.Assertions.*;
@@ -67,5 +69,36 @@ class NaverApiUtilTest {
         assertThatThrownBy(() -> naverApiUtil.searchBook("테스트", 1))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(BOOK_NAVER_API_REQUEST_ERROR.getMessage());
+    }
+
+    @Test
+    @DisplayName("네트워크 IOException 발생 시 ExternalApiException으로 변환된다 - 타임아웃 설정 동작 확인")
+    void get_ioException_throwsExternalApiException() throws Exception {
+        // given: 연결 수락 후 즉시 닫는 서버
+        // SocketTimeoutException(타임아웃)과 SocketException(연결 끊김) 모두 IOException을 상속하므로
+        // get() 내부의 catch (IOException e) → ExternalApiException 변환 경로가 동일함
+        try (ServerSocket server = new ServerSocket(0)) {
+            new Thread(() -> {
+                try { server.accept().close(); } catch (Exception ignored) {}
+            }).start();
+
+            // spy 없이 실제 get()을 실행하여 내부 catch 블록까지 동작 검증
+            NaverApiUtil util = new NaverApiUtil();
+            Field urlField = NaverApiUtil.class.getDeclaredField("bookSearchUrl");
+            urlField.setAccessible(true);
+            urlField.set(util, "http://localhost:" + server.getLocalPort() + "/?query=");
+
+            Field clientIdField = NaverApiUtil.class.getDeclaredField("clientId");
+            clientIdField.setAccessible(true);
+            clientIdField.set(util, "dummy");
+
+            Field clientSecretField = NaverApiUtil.class.getDeclaredField("clientSecret");
+            clientSecretField.setAccessible(true);
+            clientSecretField.set(util, "dummy");
+
+            // when & then: IOException → catch → ExternalApiException(BOOK_NAVER_API_REQUEST_ERROR)
+            assertThatThrownBy(() -> util.searchBook("테스트", 1))
+                    .isInstanceOf(ExternalApiException.class);
+        }
     }
 }

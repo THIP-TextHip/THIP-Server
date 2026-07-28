@@ -17,6 +17,7 @@ public class BookMapper {
                 .imageUrl(book.getImageUrl())
                 .pageCount(book.getPageCount())
                 .description(book.getDescription())
+                .pageCountUnfindable(book.isPageCountUnfindable())
                 .build();
     }
 
@@ -31,6 +32,7 @@ public class BookMapper {
                 .imageUrl(bookJpaEntity.getImageUrl())
                 .pageCount(bookJpaEntity.getPageCount())
                 .description(bookJpaEntity.getDescription())
+                .pageCountUnfindable(bookJpaEntity.isPageCountUnfindable())
                 .createdAt(bookJpaEntity.getCreatedAt())
                 .modifiedAt(bookJpaEntity.getModifiedAt())
                 .status(bookJpaEntity.getStatus())
