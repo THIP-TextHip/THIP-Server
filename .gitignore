@@ -124,3 +124,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# monitoring files for local development
+/monitoring/
+

@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import konkuk.thip.comment.adapter.in.web.request.CommentCreateRequest;
+import konkuk.thip.comment.adapter.in.web.request.RootCommentCreateRequest;
+import konkuk.thip.comment.adapter.in.web.request.ChildCommentCreateRequest;
 import konkuk.thip.comment.adapter.in.web.request.CommentIsLikeRequest;
 import konkuk.thip.comment.adapter.in.web.response.CommentDeleteResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentCreateResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIsLikeResponse;
-import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
+import konkuk.thip.comment.application.port.in.RootCommentCreateUseCase;
+import konkuk.thip.comment.application.port.in.ChildCommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.CommentDeleteUseCase;
 import konkuk.thip.comment.application.port.in.CommentLikeUseCase;
 import konkuk.thip.common.dto.BaseResponse;
@@ -25,28 +27,35 @@ import static konkuk.thip.common.swagger.SwaggerResponseDescription.*;
 @RequiredArgsConstructor
 public class CommentCommandController {
 
-    private final CommentCreateUseCase commentCreateUseCase;
+    private final RootCommentCreateUseCase rootCommentCreateUseCase;
+    private final ChildCommentCreateUseCase childCommentCreateUseCase;
     private final CommentLikeUseCase commentLikeUseCase;
     private final CommentDeleteUseCase commentDeleteUseCase;
 
-    /**
-     * 댓글/답글 작성
-     * parentId:{Long},isReplyRequest:true 답글
-     * parentId:null,isReplyRequest:false 댓글
-     */
     @Operation(
-            summary = "댓글 작성",
-            description = "사용자가 댓글을 작성합니다.\n" +
-                    "답글 작성 시 parentId를 지정하고 isReplyRequest를 true로 설정합니다. " +
-                    "댓글 작성 시 parentId는 null로 설정하고 isReplyRequest를 false로 설정합니다."
+            summary = "루트 댓글 작성",
+            description = "특정 게시글에 루트 댓글을 작성합니다."
     )
     @ExceptionDescription(COMMENT_CREATE)
     @PostMapping("/comments/{postId}")
-    public BaseResponse<CommentCreateResponse> createComment(
-            @RequestBody @Valid final CommentCreateRequest request,
+    public BaseResponse<CommentCreateResponse> createRootComment(
+            @RequestBody @Valid final RootCommentCreateRequest request,
             @Parameter(description = "댓글을 작성하려는 게시물 ID", example = "1") @PathVariable("postId") final Long postId,
             @Parameter(hidden = true) @UserId final Long userId) {
-        return BaseResponse.ok(commentCreateUseCase.createComment(request.toCommand(userId,postId)));
+        return BaseResponse.ok(rootCommentCreateUseCase.createRootComment(request.toCommand(userId, postId)));
+    }
+
+    @Operation(
+            summary = "답글 작성",
+            description = "특정 댓글에 답글(자식 댓글)을 작성합니다."
+    )
+    @ExceptionDescription(COMMENT_CREATE)
+    @PostMapping("/comments/replies/{parentCommentId}")
+    public BaseResponse<CommentCreateResponse> createChildComment(
+            @RequestBody @Valid final ChildCommentCreateRequest request,
+            @Parameter(description = "부모 댓글 ID", example = "1") @PathVariable("parentCommentId") final Long parentCommentId,
+            @Parameter(hidden = true) @UserId final Long userId) {
+        return BaseResponse.ok(childCommentCreateUseCase.createChildComment(request.toCommand(userId, parentCommentId)));
     }
 
     @Operation(

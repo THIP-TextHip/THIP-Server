@@ -32,17 +32,9 @@ class CommentTest {
     }
 
     @Test
-    @DisplayName("createComment: 일반 댓글 생성 시 parentId는 null이면 정상적으로 Comment가 생성된다.")
+    @DisplayName("createRootComment: 루트 댓글 생성 시 정상적으로 Comment가 생성된다.")
     void createRootComment_valid() {
-        Comment comment = Comment.createComment(
-                CONTENT,
-                POST_ID,
-                CREATOR_ID,
-                "feed",
-                false,
-                null,
-                null
-        );
+        Comment comment = Comment.createRootComment(CONTENT, POST_ID, CREATOR_ID, FEED);
 
         assertNotNull(comment);
         assertNull(comment.getParentCommentId());
@@ -52,19 +44,11 @@ class CommentTest {
     }
 
     @Test
-    @DisplayName("createComment: 답글 생성 시 parentComment 존재 + 게시글 ID 일치하면 정상적으로 Comment가 생성된다.")
-    void createReplyComment_valid() {
+    @DisplayName("createChildComment: 답글 생성 시 parentComment 존재 + 게시글 ID 일치하면 정상적으로 Comment가 생성된다.")
+    void createChildComment_valid() {
         Comment parent = createParentComment(POST_ID);
 
-        Comment reply = Comment.createComment(
-                "답글입니다.",
-                POST_ID,
-                CREATOR_ID,
-                "feed",
-                true,
-                parent.getId(),
-                parent
-        );
+        Comment reply = Comment.createChildComment("답글입니다.", POST_ID, CREATOR_ID, parent, FEED);
 
         assertNotNull(reply);
         assertEquals(parent.getId(), reply.getParentCommentId());
@@ -72,67 +56,23 @@ class CommentTest {
     }
 
     @Test
-    @DisplayName("createComment: 일반 댓글 생성 시 parentId가 존재하면 InvalidStateException 이 발생한다.")
-    void createRootComment_withParentId_shouldFail() {
-        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> Comment.createComment(
-                CONTENT,
-                POST_ID,
-                CREATOR_ID,
-                "feed",
-                false,
-                99L,
-                null
-        ));
-
-        assertEquals("일반 댓글에는 parentId가 없어야 합니다.", ex.getCause().getMessage());
-    }
-
-    @Test
-    @DisplayName("createComment: 답글 생성 시 parentId가 null이면 InvalidStateException 이 발생한다.")
-    void createReplyComment_missingParentId_shouldFail() {
-        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> Comment.createComment(
-                CONTENT,
-                POST_ID,
-                CREATOR_ID,
-                "feed",
-                true,
-                null,
-                null
-        ));
-
-        assertEquals("답글 작성 시 parentId는 필수입니다.", ex.getCause().getMessage());
-    }
-
-    @Test
-    @DisplayName("createComment: 답글 생성 시 parentComment 가 null 이면 InvalidStateException 이 발생한다.")
-    void createReplyComment_missingParentComment_shouldFail() {
-        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> Comment.createComment(
-                CONTENT,
-                POST_ID,
-                CREATOR_ID,
-                "feed",
-                true,
-                1L,
-                null // parentComment 누락
-        ));
+    @DisplayName("createChildComment: 답글 생성 시 parentComment 가 null 이면 InvalidStateException 이 발생한다.")
+    void createChildComment_missingParentComment_shouldFail() {
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> Comment.createChildComment(CONTENT, POST_ID, CREATOR_ID, null, FEED)
+        );
 
         assertEquals("parentId에 해당하는 부모 댓글이 존재해야 합니다.", ex.getCause().getMessage());
     }
 
     @Test
-    @DisplayName("createComment: 답글 생성 시 부모 댓글과 게시글 ID가 일치하지 않으면 InvalidStateException 이 발생한다.")
-    void createReplyComment_parentPostMismatch_shouldFail() {
+    @DisplayName("createChildComment: 답글 생성 시 부모 댓글과 게시글 ID가 일치하지 않으면 InvalidStateException 이 발생한다.")
+    void createChildComment_parentPostMismatch_shouldFail() {
         Comment parent = createParentComment(999L); // 다른 postId
 
-        InvalidStateException ex = assertThrows(InvalidStateException.class, () -> Comment.createComment(
-                CONTENT,
-                POST_ID,
-                CREATOR_ID,
-                "feed",
-                true,
-                parent.getId(),
-                parent
-        ));
+        InvalidStateException ex = assertThrows(InvalidStateException.class,
+                () -> Comment.createChildComment(CONTENT, POST_ID, CREATOR_ID, parent, FEED)
+        );
 
         assertEquals("댓글과 부모 댓글의 게시글이 일치하지 않습니다.", ex.getCause().getMessage());
     }

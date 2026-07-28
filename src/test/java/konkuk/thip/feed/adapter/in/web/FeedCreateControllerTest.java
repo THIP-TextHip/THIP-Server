@@ -44,7 +44,6 @@ class FeedCreateControllerTest {
         request.put("isbn", "9788954682152");
         request.put("contentBody", "테스트 콘텐츠");
         request.put("isPublic", true);
-        request.put("category", "문학");
         request.put("tagList", List.of(Tag.PHYSICS.getValue(), Tag.CHEMISTRY.getValue()));
         return request;
     }

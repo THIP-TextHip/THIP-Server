@@ -7,7 +7,13 @@ import lombok.*;
 
 
 @Entity
-@Table(name = "comment_likes")
+@Table(
+        name = "comment_likes",
+        indexes = {
+                // 유저별 좋아하는 댓글 목록 복합 인덱스
+                @Index(name = "idx_comment_like_user_comment", columnList = "user_id, comment_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

@@ -6,7 +6,7 @@ import konkuk.thip.post.domain.PostType;
 public record CommentShowAllQuery(
         Long postId,
         Long userId,
-        PostType postType,
+        PostType postType,      // PostType : 유효성 검사용
         String cursorStr
 ) {
     public static CommentShowAllQuery of(Long postId, Long userId, String postTypeStr, String cursorStr) {

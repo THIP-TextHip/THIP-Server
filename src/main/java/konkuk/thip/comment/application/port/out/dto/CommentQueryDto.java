@@ -18,7 +18,8 @@ public record CommentQueryDto(
         LocalDateTime createdAt,    // 댓글 작성 시각
         String content,
         int likeCount,
-        Boolean isDeleted
+        Boolean isDeleted,
+        int descendantCount  // 자식 댓글 수 (루트 댓글만 사용, 자식 댓글은 0)
 ) {
     /**
      * child comment
@@ -38,7 +39,7 @@ public record CommentQueryDto(
     ) {
         this(commentId, parentCommentId, parentCommentCreatorNickname, creatorId, creatorAlias.getImageUrl(),
                 creatorNickname, creatorAlias.getValue(), creatorAlias.getColor(),
-                createdAt, content, likeCount, isDeleted);
+                createdAt, content, likeCount, isDeleted, 0);  // 자식 댓글은 descendantCount 0
     }
 
     /**
@@ -53,10 +54,11 @@ public record CommentQueryDto(
             LocalDateTime createdAt,    // 댓글 작성 시각
             String content,
             int likeCount,
-            boolean isDeleted
+            boolean isDeleted,
+            int descendantCount
     ) {
         this(commentId, null, null, creatorId, creatorAlias.getImageUrl(),
                 creatorNickname, creatorAlias.getValue(), creatorAlias.getColor(),
-                createdAt, content, likeCount, isDeleted);
+                createdAt, content, likeCount, isDeleted, descendantCount);
     }
 }

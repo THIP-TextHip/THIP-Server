@@ -3,7 +3,6 @@ package konkuk.thip.comment.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import konkuk.thip.book.adapter.out.jpa.BookJpaEntity;
 import konkuk.thip.book.adapter.out.persistence.repository.BookJpaRepository;
-import konkuk.thip.comment.adapter.out.persistence.repository.CommentJpaRepository;
 import konkuk.thip.common.util.TestEntityFactory;
 import konkuk.thip.feed.adapter.out.jpa.FeedJpaEntity;
 import konkuk.thip.feed.adapter.out.persistence.repository.FeedJpaRepository;
@@ -34,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
-import static konkuk.thip.post.domain.PostType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,9 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 @Transactional
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@DisplayName("[통합] 댓글 생성 api 통합 테스트")
-class CommentCreateApiTest {
+@DisplayName("[통합] 루트 댓글 생성 API 통합 테스트")
+class RootCommentCreateApiTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,46 +53,73 @@ class CommentCreateApiTest {
     @Autowired private FeedJpaRepository feedJpaRepository;
     @Autowired private VoteJpaRepository voteJpaRepository;
     @Autowired private RecordJpaRepository recordJpaRepository;
-    @Autowired private CommentJpaRepository commentJpaRepository;
     @Autowired private RoomJpaRepository roomJpaRepository;
     @Autowired private RoomParticipantJpaRepository roomParticipantJpaRepository;
 
-    private Alias alias;
     private UserJpaEntity user;
-    private Category category;
     private FeedJpaEntity feed;
-    private BookJpaEntity book;
     private RecordJpaEntity record;
     private VoteJpaEntity vote;
-    private RoomJpaEntity room;
 
     @BeforeEach
     void setUp() {
-        alias = TestEntityFactory.createLiteratureAlias();
+        Alias alias = TestEntityFactory.createLiteratureAlias();
         user = userJpaRepository.save(TestEntityFactory.createUser(alias));
-        category = TestEntityFactory.createLiteratureCategory();
-        book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
-        room = roomJpaRepository.save(TestEntityFactory.createRoom(book,category));
-        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user,book, true));
-        record = recordJpaRepository.save(TestEntityFactory.createRecord(user,room));
-        vote = voteJpaRepository.save(TestEntityFactory.createVote(user,room));
+        Category category = TestEntityFactory.createLiteratureCategory();
+        BookJpaEntity book = bookJpaRepository.save(TestEntityFactory.createBookWithISBN("9788954682152"));
+        RoomJpaEntity room = roomJpaRepository.save(TestEntityFactory.createRoom(book, category));
+        feed = feedJpaRepository.save(TestEntityFactory.createFeed(user, book, true));
+        record = recordJpaRepository.save(TestEntityFactory.createRecord(user, room));
+        vote = voteJpaRepository.save(TestEntityFactory.createVote(user, room));
         roomParticipantJpaRepository.save(TestEntityFactory.createRoomParticipant(room, user, RoomParticipantRole.HOST, 0.0));
     }
 
-    // 공통 JSON 생성 함수
-    private String toJson(String content, boolean isReply, Long parentId, String postType) throws Exception {
+    private String toRootCommentJson(String content, String postType) throws Exception {
         Map<String, Object> req = new HashMap<>();
         req.put("content", content);
-        req.put("isReplyRequest", isReply);
-        req.put("parentId", parentId);
         req.put("postType", postType);
         return objectMapper.writeValueAsString(req);
     }
 
     @Test
-    @DisplayName("각 게시물 타입별로 존재하는 게시물에 대해 (루트)댓글 생성을 할 수 있다.")
-    void createRootCommentEachPostType() throws Exception {
+    @DisplayName("Feed 게시물에 루트 댓글을 생성할 수 있다.")
+    void createRootCommentOnFeed() throws Exception {
+        // given & when & then
+        mockMvc.perform(post("/comments/{postId}", feed.getPostId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toRootCommentJson("피드에 루트 댓글입니다", "feed"))
+                        .requestAttr("userId", user.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.commentId").exists());
+    }
 
+    @Test
+    @DisplayName("Record 게시물에 루트 댓글을 생성할 수 있다.")
+    void createRootCommentOnRecord() throws Exception {
+        // given & when & then
+        mockMvc.perform(post("/comments/{postId}", record.getPostId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toRootCommentJson("기록에 루트 댓글입니다", "record"))
+                        .requestAttr("userId", user.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.commentId").exists());
+    }
+
+    @Test
+    @DisplayName("Vote 게시물에 루트 댓글을 생성할 수 있다.")
+    void createRootCommentOnVote() throws Exception {
+        // given & when & then
+        mockMvc.perform(post("/comments/{postId}", vote.getPostId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toRootCommentJson("투표에 루트 댓글입니다", "vote"))
+                        .requestAttr("userId", user.getUserId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.commentId").exists());
+    }
+
+    @Test
+    @DisplayName("각 게시물 타입별로 루트 댓글을 생성할 수 있다.")
+    void createRootCommentEachPostType() throws Exception {
         // given
         String[] postTypes = {"feed", "record", "vote"};
         Long[] postIds = {feed.getPostId(), record.getPostId(), vote.getPostId()};
@@ -104,41 +128,10 @@ class CommentCreateApiTest {
         for (int i = 0; i < postTypes.length; i++) {
             mockMvc.perform(post("/comments/{postId}", postIds[i])
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(toJson("루트 댓글입니다", false, null, postTypes[i]))
+                            .content(toRootCommentJson("루트 댓글입니다", postTypes[i]))
                             .requestAttr("userId", user.getUserId()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.commentId").exists());
         }
     }
-
-
-    @Test
-    @DisplayName("각 게시물 타입별로 존재하는 게시물 및 댓글에 대해 답글 생성을 할 수 있다.")
-    void createReplyCommentEachPostType() throws Exception {
-
-        // given
-        //부모 댓글 생성
-        Long feedParentId = commentJpaRepository.save(TestEntityFactory.createComment(feed,user, FEED)).getCommentId();
-        Long recordParentId = commentJpaRepository.save(TestEntityFactory.createComment(record,user,RECORD)).getCommentId();
-        Long voteParentId = commentJpaRepository.save(TestEntityFactory.createComment(vote,user,VOTE)).getCommentId();
-
-        // 답글 생성 요청
-        Map<String, Object>[] replyRequests = new Map[]{
-                Map.of("content", "Feed 답글", "isReplyRequest", true, "parentId", feedParentId, "postType", "feed"),
-                Map.of("content", "Record 답글", "isReplyRequest", true, "parentId", recordParentId, "postType", "record"),
-                Map.of("content", "Vote 답글", "isReplyRequest", true, "parentId", voteParentId, "postType", "vote")
-        };
-
-        Long[] postIds = {feed.getPostId(), record.getPostId(), vote.getPostId()};
-
-        for (int i = 0; i < replyRequests.length; i++) {
-            mockMvc.perform(post("/comments/{postId}", postIds[i])
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(replyRequests[i]))
-                            .requestAttr("userId", user.getUserId()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.commentId").exists());
-        }
-    }
-
 }

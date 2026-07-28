@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("[통합] 댓글 조회 api 통합 테스트")
 @Transactional
-class CommentShowAllApiTest {
+class RootCommentShowApiTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private UserJpaRepository userJpaRepository;
@@ -51,7 +51,7 @@ class CommentShowAllApiTest {
     private static final String FEED_POST_TYPE = PostType.FEED.getType();
 
     @Test
-    @DisplayName("댓글 조회 요청에 대하여, 특정 게시글(= 피드, 기록, 투표)의 루트 댓글, 루트 댓글의 모든 자식 댓글의 데이터를 구분하여 반환한다.")
+    @DisplayName("댓글 조회 요청에 대하여, 특정 게시글(= 피드, 기록, 투표)의 루트 댓글만 반환하고, 자식 댓글 수(descendantCount)를 포함한다.")
     void comment_show_all_test() throws Exception {
         //given
         Alias a0 = TestEntityFactory.createScienceAlias();
@@ -81,6 +81,11 @@ class CommentShowAllApiTest {
                 "UPDATE comments SET created_at = ? WHERE comment_id = ?",
                 Timestamp.valueOf(base.minusMinutes(30)), comment1_1.getCommentId());
 
+        // descendantCount 업데이트 (자식 댓글 1개)
+        jdbcTemplate.update(
+                "UPDATE comments SET descendant_count = 1 WHERE comment_id = ?",
+                comment1.getCommentId());
+
         //when //then
         mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
                         .requestAttr("userId", me.getUserId())
@@ -88,26 +93,20 @@ class CommentShowAllApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.commentList", hasSize(1)))
                 /**
-                 * 루트 댓글 : 댓글 정보, 댓글 작성자 정보, 좋아요 수, 삭제된 댓글 여부 등을 반환한다
-                 * 자식 댓글 : 부모 댓글의 작성자 정보(@ 표시를 위함), 댓글 정보, 댓글 작성자 정보, 좋아요 수 등을 반환한다
+                 * 루트 댓글 : 댓글 정보, 댓글 작성자 정보, 좋아요 수, 삭제된 댓글 여부, 자식 댓글 수 등을 반환한다
+                 * 자식 댓글 리스트는 반환하지 않는다 (별도 API로 조회)
                  */
                 .andExpect(jsonPath("$.data.commentList[0].commentId", is(comment1.getCommentId().intValue())))
                 .andExpect(jsonPath("$.data.commentList[0].creatorNickname", is(user1.getNickname())))
                 .andExpect(jsonPath("$.data.commentList[0].content", is(comment1.getContent())))
                 .andExpect(jsonPath("$.data.commentList[0].likeCount", is(comment1.getLikeCount())))
                 .andExpect(jsonPath("$.data.commentList[0].isLike", is(true)))  // me가 comment1을 좋아함
-                .andExpect(jsonPath("$.data.commentList[0].replyList", hasSize(1)))  // 자식 댓글 1개 존재
-
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].parentCommentCreatorNickname", is(user1.getNickname())))    // comment1_1의 부모 댓글(= comment1) 의 작성자 = user1
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].commentId", is(comment1_1.getCommentId().intValue())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].creatorNickname", is(me.getNickname())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].content", is(comment1_1.getContent())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].likeCount", is(comment1_1.getLikeCount())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].isLike", is(false)));    // me가 comment1_1을 좋아하지 않음
+                .andExpect(jsonPath("$.data.commentList[0].isDeleted", is(false)))
+                .andExpect(jsonPath("$.data.commentList[0].descendantCount", is(1)));  // 자식 댓글 1개
     }
 
     @Test
-    @DisplayName("루트 댓글은 최신순, 루트 댓글의 모든 자식 댓글은 작성 시각순으로 정렬하여 반환한다.")
+    @DisplayName("루트 댓글은 최신순으로 정렬하여 반환하고, 각 루트 댓글의 자식 댓글 수(descendantCount)를 포함한다.")
     void comment_show_all_ordering_test() throws Exception {
         //given
         Alias a0 = TestEntityFactory.createScienceAlias();
@@ -149,6 +148,10 @@ class CommentShowAllApiTest {
                 "UPDATE comments SET created_at = ? WHERE comment_id = ?",
                 Timestamp.valueOf(base.minusMinutes(5)), comment1_1_1.getCommentId());
 
+        // descendantCount 업데이트 (comment1은 자식 댓글 3개, comment2는 0개)
+        jdbcTemplate.update(
+                "UPDATE comments SET descendant_count = 3 WHERE comment_id = ?",
+                comment1.getCommentId());
 
         //when //then
         mockMvc.perform(get("/comments/{postId}", f1.getPostId().intValue())
@@ -157,29 +160,19 @@ class CommentShowAllApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.commentList", hasSize(2)))
                 /**
-                 * 정렬 조건
-                 * 게시글에 바로 달린 댓글들(= 루트 댓글) : 최신순 정렬
-                 * 루트 댓글의 모든 하위 댓글들 : 작성 시간 순 정렬 (최신순 역순)
+                 * 정렬 조건: 게시글에 바로 달린 댓글들(= 루트 댓글)은 최신순 정렬
+                 * 루트 댓글의 자식 댓글 리스트는 반환하지 않고, descendantCount만 반환
                  */
-                // 루트 댓글 정렬 확인
+                // 루트 댓글 정렬 확인 (최신순: comment2 -> comment1)
                 .andExpect(jsonPath("$.data.commentList[0].commentId", is(comment2.getCommentId().intValue())))
+                .andExpect(jsonPath("$.data.commentList[0].descendantCount", is(0)))     // comment2는 자식 댓글 없음
+
                 .andExpect(jsonPath("$.data.commentList[1].commentId", is(comment1.getCommentId().intValue())))
-                // 루트 댓글의 모든 자식 댓글 정렬 확인
-                .andExpect(jsonPath("$.data.commentList[0].replyList", hasSize(0)))     // comment2 는 자식 댓글 없음
-                .andExpect(jsonPath("$.data.commentList[1].replyList", hasSize(3)))     // comment1 은 총 3개의 자식 댓글 있음
-
-                .andExpect(jsonPath("$.data.commentList[1].replyList[0].commentId", is(comment1_1.getCommentId().intValue())))
-                .andExpect(jsonPath("$.data.commentList[1].replyList[0].parentCommentCreatorNickname", is(user1.getNickname())))    // comment1_1의 부모 댓글(= comment1) 작성자 = user1
-
-                .andExpect(jsonPath("$.data.commentList[1].replyList[1].commentId", is(comment1_2.getCommentId().intValue())))
-                .andExpect(jsonPath("$.data.commentList[1].replyList[1].parentCommentCreatorNickname", is(user1.getNickname())))    // comment1_1의 부모 댓글(= comment1) 작성자 = user1
-
-                .andExpect(jsonPath("$.data.commentList[1].replyList[2].commentId", is(comment1_1_1.getCommentId().intValue())))
-                .andExpect(jsonPath("$.data.commentList[1].replyList[2].parentCommentCreatorNickname", is(user3.getNickname())));   // comment1_1_1의 부모 댓글(= comment1_1) 작성자 = user3
+                .andExpect(jsonPath("$.data.commentList[1].descendantCount", is(3)));    // comment1은 총 3개의 자식 댓글
     }
 
     @Test
-    @DisplayName("삭제된 루트 댓글의 경우, 자식 댓글이 있으면 반환하고, 없으면 반환하지 않는다.")
+    @DisplayName("삭제된 루트 댓글의 경우, 자식 댓글 개수가 0보다 크면 쓰레기 값으로 반환하고, 0이면 응답에서 제외한다.")
     void comment_show_all_deleted_root_comment_test() throws Exception {
         //given
         Alias a0 = TestEntityFactory.createScienceAlias();
@@ -191,9 +184,9 @@ class CommentShowAllApiTest {
         // 피드, 댓글, 자식 댓글 생성 및 생성일 직접 설정
         LocalDateTime base = LocalDateTime.now();
         FeedJpaEntity f1 = feedJpaRepository.save(TestEntityFactory.createFeed(me, book, true, 10, 5, List.of()));
+        CommentJpaEntity comment2 = commentJpaRepository.save(TestEntityFactory.createComment(f1, user1, PostType.FEED, "댓글2", 5));
         CommentJpaEntity comment1 = commentJpaRepository.save(TestEntityFactory.createComment(f1, user1, PostType.FEED, "댓글1", 5));
         CommentJpaEntity comment1_1 = commentJpaRepository.save(TestEntityFactory.createReplyComment(f1, me, PostType.FEED, comment1, "댓글1_답글1", 8));
-        CommentJpaEntity comment2 = commentJpaRepository.save(TestEntityFactory.createComment(f1, user1, PostType.FEED, "댓글2", 5));
 
         feedJpaRepository.flush();
         jdbcTemplate.update(
@@ -203,17 +196,20 @@ class CommentShowAllApiTest {
         commentJpaRepository.flush();
         jdbcTemplate.update(
                 "UPDATE comments SET created_at = ? WHERE comment_id = ?",
-                Timestamp.valueOf(base.minusMinutes(40)), comment1.getCommentId());
+                Timestamp.valueOf(base.minusMinutes(40)), comment2.getCommentId());
         jdbcTemplate.update(
                 "UPDATE comments SET created_at = ? WHERE comment_id = ?",
-                Timestamp.valueOf(base.minusMinutes(30)), comment1_1.getCommentId());
-
-        // comment1, 2 soft delete
+                Timestamp.valueOf(base.minusMinutes(30)), comment1.getCommentId());
         jdbcTemplate.update(
-                "UPDATE comments SET status = 'INACTIVE' WHERE comment_id = ?",
+                "UPDATE comments SET created_at = ? WHERE comment_id = ?",
+                Timestamp.valueOf(base.minusMinutes(20)), comment1_1.getCommentId());
+
+        // comment1, comment2 soft delete (descendantCount는 업데이트하지 않고 테스트)
+        jdbcTemplate.update(
+                "UPDATE comments SET status = 'INACTIVE', descendant_count = 1 WHERE comment_id = ?",
                 comment1.getCommentId());
         jdbcTemplate.update(
-                "UPDATE comments SET status = 'INACTIVE' WHERE comment_id = ?",
+                "UPDATE comments SET status = 'INACTIVE', descendant_count = 0 WHERE comment_id = ?",
                 comment2.getCommentId());
 
         //when //then
@@ -221,23 +217,17 @@ class CommentShowAllApiTest {
                         .requestAttr("userId", me.getUserId())
                         .param("postType", FEED_POST_TYPE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.commentList", hasSize(1)))      // comment1 만 조회된다
+                .andExpect(jsonPath("$.data.commentList", hasSize(1)))      // comment1만 조회됨 (descendantCount > 0), comment2는 제외 (descendantCount == 0)
                 /**
-                 * 루트 댓글 :
-                 * 자식 댓글 : 부모 댓글의 작성자 정보(@ 표시를 위함), 댓글 정보, 댓글 작성자 정보, 좋아요 수 등을 반환한다
+                 * 삭제된 루트 댓글 처리:
+                 * - descendantCount > 0: 쓰레기 값으로 반환 (isDeleted=true, descendantCount=실제값, 나머지는 null)
+                 * - descendantCount == 0: 응답에서 제외
                  */
                 .andExpect(jsonPath("$.data.commentList[0].commentId", nullValue()))
                 .andExpect(jsonPath("$.data.commentList[0].creatorNickname", nullValue()))
                 .andExpect(jsonPath("$.data.commentList[0].content", nullValue()))
                 .andExpect(jsonPath("$.data.commentList[0].isDeleted", is(true)))
-                .andExpect(jsonPath("$.data.commentList[0].replyList", hasSize(1)))  // 자식 댓글 1개 존재
-
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].parentCommentCreatorNickname", is(user1.getNickname())))    // comment1_1의 부모 댓글(= comment1) 의 작성자 = user1
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].commentId", is(comment1_1.getCommentId().intValue())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].creatorNickname", is(me.getNickname())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].content", is(comment1_1.getContent())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].likeCount", is(comment1_1.getLikeCount())))
-                .andExpect(jsonPath("$.data.commentList[0].replyList[0].isLike", is(false)));    // me가 comment1_1을 좋아하지 않음
+                .andExpect(jsonPath("$.data.commentList[0].descendantCount", is(1)));  // 자식 댓글 1개 (실제 값)
     }
 
     @Test
@@ -318,12 +308,14 @@ class CommentShowAllApiTest {
                 .andExpect(jsonPath("$.data.isLast", is(false)))
                 .andExpect(jsonPath("$.data.commentList", hasSize(10)))
                 /**
-                 * 루트 댓글 : 댓글 정보, 댓글 작성자 정보, 좋아요 수, 삭제된 댓글 여부 등을 반환한다
-                 * 자식 댓글 : 부모 댓글의 작성자 정보(@ 표시를 위함), 댓글 정보, 댓글 작성자 정보, 좋아요 수 등을 반환한다
+                 * 루트 댓글만 반환, 자식 댓글 리스트는 포함하지 않음
+                 * descendantCount는 모두 0 (자식 댓글이 없음)
                  */
-                // 루트 댓글 정렬 확인
+                // 루트 댓글 정렬 확인 (최신순)
                 .andExpect(jsonPath("$.data.commentList[0].commentId", is(comment12.getCommentId().intValue())))
+                .andExpect(jsonPath("$.data.commentList[0].descendantCount", is(0)))
                 .andExpect(jsonPath("$.data.commentList[1].commentId", is(comment11.getCommentId().intValue())))
+                .andExpect(jsonPath("$.data.commentList[1].descendantCount", is(0)))
                 .andExpect(jsonPath("$.data.commentList[2].commentId", is(comment10.getCommentId().intValue())))
                 .andExpect(jsonPath("$.data.commentList[3].commentId", is(comment9.getCommentId().intValue())))
                 .andExpect(jsonPath("$.data.commentList[4].commentId", is(comment8.getCommentId().intValue())))
@@ -346,11 +338,12 @@ class CommentShowAllApiTest {
                 .andExpect(jsonPath("$.data.isLast", is(true)))
                 .andExpect(jsonPath("$.data.commentList", hasSize(2)))
                 /**
-                 * 루트 댓글 : 댓글 정보, 댓글 작성자 정보, 좋아요 수, 삭제된 댓글 여부 등을 반환한다
-                 * 자식 댓글 : 부모 댓글의 작성자 정보(@ 표시를 위함), 댓글 정보, 댓글 작성자 정보, 좋아요 수 등을 반환한다
+                 * 루트 댓글만 반환, descendantCount 포함
                  */
                 // 루트 댓글 정렬 확인
                 .andExpect(jsonPath("$.data.commentList[0].commentId", is(comment2.getCommentId().intValue())))
-                .andExpect(jsonPath("$.data.commentList[1].commentId", is(comment1.getCommentId().intValue())));
+                .andExpect(jsonPath("$.data.commentList[0].descendantCount", is(0)))
+                .andExpect(jsonPath("$.data.commentList[1].commentId", is(comment1.getCommentId().intValue())))
+                .andExpect(jsonPath("$.data.commentList[1].descendantCount", is(0)));
     }
 }

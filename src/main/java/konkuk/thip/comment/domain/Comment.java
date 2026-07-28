@@ -26,11 +26,24 @@ public class Comment extends BaseDomainEntity {
     @Builder.Default
     private int likeCount = 0;
 
+    /**
+     * 루트 댓글에서만 의미있는 값
+     */
+    @Builder.Default
+    private int descendantCount = 0;
+
     private Long targetPostId;
 
     private Long creatorId;
 
     private Long parentCommentId;
+
+    /**
+     * PersistenceAdapter 에서 Comment -> CommentJpaEntity 변환 시에 rootCommentId 값 세팅
+     * 코드 수정 최소화를 위해 Builder Default 로 null 설정
+     */
+    @Builder.Default
+    private Long rootCommentId = null;
 
     private PostType postType;
 
@@ -47,28 +60,11 @@ public class Comment extends BaseDomainEntity {
         return Objects.hash(id);
     }
 
-
-    public static Comment createComment(String content, Long postId, Long creatorId, String type,
-                                 boolean isReplyRequest, Long parentId, Comment parent) {
-
-        // 댓글/답글 생성 검증
-        validateCommentCreate(isReplyRequest,parentId);
-        PostType postType = PostType.from(type);
-
-        if (isReplyRequest) {
-            // 답글 생성 검증
-            validateReplyCommentCreate(postId, parent);
-            return withoutIdReplyComment(content, postId, creatorId, parent, postType);
-        }
-        return withoutIdRootComment(content, postId, creatorId, postType);
-    }
-
-
-    private static Comment withoutIdRootComment(String content, Long targetPostId, Long creatorId, PostType postType) {
+    public static Comment createRootComment(String content, Long postId, Long creatorId, PostType postType) {
         return Comment.builder()
                 .id(null)
                 .content(content)
-                .targetPostId(targetPostId)
+                .targetPostId(postId)
                 .creatorId(creatorId)
                 .parentCommentId(null)
                 .postType(postType)
@@ -77,11 +73,12 @@ public class Comment extends BaseDomainEntity {
                 .build();
     }
 
-    private static Comment withoutIdReplyComment(String content, Long targetPostId, Long creatorId, Comment parentComment, PostType postType) {
+    public static Comment createChildComment(String content, Long postId, Long creatorId, Comment parentComment, PostType postType) {
+        validateParentComment(postId, parentComment);
         return Comment.builder()
                 .id(null)
                 .content(content)
-                .targetPostId(targetPostId)
+                .targetPostId(postId)
                 .creatorId(creatorId)
                 .parentCommentId(parentComment.getId())
                 .postType(postType)
@@ -90,26 +87,14 @@ public class Comment extends BaseDomainEntity {
                 .build();
     }
 
-    private static void validateReplyCommentCreate(Long targetPostId, Comment parentComment) {
+    private static void validateParentComment(Long targetPostId, Comment parentComment) {
         if (parentComment == null) {
             throw new InvalidStateException(
-                    INVALID_COMMENT_CREATE,new IllegalArgumentException("parentId에 해당하는 부모 댓글이 존재해야 합니다."));
+                    INVALID_COMMENT_CREATE, new IllegalArgumentException("parentId에 해당하는 부모 댓글이 존재해야 합니다."));
         }
         if (!targetPostId.equals(parentComment.getTargetPostId())) {
             throw new InvalidStateException(
-                    INVALID_COMMENT_CREATE,new IllegalArgumentException("댓글과 부모 댓글의 게시글이 일치하지 않습니다."));
-        }
-    }
-
-    public static void validateCommentCreate(boolean isReplyRequest, Long parentId) {
-        if (isReplyRequest && parentId == null) {
-            throw new InvalidStateException(
-                    INVALID_COMMENT_CREATE, new IllegalArgumentException("답글 작성 시 parentId는 필수입니다."));
-
-        }
-        if (!isReplyRequest && parentId != null) {
-            throw new InvalidStateException(
-                    INVALID_COMMENT_CREATE, new IllegalArgumentException("일반 댓글에는 parentId가 없어야 합니다."));
+                    INVALID_COMMENT_CREATE, new IllegalArgumentException("댓글과 부모 댓글의 게시글이 일치하지 않습니다."));
         }
     }
 
