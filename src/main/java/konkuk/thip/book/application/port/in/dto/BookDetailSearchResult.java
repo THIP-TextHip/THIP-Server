@@ -1,22 +1,22 @@
 package konkuk.thip.book.application.port.in.dto;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
+import konkuk.thip.book.adapter.out.api.dto.BookDetailResult;
 
 
 public record BookDetailSearchResult(
-        NaverDetailBookParseResult naverDetailBook,
+        BookDetailResult bookDetail,
         int recruitingRoomCount,
         int readCount,
         boolean isSaved
 
 )
 {
-    public static BookDetailSearchResult of(NaverDetailBookParseResult naverDetailBook ,
+    public static BookDetailSearchResult of(BookDetailResult bookDetail,
                                                  int recruitingRoomCount,
                                                  int readCount,
                                                  boolean isSaved) {
         return new BookDetailSearchResult(
-                naverDetailBook,
+                bookDetail,
                 recruitingRoomCount,
                 readCount,
                 isSaved);

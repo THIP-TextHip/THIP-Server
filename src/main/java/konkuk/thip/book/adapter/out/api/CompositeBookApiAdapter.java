@@ -1,9 +1,9 @@
 package konkuk.thip.book.adapter.out.api;
 
 import konkuk.thip.book.adapter.out.api.aladin.AladinApiClient;
-import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
-import konkuk.thip.book.adapter.out.api.naver.NaverApiClient;
+import konkuk.thip.book.adapter.out.api.aladin.AladinApiUtil;
+import konkuk.thip.book.adapter.out.api.dto.BookSearchResult;
+import konkuk.thip.book.adapter.out.api.dto.BookDetailResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.domain.Book;
 import lombok.RequiredArgsConstructor;
@@ -13,17 +13,16 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CompositeBookApiAdapter implements BookApiQueryPort {
 
-    private final NaverApiClient naverApiClient;
     private final AladinApiClient aladinApiClient;
 
     @Override
-    public NaverBookParseResult findBooksByKeyword(String keyword, int start) {
-        return naverApiClient.findBooksByKeyword(keyword, start);
+    public BookSearchResult findBooksByKeyword(String keyword, int start) {
+        return aladinApiClient.findBooksByKeyword(keyword, start);
     }
 
     @Override
-    public NaverDetailBookParseResult findDetailBookByIsbn(String isbn) {
-        return naverApiClient.findDetailBookByIsbn(isbn);
+    public BookDetailResult findDetailBookByIsbn(String isbn) {
+        return aladinApiClient.findDetailBookByIsbn(isbn);
     }
 
     @Override
@@ -33,22 +32,19 @@ public class CompositeBookApiAdapter implements BookApiQueryPort {
 
     @Override
     public Book loadBookWithPageByIsbn(String isbn) {
-        // 1. naver 상세정보 조회 api 로 책 상세정보(without page) load
-        NaverDetailBookParseResult detailBookByKeyword = findDetailBookByIsbn(isbn);
+        // 상세정보 + page 정보를 알라딘 ItemLookUp 한 번의 호출로 함께 조회
+        AladinApiUtil.AladinDetailResult result = aladinApiClient.findDetailBookWithPageCountByIsbn(isbn);
+        BookDetailResult detail = result.detail();
 
-        // 2. 알라딘으로부터 책 page 정보 load
-        Integer pageCount = findPageCountByIsbn(isbn);
-
-        // 3. pageCount 정보를 포함한 Book 반환
         return Book.withoutId(
-                detailBookByKeyword.title(),
+                detail.title(),
                 isbn,
-                detailBookByKeyword.author(),
+                detail.author(),
                 false,      // TODO : 추후 BestSeller 도입되면 고려해야함
-                detailBookByKeyword.publisher(),
-                detailBookByKeyword.imageUrl(),
-                pageCount,
-                detailBookByKeyword.description()
+                detail.publisher(),
+                detail.imageUrl(),
+                result.pageCount(),
+                detail.description()
         );
     }
 }

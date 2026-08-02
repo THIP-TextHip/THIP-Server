@@ -1,6 +1,5 @@
 package konkuk.thip.feed.application.service;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
 import konkuk.thip.book.domain.Book;
@@ -76,7 +75,7 @@ public class FeedCreateService implements FeedCreateUseCase {
     }
 
     /**
-     * ISBN으로 책을 조회하고, 없으면 외부 API(Naver)에서 상세 정보를 조회해 새로 저장 후 ID 반환
+     * ISBN으로 책을 조회하고, 없으면 외부 API에서 상세 정보(+페이지 수)를 조회해 새로 저장 후 ID 반환
      */
     private Long findOrCreateBookByIsbn(String isbn) {
         return bookCommandPort.findByIsbn(isbn)
@@ -85,19 +84,10 @@ public class FeedCreateService implements FeedCreateUseCase {
     }
 
     /**
-     * 외부 API(Naver)를 통해 상세 책 정보를 조회하고 Book 도메인으로 저장
+     * 외부 API를 통해 상세 책 정보와 페이지 수를 함께 조회하여 Book 도메인으로 저장
      */
     private Long saveNewBookWithFromExternalApi(String isbn) {
-        NaverDetailBookParseResult detailBookByKeyword = bookApiQueryPort.findDetailBookByIsbn(isbn);
-        Book newBook = Book.withoutId(
-                detailBookByKeyword.title(),
-                detailBookByKeyword.isbn(),
-                detailBookByKeyword.author(),
-                false,  // TODO : 추후 BestSeller 도입 시 로직 수정
-                detailBookByKeyword.publisher(),
-                detailBookByKeyword.imageUrl(),
-                null,
-                detailBookByKeyword.description());
+        Book newBook = bookApiQueryPort.loadBookWithPageByIsbn(isbn);
         return bookCommandPort.save(newBook);
     }
 }

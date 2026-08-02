@@ -1,6 +1,6 @@
 package konkuk.thip.book.application.service;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
+import konkuk.thip.book.adapter.out.api.dto.BookDetailResult;
 import konkuk.thip.book.application.port.in.dto.BookMostSearchResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
 import konkuk.thip.book.application.port.out.BookCommandPort;
@@ -64,13 +64,13 @@ public class BookMostSearchRankService {
                                         .build()
                         ),
                         () -> {
-                            // DB에 없으면 Naver API에서 상세 정보 조회
-                            NaverDetailBookParseResult naverResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
+                            // DB에 없으면 외부 API에서 상세 정보 조회
+                            BookDetailResult bookDetail = bookApiQueryPort.findDetailBookByIsbn(isbn);
                             bookRankDetails.add(
                                     BookMostSearchResult.BookRankInfo.builder()
                                             .rank(rank.getAndIncrement())
-                                            .title(naverResult.title())
-                                            .imageUrl(naverResult.imageUrl())
+                                            .title(bookDetail.title())
+                                            .imageUrl(bookDetail.imageUrl())
                                             .isbn(isbn)
                                             .build()
                             );
