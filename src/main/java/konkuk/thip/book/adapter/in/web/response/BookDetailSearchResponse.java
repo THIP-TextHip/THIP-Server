@@ -18,12 +18,12 @@ public record BookDetailSearchResponse(
     public static BookDetailSearchResponse of(BookDetailSearchResult result) {
 
         return new BookDetailSearchResponse(
-                result.naverDetailBook().title(),
-                result.naverDetailBook().imageUrl(),
-                result.naverDetailBook().author(),
-                result.naverDetailBook().publisher(),
-                result.naverDetailBook().isbn(),
-                result.naverDetailBook().description(),
+                result.bookDetail().title(),
+                result.bookDetail().imageUrl(),
+                result.bookDetail().author(),
+                result.bookDetail().publisher(),
+                result.bookDetail().isbn(),
+                result.bookDetail().description(),
                 result.recruitingRoomCount(),
                 result.readCount(),
                 result.isSaved());

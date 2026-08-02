@@ -1,7 +1,7 @@
 package konkuk.thip.book.application.service;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
+import konkuk.thip.book.adapter.out.api.dto.BookSearchResult;
+import konkuk.thip.book.adapter.out.api.dto.BookDetailResult;
 import konkuk.thip.book.application.port.in.BookSearchUseCase;
 import konkuk.thip.book.application.port.in.dto.BookDetailSearchResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
@@ -25,7 +25,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
+import static konkuk.thip.book.adapter.out.api.dto.BookSearchResult.PAGE_SIZE;
 import static konkuk.thip.common.exception.code.ErrorCode.*;
 import static konkuk.thip.recentSearch.domain.value.RecentSearchType.BOOK_SEARCH;
 
@@ -47,7 +47,7 @@ public class BookSearchService implements BookSearchUseCase {
 
     @Override
     @Transactional
-    public NaverBookParseResult searchBooks(String keyword, int page, Long userId, boolean isFinalized) {
+    public BookSearchResult searchBooks(String keyword, int page, Long userId, boolean isFinalized) {
 
         if (keyword == null || keyword.isBlank()) {
             throw new BusinessException(BOOK_KEYWORD_REQUIRED);
@@ -59,7 +59,7 @@ public class BookSearchService implements BookSearchUseCase {
 
 
         int start = (page - 1) * PAGE_SIZE + 1; //검색 시작 위치
-        NaverBookParseResult result = bookApiQueryPort.findBooksByKeyword(keyword, start);
+        BookSearchResult result = bookApiQueryPort.findBooksByKeyword(keyword, start);
 
         int totalElements = result.total();
         int totalPages = (totalElements + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -81,7 +81,7 @@ public class BookSearchService implements BookSearchUseCase {
         User user =  userCommandPort.findById(userId);
 
         //책 상세정보
-        NaverDetailBookParseResult naverDetailBookParseResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
+        BookDetailResult bookDetailResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
 
         //책 검색순위 정보 업데이트
         bookRedisCommandPort.incrementBookSearchCount(isbn,LocalDate.now());
@@ -96,7 +96,7 @@ public class BookSearchService implements BookSearchUseCase {
                     boolean isSaved = bookQueryPort.existsSavedBookByUserIdAndBookId(user.getId(), book.getId());
 
                     return BookDetailSearchResult.of(
-                            naverDetailBookParseResult,
+                            bookDetailResult,
                             recruitingRoomCount,
                             readCount,
                             isSaved
@@ -104,7 +104,7 @@ public class BookSearchService implements BookSearchUseCase {
                 })
                 .orElseGet(() ->
                         BookDetailSearchResult.of(
-                                naverDetailBookParseResult,
+                                bookDetailResult,
                                 0,    // 모집 중인 방 개수
                                 0,    // 읽기 참여자 수
                                 false // 저장 여부

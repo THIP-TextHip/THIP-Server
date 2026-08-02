@@ -131,7 +131,7 @@ class BookDetailSearchApiTest {
         assertThat(result.recruitingRoomCount()).isEqualTo(1);
         assertThat(result.readCount()).isEqualTo(1);
         assertThat(result.isSaved()).isTrue();
-        assertThat(result.naverDetailBook()).isNotNull();
+        assertThat(result.bookDetail()).isNotNull();
     }
 
     @Test

@@ -4,7 +4,7 @@ package konkuk.thip.book.adapter.out.api.dto;
 import lombok.Builder;
 
 @Builder
-public record NaverDetailBookParseResult(
+public record BookDetailResult(
             String title,
             String imageUrl,
             String author,

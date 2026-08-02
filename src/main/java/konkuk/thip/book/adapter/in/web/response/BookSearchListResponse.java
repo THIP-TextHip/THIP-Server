@@ -1,10 +1,10 @@
 package konkuk.thip.book.adapter.in.web.response;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
+import konkuk.thip.book.adapter.out.api.dto.BookSearchResult;
 
 import java.util.List;
 
-import static konkuk.thip.book.adapter.out.api.naver.NaverApiUtil.PAGE_SIZE;
+import static konkuk.thip.book.adapter.out.api.dto.BookSearchResult.PAGE_SIZE;
 
 public record BookSearchListResponse(
         List<BookSearchDto> searchResult, // 책 목록
@@ -15,13 +15,13 @@ public record BookSearchListResponse(
         boolean last,               // 마지막 페이지 여부
         boolean first               // 첫 페이지 여부
 ) {
-    public static BookSearchListResponse of(NaverBookParseResult result, int page) {
+    public static BookSearchListResponse of(BookSearchResult result, int page) {
         int totalElements = result.total();
         int totalPages = (int) Math.ceil((double) totalElements / PAGE_SIZE);
         boolean last = (page >= totalPages);
         boolean first = (page == 1);
 
-        List<BookSearchDto> bookSearchDtos = result.naverBooks().stream()
+        List<BookSearchDto> bookSearchDtos = result.books().stream()
                 .map(BookSearchDto::of)
                 .toList();
 
@@ -42,13 +42,13 @@ public record BookSearchListResponse(
             String publisher,
             String isbn
     ) {
-        public static BookSearchDto of(NaverBookParseResult.NaverBook naverBook) {
+        public static BookSearchDto of(BookSearchResult.BookSummary book) {
             return new BookSearchDto(
-                    naverBook.title(),
-                    naverBook.imageUrl(),
-                    naverBook.author(),
-                    naverBook.publisher(),
-                    naverBook.isbn()
+                    book.title(),
+                    book.imageUrl(),
+                    book.author(),
+                    book.publisher(),
+                    book.isbn()
             );
         }
     }
