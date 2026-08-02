@@ -6,7 +6,9 @@ public enum AladinApiParam {
     OUTPUT("js"),
     API_VERSION("20131101"),
     SUB_INFO_PARSING_KEY("subInfo"),
-    PAGE_COUNT_PARSING_KEY("itemPage");
+    PAGE_COUNT_PARSING_KEY("itemPage"),
+    QUERY_TYPE("Keyword"),
+    SEARCH_TARGET("Book");
 
     private final String value;
 
