@@ -21,7 +21,7 @@ public class CompositeBookApiAdapter implements BookApiQueryPort {
     }
 
     @Override
-    public BookDetailResult 랑(String isbn) {
+    public BookDetailResult findDetailBookByIsbn(String isbn) {
         return aladinApiClient.findDetailBookByIsbn(isbn);
     }
 
