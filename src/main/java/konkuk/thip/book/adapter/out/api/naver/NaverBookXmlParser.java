@@ -1,7 +1,7 @@
 package konkuk.thip.book.adapter.out.api.naver;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverBookParseResult;
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
+import konkuk.thip.book.adapter.out.api.dto.BookSearchResult;
+import konkuk.thip.book.adapter.out.api.dto.BookDetailResult;
 import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.common.exception.ExternalApiException;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -19,8 +19,8 @@ public class NaverBookXmlParser {
     private static final int MAX_DESCRIPTION_LENGTH = 3000;
     private static final String DESCRIPTION_SUFFIX = "...";
 
-    public static NaverBookParseResult parseBookList(String xml) {
-        List<NaverBookParseResult.NaverBook> naverBooks = new ArrayList<>();
+    public static BookSearchResult parseBookList(String xml) {
+        List<BookSearchResult.BookSummary> books = new ArrayList<>();
         int total = -1;
         int start = -1;
         try {
@@ -35,65 +35,64 @@ public class NaverBookXmlParser {
                     String author = getTagValue(item, "author");
                     String publisher = getTagValue(item, "publisher");
                     String isbn = getTagValue(item, "isbn");
-                    NaverBookParseResult.NaverBook naverBook = NaverBookParseResult.NaverBook.builder()
+                    BookSearchResult.BookSummary naverBook = BookSearchResult.BookSummary.builder()
                             .title(title)
                             .imageUrl(imageUrl)
                             .author(author)
                             .publisher(publisher)
                             .isbn(isbn)
                             .build();
-                    naverBooks.add(naverBook);
+                    books.add(naverBook);
                 }
             }
         } catch (Exception e) {
             throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
         }
-        return NaverBookParseResult.of(naverBooks, total, start);
+        return BookSearchResult.of(books, total, start);
     }
 
-    public static NaverDetailBookParseResult parseBookDetail(String xml) {
+    public static BookDetailResult parseBookDetail(String xml) {
         try {
             Element channel = getFirstChannel(xml);
-            if (channel != null) {
-                int total = 0;
-                String totalStr = getTagValue(channel, "total");
-                if (totalStr != null) total = Integer.parseInt(totalStr);
+            if (channel == null) throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
 
-                // total이 0이면 isbn에 해당하는 책이 없음(잘못 넘어온 isbn 예외처리)
-                if (total == 0) throw new BusinessException(BOOK_NAVER_API_ISBN_NOT_FOUND);
+            int total = 0;
+            String totalStr = getTagValue(channel, "total");
+            if (totalStr != null) total = Integer.parseInt(totalStr);
 
-                List<Element> items = getItemElements(channel);
-                if (!items.isEmpty()) {
-                    Element item = items.get(0);
-                    String title = StringEscapeUtils.unescapeHtml4(getTagValue(item, "title"));
-                    String imageUrl = getTagValue(item, "image");
-                    String author = getTagValue(item, "author");
-                    String publisher = getTagValue(item, "publisher");
-                    String isbn = getTagValue(item, "isbn");
-                    String rawDescription =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
-                    String description;
-                    if (rawDescription.length() > MAX_DESCRIPTION_LENGTH) {
-                        description = rawDescription.substring(0, MAX_DESCRIPTION_LENGTH - DESCRIPTION_SUFFIX.length()) + DESCRIPTION_SUFFIX;
-                    } else {
-                        description = rawDescription;
-                    }
+            // total이 0이면 isbn에 해당하는 책이 없음(잘못 넘어온 isbn 예외처리)
+            if (total == 0) throw new BusinessException(BOOK_NAVER_API_ISBN_NOT_FOUND);
 
-                    return NaverDetailBookParseResult.builder()
-                            .title(title)
-                            .imageUrl(imageUrl)
-                            .author(author)
-                            .publisher(publisher)
-                            .isbn(isbn)
-                            .description(description)
-                            .build();
-                }
+            List<Element> items = getItemElements(channel);
+            if (items.isEmpty()) throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
+
+            Element item = items.get(0);
+            String title = StringEscapeUtils.unescapeHtml4(getTagValue(item, "title"));
+            String imageUrl = getTagValue(item, "image");
+            String author = getTagValue(item, "author");
+            String publisher = getTagValue(item, "publisher");
+            String isbn = getTagValue(item, "isbn");
+            String rawDescription =  StringEscapeUtils.unescapeHtml4(getTagValue(item, "description"));
+            String description;
+            if (rawDescription.length() > MAX_DESCRIPTION_LENGTH) {
+                description = rawDescription.substring(0, MAX_DESCRIPTION_LENGTH - DESCRIPTION_SUFFIX.length()) + DESCRIPTION_SUFFIX;
+            } else {
+                description = rawDescription;
             }
-        } catch (BusinessException e) {
+
+            return BookDetailResult.builder()
+                    .title(title)
+                    .imageUrl(imageUrl)
+                    .author(author)
+                    .publisher(publisher)
+                    .isbn(isbn)
+                    .description(description)
+                    .build();
+        } catch (BusinessException | ExternalApiException e) {
             throw e;
         } catch (Exception e) {
             throw new ExternalApiException(BOOK_NAVER_API_PARSING_ERROR);
         }
-        return null;
     }
 
     private static Document parseXml(String xml) throws Exception {
