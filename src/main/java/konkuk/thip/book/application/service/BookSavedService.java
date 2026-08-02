@@ -1,6 +1,5 @@
 package konkuk.thip.book.application.service;
 
-import konkuk.thip.book.adapter.out.api.dto.NaverDetailBookParseResult;
 import konkuk.thip.book.application.port.in.BookSavedUseCase;
 import konkuk.thip.book.application.port.in.dto.BookIsSavedResult;
 import konkuk.thip.book.application.port.out.BookApiQueryPort;
@@ -48,17 +47,8 @@ public class BookSavedService implements BookSavedUseCase {
     }
 
     private Book registerBookByIsbn(String isbn) {
-        // 저장 요청이면 네이버 API로 책 정보 조회 후 저장
-        NaverDetailBookParseResult naverResult = bookApiQueryPort.findDetailBookByIsbn(isbn);
-        Book newBook = Book.withoutId(
-                naverResult.title(),
-                naverResult.isbn(),
-                naverResult.author(),
-                false,
-                naverResult.publisher(),
-                naverResult.imageUrl(),
-                null,
-                naverResult.description());
+        // 저장 요청이면 외부 API로 책 정보 + 페이지 수를 함께 조회 후 저장
+        Book newBook = bookApiQueryPort.loadBookWithPageByIsbn(isbn);
 
         Long savedBookId = bookCommandPort.save(newBook);
         return bookCommandPort.findById(savedBookId);
