@@ -223,7 +223,8 @@ public enum SwaggerResponseDescription {
             TAG_NAME_NOT_MATCH,
             TAG_SHOULD_BE_UNIQUE,
             TAG_LIST_SIZE_OVERFLOW,
-            BOOK_NAVER_API_PARSING_ERROR,
+            BOOK_ALADIN_API_PARSING_ERROR,
+            BOOK_ALADIN_API_ISBN_NOT_FOUND,
             URL_INVALID_DOMAIN,
             URL_USER_ID_MISMATCH
     ))),
@@ -322,15 +323,12 @@ public enum SwaggerResponseDescription {
             BOOK_SEARCH_PAGE_OUT_OF_RANGE,
             BOOK_KEYWORD_REQUIRED,
             BOOK_PAGE_NUMBER_INVALID,
-            BOOK_NAVER_API_PARSING_ERROR,
-            BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED,
-            BOOK_NAVER_API_RESPONSE_ERROR
+            BOOK_ALADIN_API_PARSING_ERROR
     ))),
     BOOK_DETAIL_SEARCH(new LinkedHashSet<>(Set.of(
             BOOK_NOT_FOUND,
-            BOOK_NAVER_API_PARSING_ERROR,
-            BOOK_NAVER_API_ISBN_NOT_FOUND,
-            BOOK_NAVER_API_URL_HTTP_CONNECT_FAILED
+            BOOK_ALADIN_API_PARSING_ERROR,
+            BOOK_ALADIN_API_ISBN_NOT_FOUND
     ))),
     POPULAR_BOOK_SEARCH(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND,
