@@ -5,4 +5,6 @@ import konkuk.thip.notification.adapter.in.web.response.NotificationMarkToChecke
 public interface NotificationMarkUseCase {
 
     NotificationMarkToCheckedResponse markToChecked(Long notificationId, Long userId);
+
+    void markAllToChecked(Long userId);
 }

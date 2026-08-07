@@ -399,6 +399,9 @@ public enum SwaggerResponseDescription {
             NOTIFICATION_NOT_FOUND,
             NOTIFICATION_ACCESS_FORBIDDEN
     ))),
+    NOTIFICATION_MARK_ALL_TO_CHECKED(new LinkedHashSet<>(Set.of(
+
+    ))),
 
   ;
     private final Set<ErrorCode> errorCodeList;
