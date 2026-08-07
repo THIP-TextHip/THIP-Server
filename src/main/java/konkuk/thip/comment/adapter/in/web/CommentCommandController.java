@@ -9,9 +9,11 @@ import konkuk.thip.comment.adapter.in.web.request.CommentIsLikeRequest;
 import konkuk.thip.comment.adapter.in.web.response.CommentDeleteResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentCreateResponse;
 import konkuk.thip.comment.adapter.in.web.response.CommentIsLikeResponse;
+import konkuk.thip.comment.adapter.in.web.response.CommentReportResponse;
 import konkuk.thip.comment.application.port.in.CommentCreateUseCase;
 import konkuk.thip.comment.application.port.in.CommentDeleteUseCase;
 import konkuk.thip.comment.application.port.in.CommentLikeUseCase;
+import konkuk.thip.comment.application.port.in.CommentReportUseCase;
 import konkuk.thip.common.dto.BaseResponse;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
@@ -28,6 +30,7 @@ public class CommentCommandController {
     private final CommentCreateUseCase commentCreateUseCase;
     private final CommentLikeUseCase commentLikeUseCase;
     private final CommentDeleteUseCase commentDeleteUseCase;
+    private final CommentReportUseCase commentReportUseCase;
 
     /**
      * 댓글/답글 작성
@@ -72,6 +75,17 @@ public class CommentCommandController {
             @Parameter(description = "삭제하려는 댓글 ID", example = "1") @PathVariable("commentId") final Long commentId,
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(CommentDeleteResponse.of(commentDeleteUseCase.deleteComment(commentId,userId)));
+    }
+
+    @Operation(
+            summary = "댓글 신고",
+            description = "사용자가 댓글을 신고합니다. 신고 횟수만 증가하며 별도의 처리는 이루어지지 않습니다."
+    )
+    @ExceptionDescription(COMMENT_REPORT)
+    @PostMapping("/comments/{commentId}/report")
+    public BaseResponse<CommentReportResponse> reportComment(
+            @Parameter(description = "신고하려는 댓글 ID", example = "1") @PathVariable("commentId") final Long commentId) {
+        return BaseResponse.ok(CommentReportResponse.of(commentReportUseCase.reportComment(commentId)));
     }
 
 }

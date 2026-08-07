@@ -143,6 +143,10 @@ public class Feed extends BaseDomainEntity implements CountUpdatable {
         this.contentList = convertToContentList(newImageUrls);
     }
 
+    public void increaseReportCount() {
+        reportCount++;
+    }
+
     @Override
     public void increaseCommentCount() {
         commentCount++;

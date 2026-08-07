@@ -268,6 +268,9 @@ public enum SwaggerResponseDescription {
             FEED_NOT_FOUND,
             FEED_ACCESS_FORBIDDEN
     ))),
+    FEED_REPORT(new LinkedHashSet<>(Set.of(
+            FEED_NOT_FOUND
+    ))),
 
     // Comment
     COMMENT_CREATE(new LinkedHashSet<>(Set.of(
@@ -308,6 +311,9 @@ public enum SwaggerResponseDescription {
             ROOM_ACCESS_FORBIDDEN,
             ROOM_IS_EXPIRED,
             ROOM_NOT_IN_PROGRESS
+    ))),
+    COMMENT_REPORT(new LinkedHashSet<>(Set.of(
+            COMMENT_NOT_FOUND
     ))),
 
     // Book
