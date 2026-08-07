@@ -18,6 +18,7 @@ public class RecordMapper {
                 .page(record.getPage())
                 .isOverview(record.isOverview())
                 .roomJpaEntity(roomJpaEntity)
+                .reportCount(record.getReportCount())
                 .build();
     }
 
@@ -31,6 +32,7 @@ public class RecordMapper {
                 .roomId(recordJpaEntity.getRoomJpaEntity().getRoomId())
                 .likeCount(recordJpaEntity.getLikeCount())
                 .commentCount(recordJpaEntity.getCommentCount())
+                .reportCount(recordJpaEntity.getReportCount())
                 .createdAt(recordJpaEntity.getCreatedAt())
                 .modifiedAt(recordJpaEntity.getModifiedAt())
                 .status(recordJpaEntity.getStatus())

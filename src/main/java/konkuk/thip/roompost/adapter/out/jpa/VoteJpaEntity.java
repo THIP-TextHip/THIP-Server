@@ -27,12 +27,16 @@ public class VoteJpaEntity extends PostJpaEntity {
     @JoinColumn(name = "room_id")   // FEED 로 인해 nullable = true로 설정
     private RoomJpaEntity roomJpaEntity;
 
+    @Column(name = "report_count", nullable = false)
+    private int reportCount;
+
     @Builder
-    public VoteJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity) {
+    public VoteJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity, int reportCount) {
         super(content, likeCount, commentCount, userJpaEntity);
         this.page = page;
         this.isOverview = isOverview;
         this.roomJpaEntity = roomJpaEntity;
+        this.reportCount = reportCount;
     }
 
     public VoteJpaEntity updateFrom(Vote vote) {
@@ -41,6 +45,7 @@ public class VoteJpaEntity extends PostJpaEntity {
         this.commentCount = vote.getCommentCount();
         this.page = vote.getPage();
         this.isOverview = vote.isOverview();
+        this.reportCount = vote.getReportCount();
         return this;
     }
 

@@ -40,6 +40,7 @@ public class RoomMapper {
                 .roomStatus(roomJpaEntity.getRoomStatus())
                 .bookId(roomJpaEntity.getBookJpaEntity().getBookId())
                 .category(roomJpaEntity.getCategory())
+                .reportCount(roomJpaEntity.getReportCount())
                 .createdAt(roomJpaEntity.getCreatedAt())
                 .modifiedAt(roomJpaEntity.getModifiedAt())
                 .status(roomJpaEntity.getStatus())

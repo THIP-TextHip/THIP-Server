@@ -69,6 +69,10 @@ public class RoomJpaEntity extends BaseJpaEntity {
     @Column(nullable = false)
     private Category category;
 
+    @Builder.Default
+    @Column(name = "report_count", nullable = false)
+    private int reportCount = 0;
+
     public RoomJpaEntity updateFrom(Room room) {
         this.title = room.getTitle();
         this.description = room.getDescription();
@@ -80,6 +84,7 @@ public class RoomJpaEntity extends BaseJpaEntity {
         this.recruitCount = room.getRecruitCount();
         this.memberCount = room.getMemberCount();
         this.roomStatus = room.getRoomStatus();
+        this.reportCount = room.getReportCount();
         return this;
     }
 

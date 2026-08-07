@@ -48,6 +48,15 @@ public class AttendanceCheckCommandPersistenceAdapter implements AttendanceCheck
     }
 
     @Override
+    public void update(AttendanceCheck attendanceCheck) {
+        AttendanceCheckJpaEntity attendanceCheckJpaEntity = attendanceCheckJpaRepository.findByAttendanceCheckId(attendanceCheck.getId()).orElseThrow(
+                () -> new EntityNotFoundException(ATTENDANCE_CHECK_NOT_FOUND)
+        );
+
+        attendanceCheckJpaRepository.save(attendanceCheckJpaEntity.updateFrom(attendanceCheck));
+    }
+
+    @Override
     public void delete(AttendanceCheck attendanceCheck) {
         AttendanceCheckJpaEntity attendanceCheckJpaEntity = attendanceCheckJpaRepository.findByAttendanceCheckId(attendanceCheck.getId()).orElseThrow(
                 () -> new EntityNotFoundException(ATTENDANCE_CHECK_NOT_FOUND)

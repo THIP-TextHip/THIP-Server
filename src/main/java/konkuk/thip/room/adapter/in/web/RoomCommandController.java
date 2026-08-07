@@ -15,10 +15,12 @@ import konkuk.thip.room.adapter.in.web.response.RoomCreateResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomJoinResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomPostIsLikeResponse;
 import konkuk.thip.room.adapter.in.web.response.RoomRecruitCloseResponse;
+import konkuk.thip.room.adapter.in.web.response.RoomReportResponse;
 import konkuk.thip.room.application.port.in.RoomCreateUseCase;
 import konkuk.thip.room.application.port.in.RoomJoinUseCase;
 import konkuk.thip.room.application.port.in.RoomParticipantDeleteUseCase;
 import konkuk.thip.room.application.port.in.RoomRecruitCloseUseCase;
+import konkuk.thip.room.application.port.in.RoomReportUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,7 @@ public class RoomCommandController {
     private final RoomRecruitCloseUseCase roomRecruitCloseUsecase;
     private final RoomParticipantDeleteUseCase roomParticipantDeleteUseCase;
     private final PostLikeUseCase postLikeUseCase;
+    private final RoomReportUseCase roomReportUseCase;
 
     /**
      * 방 생성 요청
@@ -112,5 +115,16 @@ public class RoomCommandController {
             @Parameter(hidden = true) @UserId final Long userId,
             @Parameter(description = "나갈 방의 ID", example = "1") @PathVariable final Long roomId) {
         return BaseResponse.ok(roomParticipantDeleteUseCase.leaveRoom(userId, roomId));
+    }
+
+    @Operation(
+            summary = "모임방 신고",
+            description = "사용자가 모임방을 신고합니다. 신고 횟수만 증가하며 별도의 처리는 이루어지지 않습니다."
+    )
+    @ExceptionDescription(ROOM_REPORT)
+    @PostMapping("/rooms/{roomId}/report")
+    public BaseResponse<RoomReportResponse> reportRoom(
+            @Parameter(description = "신고하려는 방 ID", example = "1") @PathVariable("roomId") final Long roomId) {
+        return BaseResponse.ok(RoomReportResponse.of(roomReportUseCase.reportRoom(roomId)));
     }
 }

@@ -29,6 +29,9 @@ public class Vote extends BaseDomainEntity implements RoomPost {
     @Builder.Default
     private Integer commentCount = 0;
 
+    @Builder.Default
+    private int reportCount = 0;
+
     private Long roomId;
 
     public static Vote withoutId(String content, Long creatorId, Integer page, boolean isOverview, Long roomId) {
@@ -65,6 +68,10 @@ public class Vote extends BaseDomainEntity implements RoomPost {
                     new IllegalArgumentException(message)
             );
         }
+    }
+
+    public void increaseReportCount() {
+        reportCount++;
     }
 
     @Override

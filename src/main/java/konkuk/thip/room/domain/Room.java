@@ -5,6 +5,7 @@ import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.value.RoomStatus;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,6 +46,9 @@ public class Room extends BaseDomainEntity {
     private Long bookId;
 
     private Category category;
+
+    @Builder.Default
+    private int reportCount = 0;
 
     public static Room withoutId(String title, String description, boolean isPublic, String password, LocalDate startDate, LocalDate endDate, int recruitCount, Long bookId, Category category) {
         validateVisibilityPasswordRule(isPublic, password);
@@ -180,6 +184,10 @@ public class Room extends BaseDomainEntity {
         if (this.roomStatus != RoomStatus.IN_PROGRESS) {
             throw new InvalidStateException(ErrorCode.ROOM_NOT_IN_PROGRESS);
         }
+    }
+
+    public void increaseReportCount() {
+        reportCount++;
     }
 
 }
