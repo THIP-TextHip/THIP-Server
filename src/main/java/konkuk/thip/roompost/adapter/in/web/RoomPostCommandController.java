@@ -32,8 +32,12 @@ public class RoomPostCommandController {
 
     private final AttendanceCheckCreateUseCase attendanceCheckCreateUseCase;
     private final AttendanceCheckDeleteUseCase attendanceCheckDeleteUseCase;
+    private final AttendanceCheckReportUseCase attendanceCheckReportUseCase;
 
     private final RecordReviewCreateUseCase recordReviewCreateUseCase;
+
+    private final RecordReportUseCase recordReportUseCase;
+    private final VoteReportUseCase voteReportUseCase;
 
     /**
      * 기록 관련
@@ -83,6 +87,18 @@ public class RoomPostCommandController {
         return BaseResponse.ok(RecordUpdateResponse.of(
                 roomPostUpdateUseCase.updateRecord(request.toCommand(userId, roomId, recordId))
         ));
+    }
+
+    @Operation(
+            summary = "기록 신고",
+            description = "사용자가 기록을 신고합니다. 신고 횟수만 증가하며 별도의 처리는 이루어지지 않습니다."
+    )
+    @ExceptionDescription(RECORD_REPORT)
+    @PostMapping("/rooms/{roomId}/record/{recordId}/report")
+    public BaseResponse<RecordReportResponse> reportRecord(
+            @Parameter(description = "신고할 방 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(description = "신고하려는 기록 ID", example = "1") @PathVariable("recordId") final Long recordId) {
+        return BaseResponse.ok(RecordReportResponse.of(recordReportUseCase.reportRecord(recordId)));
     }
 
     /**
@@ -149,6 +165,18 @@ public class RoomPostCommandController {
         ));
     }
 
+    @Operation(
+            summary = "투표 신고",
+            description = "사용자가 투표를 신고합니다. 신고 횟수만 증가하며 별도의 처리는 이루어지지 않습니다."
+    )
+    @ExceptionDescription(VOTE_REPORT)
+    @PostMapping("/rooms/{roomId}/vote/{voteId}/report")
+    public BaseResponse<VoteReportResponse> reportVote(
+            @Parameter(description = "신고할 방 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(description = "신고하려는 투표 ID", example = "1") @PathVariable("voteId") final Long voteId) {
+        return BaseResponse.ok(VoteReportResponse.of(voteReportUseCase.reportVote(voteId)));
+    }
+
     /**
      * 오늘의 한마디 관련
      */
@@ -179,6 +207,20 @@ public class RoomPostCommandController {
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(AttendanceCheckDeleteResponse.of(
                 attendanceCheckDeleteUseCase.delete(userId, roomId, attendanceCheckId)
+        ));
+    }
+
+    @Operation(
+            summary = "오늘의 한마디 신고",
+            description = "사용자가 오늘의 한마디를 신고합니다. 신고 횟수만 증가하며 별도의 처리는 이루어지지 않습니다."
+    )
+    @ExceptionDescription(ATTENDANCE_CHECK_REPORT)
+    @PostMapping("/rooms/{roomId}/daily-greeting/{attendanceCheckId}/report")
+    public BaseResponse<AttendanceCheckReportResponse> reportAttendanceCheck(
+            @Parameter(description = "신고할 방 ID", example = "1") @PathVariable("roomId") final Long roomId,
+            @Parameter(description = "신고하려는 오늘의 한마디 ID", example = "1") @PathVariable("attendanceCheckId") final Long attendanceCheckId) {
+        return BaseResponse.ok(AttendanceCheckReportResponse.of(
+                attendanceCheckReportUseCase.reportAttendanceCheck(attendanceCheckId)
         ));
     }
 

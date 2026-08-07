@@ -3,6 +3,7 @@ package konkuk.thip.roompost.adapter.out.jpa;
 import jakarta.persistence.*;
 import konkuk.thip.common.entity.BaseJpaEntity;
 import konkuk.thip.room.adapter.out.jpa.RoomJpaEntity;
+import konkuk.thip.roompost.domain.AttendanceCheck;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -31,5 +32,14 @@ public class AttendanceCheckJpaEntity extends BaseJpaEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserJpaEntity userJpaEntity;
+
+    @Builder.Default
+    @Column(name = "report_count", nullable = false)
+    private int reportCount = 0;
+
+    public AttendanceCheckJpaEntity updateFrom(AttendanceCheck attendanceCheck) {
+        this.reportCount = attendanceCheck.getReportCount();
+        return this;
+    }
 
 }

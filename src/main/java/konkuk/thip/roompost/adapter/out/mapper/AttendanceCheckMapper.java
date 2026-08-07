@@ -23,6 +23,7 @@ public class AttendanceCheckMapper {
                 .todayComment(attendanceCheckJpaEntity.getTodayComment())
                 .roomId(attendanceCheckJpaEntity.getRoomJpaEntity().getRoomId())
                 .creatorId(attendanceCheckJpaEntity.getUserJpaEntity().getUserId())
+                .reportCount(attendanceCheckJpaEntity.getReportCount())
                 .createdAt(attendanceCheckJpaEntity.getCreatedAt())
                 .modifiedAt(attendanceCheckJpaEntity.getModifiedAt())
                 .status(attendanceCheckJpaEntity.getStatus())

@@ -28,7 +28,7 @@ public class FeedJpaEntity extends PostJpaEntity {
     @Column(name = "is_public")
     private Boolean isPublic;
 
-    @Column(name = "report_count")
+    @Column(name = "report_count", nullable = false)
     private int reportCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)

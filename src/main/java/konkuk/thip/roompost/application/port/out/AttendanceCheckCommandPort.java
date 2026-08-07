@@ -18,6 +18,8 @@ public interface AttendanceCheckCommandPort {
                 .orElseThrow(() -> new EntityNotFoundException(ATTENDANCE_CHECK_NOT_FOUND));
     }
 
+    void update(AttendanceCheck attendanceCheck);
+
     void delete(AttendanceCheck attendanceCheck);
 
     void deleteAllByUserId(Long userId);

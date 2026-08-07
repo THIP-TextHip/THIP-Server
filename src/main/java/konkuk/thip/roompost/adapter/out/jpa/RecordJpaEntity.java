@@ -27,12 +27,16 @@ public class RecordJpaEntity extends PostJpaEntity {
     @JoinColumn(name = "room_id")   // FEED 로 인해 nullable = true로 설정
     private RoomJpaEntity roomJpaEntity;
 
+    @Column(name = "report_count", nullable = false)
+    private int reportCount;
+
     @Builder
-    public RecordJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity) {
+    public RecordJpaEntity(String content, Integer likeCount, Integer commentCount, UserJpaEntity userJpaEntity, Integer page, boolean isOverview, RoomJpaEntity roomJpaEntity, int reportCount) {
         super(content, likeCount, commentCount, userJpaEntity);
         this.page = page;
         this.isOverview = isOverview;
         this.roomJpaEntity = roomJpaEntity;
+        this.reportCount = reportCount;
     }
 
     public RecordJpaEntity updateFrom(Record record) {
@@ -41,6 +45,7 @@ public class RecordJpaEntity extends PostJpaEntity {
         this.commentCount = record.getCommentCount();
         this.page = record.getPage();
         this.isOverview = record.isOverview();
+        this.reportCount = record.getReportCount();
         return this;
     }
 

@@ -127,6 +127,9 @@ public enum SwaggerResponseDescription {
             ROOM_PARTICIPANT_NOT_FOUND,
             ROOM_HOST_CANNOT_LEAVE
     ))),
+    ROOM_REPORT(new LinkedHashSet<>(Set.of(
+            ROOM_NOT_FOUND
+    ))),
 
 
     // Record
@@ -179,6 +182,9 @@ public enum SwaggerResponseDescription {
             USER_NOT_FOUND,
             ROOM_ACCESS_FORBIDDEN
     ))),
+    RECORD_REPORT(new LinkedHashSet<>(Set.of(
+            RECORD_NOT_FOUND
+    ))),
 
     // Vote
     VOTE_CREATE(new LinkedHashSet<>(Set.of(
@@ -212,6 +218,9 @@ public enum SwaggerResponseDescription {
             VOTE_ACCESS_FORBIDDEN,
             ROOM_IS_EXPIRED,
             ROOM_NOT_IN_PROGRESS
+    ))),
+    VOTE_REPORT(new LinkedHashSet<>(Set.of(
+            VOTE_NOT_FOUND
     ))),
 
 
@@ -371,6 +380,10 @@ public enum SwaggerResponseDescription {
             ATTENDANCE_CHECK_CAN_NOT_DELETE,
             ROOM_IS_EXPIRED,
             ROOM_NOT_IN_PROGRESS
+    ))),
+
+    ATTENDANCE_CHECK_REPORT(new LinkedHashSet<>(Set.of(
+            ATTENDANCE_CHECK_NOT_FOUND
     ))),
 
     // Notiification

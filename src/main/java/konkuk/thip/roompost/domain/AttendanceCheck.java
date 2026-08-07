@@ -2,6 +2,7 @@ package konkuk.thip.roompost.domain;
 
 import konkuk.thip.common.entity.BaseDomainEntity;
 import konkuk.thip.common.exception.InvalidStateException;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -21,6 +22,9 @@ public class AttendanceCheck extends BaseDomainEntity {
     private Long roomId;
 
     private Long creatorId;
+
+    @Builder.Default
+    private int reportCount = 0;
 
     public static AttendanceCheck withoutId(Long roomId, Long creatorId, String todayComment, int alreadyWrittenCountTodayOfUser) {
         validateWriteCount(alreadyWrittenCountTodayOfUser);
@@ -42,5 +46,9 @@ public class AttendanceCheck extends BaseDomainEntity {
         if (!creatorId.equals(userId)) {
             throw new InvalidStateException(ATTENDANCE_CHECK_CAN_NOT_DELETE);
         }
+    }
+
+    public void increaseReportCount() {
+        reportCount++;
     }
 }
