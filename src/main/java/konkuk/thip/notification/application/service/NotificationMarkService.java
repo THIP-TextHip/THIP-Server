@@ -36,4 +36,10 @@ public class NotificationMarkService implements NotificationMarkUseCase {
                 notification.getRedirectSpec().params()
         );
     }
+
+    @Override
+    @Transactional
+    public void markAllToChecked(Long userId) {
+        notificationCommandPort.markAllAsCheckedByUserId(userId);
+    }
 }

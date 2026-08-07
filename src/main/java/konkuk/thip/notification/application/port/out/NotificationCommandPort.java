@@ -19,4 +19,6 @@ public interface NotificationCommandPort {
     }
 
     void update(Notification notification);
+
+    void markAllAsCheckedByUserId(Long userId);
 }
