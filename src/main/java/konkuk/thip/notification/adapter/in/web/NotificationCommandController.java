@@ -77,4 +77,16 @@ public class NotificationCommandController {
             @Parameter(hidden = true) @UserId final Long userId) {
         return BaseResponse.ok(notificationMarkUseCase.markToChecked(request.notificationId(), userId));
     }
+
+    @Operation(
+            summary = "유저의 모든 알림 읽음 처리",
+            description = "유저의 읽지 않은 모든 알림을 읽음 처리합니다."
+    )
+    @ExceptionDescription(NOTIFICATION_MARK_ALL_TO_CHECKED)
+    @PostMapping("/notifications/check-all")
+    public BaseResponse<Void> markAllNotificationsToChecked(
+            @Parameter(hidden = true) @UserId final Long userId) {
+        notificationMarkUseCase.markAllToChecked(userId);
+        return BaseResponse.ok(null);
+    }
 }

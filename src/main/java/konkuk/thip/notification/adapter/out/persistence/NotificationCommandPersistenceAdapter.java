@@ -46,4 +46,9 @@ public class NotificationCommandPersistenceAdapter implements NotificationComman
 
         notificationJpaEntity.updateFrom(notification);
     }
+
+    @Override
+    public void markAllAsCheckedByUserId(Long userId) {
+        notificationJpaRepository.markAllAsCheckedByUserId(userId);
+    }
 }
