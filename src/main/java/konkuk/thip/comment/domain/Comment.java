@@ -113,6 +113,10 @@ public class Comment extends BaseDomainEntity {
         }
     }
 
+    public void increaseReportCount() {
+        reportCount++;
+    }
+
     public void updateLikeCount(Boolean like) {
         if (like) {
             likeCount++;

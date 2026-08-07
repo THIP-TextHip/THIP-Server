@@ -11,6 +11,7 @@ import konkuk.thip.feed.adapter.in.web.request.*;
 import konkuk.thip.feed.adapter.in.web.response.FeedIdResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsLikeResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedIsSavedResponse;
+import konkuk.thip.feed.adapter.in.web.response.FeedReportResponse;
 import konkuk.thip.feed.adapter.in.web.response.FeedUploadImagePresignedUrlResponse;
 import konkuk.thip.feed.adapter.out.s3.S3Service;
 import konkuk.thip.feed.application.port.in.*;
@@ -32,6 +33,7 @@ public class FeedCommandController {
     private final FeedSavedUseCase feedSavedUseCase;
     private final PostLikeUseCase postLikeUseCase;
     private final FeedDeleteUseCase feedDeleteUseCase;
+    private final FeedReportUseCase feedReportUseCase;
 
     private final S3Service s3Service;
 
@@ -112,6 +114,17 @@ public class FeedCommandController {
             @Parameter(hidden = true) @UserId final Long userId) {
         feedDeleteUseCase.deleteFeed(feedId, userId);
         return BaseResponse.ok(null);
+    }
+
+    @Operation(
+            summary = "피드 신고",
+            description = "사용자가 피드를 신고합니다. 신고 횟수만 증가하며 별도의 처리는 이루어지지 않습니다."
+    )
+    @ExceptionDescription(FEED_REPORT)
+    @PostMapping("/feeds/{feedId}/report")
+    public BaseResponse<FeedReportResponse> reportFeed(
+            @Parameter(description = "신고하려는 피드 ID", example = "1") @PathVariable("feedId") final Long feedId) {
+        return BaseResponse.ok(FeedReportResponse.of(feedReportUseCase.reportFeed(feedId)));
     }
 
 }
