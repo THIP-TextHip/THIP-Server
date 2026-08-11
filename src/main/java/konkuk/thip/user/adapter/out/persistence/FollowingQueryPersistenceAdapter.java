@@ -9,11 +9,13 @@ import konkuk.thip.user.application.port.out.dto.FollowingQueryDto;
 import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import konkuk.thip.user.domain.value.Alias;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class FollowingQueryPersistenceAdapter implements FollowingQueryPort {

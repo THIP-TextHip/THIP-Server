@@ -6,6 +6,7 @@ import konkuk.thip.roompost.adapter.out.persistence.repository.vote.VoteJpaRepos
 import konkuk.thip.roompost.application.port.out.VoteQueryPort;
 import konkuk.thip.roompost.application.port.out.dto.VoteItemQueryDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class VoteQueryPersistenceAdapter implements VoteQueryPort {

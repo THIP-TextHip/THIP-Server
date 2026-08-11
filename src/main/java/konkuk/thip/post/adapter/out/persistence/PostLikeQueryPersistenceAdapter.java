@@ -3,10 +3,12 @@ package konkuk.thip.post.adapter.out.persistence;
 import konkuk.thip.post.adapter.out.persistence.repository.PostLikeJpaRepository;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class PostLikeQueryPersistenceAdapter implements PostLikeQueryPort {

@@ -8,10 +8,12 @@ import konkuk.thip.notification.adapter.out.persistence.repository.NotificationJ
 import konkuk.thip.notification.application.port.out.NotificationQueryPort;
 import konkuk.thip.notification.application.port.out.dto.NotificationQueryDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class NotificationQueryPersistenceAdapter implements NotificationQueryPort {

@@ -31,7 +31,6 @@ public enum ErrorCode implements ResponseCode {
     AWS_BUCKET_BASE_URL_NOT_CONFIGURED(HttpStatus.INTERNAL_SERVER_ERROR, 50101, "aws s3 bucket base url 설정이 누락되었습니다."),
     WEB_DOMAIN_ORIGIN_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, 50102, "허용된 웹 도메인 설정이 비어있습니다."),
 
-    PERSISTENCE_TRANSACTION_REQUIRED(HttpStatus.INTERNAL_SERVER_ERROR, 50110, "@Transactional 컨텍스트가 필요합니다. 트랜잭션 범위 내에서만 사용할 수 있습니다."),
     RESOURCE_LOCKED(HttpStatus.LOCKED, 50200, "자원이 잠겨 있어 요청을 처리할 수 없습니다."),
 
     /* 60000부터 비즈니스 예외 */

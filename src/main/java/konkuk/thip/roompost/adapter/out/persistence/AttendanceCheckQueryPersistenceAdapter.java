@@ -7,6 +7,7 @@ import konkuk.thip.roompost.adapter.out.persistence.repository.attendancecheck.A
 import konkuk.thip.roompost.application.port.out.AttendanceCheckQueryPort;
 import konkuk.thip.roompost.application.port.out.dto.AttendanceCheckQueryDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static konkuk.thip.common.entity.StatusType.ACTIVE;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class AttendanceCheckQueryPersistenceAdapter implements AttendanceCheckQueryPort {

@@ -3,8 +3,10 @@ package konkuk.thip.room.adapter.out.persistence;
 import konkuk.thip.room.adapter.out.persistence.repository.roomparticipant.RoomParticipantJpaRepository;
 import konkuk.thip.room.application.port.out.RoomParticipantQueryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Repository;
 
+@Transactional(readOnly = true)
 @Repository
 @RequiredArgsConstructor
 public class RoomParticipantQueryPersistenceAdapter implements RoomParticipantQueryPort {
