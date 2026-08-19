@@ -22,12 +22,12 @@ public class BookRecruitingRoomsService implements BookRecruitingRoomsUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursorStr) {
+    public BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursorStr, Long userId) {
         Integer totalRoomCount = (cursorStr == null || cursorStr.isBlank()) ? // 첫 요청 여부 판단
                 roomQueryPort.countRecruitingRoomsByBookIsbn(isbn) : null;
 
         Cursor cursor = Cursor.from(cursorStr, DEFAULT_PAGE_SIZE);
-        CursorBasedList<RoomQueryDto> roomDtos = roomQueryPort.findRoomsByIsbnOrderByDeadline(isbn, cursor);
+        CursorBasedList<RoomQueryDto> roomDtos = roomQueryPort.findRoomsByIsbnOrderByDeadline(isbn, cursor, userId);
 
         return BookRecruitingRoomsResponse.of(bookQueryMapper.toRecruitingRoomDtoList(roomDtos.contents()), totalRoomCount,
                 roomDtos.nextCursor(), roomDtos.isLast());

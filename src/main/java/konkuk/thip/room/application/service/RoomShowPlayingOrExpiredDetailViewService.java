@@ -47,7 +47,7 @@ public class RoomShowPlayingOrExpiredDetailViewService implements RoomShowPlayin
         RoomParticipant roomParticipant = roomParticipantCommandPort.getByUserIdAndRoomIdOrThrow(userId, roomId);
 
         // 3. 투표 참여율이 가장 높은 투표 조회
-        List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> topParticipationVotes = voteQueryPort.findTopParticipationVotesByRoom(room, TOP_PARTICIPATION_VOTES_COUNT);
+        List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> topParticipationVotes = voteQueryPort.findTopParticipationVotesByRoom(room, TOP_PARTICIPATION_VOTES_COUNT, userId);
 
         // 4. response 구성
         return buildResponse(room, book, roomParticipant, topParticipationVotes);

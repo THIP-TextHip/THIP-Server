@@ -9,6 +9,8 @@ import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,12 +21,13 @@ public class AttendanceCheckQueryRepositoryImpl implements AttendanceCheckQueryR
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, LocalDateTime lastCreatedAt, int size) {
+    public List<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, LocalDateTime lastCreatedAt, int size, Long viewerId) {
         QAttendanceCheckJpaEntity attendanceCheck = QAttendanceCheckJpaEntity.attendanceCheckJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
         BooleanExpression roomPredicate = attendanceCheck.roomJpaEntity.roomId.eq(roomId);
         BooleanExpression cursorPredicate = (lastCreatedAt == null) ? null : attendanceCheck.createdAt.lt(lastCreatedAt);
+        BooleanExpression notBlockedPredicate = notBlockedWith(attendanceCheck.userJpaEntity.userId, viewerId);
 
         return jpaQueryFactory
                 .select(new QAttendanceCheckQueryDto(
@@ -37,7 +40,7 @@ public class AttendanceCheckQueryRepositoryImpl implements AttendanceCheckQueryR
                 ))
                 .from(attendanceCheck)
                 .join(attendanceCheck.userJpaEntity, user)
-                .where(roomPredicate, cursorPredicate)
+                .where(roomPredicate, cursorPredicate, notBlockedPredicate)
                 .orderBy(
                         attendanceCheck.createdAt.desc()
                 )

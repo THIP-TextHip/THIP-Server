@@ -4,5 +4,5 @@ import konkuk.thip.room.adapter.in.web.response.RoomGetDeadlinePopularRecentResp
 
 public interface RoomGetDeadlinePopularRecentUseCase {
 
-    RoomGetDeadlinePopularRecentResponse getDeadlineAndPopularAndRecentRoomList(String category);
+    RoomGetDeadlinePopularRecentResponse getDeadlineAndPopularAndRecentRoomList(String category, Long userId);
 }

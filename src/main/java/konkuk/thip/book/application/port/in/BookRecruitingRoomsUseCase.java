@@ -4,5 +4,5 @@ import konkuk.thip.book.adapter.in.web.response.BookRecruitingRoomsResponse;
 
 public interface BookRecruitingRoomsUseCase {
 
-    BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursor);
+    BookRecruitingRoomsResponse getRecruitingRoomsWithBook(String isbn, String cursor, Long userId);
 }

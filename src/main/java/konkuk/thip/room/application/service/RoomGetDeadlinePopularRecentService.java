@@ -23,17 +23,17 @@ public class RoomGetDeadlinePopularRecentService implements RoomGetDeadlinePopul
 
     @Override
     @Transactional(readOnly = true)
-    public RoomGetDeadlinePopularRecentResponse getDeadlineAndPopularAndRecentRoomList(String categoryStr) {
+    public RoomGetDeadlinePopularRecentResponse getDeadlineAndPopularAndRecentRoomList(String categoryStr, Long userId) {
         Category category = Category.from(categoryStr);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime recentCutoff = now.minusHours(RECENT_HOURS);
 
         var deadlineRoomList = roomQueryMapper.toDeadlinePopularRecentRoomDtoList(
-                roomQueryPort.findRoomsByCategoryOrderByDeadline(category, DEFAULT_LIMIT));
+                roomQueryPort.findRoomsByCategoryOrderByDeadline(category, DEFAULT_LIMIT, userId));
         var popularRoomList = roomQueryMapper.toDeadlinePopularRecentRoomDtoList(
-                roomQueryPort.findRoomsByCategoryOrderByPopular(category, DEFAULT_LIMIT));
+                roomQueryPort.findRoomsByCategoryOrderByPopular(category, DEFAULT_LIMIT, userId));
         var recentRoomList = roomQueryMapper.toDeadlinePopularRecentRoomDtoList(
-                roomQueryPort.findRoomsByCategoryOrderByRecent(category, recentCutoff, DEFAULT_LIMIT));
+                roomQueryPort.findRoomsByCategoryOrderByRecent(category, recentCutoff, DEFAULT_LIMIT, userId));
 
         return RoomGetDeadlinePopularRecentResponse.of(deadlineRoomList, popularRoomList,recentRoomList);
     }

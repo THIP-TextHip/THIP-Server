@@ -14,6 +14,8 @@ import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
+
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +39,8 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
                 .where(
                         vote.roomJpaEntity.roomId.eq(roomId),
                         filterByType(type, vote, userId),
-                        (startEndNull(pageStart, pageEnd) ? vote.isOverview.isTrue() : vote.page.between(pageStart, pageEnd))
+                        (startEndNull(pageStart, pageEnd) ? vote.isOverview.isTrue() : vote.page.between(pageStart, pageEnd)),
+                        notBlockedWith(vote.userJpaEntity.userId, userId)
                 )
                 .fetch();
     }
@@ -54,13 +57,14 @@ public class VoteQueryRepositoryImpl implements VoteQueryRepository {
     }
 
     @Override
-    public List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count) {
+    public List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count, Long viewerId) {
         // 1. Fetch top votes by total participation count
         List<VoteJpaEntity> topVotes = jpaQueryFactory
                 .select(vote)
                 .from(vote)
                 .join(voteItem).on(voteItem.voteJpaEntity.eq(vote))     // vote item이 없는 경우 포함 X
-                .where(vote.roomJpaEntity.roomId.eq(roomId))
+                .where(vote.roomJpaEntity.roomId.eq(roomId),
+                        notBlockedWith(vote.userJpaEntity.userId, viewerId))
                 .groupBy(vote)
                 .orderBy(voteItem.count.sum().desc())       // 해당 투표에 참여한 총 참여자 수 기준 내림차순 정렬
                 .limit(count)

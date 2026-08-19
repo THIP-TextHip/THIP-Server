@@ -7,7 +7,10 @@ import konkuk.thip.room.adapter.in.web.response.RoomRecruitingDetailViewResponse
 import konkuk.thip.room.application.port.in.RoomShowRecruitingDetailViewUseCase;
 import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomQueryPort;
+import konkuk.thip.common.exception.EntityNotFoundException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.room.domain.Room;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.RoomParticipant;
 import konkuk.thip.room.domain.RoomParticipants;
@@ -27,6 +30,7 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
     private final RoomQueryPort roomQueryPort;
     private final BookCommandPort bookCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     @Override
     @Transactional(readOnly = true)
@@ -41,11 +45,27 @@ public class RoomShowRecruitingDetailViewService implements RoomShowRecruitingDe
         List<RoomParticipant> findByRoomId = roomParticipantCommandPort.findAllByRoomId(roomId);
         RoomParticipants roomParticipants = RoomParticipants.from(findByRoomId);
 
+        // 2-1. 미참여 상태에서 방장이 차단 관계라면 진입할 수 없다 (이미 참여 중이면 통과)
+        validateHostNotBlockedForNonMember(userId, roomId, findByRoomId);
+
         // 3. 다른 모임방 추천
-        List<RoomRecruitingDetailViewResponse.RecommendRoom> recommendRooms = roomQueryPort.findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(room, RECOMMEND_ROOM_COUNT);
+        List<RoomRecruitingDetailViewResponse.RecommendRoom> recommendRooms = roomQueryPort.findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(room, RECOMMEND_ROOM_COUNT, userId);
 
         // 4. response 구성
         return buildResponse(userId, room, book, roomParticipants, recommendRooms);
+    }
+
+    private void validateHostNotBlockedForNonMember(Long userId, Long roomId, List<RoomParticipant> participants) {
+        boolean alreadyJoined = participants.stream()
+                .anyMatch(participant -> participant.getUserId().equals(userId));
+        if (alreadyJoined) {
+            return;
+        }
+
+        RoomParticipant host = roomParticipantCommandPort.findHostByRoomId(roomId);
+        if (host != null && userBlockQueryPort.existsBlockBetween(userId, host.getUserId())) {
+            throw new EntityNotFoundException(ErrorCode.ROOM_NOT_FOUND);
+        }
     }
 
     private RoomRecruitingDetailViewResponse buildResponse(
