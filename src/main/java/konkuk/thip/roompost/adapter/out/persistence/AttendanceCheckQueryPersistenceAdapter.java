@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static konkuk.thip.common.entity.StatusType.ACTIVE;
-
 @Repository
 @RequiredArgsConstructor
 public class AttendanceCheckQueryPersistenceAdapter implements AttendanceCheckQueryPort {
@@ -30,11 +28,11 @@ public class AttendanceCheckQueryPersistenceAdapter implements AttendanceCheckQu
     }
 
     @Override
-    public CursorBasedList<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, Cursor cursor) {
+    public CursorBasedList<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, Cursor cursor, Long viewerId) {
         LocalDateTime lastCreateAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
         int size = cursor.getPageSize();
 
-        List<AttendanceCheckQueryDto> attendanceCheckQueryDtos = attendanceCheckJpaRepository.findAttendanceChecksByCreatedAtDesc(roomId, lastCreateAt, size);
+        List<AttendanceCheckQueryDto> attendanceCheckQueryDtos = attendanceCheckJpaRepository.findAttendanceChecksByCreatedAtDesc(roomId, lastCreateAt, size, viewerId);
 
         return CursorBasedList.of(attendanceCheckQueryDtos, size, attendanceCheckQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(attendanceCheckQueryDto.createdAt().toString()));

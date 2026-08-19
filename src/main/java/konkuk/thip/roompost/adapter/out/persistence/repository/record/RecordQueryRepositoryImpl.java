@@ -22,6 +22,7 @@ import java.util.List;
 import static com.querydsl.jpa.JPAExpressions.treat;
 import static konkuk.thip.post.domain.PostType.RECORD;
 import static konkuk.thip.post.domain.PostType.VOTE;
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
 
 @Repository
 @RequiredArgsConstructor
@@ -70,7 +71,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
 
     @Override
     public List<RoomPostQueryDto> findGroupRecordsOrderBySortType(Long roomId, Long userId, Cursor cursor, Integer pageStart, Integer pageEnd, Boolean isOverview, RoomPostSortType roomPostSortType) {
-        BooleanBuilder where = buildRecordVoteCondition(roomId, pageStart, pageEnd, isOverview);
+        BooleanBuilder where = buildRecordVoteCondition(roomId, pageStart, pageEnd, isOverview, userId);
 
         if (!cursor.isFirstRequest()) {
             where.and(buildCursorPredicateForSortType(roomPostSortType, cursor));
@@ -86,7 +87,7 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                 .fetch();
     }
 
-    private BooleanBuilder buildRecordVoteCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview) {
+    private BooleanBuilder buildRecordVoteCondition(Long roomId, Integer pageStart, Integer pageEnd, Boolean isOverview, Long viewerId) {
         BooleanBuilder where = new BooleanBuilder();
 
         // VOTE
@@ -113,7 +114,8 @@ public class RecordQueryRepositoryImpl implements RecordQueryRepository {
                     .and(treat(post, QRecordJpaEntity.class).page.between(pageStart, pageEnd));
         }
 
-        where.and(voteCondition.or(recordCondition));
+        where.and(voteCondition.or(recordCondition))
+                .and(notBlockedWith(post.userJpaEntity.userId, viewerId));
 
         return where;
     }

@@ -31,42 +31,42 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsByDeadline(String keyword, Cursor cursor) {
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsByDeadline(String keyword, Cursor cursor, Long viewerId) {
         return findRoomsByDeadlineCursor(cursor, ((lastLocalDate, lastId, pageSize) ->
-                roomJpaRepository.findRecruitingRoomsOrderByStartDateAsc(keyword, lastLocalDate, lastId, pageSize)));
+                roomJpaRepository.findRecruitingRoomsOrderByStartDateAsc(keyword, lastLocalDate, lastId, pageSize, viewerId)));
     }
 
     @Override
-    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByDeadline(String keyword, Category category, Cursor cursor) {
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByDeadline(String keyword, Category category, Cursor cursor, Long viewerId) {
         return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsWithCategoryOrderByStartDateAsc(
-                        keyword, category, lastLocalDate, lastId, pageSize
+                        keyword, category, lastLocalDate, lastId, pageSize, viewerId
                 )
         );
     }
 
     @Override
-    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsByMemberCount(String keyword, Cursor cursor) {
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsByMemberCount(String keyword, Cursor cursor, Long viewerId) {
         return findRoomsByMemberCountCursor(cursor, (lastMemberCount, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsOrderByMemberCountDesc(
-                        keyword, lastMemberCount, lastId, pageSize
+                        keyword, lastMemberCount, lastId, pageSize, viewerId
                 )
         );
     }
 
     @Override
-    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor) {
+    public CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor, Long viewerId) {
         return findRoomsByMemberCountCursor(cursor, (lastMemberCount, lastId, pageSize) ->
                 roomJpaRepository.findRecruitingRoomsWithCategoryOrderByMemberCountDesc(
-                        keyword, category, lastMemberCount, lastId, pageSize
+                        keyword, category, lastMemberCount, lastId, pageSize, viewerId
                 )
         );
     }
 
     @Override
-    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Room currentRoom, int count) {
+    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Room currentRoom, int count, Long viewerId) {
         return roomJpaRepository.findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(
-                currentRoom.getId(), currentRoom.getCategory(), count);
+                currentRoom.getId(), currentRoom.getCategory(), count, viewerId);
     }
 
     @Override
@@ -132,9 +132,9 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor) {
+    public CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor, Long viewerId) {
         return findRoomsByDeadlineCursor(cursor, (lastLocalDate, lastId, pageSize) ->
-                roomJpaRepository.findRoomsByIsbnOrderByStartDateAsc(isbn, lastLocalDate, lastId, pageSize));
+                roomJpaRepository.findRoomsByIsbnOrderByStartDateAsc(isbn, lastLocalDate, lastId, pageSize, viewerId));
     }
 
     private CursorBasedList<RoomQueryDto> findRoomsByDeadlineCursor(Cursor cursor, LocalDateCursorRoomQueryFunction queryFunction) {
@@ -170,18 +170,18 @@ public class RoomQueryPersistenceAdapter implements RoomQueryPort {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit) {
-        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category, limit);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long viewerId) {
+        return roomJpaRepository.findRoomsByCategoryOrderByStartDateAsc(category, limit, viewerId);
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit) {
-        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category, limit);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long viewerId) {
+        return roomJpaRepository.findRoomsByCategoryOrderByMemberCount(category, limit, viewerId);
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit) {
-        return roomJpaRepository.findRoomsByCategoryOrderByCreatedAtDesc(category, createdAfter, limit);
+    public List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit, Long viewerId) {
+        return roomJpaRepository.findRoomsByCategoryOrderByCreatedAtDesc(category, createdAfter, limit, viewerId);
     }
 
     @Override

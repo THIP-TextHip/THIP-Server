@@ -6,12 +6,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +24,7 @@ class RoomNotificationOrchestratorSyncImplUnitTest {
 
     @Mock NotificationSyncExecutor notificationSyncExecutor;
     @Mock RoomEventCommandPort roomEventCommandPort;
+    @Mock UserBlockQueryPort userBlockQueryPort;
 
     @InjectMocks RoomNotificationOrchestratorSyncImpl sut;
 
@@ -51,5 +56,20 @@ class RoomNotificationOrchestratorSyncImplUnitTest {
         verify(roomEventCommandPort).publishRoomPostCommentedEvent(
                 "title", "content", 123L, targetUserId
         );
+    }
+
+    @Test
+    @DisplayName("차단 관계면 알림을 만들지 않는다")
+    void suppress_notification_when_blocked() {
+        // given
+        Long targetUserId = 10L;
+        Long actorUserId = 20L;
+        given(userBlockQueryPort.existsBlockBetween(targetUserId, actorUserId)).willReturn(true);
+
+        // when
+        sut.notifyRoomPostCommented(targetUserId, actorUserId, "alice", 1L, 2, 3L, PostType.RECORD);
+
+        // then
+        verify(notificationSyncExecutor, never()).execute(any(), any(), any(), any(), any());
     }
 }

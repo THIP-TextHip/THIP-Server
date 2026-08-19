@@ -121,10 +121,20 @@ clean.doLast {
 }
 
 tasks.named('test') {
+    // CI 러너는 UTC 다. 일부 테스트가 jdbcTemplate 로 created_at 을 직접 써서, JVM 타임존이
+    // hibernate.jdbc.time_zone 과 어긋나면 커서 경계가 깨진다. 서비스 기준인 KST 로 고정한다.
+    systemProperty 'user.timezone', 'Asia/Seoul'
 	useJUnitPlatform {
         if (System.getenv('CI') == 'true') {
             excludeTags 'concurrency'
         }
+    }
+    // 실패 원인이 요약되면 CI 로그만으로 진단할 수 없다
+    testLogging {
+        events 'failed'
+        exceptionFormat = 'full'
+        showStackTraces = true
+        showCauses = true
     }
 }
 

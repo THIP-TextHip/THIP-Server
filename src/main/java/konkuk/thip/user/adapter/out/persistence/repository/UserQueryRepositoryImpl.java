@@ -18,6 +18,8 @@ import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
+
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -69,7 +71,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 ))
                 .from(user)
                 .where(user.nickname.like(pattern)
-                        .and(user.userId.ne(userId)))
+                        .and(user.userId.ne(userId)),
+                        notBlockedWith(user.userId, userId))
                 .orderBy(priority.desc(), user.nickname.asc())
                 .limit(size)
                 .fetch();
@@ -83,6 +86,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
         BooleanBuilder where = new BooleanBuilder();
         where.and(user.userId.eq(userId));
+        // 내가 좋아요한 글이라도 작성자가 차단 관계면 숨긴다
+        where.and(notBlockedWith(post.userJpaEntity.userId, userId));
 
         if (cursorLocalDateTime != null) {
             where.and(postLike.createdAt.lt(cursorLocalDateTime));
@@ -115,6 +120,8 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
         BooleanBuilder where = new BooleanBuilder();
         where.and(user.userId.eq(userId));
+        // 내가 댓글 단 글이라도 작성자가 차단 관계면 숨긴다
+        where.and(notBlockedWith(post.userJpaEntity.userId, userId));
 
         if (cursorLocalDateTime != null) {
             where.and(comment.createdAt.lt(cursorLocalDateTime));

@@ -8,7 +8,9 @@ import konkuk.thip.feed.application.port.in.FeedShowSingleUseCase;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+
+import static konkuk.thip.common.exception.code.ErrorCode.FEED_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class FeedShowSingleService implements FeedShowSingleUseCase {
     private final BookCommandPort bookCommandPort;
     private final PostLikeQueryPort postLikeQueryPort;
     private final FeedQueryPort feedQueryPort;
+    private final UserBlockQueryPort userBlockQueryPort;
     private final FeedQueryMapper feedQueryMapper;
 
     @Override
@@ -34,6 +39,11 @@ public class FeedShowSingleService implements FeedShowSingleUseCase {
         // 1. 단일 피드 조회 및 피드 조회 유효성 검증
         Feed feed = feedCommandPort.getByIdOrThrow(feedId);
         feed.validateViewPermission(userId);
+
+        // 딥링크로 진입할 수 있으므로 여기서 막는다. 존재 여부를 감추기 위해 404 로 응답한다.
+        if (userBlockQueryPort.existsBlockBetween(userId, feed.getCreatorId())) {
+            throw new EntityNotFoundException(FEED_NOT_FOUND);
+        }
 
         // 2. 피드 작성자 도메인 조회
         User feedCreator = userCommandPort.findById(feed.getCreatorId());

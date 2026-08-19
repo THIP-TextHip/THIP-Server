@@ -46,7 +46,7 @@ public class RoomSearchService implements RoomSearchUseCase {
         Cursor cursor = Cursor.from(query.cursorStr(), DEFAULT_PAGE_SIZE);
 
         // 4) 실행 (정렬 기준별 단일 switch)
-        CursorBasedList<RoomQueryDto> result = executeSearchMode(mode, sortParam, effectiveKeyword, category, cursor);
+        CursorBasedList<RoomQueryDto> result = executeSearchMode(mode, sortParam, effectiveKeyword, category, cursor, query.userId());
 
         // 5) 최근 검색어 저장
         recentSearchCreateManager.saveRecentSearchByUser(
@@ -66,11 +66,11 @@ public class RoomSearchService implements RoomSearchUseCase {
             RoomSearchSortParam sort,
             String keyword,
             Category category,
-            Cursor cursor
+            Cursor cursor, Long viewerId
     ) {
         return switch (sort) {
-            case DEADLINE -> executeByDeadline(mode, keyword, category, cursor);
-            case MEMBER_COUNT -> executeByMemberCount(mode, keyword, category, cursor);
+            case DEADLINE -> executeByDeadline(mode, keyword, category, cursor, viewerId);
+            case MEMBER_COUNT -> executeByMemberCount(mode, keyword, category, cursor, viewerId);
             default -> throw new BusinessException(
                     API_INVALID_PARAM,
                     new IllegalArgumentException("지원하지 않는 정렬 기준입니다: " + sort)
@@ -79,20 +79,20 @@ public class RoomSearchService implements RoomSearchUseCase {
     }
 
     private CursorBasedList<RoomQueryDto> executeByDeadline(
-            RoomSearchMode mode, String keyword, Category category, Cursor cursor
+            RoomSearchMode mode, String keyword, Category category, Cursor cursor, Long viewerId
     ) {
         return switch (mode) {
-            case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByDeadline(keyword, cursor);
-            case CATEGORY_ALL, CATEGORY_BY_KEYWORD -> roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(keyword, category, cursor);
+            case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByDeadline(keyword, cursor, viewerId);
+            case CATEGORY_ALL, CATEGORY_BY_KEYWORD -> roomQueryPort.searchRecruitingRoomsWithCategoryByDeadline(keyword, category, cursor, viewerId);
         };
     }
 
     private CursorBasedList<RoomQueryDto> executeByMemberCount(
-            RoomSearchMode mode, String keyword, Category category, Cursor cursor
+            RoomSearchMode mode, String keyword, Category category, Cursor cursor, Long viewerId
     ) {
         return switch (mode) {
-            case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByMemberCount(keyword, cursor);
-            case CATEGORY_ALL, CATEGORY_BY_KEYWORD -> roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(keyword, category, cursor);
+            case GLOBAL_BY_KEYWORD_OR_ALL -> roomQueryPort.searchRecruitingRoomsByMemberCount(keyword, cursor, viewerId);
+            case CATEGORY_ALL, CATEGORY_BY_KEYWORD -> roomQueryPort.searchRecruitingRoomsWithCategoryByMemberCount(keyword, category, cursor, viewerId);
         };
     }
 

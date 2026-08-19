@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface VoteQueryPort {
 
-    List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count);
+    List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count, Long viewerId);
 
     Map<Long, List<VoteItemQueryDto>> findVoteItemsByVoteIds(Set<Long> voteIds, Long userId);
 

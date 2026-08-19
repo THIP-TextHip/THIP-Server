@@ -8,5 +8,5 @@ public interface AttendanceCheckQueryPort {
 
     int countAttendanceChecksOnTodayByUser(Long userId, Long roomId);
 
-    CursorBasedList<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, Cursor cursor);
+    CursorBasedList<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, Cursor cursor, Long viewerId);
 }

@@ -38,6 +38,7 @@ public class UserQueryController {
 
     private final UserViewAliasChoiceUseCase userViewAliasChoiceUseCase;
     private final UserGetFollowUsecase userGetFollowUsecase;
+    private final UserGetBlockedUsersUseCase userGetBlockedUsersUseCase;
     private final UserIsFollowingUsecase userIsFollowingUsecase;
     private final UserVerifyNicknameUseCase userVerifyNicknameUseCase;
     private final UserSearchUsecase userSearchUsecase;
@@ -93,6 +94,20 @@ public class UserQueryController {
             @Parameter(description = "단일 요청 페이지 크기 (1~10)")
             @RequestParam(defaultValue = "10") @Max(value = 10) @Min(value = 1) final int size) {
         return BaseResponse.ok(userGetFollowUsecase.getMyFollowing(userId, cursor, size));
+    }
+
+    @Operation(
+            summary = "내가 차단한 사용자 목록 조회",
+            description = "내가 차단한 사용자 목록을 조회합니다. 차단 해제를 위해 대상을 식별해야 하므로 이 목록에는 차단 필터를 적용하지 않습니다."
+    )
+    @ExceptionDescription(GET_BLOCKED_USERS)
+    @GetMapping("/users/blocks")
+    public BaseResponse<UserBlockedListResponse> showBlockedUsers(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "커서") @RequestParam(required = false) final String cursor,
+            @Parameter(description = "단일 요청 페이지 크기 (1~10)")
+            @RequestParam(defaultValue = "10") @Max(value = 10) @Min(value = 1) final int size) {
+        return BaseResponse.ok(userGetBlockedUsersUseCase.getBlockedUsers(userId, cursor, size));
     }
 
     @Deprecated

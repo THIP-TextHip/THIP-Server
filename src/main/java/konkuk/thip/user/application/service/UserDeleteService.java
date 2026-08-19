@@ -16,6 +16,7 @@ import konkuk.thip.user.adapter.out.persistence.repository.UserJpaRepository;
 import konkuk.thip.user.application.port.UserTokenBlacklistCommandPort;
 import konkuk.thip.user.application.port.in.UserDeleteUseCase;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.UserBlockCommandPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class UserDeleteService implements UserDeleteUseCase {
     private final UserCommandPort userCommandPort;
     private final UserJpaRepository userJpaRepository;
     private final FollowingCommandPort followingCommandPort;
+    private final UserBlockCommandPort userBlockCommandPort;
     private final AppleTokenClient appleTokenClient;
     private final FeedCommandPort feedCommandPort;
     private final BookCommandPort bookCommandPort;
@@ -70,6 +72,8 @@ public class UserDeleteService implements UserDeleteUseCase {
         // 3. 유저가 남긴 관련 정보들 삭제
         // 팔로잉 관계 삭제
         followingCommandPort.deleteAllByUserId(userId);
+        // 차단 관계 삭제 (내가 차단한 것 + 나를 차단한 것 모두)
+        userBlockCommandPort.deleteAllByUserId(userId);
         // 최근검색어 삭제
         recentSearchCommandPort.deleteAllByUserId(userId);
         // 알림 삭제 // TODO 알림구현 적용되면 수정

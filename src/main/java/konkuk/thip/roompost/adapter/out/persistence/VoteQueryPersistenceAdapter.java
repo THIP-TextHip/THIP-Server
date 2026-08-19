@@ -23,8 +23,8 @@ public class VoteQueryPersistenceAdapter implements VoteQueryPort {
     private final VoteJpaRepository voteJpaRepository;
 
     @Override
-    public List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count) {
-        return voteJpaRepository.findTopParticipationVotesByRoom(room.getId(), count);
+    public List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Room room, int count, Long viewerId) {
+        return voteJpaRepository.findTopParticipationVotesByRoom(room.getId(), count, viewerId);
     }
 
     @Override

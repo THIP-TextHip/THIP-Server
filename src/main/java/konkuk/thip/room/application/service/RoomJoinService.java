@@ -13,6 +13,7 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.application.port.in.dto.RoomJoinType;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class RoomJoinService implements RoomJoinUseCase {
     private final RoomCommandPort roomCommandPort;
     private final RoomParticipantCommandPort roomParticipantCommandPort;
     private final UserCommandPort userCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     private final RoomNotificationOrchestrator roomNotificationOrchestrator;
 
@@ -62,6 +64,11 @@ public class RoomJoinService implements RoomJoinUseCase {
         room.validateRoomRecruitExpired();
 
         Optional<RoomParticipant> roomParticipantOptional = roomParticipantCommandPort.findByUserIdAndRoomIdOptional(roomJoinCommand.userId(), roomJoinCommand.roomId());
+
+        // 참여하려는 방의 방장이 차단 관계면 참여를 막는다. 나가기(CANCEL)에는 적용하지 않는다.
+        if (type == RoomJoinType.JOIN) {
+            validateHostNotBlocked(roomJoinCommand.userId(), room.getId());
+        }
 
         // 방 참여 상태 변경 요청에 따라 분기 처리
         switch (type) {
@@ -93,6 +100,13 @@ public class RoomJoinService implements RoomJoinUseCase {
     @Recover
     public RoomJoinResult recoverBusinessException(BusinessException e, RoomJoinCommand roomJoinCommand) {
         throw e;
+    }
+
+    private void validateHostNotBlocked(Long userId, Long roomId) {
+        RoomParticipant host = roomParticipantCommandPort.findHostByRoomId(roomId);
+        if (host != null && userBlockQueryPort.existsBlockBetween(userId, host.getUserId())) {
+            throw new BusinessException(ErrorCode.ROOM_HOST_BLOCKED);
+        }
     }
 
     private void sendNotifications(RoomJoinCommand roomJoinCommand, Room room) {

@@ -4,6 +4,7 @@ import konkuk.thip.common.exception.BusinessException;
 import konkuk.thip.notification.application.service.FeedNotificationOrchestratorSyncImpl;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.application.service.following.UserFollowService;
 import konkuk.thip.user.domain.Following;
@@ -27,6 +28,7 @@ class UserFollowServiceTest {
 
     private FollowingCommandPort followingCommandPort;
     private UserCommandPort userCommandPort;
+    private UserBlockQueryPort userBlockQueryPort;
     private UserFollowService userFollowService;
 
     private FeedNotificationOrchestratorSyncImpl feedNotificationOrchestratorSyncImpl;
@@ -35,8 +37,9 @@ class UserFollowServiceTest {
     void setUp() {
         followingCommandPort = mock(FollowingCommandPort.class);
         userCommandPort = mock(UserCommandPort.class);
+        userBlockQueryPort = mock(UserBlockQueryPort.class);
         feedNotificationOrchestratorSyncImpl = mock(FeedNotificationOrchestratorSyncImpl.class);
-        userFollowService = new UserFollowService(followingCommandPort, userCommandPort, feedNotificationOrchestratorSyncImpl);
+        userFollowService = new UserFollowService(followingCommandPort, userCommandPort, userBlockQueryPort, feedNotificationOrchestratorSyncImpl);
     }
 
     @Nested

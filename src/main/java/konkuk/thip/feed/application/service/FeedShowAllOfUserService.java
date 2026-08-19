@@ -8,7 +8,9 @@ import konkuk.thip.feed.application.mapper.FeedQueryMapper;
 import konkuk.thip.feed.application.port.in.FeedShowAllOfUserUseCase;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
+import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
@@ -24,6 +28,7 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
     private static final int PAGE_SIZE = 10;
     private final FeedQueryPort feedQueryPort;
     private final PostLikeQueryPort postLikeQueryPort;
+    private final UserBlockQueryPort userBlockQueryPort;
     private final FeedQueryMapper feedQueryMapper;
 
     @Transactional(readOnly = true)
@@ -57,6 +62,11 @@ public class FeedShowAllOfUserService implements FeedShowAllOfUserUseCase {
     @Transactional(readOnly = true)
     @Override
     public FeedShowByUserResponse showPublicFeedsOfFeedOwner(Long userId, Long feedOwnerId, String cursor) {
+        // 0. 차단 관계면 프로필 자체에 진입할 수 없다 (존재 여부를 노출하지 않도록 404)
+        if (userBlockQueryPort.existsBlockBetween(userId, feedOwnerId)) {
+            throw new EntityNotFoundException(USER_NOT_FOUND);
+        }
+
         // 1. 커서 생성
         Cursor nextCursor = Cursor.from(cursor, PAGE_SIZE);
 

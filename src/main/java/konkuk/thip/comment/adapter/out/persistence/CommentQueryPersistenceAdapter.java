@@ -22,11 +22,11 @@ public class CommentQueryPersistenceAdapter implements CommentQueryPort {
     private final CommentMapper commentMapper;
 
     @Override
-    public CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, String postTypeStr, Cursor cursor) {
+    public CursorBasedList<CommentQueryDto> findLatestRootCommentsWithDeleted(Long postId, String postTypeStr, Cursor cursor, Long viewerId) {
         LocalDateTime lastCreatedAt = cursor.isFirstRequest() ? null : cursor.getLocalDateTime(0);
         int size = cursor.getPageSize();
 
-        List<CommentQueryDto> commentQueryDtos = commentJpaRepository.findRootCommentsWithDeletedByCreatedAtDesc(postId, postTypeStr, lastCreatedAt, size);
+        List<CommentQueryDto> commentQueryDtos = commentJpaRepository.findRootCommentsWithDeletedByCreatedAtDesc(postId, postTypeStr, lastCreatedAt, size, viewerId);
 
         return CursorBasedList.of(commentQueryDtos, size, commentQueryDto -> {
             Cursor nextCursor = new Cursor(List.of(commentQueryDto.createdAt().toString()));
@@ -35,13 +35,13 @@ public class CommentQueryPersistenceAdapter implements CommentQueryPort {
     }
 
     @Override
-    public List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId) {
-        return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentId);
+    public List<CommentQueryDto> findAllActiveChildCommentsOldestFirst(Long rootCommentId, Long viewerId) {
+        return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentId, viewerId);
     }
 
     @Override
-    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds) {
-        return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentIds);
+    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsOldestFirst(Set<Long> rootCommentIds, Long viewerId) {
+        return commentJpaRepository.findAllActiveChildCommentsByCreatedAtAsc(rootCommentIds, viewerId);
     }
 
     @Override

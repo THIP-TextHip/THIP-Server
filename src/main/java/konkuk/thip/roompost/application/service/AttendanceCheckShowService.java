@@ -31,7 +31,7 @@ public class AttendanceCheckShowService implements AttendanceCheckShowUseCase {
         Cursor cursor = Cursor.from(cursorStr, PAGE_SIZE);
 
         // 3. 오늘의 한마디 조회
-        CursorBasedList<AttendanceCheckQueryDto> dtos = attendanceCheckQueryPort.findAttendanceChecksByCreatedAtDesc(roomId, cursor);
+        CursorBasedList<AttendanceCheckQueryDto> dtos = attendanceCheckQueryPort.findAttendanceChecksByCreatedAtDesc(roomId, cursor, userId);
 
         // 4. response 로 매핑 후 반환
         return new AttendanceCheckShowResponse(

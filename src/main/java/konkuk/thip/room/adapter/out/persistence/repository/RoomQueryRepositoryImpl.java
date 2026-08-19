@@ -19,9 +19,12 @@ import konkuk.thip.room.application.port.out.dto.QRoomQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomParticipantQueryDto;
 import konkuk.thip.room.application.port.out.dto.RoomQueryDto;
 import konkuk.thip.room.domain.value.Category;
+import konkuk.thip.room.domain.value.RoomParticipantRole;
 import konkuk.thip.room.domain.value.RoomStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,10 +42,11 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     private final QBookJpaEntity book = QBookJpaEntity.bookJpaEntity;
     private final QRoomParticipantJpaEntity participant = QRoomParticipantJpaEntity.roomParticipantJpaEntity;
 
-    /** 모집중 + ACTIVE 공통 where */
-    private BooleanBuilder recruitingActiveWhere() {
+    /** 모집중 + ACTIVE 공통 where (방장이 차단 관계인 방은 제외) */
+    private BooleanBuilder recruitingActiveWhere(Long viewerId) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(room.roomStatus.eq(RECRUITING));
+        where.and(roomHostNotBlockedWith(viewerId));
         return where;
     }
 
@@ -96,10 +100,10 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
      * 모집중인 방 검색 관련 메서드
      */
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsOrderByStartDateAsc(String keyword, LocalDate lastStartDate, Long roomId, int pageSize) {
+    public List<RoomQueryDto> findRecruitingRoomsOrderByStartDateAsc(String keyword, LocalDate lastStartDate, Long roomId, int pageSize, Long viewerId) {
         DateExpression<LocalDate> cursorExpr = room.startDate; // 커서 비교는 startDate
 
-        BooleanBuilder where = recruitingActiveWhere();
+        BooleanBuilder where = recruitingActiveWhere(viewerId);
         applyKeyword(where, keyword);
         applyCursorStartDateAsc(where, cursorExpr, lastStartDate, roomId);
         
@@ -114,10 +118,10 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByStartDateAsc(String keyword, Category category, LocalDate lastStartDate, Long roomId, int pageSize) {
+    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByStartDateAsc(String keyword, Category category, LocalDate lastStartDate, Long roomId, int pageSize, Long viewerId) {
         DateExpression<LocalDate> cursorExpr = room.startDate;
 
-        BooleanBuilder where = recruitingActiveWhere();
+        BooleanBuilder where = recruitingActiveWhere(viewerId);
         applyCategory(where, category);
         applyKeyword(where, keyword);
         applyCursorStartDateAsc(where, cursorExpr, lastStartDate, roomId);
@@ -133,8 +137,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsOrderByMemberCountDesc(String keyword, Integer lastMemberCount, Long roomId, int pageSize) {
-        BooleanBuilder where = recruitingActiveWhere();
+    public List<RoomQueryDto> findRecruitingRoomsOrderByMemberCountDesc(String keyword, Integer lastMemberCount, Long roomId, int pageSize, Long viewerId) {
+        BooleanBuilder where = recruitingActiveWhere(viewerId);
         applyKeyword(where, keyword);
         applyCursorMemberCountDesc(where, lastMemberCount, roomId);
 
@@ -149,8 +153,8 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, Category category, Integer lastMemberCount, Long roomId, int pageSize) {
-        BooleanBuilder where = recruitingActiveWhere();
+    public List<RoomQueryDto> findRecruitingRoomsWithCategoryOrderByMemberCountDesc(String keyword, Category category, Integer lastMemberCount, Long roomId, int pageSize, Long viewerId) {
+        BooleanBuilder where = recruitingActiveWhere(viewerId);
         applyCategory(where, category);
         applyKeyword(where, keyword);
         applyCursorMemberCountDesc(where, lastMemberCount, roomId);
@@ -167,7 +171,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
 //  -----------------------------------------------------------------------------------------------------------------------
 
     @Override
-    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, Category category, int count) {
+    public List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Long roomId, Category category, int count, Long viewerId) {
         List<Tuple> tuples = queryFactory
                 .select(room.roomId, room.title, room.memberCount, room.recruitCount, room.startDate, book.imageUrl)
                 .from(room)
@@ -177,6 +181,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                                 .and(room.roomStatus.eq(RECRUITING))     // 모집 중인 방
                                 .and(room.roomId.ne(roomId))// 현재 방 제외
                                 .and(room.isPublic.isTrue()) // 공개방 만
+                        , roomHostNotBlockedWith(viewerId)
                 )
                 .orderBy(room.startDate.asc())
                 .limit(count)
@@ -323,7 +328,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(Category category, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByStartDateAsc(Category category, int limit, Long viewerId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -336,14 +341,14 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .where(findDeadlinePopularRecentRoomCondition(category))
+                .where(findDeadlinePopularRecentRoomCondition(category, viewerId))
                 .orderBy(room.startDate.asc(), room.memberCount.desc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByMemberCount(Category category, int limit, Long viewerId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -356,14 +361,14 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 ))
                 .from(room)
                 .join(room.bookJpaEntity, book)
-                .where(findDeadlinePopularRecentRoomCondition(category))
+                .where(findDeadlinePopularRecentRoomCondition(category, viewerId))
                 .orderBy(room.memberCount.desc(), room.startDate.asc(), room.roomId.asc())
                 .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime createdAfter, int limit) {
+    public List<RoomQueryDto> findRoomsByCategoryOrderByCreatedAtDesc(Category category, LocalDateTime createdAfter, int limit, Long viewerId) {
         return queryFactory
                 .select(new QRoomQueryDto(
                         room.roomId,
@@ -377,7 +382,7 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .from(room)
                 .join(room.bookJpaEntity, book)
                 .where(
-                        findDeadlinePopularRecentRoomCondition(category)
+                        findDeadlinePopularRecentRoomCondition(category, viewerId)
                                 .and(room.createdAt.goe(createdAfter))
                 )
                 .orderBy(room.createdAt.desc(), room.roomId.desc())
@@ -386,10 +391,15 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
     }
 
     @Override
-    public List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize) {
+    public List<RoomQueryDto> findRoomsByIsbnOrderByStartDateAsc(String isbn, LocalDate dateCursor, Long roomIdCursor, int pageSize, Long viewerId) {
         DateExpression<LocalDate> cursorExpr = room.startDate; // 커서 비교는 startDate(= 모집 마감일 - 1일)
         BooleanExpression baseCondition = room.bookJpaEntity.isbn.eq(isbn)
                 .and(room.roomStatus.eq(RECRUITING)); // 모집중인 방
+
+        BooleanExpression hostNotBlocked = roomHostNotBlockedWith(viewerId);
+        if (hostNotBlocked != null) {
+            baseCondition = baseCondition.and(hostNotBlocked);
+        }
 
 
         if (dateCursor != null && roomIdCursor != null) { // 첫 페이지가 아닌 경우
@@ -416,10 +426,30 @@ public class RoomQueryRepositoryImpl implements RoomQueryRepository {
                 .fetch();
     }
 
-    private BooleanExpression findDeadlinePopularRecentRoomCondition(Category category) {
-        return room.category.eq(category)
+    private BooleanExpression findDeadlinePopularRecentRoomCondition(Category category, Long viewerId) {
+        BooleanExpression condition = room.category.eq(category)
                 .and(room.roomStatus.eq(RECRUITING)) // 모집중인 방
                 .and(room.isPublic.isTrue()); // 공개 방만 조회
+
+        BooleanExpression hostNotBlocked = roomHostNotBlockedWith(viewerId);
+        return hostNotBlocked != null ? condition.and(hostNotBlocked) : condition;
+    }
+
+    // rooms 에 작성자 컬럼이 없어 방장을 participants 의 role 로 찾아야 한다. 이미 참여 중인 방은 숨기지 않는다.
+    private BooleanExpression roomHostNotBlockedWith(Long viewerId) {
+        if (viewerId == null) {
+            return null;
+        }
+        QRoomParticipantJpaEntity host = new QRoomParticipantJpaEntity("blockFilterHost");
+        return JPAExpressions
+                .selectOne()
+                .from(host)
+                .where(
+                        host.roomJpaEntity.roomId.eq(room.roomId),
+                        host.roomParticipantRole.eq(RoomParticipantRole.HOST),
+                        notBlockedWith(host.userJpaEntity.userId, viewerId).not()
+                )
+                .notExists();
     }
 
     /**

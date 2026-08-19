@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface FollowingQueryRepository {
     Optional<FollowingJpaEntity> findByUserAndTargetUser(Long userId, Long targetUserId);
 
-    List<UserQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size);
-    List<UserQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size);
+    List<UserQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size, Long viewerId);
+    List<UserQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size, Long viewerId);
 
     List<UserJpaEntity> findLatestFollowers(Long userId, int size);
 

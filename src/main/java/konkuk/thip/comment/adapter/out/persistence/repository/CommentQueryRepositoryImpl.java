@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static konkuk.thip.common.entity.StatusType.ACTIVE;
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
 
 @Repository
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
     // 최상위 댓글 조회 (삭제된 댓글 포함, 최신순, 페이징)
     @Override
-    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size) {
+    public List<CommentQueryDto> findRootCommentsWithDeletedByCreatedAtDesc(Long postId, String postTypeStr, LocalDateTime lastCreatedAt, int size, Long viewerId) {
         // 최상위 댓글(size+1) 프로젝션 생성
         QCommentQueryDto proj = new QCommentQueryDto(
                 comment.commentId,
@@ -57,6 +58,12 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                         : Expressions.TRUE
                 );
 
+        // 차단 관계인 작성자의 루트 댓글은 하위 답글까지 통째로 숨긴다
+        BooleanExpression notBlocked = notBlockedWith(commentCreator.userId, viewerId);
+        if (notBlocked != null) {
+            whereClause = whereClause.and(notBlocked);
+        }
+
         // 조회 및 반환
         return queryFactory
                 .select(proj)
@@ -69,7 +76,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     }
 
     @Override
-    public List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId) {
+    public List<CommentQueryDto> findAllActiveChildCommentsByCreatedAtAsc(Long rootCommentId, Long viewerId) {
         List<CommentQueryDto> allDescendants = new ArrayList<>();       // 결과 누적용 리스트
 
         // 1) 부모 ID 집합에 루트 댓글 ID 추가
@@ -101,7 +108,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                     .where(
                             comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
                             comment.status.eq(ACTIVE),        // 자식 댓글은 ACTIVE인 것만 조회
-                            commentCreator.status.eq(ACTIVE)    // 자식 댓글 작성자 ACTIVE
+                            commentCreator.status.eq(ACTIVE),    // 자식 댓글 작성자 ACTIVE
+                            notBlockedWith(commentCreator.userId, viewerId)     // 차단 관계인 작성자의 답글 숨김
                     )
                     .fetch();
 
@@ -120,7 +128,7 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
     }
 
     @Override
-    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsByCreatedAtAsc(Set<Long> rootCommentIds) {
+    public Map<Long, List<CommentQueryDto>> findAllActiveChildCommentsByCreatedAtAsc(Set<Long> rootCommentIds, Long viewerId) {
         // 1) 루트 ID별로 최상위 매핑 초기화
         Map<Long, Long> idToRoot = new HashMap<>();
         for (Long rootId : rootCommentIds) {
@@ -161,7 +169,8 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
                     .where(
                             comment.parent.commentId.in(parentIds),     // parentIds 하위의 모든 자식 댓글 조회
                             comment.status.eq(ACTIVE),        // 자식 댓글은 ACTIVE인 것만 조회
-                            commentCreator.status.eq(ACTIVE)    // 자식 댓글 작성자 ACTIVE
+                            commentCreator.status.eq(ACTIVE),    // 자식 댓글 작성자 ACTIVE
+                            notBlockedWith(commentCreator.userId, viewerId)     // 차단 관계인 작성자의 답글 숨김
                     )
                     .fetch();
 

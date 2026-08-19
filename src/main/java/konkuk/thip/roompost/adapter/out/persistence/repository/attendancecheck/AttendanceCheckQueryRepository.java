@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface AttendanceCheckQueryRepository {
 
-    List<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, LocalDateTime lastCreatedAt, int size);
+    List<AttendanceCheckQueryDto> findAttendanceChecksByCreatedAtDesc(Long roomId, LocalDateTime lastCreatedAt, int size, Long viewerId);
 }

@@ -7,6 +7,7 @@ import konkuk.thip.feed.application.port.in.dto.FeedIsSavedResult;
 import konkuk.thip.feed.application.port.out.FeedCommandPort;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
 import konkuk.thip.feed.domain.Feed;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class FeedSavedService implements FeedSavedUseCase {
 
     private final FeedCommandPort feedCommandPort;
     private final FeedQueryPort feedQueryPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     @Override
     @Transactional
@@ -32,6 +34,11 @@ public class FeedSavedService implements FeedSavedUseCase {
         validateSaveFeedAction(command.isSaved(), alreadySaved);
 
         if (command.isSaved()) {
+            // 차단 관계인 작성자의 피드는 새로 저장할 수 없다. 저장 해제는 막지 않는다.
+            if (!command.userId().equals(feed.getCreatorId())
+                    && userBlockQueryPort.existsBlockBetween(command.userId(), feed.getCreatorId())) {
+                throw new BusinessException(USER_BLOCKED_CANNOT_INTERACT);
+            }
             feedCommandPort.saveSavedFeed(command.userId(), feed.getId());
         } else {
             feedCommandPort.deleteSavedFeed(command.userId(), feed.getId());

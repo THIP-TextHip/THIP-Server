@@ -5,12 +5,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -19,6 +22,7 @@ class FeedNotificationOrchestratorSyncImplUnitTest {
 
     @Mock NotificationSyncExecutor notificationSyncExecutor;
     @Mock FeedEventCommandPort feedEventCommandPort;
+    @Mock UserBlockQueryPort userBlockQueryPort;
 
     @InjectMocks FeedNotificationOrchestratorSyncImpl sut;
 
@@ -50,5 +54,20 @@ class FeedNotificationOrchestratorSyncImplUnitTest {
         verify(feedEventCommandPort).publishFeedCommentedEvent(
                 "title", "content", 123L, targetUserId
         );
+    }
+
+    @Test
+    @DisplayName("차단 관계면 알림을 만들지 않는다")
+    void suppress_notification_when_blocked() {
+        // given
+        Long targetUserId = 10L;
+        Long actorUserId = 20L;
+        given(userBlockQueryPort.existsBlockBetween(targetUserId, actorUserId)).willReturn(true);
+
+        // when
+        sut.notifyFeedCommented(targetUserId, actorUserId, "alice", 99L);
+
+        // then
+        verify(notificationSyncExecutor, never()).execute(any(), any(), any(), any(), any());
     }
 }

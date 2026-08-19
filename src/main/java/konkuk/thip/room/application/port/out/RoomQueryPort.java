@@ -18,12 +18,12 @@ public interface RoomQueryPort {
     /**
      * 방 검색
      */
-    CursorBasedList<RoomQueryDto> searchRecruitingRoomsByDeadline(String keyword, Cursor cursor);
-    CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByDeadline(String keyword, Category category, Cursor cursor);
-    CursorBasedList<RoomQueryDto> searchRecruitingRoomsByMemberCount(String keyword, Cursor cursor);
-    CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor);
+    CursorBasedList<RoomQueryDto> searchRecruitingRoomsByDeadline(String keyword, Cursor cursor, Long viewerId);
+    CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByDeadline(String keyword, Category category, Cursor cursor, Long viewerId);
+    CursorBasedList<RoomQueryDto> searchRecruitingRoomsByMemberCount(String keyword, Cursor cursor, Long viewerId);
+    CursorBasedList<RoomQueryDto> searchRecruitingRoomsWithCategoryByMemberCount(String keyword, Category category, Cursor cursor, Long viewerId);
 
-    List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Room currentRoom, int count);
+    List<RoomRecruitingDetailViewResponse.RecommendRoom> findOtherRecruitingRoomsByCategoryOrderByStartDateAsc(Room currentRoom, int count, Long viewerId);
 
     CursorBasedList<RoomParticipantQueryDto> searchHomeJoinedRooms(Long userId, Cursor cursor);
 
@@ -35,13 +35,13 @@ public interface RoomQueryPort {
 
     CursorBasedList<RoomQueryDto> findExpiredRoomsUserParticipated(Long userId, Cursor cursor);
 
-    CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor);
+    CursorBasedList<RoomQueryDto> findRoomsByIsbnOrderByDeadline(String isbn, Cursor cursor, Long viewerId);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByDeadline(Category category, int limit, Long viewerId);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByPopular(Category category, int limit, Long viewerId);
 
-    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit);
+    List<RoomQueryDto> findRoomsByCategoryOrderByRecent(Category category, LocalDateTime createdAfter, int limit, Long viewerId);
     /**
      * 임시 메서드
      * TODO 리펙토링 대상

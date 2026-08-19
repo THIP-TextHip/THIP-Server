@@ -7,6 +7,7 @@ import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.application.service.validator.RoomParticipantValidator;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
     private final UserCommandPort userCommandPort;
 
     private final RoomParticipantValidator roomParticipantValidator;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     @Override
     @Transactional(readOnly = true)
@@ -35,8 +38,11 @@ public class RoomGetMemberListService implements RoomGetMemberListUseCase {
         // 1-1. 방 검증 및 방 조회
         Room room = roomCommandPort.getByIdOrThrow(roomId);
 
-        // 2. 방 참여자(UserRoom) 전체 조회
-        List<RoomParticipant> roomParticipants = roomParticipantCommandPort.findAllByRoomId(room.getId());
+        // 2. 방 참여자 전체 조회 (차단 관계인 참여자는 제외. memberCount 는 차감하지 않는다)
+        Set<Long> blockedUserIds = userBlockQueryPort.findBlockedUserIdsBothWays(userId);
+        List<RoomParticipant> roomParticipants = roomParticipantCommandPort.findAllByRoomId(room.getId()).stream()
+                .filter(roomParticipant -> !blockedUserIds.contains(roomParticipant.getUserId()))
+                .toList();
 
         // 3. 참여자 userId 목록 추출
         List<Long> userIds = roomParticipants.stream()

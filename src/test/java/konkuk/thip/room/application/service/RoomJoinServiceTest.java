@@ -8,6 +8,7 @@ import konkuk.thip.room.application.port.out.RoomCommandPort;
 import konkuk.thip.room.application.port.out.RoomParticipantCommandPort;
 import konkuk.thip.room.domain.Room;
 import konkuk.thip.room.domain.RoomParticipant;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import konkuk.thip.user.domain.value.Alias;
@@ -33,6 +34,7 @@ class RoomJoinServiceTest {
     private RoomJoinService roomJoinService;
     private UserCommandPort userCommandPort;
     private RoomNotificationOrchestratorSyncImpl roomNotificationOrchestratorSyncImpl;
+    private UserBlockQueryPort userBlockQueryPort;
 
     private final Long ROOM_ID = 1L;
     private final Long USER_ID = 2L;
@@ -47,11 +49,13 @@ class RoomJoinServiceTest {
         roomParticipantCommandPort = mock(RoomParticipantCommandPort.class);
         userCommandPort = mock(UserCommandPort.class);
         roomNotificationOrchestratorSyncImpl = mock(RoomNotificationOrchestratorSyncImpl.class);
+        userBlockQueryPort = mock(UserBlockQueryPort.class);
 
         roomJoinService = new RoomJoinService(
                 roomCommandPort,
                 roomParticipantCommandPort,
                 userCommandPort,
+                userBlockQueryPort,
                 roomNotificationOrchestratorSyncImpl
         );
     }

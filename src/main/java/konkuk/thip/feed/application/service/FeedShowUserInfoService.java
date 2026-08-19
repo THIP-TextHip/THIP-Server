@@ -4,7 +4,9 @@ import konkuk.thip.feed.adapter.in.web.response.FeedShowUserInfoResponse;
 import konkuk.thip.feed.application.mapper.FeedQueryMapper;
 import konkuk.thip.feed.application.port.in.FeedShowUserInfoUseCase;
 import konkuk.thip.feed.application.port.out.FeedQueryPort;
+import konkuk.thip.common.exception.EntityNotFoundException;
 import konkuk.thip.user.application.port.out.FollowingQueryPort;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static konkuk.thip.common.exception.code.ErrorCode.USER_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -21,6 +25,7 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
     private final UserCommandPort userCommandPort;
     private final FollowingQueryPort followingQueryPort;
     private final FeedQueryPort feedQueryPort;
+    private final UserBlockQueryPort userBlockQueryPort;
     private final FeedQueryMapper feedQueryMapper;
 
     @Transactional(readOnly = true)
@@ -41,6 +46,11 @@ public class FeedShowUserInfoService implements FeedShowUserInfoUseCase {
     @Transactional(readOnly = true)
     @Override
     public FeedShowUserInfoResponse showAnotherUserInfoInFeeds(Long userId, Long feedOwnerId) {
+        // 0. 차단 관계면 프로필 정보도 노출하지 않는다
+        if (userBlockQueryPort.existsBlockBetween(userId, feedOwnerId)) {
+            throw new EntityNotFoundException(USER_NOT_FOUND);
+        }
+
         // 1. feedOwner 찾기
         User feedOwner = userCommandPort.findById(feedOwnerId);
 

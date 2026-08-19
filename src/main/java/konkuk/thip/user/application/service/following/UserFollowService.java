@@ -7,6 +7,7 @@ import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.dto.UserFollowCommand;
 import konkuk.thip.user.application.port.out.FollowingCommandPort;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.Following;
 import konkuk.thip.user.domain.User;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static konkuk.thip.common.exception.code.ErrorCode.USER_BLOCKED_CANNOT_INTERACT;
 import static konkuk.thip.common.exception.code.ErrorCode.USER_CANNOT_FOLLOW_SELF;
 
 @Service
@@ -27,6 +29,7 @@ public class UserFollowService implements UserFollowUsecase {
 
     private final FollowingCommandPort followingCommandPort;
     private final UserCommandPort userCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     private final FeedNotificationOrchestrator feedNotificationOrchestrator;
 
@@ -57,6 +60,7 @@ public class UserFollowService implements UserFollowUsecase {
         boolean isFollowRequest = Following.validateFollowingState(optionalFollowing.isPresent(), type);
 
         if (isFollowRequest) { // 팔로우 요청인 경우
+            validateNotBlocked(userId, targetUserId);
             targetUser.increaseFollowerCount();
             followingCommandPort.save(Following.withoutId(userId, targetUserId), targetUser);
 
@@ -83,6 +87,12 @@ public class UserFollowService implements UserFollowUsecase {
     private void validateParams(Long userId, Long targetUserId) {
         if(userId.equals(targetUserId)) {
             throw new BusinessException(USER_CANNOT_FOLLOW_SELF);
+        }
+    }
+
+    private void validateNotBlocked(Long userId, Long targetUserId) {
+        if (userBlockQueryPort.existsBlockBetween(userId, targetUserId)) {
+            throw new BusinessException(USER_BLOCKED_CANNOT_INTERACT);
         }
     }
 }

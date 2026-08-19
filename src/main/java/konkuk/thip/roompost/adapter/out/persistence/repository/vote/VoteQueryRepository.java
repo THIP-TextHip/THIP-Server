@@ -11,7 +11,7 @@ public interface VoteQueryRepository {
 
     List<VoteJpaEntity> findVotesByRoom(Long roomId, String type, Integer pageStart, Integer pageEnd, Long userId);
 
-    List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count);
+    List<RoomPlayingOrExpiredDetailViewResponse.CurrentVote> findTopParticipationVotesByRoom(Long roomId, int count, Long viewerId);
 
     List<VoteItemQueryDto> mapVoteItemsByVoteIds(Set<Long> voteIds, Long userId);
 

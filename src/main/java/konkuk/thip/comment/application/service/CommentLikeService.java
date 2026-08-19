@@ -8,12 +8,15 @@ import konkuk.thip.comment.application.port.out.CommentLikeCommandPort;
 import konkuk.thip.comment.application.port.out.CommentLikeQueryPort;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
+import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
 import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.domain.PostType;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class CommentLikeService implements CommentLikeUseCase {
     private final CommentLikeQueryPort commentLikeQueryPort;
     private final CommentLikeCommandPort commentLikeCommandPort;
     private final UserCommandPort userCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     private final PostHandler postHandler;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
@@ -50,6 +54,7 @@ public class CommentLikeService implements CommentLikeUseCase {
 
         // 3. 좋아요 상태변경
         if (command.isLike()) {
+            validateNotBlocked(command.userId(), comment.getCreatorId());    // 차단 관계인 작성자의 댓글에는 좋아요할 수 없다
             comment.validateCanLike(alreadyLiked); // 좋아요 가능 여부 검증
             commentLikeCommandPort.save(command.userId(), command.commentId());
 
@@ -65,6 +70,15 @@ public class CommentLikeService implements CommentLikeUseCase {
         commentCommandPort.update(comment);
 
         return CommentIsLikeResult.of(comment.getId(), command.isLike());
+    }
+
+    private void validateNotBlocked(Long userId, Long commentCreatorId) {
+        if (userId.equals(commentCreatorId)) {
+            return;
+        }
+        if (userBlockQueryPort.existsBlockBetween(userId, commentCreatorId)) {
+            throw new BusinessException(ErrorCode.USER_BLOCKED_CANNOT_INTERACT);
+        }
     }
 
     private void sendNotifications(CommentIsLikeCommand command, Comment comment) {

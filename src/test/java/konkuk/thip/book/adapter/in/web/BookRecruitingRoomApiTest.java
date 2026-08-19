@@ -107,6 +107,7 @@ class BookRecruitingRoomApiTest {
 
         // when & then
         mockMvc.perform(get("/books/{isbn}/recruiting-rooms", book.getIsbn())
+                        .requestAttr("userId", user.getUserId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -121,6 +122,7 @@ class BookRecruitingRoomApiTest {
     void getRecruitingRooms_no_matching_book() throws Exception {
         // when & then
         mockMvc.perform(get("/books/{isbn}/recruiting-rooms", "0987654321123")
+                        .requestAttr("userId", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -149,6 +151,7 @@ class BookRecruitingRoomApiTest {
 
         // when & then (1페이지 요청)
         MvcResult result = mockMvc.perform(get("/books/{isbn}/recruiting-rooms", isbn)
+                        .requestAttr("userId", 1L)
                         .param("cursor", (String) null))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isSuccess").value(true))
@@ -164,6 +167,7 @@ class BookRecruitingRoomApiTest {
 
         // when & then (2페이지 요청)
         mockMvc.perform(get("/books/{isbn}/recruiting-rooms", isbn)
+                        .requestAttr("userId", 1L)
                         .param("cursor", nextCursor))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.recruitingRoomList.length()").value(5)) // 나머지 5개
