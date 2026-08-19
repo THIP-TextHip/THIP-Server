@@ -126,6 +126,13 @@ tasks.named('test') {
             excludeTags 'concurrency'
         }
     }
+    // 실패 원인이 요약되면 CI 로그만으로 진단할 수 없다
+    testLogging {
+        events 'failed'
+        exceptionFormat = 'full'
+        showStackTraces = true
+        showCauses = true
+    }
 }
 
 apply from: "$rootDir/jacoco.gradle"
