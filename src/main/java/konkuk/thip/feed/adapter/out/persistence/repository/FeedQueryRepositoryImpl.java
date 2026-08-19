@@ -13,12 +13,12 @@ import konkuk.thip.feed.adapter.out.jpa.QFeedJpaEntity;
 import konkuk.thip.feed.adapter.out.jpa.QSavedFeedJpaEntity;
 import konkuk.thip.feed.application.port.out.dto.FeedQueryDto;
 import konkuk.thip.feed.application.port.out.dto.QFeedQueryDto;
-import konkuk.thip.post.application.port.out.dto.PostQueryDto;
-import konkuk.thip.post.application.port.out.dto.QPostQueryDto;
 import konkuk.thip.user.adapter.out.jpa.QFollowingJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.QUserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -136,7 +136,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .where(
                         // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
                         feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
-                        cursorCondition
+                        cursorCondition,
+                        notBlockedWith(feed.userJpaEntity.userId, userId)
                 )
                 .orderBy(priority.desc(), feed.createdAt.desc())
                 .limit(size + 1)
@@ -153,7 +154,8 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                 .where(
                         // ACTIVE 인 feed & (내가 작성한 글 or 다른 유저가 작성한 공개글) & cursorCondition
                         feed.userJpaEntity.userId.eq(userId).or(feed.isPublic.eq(true)),
-                        lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE
+                        lastCreatedAt != null ? feed.createdAt.lt(lastCreatedAt) : Expressions.TRUE,
+                        notBlockedWith(feed.userJpaEntity.userId, userId)
                 )
                 .orderBy(feed.createdAt.desc())
                 .limit(size + 1)
@@ -343,11 +345,14 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
         );
     }
 
-    // 필터링 조건: 책 ISBN & 공개 피드
+    // 필터링 조건: 책 ISBN & 공개 피드 & 차단 관계가 아닌 작성자
     private BooleanExpression feedByBooksFilter(String isbn, Long userId) {
-        return feed.bookJpaEntity.isbn.eq(isbn)
+        BooleanExpression filter = feed.bookJpaEntity.isbn.eq(isbn)
 //                .and(feed.userJpaEntity.userId.ne(userId))
                 .and(feed.isPublic.eq(true));
+
+        BooleanExpression notBlocked = notBlockedWith(feed.userJpaEntity.userId, userId);
+        return notBlocked != null ? filter.and(notBlocked) : filter;
     }
 
     @Override
@@ -373,6 +378,12 @@ public class FeedQueryRepositoryImpl implements FeedQueryRepository {
                         savedFeed.feedJpaEntity.userJpaEntity.userId.eq(userId)
                                 .or(savedFeed.feedJpaEntity.isPublic.eq(true))
                 );
+
+        // 저장 관계(saved_feeds row)는 지우지 않고 목록에서만 숨긴다. 차단을 해제하면 다시 보인다.
+        BooleanExpression notBlocked = notBlockedWith(savedFeed.feedJpaEntity.userJpaEntity.userId, userId);
+        if (notBlocked != null) {
+            where = where.and(notBlocked);
+        }
 
         if (lastSavedAt != null) {
             where = where.and(savedFeed.createdAt.lt(lastSavedAt));

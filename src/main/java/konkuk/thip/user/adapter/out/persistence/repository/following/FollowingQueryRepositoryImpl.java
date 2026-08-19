@@ -13,6 +13,8 @@ import konkuk.thip.user.application.port.out.dto.UserQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static konkuk.thip.user.adapter.out.persistence.expression.BlockFilterExpressions.notBlockedWith;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,26 +39,29 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
     }
 
     @Override
-    public List<UserQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+    public List<UserQueryDto> findFollowerDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size, Long viewerId) {
         return findFollowDtos(
                 userId,
                 cursor,
                 size,
-                true // isFollowerQuery
+                true, // isFollowerQuery
+                viewerId
         );
     }
 
     @Override
-    public List<UserQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size) {
+    public List<UserQueryDto> findFollowingDtosByUserIdBeforeCreatedAt(Long userId, LocalDateTime cursor, int size, Long viewerId) {
         return findFollowDtos(
                 userId,
                 cursor,
                 size,
-                false // isFollowingQuery
+                false, // isFollowingQuery
+                viewerId
         );
     }
 
-    private List<UserQueryDto> findFollowDtos(Long userId, LocalDateTime cursor, int size, boolean isFollowerQuery) {
+    // userId 는 목록의 주인, viewerId 는 조회 주체. 제3자의 팔로우 목록을 볼 때 서로 다르다.
+    private List<UserQueryDto> findFollowDtos(Long userId, LocalDateTime cursor, int size, boolean isFollowerQuery, Long viewerId) {
         QFollowingJpaEntity following = QFollowingJpaEntity.followingJpaEntity;
         QUserJpaEntity user = QUserJpaEntity.userJpaEntity;
 
@@ -70,6 +75,8 @@ public class FollowingQueryRepositoryImpl implements FollowingQueryRepository {
         }
 
         QUserJpaEntity targetUser = isFollowerQuery ? following.userJpaEntity : following.followingUserJpaEntity;
+
+        condition.and(notBlockedWith(targetUser.userId, viewerId));
 
         return jpaQueryFactory
                 .select(new QUserQueryDto(

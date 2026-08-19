@@ -32,7 +32,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
                 user.getFollowerCount() : null;
 
         CursorBasedList<UserQueryDto> result = followingQueryPort.getFollowersByUserId(
-                user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
+                user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE), loginUserId
         );
 
         var followers = result.contents().stream()
@@ -55,7 +55,7 @@ public class UserGetFollowService implements UserGetFollowUsecase {
                 followingQueryPort.getFollowingCountByUser(user.getId()) : null;
 
         CursorBasedList<UserQueryDto> result = followingQueryPort.getFollowingByUserId(
-                user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE)
+                user.getId(), cursor, Math.min(size, MAX_PAGE_SIZE), userId
         );
 
         var following = result.contents().stream()
