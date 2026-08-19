@@ -12,9 +12,6 @@ import lombok.*;
                         name = "uq_user_blocks_user_target",
                         columnNames = {"user_id", "blocked_user_id"}
                 )
-        },
-        indexes = {
-                @Index(name = "idx_user_blocks_reverse", columnList = "blocked_user_id, user_id")
         }
 )
 @Getter
