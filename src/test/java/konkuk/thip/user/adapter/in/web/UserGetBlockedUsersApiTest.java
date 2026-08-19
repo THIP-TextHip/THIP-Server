@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -75,6 +76,54 @@ class UserGetBlockedUsersApiTest {
                 .andExpect(jsonPath("$.data.blockedUsers", hasSize(0)))
                 .andExpect(jsonPath("$.data.totalBlockedUserCount").value(0))
                 .andExpect(jsonPath("$.data.isLast").value(true));
+    }
+
+    @Test
+    @DisplayName("[성공] 차단 목록은 size 만큼 끊어 커서로 이어진다. (무한스크롤)")
+    void getBlockedUsers_paging() throws Exception {
+        // given : 25명을 차단한다
+        Alias alias = TestEntityFactory.createLiteratureAlias();
+        for (int i = 0; i < 25; i++) {
+            UserJpaEntity target = userJpaRepository.save(TestEntityFactory.createUser(alias, "blocked" + i));
+            userBlockJpaRepository.save(TestEntityFactory.createUserBlock(user, target));
+        }
+        userBlockJpaRepository.flush();
+
+        // when & then : 1페이지 10개, 총 개수는 첫 페이지에만 내려온다
+        String cursor = readPage(null, 10, 25, false);
+
+        // when & then : 2페이지 10개, 총 개수는 null
+        cursor = readPage(cursor, 10, null, false);
+
+        // when & then : 3페이지 5개, isLast = true, nextCursor 없음
+        readPage(cursor, 5, null, true);
+    }
+
+    /**
+     * 한 페이지를 조회해 크기·총개수·isLast 를 검증하고 다음 커서를 돌려준다.
+     */
+    private String readPage(String cursor, int expectedSize, Integer expectedTotal, boolean expectedLast) throws Exception {
+        var request = get(BLOCKED_USERS_API_PATH).requestAttr("userId", user.getUserId()).param("size", "10");
+        if (cursor != null) {
+            request = request.param("cursor", cursor);
+        }
+
+        String body = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.blockedUsers", hasSize(expectedSize)))
+                .andExpect(jsonPath("$.data.isLast").value(expectedLast))
+                .andExpect(expectedTotal == null
+                        ? jsonPath("$.data.totalBlockedUserCount").doesNotExist()
+                        : jsonPath("$.data.totalBlockedUserCount").value(expectedTotal))
+                .andReturn().getResponse().getContentAsString();
+
+        String next = com.jayway.jsonpath.JsonPath.parse(body).read("$.data.nextCursor", String.class);
+        if (expectedLast) {
+            assertThat(next).isNull();
+        } else {
+            assertThat(next).isNotBlank();
+        }
+        return next;
     }
 
     @Test
