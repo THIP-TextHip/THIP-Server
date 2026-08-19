@@ -6,6 +6,7 @@ import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator
 import konkuk.thip.notification.application.service.template.feed.*;
 import konkuk.thip.notification.domain.value.MessageRoute;
 import konkuk.thip.notification.domain.value.NotificationRedirectSpec;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,21 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
 
     private final NotificationSyncExecutor notificationSyncExecutor;
     private final FeedEventCommandPort feedEventCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
+
+    // 차단 관계면 알림을 만들지 않는다. DB 저장과 FCM 발송이 같은 경로라 early return 으로 둘 다 막힌다.
+    private boolean suppressed(Long targetUserId, Long actorUserId) {
+        return actorUserId != null && userBlockQueryPort.existsBlockBetween(targetUserId, actorUserId);
+    }
 
     // ========================= Feed 영역 =========================
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFollowed(Long targetUserId, Long actorUserId, String actorUsername) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new FollowedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
@@ -51,6 +62,10 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedCommented(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new FeedCommentedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
@@ -72,6 +87,10 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedReplied(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new FeedRepliedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
@@ -93,6 +112,10 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFolloweeNewFeed(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new FolloweeNewFeedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
@@ -114,6 +137,10 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedLiked(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new FeedLikedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
@@ -135,6 +162,10 @@ public class FeedNotificationOrchestratorSyncImpl implements FeedNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyFeedCommentLiked(Long targetUserId, Long actorUserId, String actorUsername, Long feedId) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new FeedCommentLikedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(

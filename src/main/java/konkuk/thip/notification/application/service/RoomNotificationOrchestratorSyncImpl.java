@@ -7,6 +7,7 @@ import konkuk.thip.notification.application.service.template.room.*;
 import konkuk.thip.notification.domain.value.MessageRoute;
 import konkuk.thip.notification.domain.value.NotificationRedirectSpec;
 import konkuk.thip.post.domain.PostType;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +27,22 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
 
     private final NotificationSyncExecutor notificationSyncExecutor;
     private final RoomEventCommandPort roomEventCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
+
+    // 차단 관계면 알림을 만들지 않는다. DB 저장과 FCM 발송이 같은 경로라 early return 으로 둘 다 막힌다.
+    private boolean suppressed(Long targetUserId, Long actorUserId) {
+        return actorUserId != null && userBlockQueryPort.existsBlockBetween(targetUserId, actorUserId);
+    }
 
     // ========================= Room 영역 =========================
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomPostCommented(Long targetUserId, Long actorUserId, String actorUsername,
                                         Long roomId, Integer page, Long postId, PostType postType) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new RoomPostCommentedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = createRoomPostWithCommentsRedirectSpec(roomId, page, postId, postType);
@@ -69,6 +80,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomRecordCreated(Long targetUserId, Long actorUserId, String actorUsername,
                                         Long roomId, String roomTitle, Integer page, Long postId) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new RoomRecordCreatedTemplate.Args(roomTitle, actorUsername);
 
         NotificationRedirectSpec redirectSpec = createRoomPostRedirectSpec(roomId, page, postId, PostType.RECORD);
@@ -129,6 +144,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomJoinToHost(Long hostUserId, Long roomId, String roomTitle, Long actorUserId, String actorUsername) {
+        if (suppressed(hostUserId, actorUserId)) {
+            return;
+        }
+
         var args = new RoomJoinToHostTemplate.Args(roomTitle, actorUsername);
 
         NotificationRedirectSpec redirectSpec = new NotificationRedirectSpec(
@@ -151,6 +170,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomCommentLiked(Long targetUserId, Long actorUserId, String actorUsername,
                                        Long roomId, Integer page, Long postId, PostType postType) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new RoomCommentLikedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = createRoomPostWithCommentsRedirectSpec(roomId, page, postId, postType);
@@ -170,6 +193,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomPostLiked(Long targetUserId, Long actorUserId, String actorUsername,
                                     Long roomId, Integer page, Long postId, PostType postType) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new RoomPostLikedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = createRoomPostRedirectSpec(roomId, page, postId, postType);
@@ -189,6 +216,10 @@ public class RoomNotificationOrchestratorSyncImpl implements RoomNotificationOrc
     @Transactional(propagation = Propagation.MANDATORY)
     public void notifyRoomPostCommentReplied(Long targetUserId, Long actorUserId, String actorUsername,
                                              Long roomId, Integer page, Long postId, PostType postType) {
+        if (suppressed(targetUserId, actorUserId)) {
+            return;
+        }
+
         var args = new RoomPostCommentRepliedTemplate.Args(actorUsername);
 
         NotificationRedirectSpec redirectSpec = createRoomPostWithCommentsRedirectSpec(roomId, page, postId, postType);

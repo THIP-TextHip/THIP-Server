@@ -10,6 +10,8 @@ import konkuk.thip.comment.application.port.out.CommentQueryPort;
 import konkuk.thip.comment.application.port.out.dto.CommentQueryDto;
 import konkuk.thip.comment.application.service.validator.CommentAuthorizationValidator;
 import konkuk.thip.comment.domain.Comment;
+import konkuk.thip.common.exception.BusinessException;
+import konkuk.thip.common.exception.code.ErrorCode;
 import konkuk.thip.common.exception.InvalidStateException;
 import konkuk.thip.notification.application.port.in.FeedNotificationOrchestrator;
 import konkuk.thip.notification.application.port.in.RoomNotificationOrchestrator;
@@ -17,6 +19,7 @@ import konkuk.thip.post.application.port.out.dto.PostQueryDto;
 import konkuk.thip.post.domain.CountUpdatable;
 import konkuk.thip.post.application.service.handler.PostHandler;
 import konkuk.thip.post.domain.PostType;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,7 @@ public class CommentCreateService implements CommentCreateUseCase {
     private final CommentLikeQueryPort commentLikeQueryPort;
     private final CommentQueryMapper commentQueryMapper;
     private final UserCommandPort userCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     private final PostHandler postHandler;
     private final CommentAuthorizationValidator commentAuthorizationValidator;
@@ -55,8 +59,11 @@ public class CommentCreateService implements CommentCreateUseCase {
         // 2-1. 게시글 타입에 따른 댓글 생성 권한 검증
         commentAuthorizationValidator.validateUserCanAccessPostForComment(type, post, command.userId());
 
-        // 2-2. 댓글 생성 푸쉬 알림 전송 (게시글 작성자에게)
+        // 2-2. 차단 관계인 작성자의 게시글에는 댓글을 달 수 없다
         PostQueryDto postQueryDto = postHandler.getPostQueryDto(type, post.getId());
+        validateNotBlocked(command.userId(), postQueryDto.creatorId());
+
+        // 2-3. 댓글 생성 푸쉬 알림 전송 (게시글 작성자에게)
         User actorUser = userCommandPort.findById(command.userId());
         sendNotificationsToPostWriter(postQueryDto, actorUser);
 
@@ -87,6 +94,15 @@ public class CommentCreateService implements CommentCreateUseCase {
         } else {
             CommentQueryDto savedCommentDto = commentQueryPort.findRootCommentById(savedCommentId);
             return commentQueryMapper.toRoot(savedCommentDto, false, command.userId());
+        }
+    }
+
+    private void validateNotBlocked(Long userId, Long targetUserId) {
+        if (targetUserId == null || userId.equals(targetUserId)) {
+            return;
+        }
+        if (userBlockQueryPort.existsBlockBetween(userId, targetUserId)) {
+            throw new BusinessException(ErrorCode.USER_BLOCKED_CANNOT_INTERACT);
         }
     }
 

@@ -16,6 +16,7 @@ import konkuk.thip.post.application.port.out.PostLikeCommandPort;
 import konkuk.thip.post.application.port.out.PostLikeQueryPort;
 import konkuk.thip.post.application.service.validator.PostLikeAuthorizationValidator;
 import konkuk.thip.post.domain.service.PostCountService;
+import konkuk.thip.user.application.port.out.UserBlockQueryPort;
 import konkuk.thip.user.application.port.out.UserCommandPort;
 import konkuk.thip.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class PostLikeService implements PostLikeUseCase {
     private final PostLikeQueryPort postLikeQueryPort;
     private final PostLikeCommandPort postLikeCommandPort;
     private final UserCommandPort userCommandPort;
+    private final UserBlockQueryPort userBlockQueryPort;
 
     private final PostHandler postHandler;
     private final PostCountService postCountService;
@@ -65,6 +67,7 @@ public class PostLikeService implements PostLikeUseCase {
 
         // 4. 좋아요 상태변경
         if (command.isLike()) {
+            validateNotBlocked(command);    // 차단 관계인 작성자의 게시글에는 좋아요할 수 없다
             postLikeAuthorizationValidator.validateUserCanLike(alreadyLiked); // 좋아요 가능 여부 검증
             postLikeCommandPort.save(command.userId(), command.postId(),command.postType());
 
@@ -91,6 +94,16 @@ public class PostLikeService implements PostLikeUseCase {
     @Recover
     public PostIsLikeResult recoverBusinessException(BusinessException e, PostIsLikeCommand command) {
         throw e;
+    }
+
+    private void validateNotBlocked(PostIsLikeCommand command) {
+        PostQueryDto postQueryDto = postHandler.getPostQueryDto(command.postType(), command.postId());
+        if (command.userId().equals(postQueryDto.creatorId())) {
+            return;
+        }
+        if (userBlockQueryPort.existsBlockBetween(command.userId(), postQueryDto.creatorId())) {
+            throw new BusinessException(ErrorCode.USER_BLOCKED_CANNOT_INTERACT);
+        }
     }
 
     private void sendNotifications(PostIsLikeCommand command) {
