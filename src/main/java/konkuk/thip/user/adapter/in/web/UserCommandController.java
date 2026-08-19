@@ -9,11 +9,14 @@ import konkuk.thip.common.security.annotation.AuthToken;
 import konkuk.thip.common.security.annotation.Oauth2Id;
 import konkuk.thip.common.security.annotation.UserId;
 import konkuk.thip.common.swagger.annotation.ExceptionDescription;
+import konkuk.thip.user.adapter.in.web.request.UserBlockRequest;
 import konkuk.thip.user.adapter.in.web.request.UserFollowRequest;
 import konkuk.thip.user.adapter.in.web.request.UserSignupRequest;
 import konkuk.thip.user.adapter.in.web.request.UserUpdateRequest;
+import konkuk.thip.user.adapter.in.web.response.UserBlockResponse;
 import konkuk.thip.user.adapter.in.web.response.UserFollowResponse;
 import konkuk.thip.user.adapter.in.web.response.UserSignupResponse;
+import konkuk.thip.user.application.port.in.UserBlockUseCase;
 import konkuk.thip.user.application.port.in.UserDeleteUseCase;
 import konkuk.thip.user.application.port.in.UserFollowUsecase;
 import konkuk.thip.user.application.port.in.UserSignupUseCase;
@@ -30,6 +33,7 @@ public class UserCommandController {
 
     private final UserSignupUseCase userSignupUseCase;
     private final UserFollowUsecase userFollowUsecase;
+    private final UserBlockUseCase userBlockUseCase;
     private final UserUpdateUseCase userUpdateUseCase;
     private final UserDeleteUseCase userDeleteUseCase;
 
@@ -62,6 +66,23 @@ public class UserCommandController {
             @RequestBody @Valid final UserFollowRequest userFollowRequest) {
         return BaseResponse.ok(UserFollowResponse.of(userFollowUsecase.changeFollowingState(
                 userFollowRequest.toCommand(userId, followingUserId)
+        )));
+    }
+
+    @Operation(
+            summary = "사용자 차단 상태 변경",
+            description = "특정 사용자를 차단하거나 차단 해제합니다. true 이면 차단, false 이면 차단 해제입니다. " +
+                    "차단하면 서로의 콘텐츠가 목록에서 보이지 않게 되며, 양쪽 팔로우 관계가 자동으로 해제됩니다. " +
+                    "차단을 해제해도 팔로우 관계는 복구되지 않습니다."
+    )
+    @ExceptionDescription(CHANGE_BLOCK_STATE)
+    @PostMapping("/users/block/{targetUserId}")
+    public BaseResponse<UserBlockResponse> blockUser(
+            @Parameter(hidden = true) @UserId final Long userId,
+            @Parameter(description = "차단/차단 해제할 사용자 ID") @PathVariable final Long targetUserId,
+            @RequestBody @Valid final UserBlockRequest userBlockRequest) {
+        return BaseResponse.ok(UserBlockResponse.of(userBlockUseCase.changeBlockState(
+                userBlockRequest.toCommand(userId, targetUserId)
         )));
     }
 

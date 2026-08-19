@@ -48,9 +48,23 @@ public enum SwaggerResponseDescription {
             USER_ALREADY_FOLLOWED,
             USER_ALREADY_UNFOLLOWED,
             USER_CANNOT_FOLLOW_SELF,
+            USER_BLOCKED_CANNOT_INTERACT,
             FOLLOW_COUNT_CANNOT_BE_NEGATIVE
     ))),
     GET_USER_FOLLOW(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND
+    ))),
+
+    // Block
+    CHANGE_BLOCK_STATE(new LinkedHashSet<>(Set.of(
+            USER_NOT_FOUND,
+            USER_ALREADY_BLOCKED,
+            USER_ALREADY_UNBLOCKED,
+            USER_CANNOT_BLOCK_SELF,
+            BLOCK_NOT_FOUND,
+            FOLLOW_COUNT_CANNOT_BE_NEGATIVE
+    ))),
+    GET_BLOCKED_USERS(new LinkedHashSet<>(Set.of(
             USER_NOT_FOUND
     ))),
 
@@ -62,6 +76,7 @@ public enum SwaggerResponseDescription {
 
     ))),
     ROOM_JOIN_CANCEL(new LinkedHashSet<>(Set.of(
+            ROOM_HOST_BLOCKED,
             USER_NOT_FOUND,
             ROOM_NOT_FOUND,
             ROOM_RECRUITMENT_PERIOD_EXPIRED,
@@ -254,6 +269,7 @@ public enum SwaggerResponseDescription {
             FEED_ACCESS_FORBIDDEN
     ))),
     CHANGE_FEED_SAVED_STATE(new LinkedHashSet<>(Set.of(
+            USER_BLOCKED_CANNOT_INTERACT,
             USER_NOT_FOUND,
             FEED_NOT_FOUND,
             FEED_ALREADY_SAVED,
@@ -283,6 +299,7 @@ public enum SwaggerResponseDescription {
 
     // Comment
     COMMENT_CREATE(new LinkedHashSet<>(Set.of(
+            USER_BLOCKED_CANNOT_INTERACT,
             POST_TYPE_NOT_MATCH,
             USER_NOT_FOUND,
             FEED_NOT_FOUND,
@@ -295,6 +312,7 @@ public enum SwaggerResponseDescription {
             ROOM_NOT_IN_PROGRESS
     ))),
     CHANGE_COMMENT_LIKE_STATE(new LinkedHashSet<>(Set.of(
+            USER_BLOCKED_CANNOT_INTERACT,
             USER_NOT_FOUND,
             COMMENT_NOT_FOUND,
             FEED_NOT_FOUND,

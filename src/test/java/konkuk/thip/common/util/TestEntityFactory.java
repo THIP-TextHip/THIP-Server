@@ -25,6 +25,7 @@ import konkuk.thip.room.domain.value.Category;
 import konkuk.thip.room.domain.value.RoomStatus;
 import konkuk.thip.roompost.adapter.out.jpa.*;
 import konkuk.thip.user.adapter.out.jpa.FollowingJpaEntity;
+import konkuk.thip.user.adapter.out.jpa.UserBlockJpaEntity;
 import konkuk.thip.user.adapter.out.jpa.UserJpaEntity;
 import konkuk.thip.user.domain.value.UserRole;
 import konkuk.thip.user.domain.value.Alias;
@@ -294,6 +295,13 @@ public class TestEntityFactory {
         return FollowingJpaEntity.builder()
                 .userJpaEntity(followerUser)
                 .followingUserJpaEntity(followingUser)
+                .build();
+    }
+
+    public static UserBlockJpaEntity createUserBlock(UserJpaEntity user, UserJpaEntity blockedUser) {
+        return UserBlockJpaEntity.builder()
+                .userJpaEntity(user)
+                .blockedUserJpaEntity(blockedUser)
                 .build();
     }
 

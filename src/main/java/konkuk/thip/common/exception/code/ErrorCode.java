@@ -67,6 +67,16 @@ public enum ErrorCode implements ResponseCode {
     FOLLOW_COUNT_CANNOT_BE_NEGATIVE(HttpStatus.BAD_REQUEST, 75003, "사용자의 팔로우 수가 0일때는 언팔로우는 불가능합니다."),
 
     /**
+     * 77000 : block error
+     */
+    BLOCK_NOT_FOUND(HttpStatus.NOT_FOUND, 77000, "존재하지 않는 차단 관계입니다."),
+    USER_ALREADY_BLOCKED(HttpStatus.BAD_REQUEST, 77001, "이미 차단한 사용자입니다."),
+    USER_ALREADY_UNBLOCKED(HttpStatus.BAD_REQUEST, 77002, "이미 차단 해제한 사용자입니다."),
+    USER_CANNOT_BLOCK_SELF(HttpStatus.BAD_REQUEST, 77003, "사용자는 자신을 차단할 수 없습니다."),
+    USER_BLOCKED_CANNOT_INTERACT(HttpStatus.BAD_REQUEST, 77004, "차단한 사용자와는 상호작용할 수 없습니다."),
+    ROOM_HOST_BLOCKED(HttpStatus.BAD_REQUEST, 77005, "차단한 사용자가 방장인 모임방에는 참여할 수 없습니다."),
+
+    /**
      * 80000 : book error
      */
     BOOK_KEYWORD_ENCODING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 80000, "검색어 인코딩에 실패했습니다."),
